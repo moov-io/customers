@@ -1,0 +1,39 @@
+"Customer" meeting with Wade
+- KYC is required before OFAC
+- CIP: Customer Identification Program (for Banks and Fiancial Service companies)
+- KYC (3 pieces) vs CIP (4 pieces w/ SSN)
+- If we hold deposits for a customer then we need their SSN
+- Validate legal name, address,
+
+Originators need KYC and OFAC
+Receivers need OFAC checks (think about allowing KYC on them too)
+
+Allow arbitrary map of ID's (salesforceId, etc) to centralize lookups and foreign key relationships
+
+KYC / CIP are 'affirmative' (reasonably sure) whereas OFAC is a negative match (rejection)
+
+Identity Verification of Customer
+- Rejected (level 0)
+- ReviewRequired (level 1)
+- None (level 2)
+- OFAC Only (Run check on data I give) (level 3)
+- KYC: (3 pieces of info, with workflow that verifies each) (level 4)
+  - legal name, address, and date of birth
+- CIP: (4 pieces, with SSN) (level 5)
+  - pull credit check with SSN (verify DoB, address, etc)
+  - required to hold deposits
+  - require drivers license
+
+Auth (in Customer model) might not be restricted to one Customer
+ - think teller or internal employee
+
+Profile photos (driver license) are hidden to avoid discrimination.
+
+Documents: DriversLicense (Legal name) and Utility Bill (Address)
+
+
+customer-profiles?
+
+customers
+
+kyc cip ofac
