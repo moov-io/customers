@@ -180,11 +180,13 @@ components:
           type: string
           description: State of the customer
           enum:
-            - Applied
-            - Verified
-            - Denied
-            - Archieved
             - Deceased
+            - Rejected
+            - ReviewRequired
+            - None
+            - KYC
+            - OFAC
+            - CIP
         email:
           type: string
           maximum: 500

@@ -264,7 +264,7 @@ components:
         ID: e210a9d6-d755-4455-9bd2-9577ea7e1081
         lastModified: 2000-01-23T04:56:07.000+00:00
         email: email
-        status: Applied
+        status: Deceased
       properties:
         ID:
           description: The unique identifier for the customer who owns the account
@@ -299,11 +299,13 @@ components:
         status:
           description: State of the customer
           enum:
-          - Applied
-          - Verified
-          - Denied
-          - Archieved
           - Deceased
+          - Rejected
+          - ReviewRequired
+          - None
+          - KYC
+          - OFAC
+          - CIP
           type: string
         email:
           description: Primary email address of customer name@domain.com
