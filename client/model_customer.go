@@ -15,7 +15,7 @@ import (
 
 type Customer struct {
 	// The unique identifier for the customer who owns the account
-	ID string `json:"ID,omitempty"`
+	Id string `json:"id,omitempty"`
 	// Given Name or First Name
 	FirstName string `json:"firstName,omitempty"`
 	// Middle Name

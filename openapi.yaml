@@ -79,6 +79,73 @@ paths:
                 $ref: '#/components/schemas/Customer'
         '404':
           description: A resource with the specified ID was not found
+  /customers/{customer_id}/documents:
+    post:
+      tags: [Customers]
+      summary: Upload a document for the given customer.
+      operationId: uploadCustomerDocument
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: type
+          in: query
+          description: Document type (see Document type for values)
+          required: true
+          schema:
+            type: string
+            example: DriversLicense
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: Document to be uploaded
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '200':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Document was not uploaded, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags: [Customers]
+      summary: Get documents for a customer
+      operationId: getCustomerDocuments
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Documents'
 
 components:
   schemas:
@@ -145,11 +212,10 @@ components:
     Customer:
       type: object
       properties:
-        ID:
+        id:
           type: string
-          format: uuid
           description: The unique identifier for the customer who owns the account
-          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          example: e210a9d6
         firstName:
           type: string
           maximum: 64
@@ -310,6 +376,33 @@ components:
         active:
           type: boolean
           description: Address is currently being used for customer
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for this document
+          example: e210a9d6
+        type:
+          type: string
+          enum:
+            - DriversLicense
+            - Passport
+            - UtilityBill
+            - BankStatement
+        parseErrors:
+          description: Optional array of errors encountered dring automated parsing.
+          type: array
+          items:
+            type: string
+        uploadedAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+    Documents:
+      type: array
+      items:
+        $ref: '#/components/schemas/Document'
   parameters:
     requestId:
       in: header

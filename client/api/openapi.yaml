@@ -114,6 +114,115 @@ paths:
       summary: Retrieves a Customer object associated with the customer ID.
       tags:
       - Customers
+  /customers/{customer_id}/documents:
+    get:
+      operationId: getCustomerDocuments
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          example: 94c825ee
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          example: e3cdf999
+          type: string
+        style: simple
+      - description: Customer Id
+        explode: false
+        in: path
+        name: customer_id
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Documents'
+          description: Document uploaded successfully
+      summary: Get documents for a customer
+      tags:
+      - Customers
+    post:
+      operationId: uploadCustomerDocument
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          example: 94c825ee
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          example: e3cdf999
+          type: string
+        style: simple
+      - description: Customer Id
+        explode: false
+        in: path
+        name: customer_id
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Document type (see Document type for values)
+        explode: true
+        in: query
+        name: type
+        required: true
+        schema:
+          example: DriversLicense
+          type: string
+        style: form
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: Document to be uploaded
+                  format: binary
+                  type: string
+              required:
+              - file
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+          description: Document uploaded successfully
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Document was not uploaded, see error(s)
+      summary: Upload a document for the given customer.
+      tags:
+      - Customers
 components:
   parameters:
     requestId:
@@ -261,15 +370,14 @@ components:
         firstName: Robert
         createdAt: 2000-01-23T04:56:07.000+00:00
         middleName: Flex
-        ID: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        id: e210a9d6
         lastModified: 2000-01-23T04:56:07.000+00:00
         email: email
         status: Deceased
       properties:
-        ID:
+        id:
           description: The unique identifier for the customer who owns the account
-          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-          format: uuid
+          example: e210a9d6
           type: string
         firstName:
           description: Given Name or First Name
@@ -454,3 +562,36 @@ components:
           description: Address is currently being used for customer
           type: boolean
       type: object
+    Document:
+      example:
+        uploadedAt: 2000-01-23T04:56:07.000+00:00
+        id: e210a9d6
+        type: DriversLicense
+        parseErrors:
+        - parseErrors
+        - parseErrors
+      properties:
+        id:
+          description: The unique identifier for this document
+          example: e210a9d6
+          type: string
+        type:
+          enum:
+          - DriversLicense
+          - Passport
+          - UtilityBill
+          - BankStatement
+          type: string
+        parseErrors:
+          description: Optional array of errors encountered dring automated parsing.
+          items:
+            type: string
+          type: array
+        uploadedAt:
+          format: date-time
+          type: string
+      type: object
+    Documents:
+      items:
+        $ref: '#/components/schemas/Document'
+      type: array

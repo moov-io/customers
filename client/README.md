@@ -35,7 +35,9 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create a new customer
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customer_id} | Retrieves a Customer object associated with the customer ID.
+*CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customer_id}/documents | Get documents for a customer
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping the Customers service to check if running
+*CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customer_id}/documents | Upload a document for the given customer.
 
 
 ## Documentation For Models
@@ -45,6 +47,7 @@ Class | Method | HTTP request | Description
  - [CreateCustomer](docs/CreateCustomer.md)
  - [CreatePhone](docs/CreatePhone.md)
  - [Customer](docs/Customer.md)
+ - [Document](docs/Document.md)
  - [Error](docs/Error.md)
  - [Phone](docs/Phone.md)
 
