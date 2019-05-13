@@ -9,13 +9,21 @@
 
 package openapi
 
+import (
+	"time"
+)
+
 type CreateCustomer struct {
 	// Given Name or First Name
-	FirstName string `json:"firstName,omitempty"`
+	FirstName string `json:"firstName"`
 	// Surname or Last Name
-	LastName string `json:"lastName,omitempty"`
+	LastName string `json:"lastName"`
+	// Legal date of birth
+	BirthDate time.Time `json:"birthDate"`
 	// Primary email address of customer name@domain.com
-	Email     string          `json:"email,omitempty"`
+	Email string `json:"email"`
+	// Customer Social Security Number (SSN)
+	SSN       string          `json:"SSN,omitempty"`
 	Phones    []CreatePhone   `json:"phones,omitempty"`
-	Addresses []CreateAddress `json:"addresses,omitempty"`
+	Addresses []CreateAddress `json:"addresses"`
 }

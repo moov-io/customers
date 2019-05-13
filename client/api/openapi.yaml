@@ -170,7 +170,9 @@ components:
           type: Home
         - number: +1.818.555.1212
           type: Home
+        birthDate: 2000-01-23T04:56:07.000+00:00
         email: email
+        SSN: 111-11-1111
       properties:
         firstName:
           description: Given Name or First Name
@@ -181,9 +183,17 @@ components:
           description: Surname or Last Name
           example: Smith
           type: string
+        birthDate:
+          description: Legal date of birth
+          format: date-time
+          type: string
         email:
           description: Primary email address of customer name@domain.com
           maximum: 255
+          type: string
+        SSN:
+          description: Customer Social Security Number (SSN)
+          example: 111-11-1111
           type: string
         phones:
           items:
@@ -192,7 +202,14 @@ components:
         addresses:
           items:
             $ref: '#/components/schemas/CreateAddress'
+          minimum: 1
           type: array
+      required:
+      - addresses
+      - birthDate
+      - email
+      - firstName
+      - lastName
       type: object
     Customer:
       example:

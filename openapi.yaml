@@ -102,18 +102,34 @@ components:
           type: string
           description: Surname or Last Name
           example: Smith
+        birthDate:
+          type: string
+          format: date-time
+          description: Legal date of birth
+          example: '2016-08-29T09:12:33.001Z'
         email:
           type: string
           maximum: 255
           description: Primary email address of customer name@domain.com
+        SSN:
+          type: string
+          description: Customer Social Security Number (SSN)
+          example: 111-11-1111
         phones:
           type: array
           items:
             $ref: '#/components/schemas/CreatePhone'
         addresses:
           type: array
+          minimum: 1
           items:
             $ref: '#/components/schemas/CreateAddress'
+      required:
+        - firstName
+        - lastName
+        - birthDate
+        - email
+        - addresses
     Customer:
       type: object
       properties:
