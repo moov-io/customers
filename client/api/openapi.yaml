@@ -1,0 +1,436 @@
+openapi: 3.0.2
+info:
+  contact:
+    url: https://github.com/moov-io/customers
+  description: Customers ...
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Customers API
+  version: v1
+servers:
+- description: Local development
+  url: http://localhost:8087
+tags:
+- description: Endpoints for searching, creating, and verifying individuals according
+    to US government criteria for money movement within the country.
+  name: Customers
+paths:
+  /ping:
+    get:
+      operationId: ping
+      responses:
+        200:
+          description: Service is running properly
+      summary: Ping the Customers service to check if running
+      tags:
+      - Customers
+  /customers:
+    post:
+      operationId: createCustomer
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          example: 94c825ee
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          example: e3cdf999
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomer'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Customer was successfully created
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer was not created, see error(s)
+      summary: Create a new customer
+      tags:
+      - Customers
+  /customers/{customer_id}:
+    get:
+      operationId: getCustomer
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          example: 94c825ee
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          example: e3cdf999
+          type: string
+        style: simple
+      - description: Customer Id
+        explode: false
+        in: path
+        name: customer_id
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: A customer objects for the supplied customer ID
+        404:
+          description: A resource with the specified ID was not found
+      summary: Retrieves a Customer object associated with the customer ID.
+      tags:
+      - Customers
+components:
+  parameters:
+    requestId:
+      description: Optional Request ID allows application developer to trace requests
+        through the systems logs
+      explode: false
+      in: header
+      name: X-Request-Id
+      required: false
+      schema:
+        example: 94c825ee
+        type: string
+      style: simple
+    userId:
+      description: Moov User ID header, required in all requests
+      explode: false
+      in: header
+      name: X-User-Id
+      required: false
+      schema:
+        example: e3cdf999
+        type: string
+      style: simple
+  schemas:
+    Error:
+      properties:
+        error:
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+          type: string
+      required:
+      - error
+    CreateCustomer:
+      example:
+        firstName: Robert
+        lastName: Smith
+        addresses:
+        - country: US
+          address2: address2
+          city: city
+          address1: address1
+          postalCode: postalCode
+          state: state
+          type: Primary
+        - country: US
+          address2: address2
+          city: city
+          address1: address1
+          postalCode: postalCode
+          state: state
+          type: Primary
+        phones:
+        - number: +1.818.555.1212
+          type: Home
+        - number: +1.818.555.1212
+          type: Home
+        email: email
+      properties:
+        firstName:
+          description: Given Name or First Name
+          example: Robert
+          maximum: 64
+          type: string
+        lastName:
+          description: Surname or Last Name
+          example: Smith
+          type: string
+        email:
+          description: Primary email address of customer name@domain.com
+          maximum: 255
+          type: string
+        phones:
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+          type: array
+        addresses:
+          items:
+            $ref: '#/components/schemas/CreateAddress'
+          type: array
+      type: object
+    Customer:
+      example:
+        lastName: Smith
+        addresses:
+        - country: US
+          validated: true
+          address2: address2
+          city: city
+          address1: address1
+          postalCode: postalCode
+          active: true
+          state: state
+          type: Primary
+        - country: US
+          validated: true
+          address2: address2
+          city: city
+          address1: address1
+          postalCode: postalCode
+          active: true
+          state: state
+          type: Primary
+        gender: Male
+        nickName: Bob
+        phones:
+        - valid: true
+          number: +1.818.555.1212
+          type: Home
+        - valid: true
+          number: +1.818.555.1212
+          type: Home
+        suffix: suffix
+        birthDate: 2000-01-23T04:56:07.000+00:00
+        firstName: Robert
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        culture: en-US
+        customerId: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        middleName: Flex
+        lastModified: 2000-01-23T04:56:07.000+00:00
+        email: email
+        status: Applied
+      properties:
+        customerId:
+          description: The unique identifier for the customer who owns the account
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          format: uuid
+          type: string
+        firstName:
+          description: Given Name or First Name
+          example: Robert
+          maximum: 64
+          type: string
+        middleName:
+          description: Middle Name
+          example: Flex
+          maximum: 64
+          type: string
+        lastName:
+          description: Surname or Last Name
+          example: Smith
+          type: string
+        nickName:
+          description: Name Customer is preferred to be called
+          example: Bob
+          type: string
+        suffix:
+          description: Customers name suffix. "Jr", "PH.D."
+          type: string
+        birthDate:
+          description: Legal date of birth
+          format: date-time
+          type: string
+        gender:
+          enum:
+          - Male
+          - Female
+          - Unknown
+          type: string
+        culture:
+          description: Used for localization of documents
+          enum:
+          - en-US
+          - es-US
+          type: string
+        status:
+          description: State of the customer
+          enum:
+          - Applied
+          - Verified
+          - Denied
+          - Archieved
+          - Deceased
+          type: string
+        email:
+          description: Primary email address of customer name@domain.com
+          maximum: 255
+          type: string
+        phones:
+          items:
+            $ref: '#/components/schemas/Phone'
+          type: array
+        addresses:
+          items:
+            $ref: '#/components/schemas/Address'
+          type: array
+        createdAt:
+          format: date-time
+          type: string
+        lastModified:
+          description: Last time the object was modified
+          format: date-time
+          type: string
+      type: object
+    Customers:
+      items:
+        $ref: '#/components/schemas/Customer'
+      type: array
+    CreatePhone:
+      example:
+        number: +1.818.555.1212
+        type: Home
+      properties:
+        number:
+          description: phone number
+          example: +1.818.555.1212
+          type: string
+        type:
+          enum:
+          - Home
+          - Mobile
+          - Work
+          type: string
+      required:
+      - number
+      - type
+    Phone:
+      example:
+        valid: true
+        number: +1.818.555.1212
+        type: Home
+      properties:
+        number:
+          description: phone number
+          example: +1.818.555.1212
+          type: string
+        valid:
+          description: phone number has been validated to connect with customer
+          type: boolean
+        type:
+          enum:
+          - Home
+          - Mobile
+          - Work
+          type: string
+    CreateAddress:
+      example:
+        country: US
+        address2: address2
+        city: city
+        address1: address1
+        postalCode: postalCode
+        state: state
+        type: Primary
+      properties:
+        type:
+          enum:
+          - Primary
+          - Secondary
+          type: string
+        address1:
+          description: First line of the address
+          type: string
+        address2:
+          description: Second line of the address
+          type: string
+        city:
+          type: string
+        state:
+          description: two charcer code of US state
+          maximum: 2
+          minimum: 2
+          type: string
+        postalCode:
+          type: string
+        country:
+          enum:
+          - US
+          type: string
+      required:
+      - address1
+      - address2
+      - city
+      - country
+      - postalCode
+      - state
+      - type
+      type: object
+    Address:
+      example:
+        country: US
+        validated: true
+        address2: address2
+        city: city
+        address1: address1
+        postalCode: postalCode
+        active: true
+        state: state
+        type: Primary
+      properties:
+        type:
+          enum:
+          - Primary
+          - Secondary
+          type: string
+        address1:
+          description: First line of the address
+          type: string
+        address2:
+          description: Second line of the address
+          type: string
+        city:
+          type: string
+        state:
+          description: two charcer code of US state
+          maximum: 2
+          minimum: 2
+          type: string
+        postalCode:
+          type: string
+        country:
+          enum:
+          - US
+          type: string
+        validated:
+          description: Address has been validated for customer
+          type: boolean
+        active:
+          description: Address is currently being used for customer
+          type: boolean
+      type: object
