@@ -165,11 +165,14 @@ components:
           postalCode: postalCode
           state: state
           type: Primary
+        nickName: Bob
         phones:
         - number: +1.818.555.1212
           type: Home
         - number: +1.818.555.1212
           type: Home
+        middleName: Flex
+        suffix: suffix
         birthDate: 2000-01-23T04:56:07.000+00:00
         email: email
         SSN: 111-11-1111
@@ -179,9 +182,21 @@ components:
           example: Robert
           maximum: 64
           type: string
+        middleName:
+          description: Middle Name
+          example: Flex
+          maximum: 64
+          type: string
         lastName:
           description: Surname or Last Name
           example: Smith
+          type: string
+        nickName:
+          description: Name Customer is preferred to be called
+          example: Bob
+          type: string
+        suffix:
+          description: Customers name suffix. "Jr", "PH.D."
           type: string
         birthDate:
           description: Legal date of birth
@@ -189,7 +204,7 @@ components:
           type: string
         email:
           description: Primary email address of customer name@domain.com
-          maximum: 255
+          maximum: 500
           type: string
         SSN:
           description: Customer Social Security Number (SSN)
@@ -247,13 +262,13 @@ components:
         firstName: Robert
         createdAt: 2000-01-23T04:56:07.000+00:00
         culture: en-US
-        customerId: e210a9d6-d755-4455-9bd2-9577ea7e1081
         middleName: Flex
+        ID: e210a9d6-d755-4455-9bd2-9577ea7e1081
         lastModified: 2000-01-23T04:56:07.000+00:00
         email: email
         status: Applied
       properties:
-        customerId:
+        ID:
           description: The unique identifier for the customer who owns the account
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
           format: uuid
@@ -306,7 +321,7 @@ components:
           type: string
         email:
           description: Primary email address of customer name@domain.com
-          maximum: 255
+          maximum: 500
           type: string
         phones:
           items:

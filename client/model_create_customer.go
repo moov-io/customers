@@ -16,8 +16,14 @@ import (
 type CreateCustomer struct {
 	// Given Name or First Name
 	FirstName string `json:"firstName"`
+	// Middle Name
+	MiddleName string `json:"middleName,omitempty"`
 	// Surname or Last Name
 	LastName string `json:"lastName"`
+	// Name Customer is preferred to be called
+	NickName string `json:"nickName,omitempty"`
+	// Customers name suffix. \"Jr\", \"PH.D.\"
+	Suffix string `json:"suffix,omitempty"`
 	// Legal date of birth
 	BirthDate time.Time `json:"birthDate"`
 	// Primary email address of customer name@domain.com
