@@ -28,9 +28,6 @@ type Customer struct {
 	Suffix string `json:"suffix,omitempty"`
 	// Legal date of birth
 	BirthDate time.Time `json:"birthDate,omitempty"`
-	Gender    string    `json:"gender,omitempty"`
-	// Used for localization of documents
-	Culture string `json:"culture,omitempty"`
 	// State of the customer
 	Status string `json:"status,omitempty"`
 	// Primary email address of customer name@domain.com

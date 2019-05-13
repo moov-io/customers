@@ -11,8 +11,6 @@ Name | Type | Description | Notes
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **BirthDate** | [**time.Time**](time.Time.md) | Legal date of birth | [optional] 
-**Gender** | **string** |  | [optional] 
-**Culture** | **string** | Used for localization of documents | [optional] 
 **Status** | **string** | State of the customer | [optional] 
 **Email** | **string** | Primary email address of customer name@domain.com | [optional] 
 **Phones** | [**[]Phone**](Phone.md) |  | [optional] 

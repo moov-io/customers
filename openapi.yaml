@@ -176,18 +176,6 @@ components:
           format: date-time
           description: Legal date of birth
           example: '2016-08-29T09:12:33.001Z'
-        gender:
-          type: string
-          enum: # TODO(adam): Do we need to capture this? Could we call it sex?
-            - Male
-            - Female
-            - Unknown
-        culture:
-          type: string
-          description: Used for localization of documents
-          enum: # TODO(adam): Should we use some ISO standard set of values?
-            - en-US
-            - es-US
         status:
           type: string
           description: State of the customer
