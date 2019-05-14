@@ -1,0 +1,457 @@
+openapi: 3.0.2
+info:
+  description: Customers ...
+  version: v1
+  title: Customers API
+  contact:
+    url: https://github.com/moov-io/customers
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:8087
+    description: Local development
+
+tags:
+  - name: Customers
+    description: Endpoints for searching, creating, and verifying individuals according to US government criteria for money movement within the country.
+
+paths:
+  /ping:
+    get:
+      tags:
+        - Customers
+      summary: Ping the Customers service to check if running
+      operationId: ping
+      responses:
+        '200':
+          description: Service is running properly
+  # Customer endpoints
+  /customers:
+    post:
+      tags: [Customers]
+      summary: Create a new customer
+      operationId: createCustomer
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomer'
+      responses:
+        '200':
+          description: Customer was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Customer was not created, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /customers/{customer_id}:
+    get:
+      tags: [Customers]
+      summary: Retrieves a Customer object associated with the customer ID.
+      operationId: getCustomer
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: A customer objects for the supplied customer ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: A resource with the specified ID was not found
+  /customers/{customer_id}/documents:
+    post:
+      tags: [Customers]
+      summary: Upload a document for the given customer.
+      operationId: uploadCustomerDocument
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: type
+          in: query
+          description: Document type (see Document type for values)
+          required: true
+          schema:
+            type: string
+            example: DriversLicense
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: Document to be uploaded
+                  type: string
+                  format: binary
+              required:
+                - file
+      responses:
+        '200':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: Document was not uploaded, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      tags: [Customers]
+      summary: Get documents for a customer
+      operationId: getCustomerDocuments
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: Document uploaded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Documents'
+  /customers/{customer_id}/documents/{document_id}:
+    get:
+      tags: [Customers]
+      summary: Retrieve the referenced document
+      operationId: getCustomerDocumentContents
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6
+        - name: document_id
+          in: path
+          description: Document Id
+          required: true
+          schema:
+            type: string
+            example: 9577ea7e1081
+      responses:
+        '200':
+          description: Document contents (ready for a browser to download)
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/*:
+              schema:
+                type: string
+                format: binary
+
+components:
+  schemas:
+    Error:
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+    CreateCustomer:
+      type: object
+      properties:
+        firstName:
+          type: string
+          maximum: 64
+          description: Given Name or First Name
+          example: Robert
+        middleName:
+          type: string
+          maximum: 64
+          description: Middle Name
+          example: Flex
+        lastName:
+          type: string
+          description: Surname or Last Name
+          example: Smith
+        nickName:
+          type: string
+          description: Name Customer is preferred to be called
+          example: Bob
+        suffix:
+          type: string
+          description: Customers name suffix. "Jr", "PH.D."
+        birthDate:
+          type: string
+          format: date-time
+          description: Legal date of birth
+          example: '2016-08-29T09:12:33.001Z'
+        email:
+          type: string
+          maximum: 500
+          description: Primary email address of customer name@domain.com
+        SSN:
+          type: string
+          description: Customer Social Security Number (SSN)
+          example: 111-11-1111
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+        addresses:
+          type: array
+          minimum: 1
+          items:
+            $ref: '#/components/schemas/CreateAddress'
+      required:
+        - firstName
+        - lastName
+        - birthDate
+        - email
+        - addresses
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for the customer who owns the account
+          example: e210a9d6
+        firstName:
+          type: string
+          maximum: 64
+          description: Given Name or First Name
+          example: Robert
+        middleName:
+          type: string
+          maximum: 64
+          description: Middle Name
+          example: Flex
+        lastName:
+          type: string
+          description: Surname or Last Name
+          example: Smith
+        nickName:
+          type: string
+          description: Name Customer is preferred to be called
+          example: Bob
+        suffix:
+          type: string
+          description: Customers name suffix. "Jr", "PH.D."
+        birthDate:
+          type: string
+          format: date-time
+          description: Legal date of birth
+          example: '2016-08-29T09:12:33.001Z'
+        status:
+          type: string
+          description: State of the customer
+          enum:
+            - Deceased
+            - Rejected
+            - ReviewRequired
+            - None
+            - KYC
+            - OFAC
+            - CIP
+        email:
+          type: string
+          maximum: 500
+          description: Primary email address of customer name@domain.com
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Phone'
+        addresses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        lastModified:
+          type: string
+          format: date-time
+          description: Last time the object was modified
+          example: '2016-08-29T09:12:33.001Z'
+    Customers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Customer'
+    CreatePhone:
+      properties:
+        number:
+          type: string
+          description: phone number
+          example: "+1.818.555.1212"
+        type:
+          type: string
+          enum:
+            - Home
+            - Mobile
+            - Work
+      required:
+        - number
+        - type
+    Phone:
+      properties:
+        number:
+          type: string
+          description: phone number
+          example: "+1.818.555.1212"
+        valid:
+          type: boolean
+          description: phone number has been validated to connect with customer
+        type:
+          type: string
+          enum:
+            - Home
+            - Mobile
+            - Work
+    CreateAddress:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Primary
+            - Secondary
+        address1:
+          type: string
+          description: First line of the address
+        address2:
+          type: string
+          description: Second line of the address
+        city:
+          type: string
+        state:
+          type: string
+          minimum: 2
+          maximum: 2
+          description: two charcer code of US state
+        postalCode:
+          type: string
+        country:
+          type: string
+          enum:
+            - US
+      required:
+        - type
+        - address1
+        - address2
+        - city
+        - state
+        - postalCode
+        - country
+    Address:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - Primary
+            - Secondary
+        address1:
+          type: string
+          description: First line of the address
+        address2:
+          type: string
+          description: Second line of the address
+        city:
+          type: string
+        state:
+          type: string
+          minimum: 2
+          maximum: 2
+          description: two charcer code of US state
+        postalCode:
+          type: string
+        country:
+          type: string
+          enum:
+            - US
+        validated:
+          type: boolean
+          description: Address has been validated for customer
+        active:
+          type: boolean
+          description: Address is currently being used for customer
+    Document:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier for this document
+          example: e210a9d6
+        type:
+          type: string
+          enum:
+            - DriversLicense
+            - Passport
+            - UtilityBill
+            - BankStatement
+        contentType:
+          type: string
+          example: application/pdf
+        parseErrors:
+          description: Optional array of errors encountered dring automated parsing.
+          type: array
+          items:
+            type: string
+        uploadedAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+    Documents:
+      type: array
+      items:
+        $ref: '#/components/schemas/Document'
+  parameters:
+    requestId:
+      in: header
+      name: X-Request-Id
+      description: Optional Request ID allows application developer to trace requests through the systems logs
+      schema:
+        type: string
+        example: 94c825ee
+    userId:
+      in: header
+      name: X-User-Id
+      description: Moov User ID header, required in all requests
+      schema:
+        type: string
+        example: e3cdf999
