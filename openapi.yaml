@@ -146,6 +146,40 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Documents'
+  /customers/{customer_id}/documents/{document_id}:
+    get:
+      tags: [Customers]
+      summary: Retrieve the referenced document
+      operationId: getCustomerDocumentContents
+      parameters:
+        - $ref: '#/components/parameters/requestId'
+        - $ref: '#/components/parameters/userId'
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6
+        - name: document_id
+          in: path
+          description: Document Id
+          required: true
+          schema:
+            type: string
+            example: 9577ea7e1081
+      responses:
+        '200':
+          description: Document contents (ready for a browser to download)
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/*:
+              schema:
+                type: string
+                format: binary
 
 components:
   schemas:
@@ -390,6 +424,9 @@ components:
             - Passport
             - UtilityBill
             - BankStatement
+        contentType:
+          type: string
+          example: application/pdf
         parseErrors:
           description: Optional array of errors encountered dring automated parsing.
           type: array

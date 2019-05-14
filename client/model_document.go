@@ -15,8 +15,9 @@ import (
 
 type Document struct {
 	// The unique identifier for this document
-	Id   string `json:"id,omitempty"`
-	Type string `json:"type,omitempty"`
+	Id          string `json:"id,omitempty"`
+	Type        string `json:"type,omitempty"`
+	ContentType string `json:"contentType,omitempty"`
 	// Optional array of errors encountered dring automated parsing.
 	ParseErrors []string  `json:"parseErrors,omitempty"`
 	UploadedAt  time.Time `json:"uploadedAt,omitempty"`

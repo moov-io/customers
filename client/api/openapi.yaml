@@ -223,6 +223,62 @@ paths:
       summary: Upload a document for the given customer.
       tags:
       - Customers
+  /customers/{customer_id}/documents/{document_id}:
+    get:
+      operationId: getCustomerDocumentContents
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          example: 94c825ee
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          example: e3cdf999
+          type: string
+        style: simple
+      - description: Customer Id
+        explode: false
+        in: path
+        name: customer_id
+        required: true
+        schema:
+          example: e210a9d6
+          type: string
+        style: simple
+      - description: Document Id
+        explode: false
+        in: path
+        name: document_id
+        required: true
+        schema:
+          example: 9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/pdf:
+              schema:
+                format: binary
+                type: string
+            image/*:
+              schema:
+                format: binary
+                type: string
+          description: Document contents (ready for a browser to download)
+      summary: Retrieve the referenced document
+      tags:
+      - Customers
 components:
   parameters:
     requestId:
@@ -570,6 +626,7 @@ components:
         parseErrors:
         - parseErrors
         - parseErrors
+        contentType: application/pdf
       properties:
         id:
           description: The unique identifier for this document
@@ -581,6 +638,9 @@ components:
           - Passport
           - UtilityBill
           - BankStatement
+          type: string
+        contentType:
+          example: application/pdf
           type: string
         parseErrors:
           description: Optional array of errors encountered dring automated parsing.
