@@ -31,21 +31,21 @@ paths:
       parameters:
       - description: Optional Request ID allows application developer to trace requests
           through the systems logs
+        example: rs4f9915
         explode: false
         in: header
         name: X-Request-Id
         required: false
         schema:
-          example: 94c825ee
           type: string
         style: simple
       - description: Moov User ID header, required in all requests
+        example: e3cdf999
         explode: false
         in: header
         name: X-User-Id
         required: false
         schema:
-          example: e3cdf999
           type: string
         style: simple
       requestBody:
@@ -76,21 +76,21 @@ paths:
       parameters:
       - description: Optional Request ID allows application developer to trace requests
           through the systems logs
+        example: rs4f9915
         explode: false
         in: header
         name: X-Request-Id
         required: false
         schema:
-          example: 94c825ee
           type: string
         style: simple
       - description: Moov User ID header, required in all requests
+        example: e3cdf999
         explode: false
         in: header
         name: X-User-Id
         required: false
         schema:
-          example: e3cdf999
           type: string
         style: simple
       - description: Customer Id
@@ -120,21 +120,21 @@ paths:
       parameters:
       - description: Optional Request ID allows application developer to trace requests
           through the systems logs
+        example: rs4f9915
         explode: false
         in: header
         name: X-Request-Id
         required: false
         schema:
-          example: 94c825ee
           type: string
         style: simple
       - description: Moov User ID header, required in all requests
+        example: e3cdf999
         explode: false
         in: header
         name: X-User-Id
         required: false
         schema:
-          example: e3cdf999
           type: string
         style: simple
       - description: Customer Id
@@ -161,21 +161,21 @@ paths:
       parameters:
       - description: Optional Request ID allows application developer to trace requests
           through the systems logs
+        example: rs4f9915
         explode: false
         in: header
         name: X-Request-Id
         required: false
         schema:
-          example: 94c825ee
           type: string
         style: simple
       - description: Moov User ID header, required in all requests
+        example: e3cdf999
         explode: false
         in: header
         name: X-User-Id
         required: false
         schema:
-          example: e3cdf999
           type: string
         style: simple
       - description: Customer Id
@@ -229,21 +229,21 @@ paths:
       parameters:
       - description: Optional Request ID allows application developer to trace requests
           through the systems logs
+        example: rs4f9915
         explode: false
         in: header
         name: X-Request-Id
         required: false
         schema:
-          example: 94c825ee
           type: string
         style: simple
       - description: Moov User ID header, required in all requests
+        example: e3cdf999
         explode: false
         in: header
         name: X-User-Id
         required: false
         schema:
-          example: e3cdf999
           type: string
         style: simple
       - description: Customer Id
@@ -280,28 +280,6 @@ paths:
       tags:
       - Customers
 components:
-  parameters:
-    requestId:
-      description: Optional Request ID allows application developer to trace requests
-        through the systems logs
-      explode: false
-      in: header
-      name: X-Request-Id
-      required: false
-      schema:
-        example: 94c825ee
-        type: string
-      style: simple
-    userId:
-      description: Moov User ID header, required in all requests
-      explode: false
-      in: header
-      name: X-User-Id
-      required: false
-      schema:
-        example: e3cdf999
-        type: string
-      style: simple
   schemas:
     Error:
       properties:

@@ -34,8 +34,18 @@ paths:
       summary: Create a new customer
       operationId: createCustomer
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/userId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
       requestBody:
         required: true
         content:
@@ -61,8 +71,18 @@ paths:
       summary: Retrieves a Customer object associated with the customer ID.
       operationId: getCustomer
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/userId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
         - name: customer_id
           in: path
           description: Customer Id
@@ -85,8 +105,18 @@ paths:
       summary: Upload a document for the given customer.
       operationId: uploadCustomerDocument
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/userId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
         - name: customer_id
           in: path
           description: Customer Id
@@ -130,8 +160,18 @@ paths:
       summary: Get documents for a customer
       operationId: getCustomerDocuments
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/userId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
         - name: customer_id
           in: path
           description: Customer Id
@@ -152,8 +192,18 @@ paths:
       summary: Retrieve the referenced document
       operationId: getCustomerDocumentContents
       parameters:
-        - $ref: '#/components/parameters/requestId'
-        - $ref: '#/components/parameters/userId'
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
         - name: customer_id
           in: path
           description: Customer Id
@@ -440,18 +490,3 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Document'
-  parameters:
-    requestId:
-      in: header
-      name: X-Request-Id
-      description: Optional Request ID allows application developer to trace requests through the systems logs
-      schema:
-        type: string
-        example: 94c825ee
-    userId:
-      in: header
-      name: X-User-Id
-      description: Moov User ID header, required in all requests
-      schema:
-        type: string
-        example: e3cdf999
