@@ -48,18 +48,18 @@ after_success:
 - make docker
 before_deploy:
   - make dist
-# deploy:
-#   provider: releases
-#   api_key:
-#     secure: lPJQJFPgzw0eAZwG6A5yG3hMVrkuAeXhZy0wcWpOHWH/Ten2uDPo0hm4W5aoeTLi0ABEL9YWeheZRtq5BY9sxNBZLoGf4duz9q4Nc+WvrJT7dIEaynbK1ou2ycHPU35VX3FY6wdcCBPxcDVNQiKHgreXpY6IbcBj8iDWYaaz945INoN+8LAkceyeonrm7AeqeS2jEmdbxlOAHxGFh2mgP2XylLAIKrWe/tvOEPvn7Hz/EIjTJE7K5+j+UhNFFUd+VtcN8I/qyPrs9IoleIKrU9lx1RcrXA0EPDt+bXFzc233Uwa5lYBsj3mtI1imriCEy9ByA8CEBwYOxa9KQPendkGlwqGrKn3bjDXKuBKM7nsiJWG4uHUABMQGBVDXGXcOJnDsmcaR69sCrNxFWed8R4YpYC/QLZkNVPnw4E08dQ9gaw83I6mUW01/qeFczgDd/HDjhNRB1o6/y4Jb5kPVTRYiQ8p+suAmhPfmIUOKlSjwBTB95LisrWtEud66tzfkV9XdKvuxh0FYdlIGDhexcUEME7ZkYo5gelDPmX4V5NagBmKd+9Y+xYAsqCE/Z3Vy0DWRyGZYZGxWcQ5+8M0XlYrPqBP6saDALM8XI+apNuLa3KKzozS5s4G2F9vSVyFHOS+uhOnAz6gftrL9t6g2E9KHiN43tf2JhNrsVNqZbEs=
-#   file_glob: true
-#   file:
-#     - bin/customers-*
-#   on:
-#     repo: moov-io/customers
-#     tags: true
-#     go: 1.12.x
-#   skip_cleanup: true
 after_deploy:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - make release-push
+deploy:
+  provider: releases
+  api_key:
+    secure: Ai7efi3yilhxCCjCW6QSQrkk0aYF6unjBDdVywotXg1jTzrNnL1KFPR7vK5AHcU9iakhSrvRYY/wYHs9MV/al+FmTEBHD5QB5+V7QdqiOVVCDjbItP3M16ni14q5s2MwfPsgELIAJoKGIgjdJ7Rwbtd04Oqa1GmA4BzVkr+0TIbbRO85ds7jZUUnpQY3T0MGT8sPoLr4K/iBj6M9BLDlT6j9sEWjVscFkNlN5Q9q7M3/QyZvRlASvXg6FaBhDud1Sn0AOAOJLu0Nq4rv3ZK9+PeURovNalFcq20EwHyoan9IacZ73nPWerwov2JMWBCVcdGffmkZ2DlUa/T15kQkrflPn48CSn1hq5jut9yZpNg7a+BTEOSdlzSb78aS10JRjQ5Ke0Y/6xc5bIeKzgWeICpSGkl1A3rQ6DN8ZRL3gIfx4FfaBDoszQcZQFrmMm21g/QdN1m+MxP9U5bEODWdl9PAo27n11UY5ItMymHw5qaGw3HXUbHk7X+qUHjEWtW/z4dQQJMAzfXCWrx92tEavFE9/gvYtybpn1dfw1O2FlxCxSCkk2AejC/E6RMCgGaDV3SvIzYn+ai0ijwn8o4/fKoaKc8vjIpCDXGvWxAfBkhFRkQ38n3fpBhgYp8THD98jU3XNXsN0ltFfCEJQ3KpPGyCUbbvBnsqPvols0HuaX4=
+  file_glob: true
+  file:
+    - bin/customers-*
+  on:
+    repo: moov-io/customers
+    tags: true
+    go: 1.12.x
+  skip_cleanup: true
