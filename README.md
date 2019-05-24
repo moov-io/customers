@@ -25,6 +25,19 @@ TODO
 |-----|-----|-----|
 | TODO | Description | ` ` |
 
+#### Document Storage
+
+BUCKET_NAME
+CLOUD_PROVIDER
+
+AWS_REGION
+AWS_ACCESS_KEY_ID
+AWS_SECRET_ACCESS_KEY
+
+GCP service account
+GOOGLE_APPLICATION_CREDENTIALS
+https://cloud.google.com/docs/authentication/getting-started
+
 ## Getting Help
 
  channel | info

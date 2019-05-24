@@ -79,12 +79,15 @@ func main() {
 
 	customerRepo := &sqliteCustomerRepository{db}
 	defer customerRepo.close()
+	documentRepo := &sqliteDocumentRepository{db}
+	defer documentRepo.close()
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
 	addCustomerRoutes(logger, router, customerRepo)
+	addDocumentRoutes(logger, router, documentRepo, getBucket)
 
 	// Start business HTTP server
 	readTimeout, _ := time.ParseDuration("30s")

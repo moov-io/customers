@@ -15,3 +15,4 @@
 *.db
 
 openapi-generator-cli-*.jar
+/storage/

@@ -1,0 +1,183 @@
+// Copyright 2018 The Moov Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
+package main
+
+import (
+	"context"
+	"database/sql"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"time"
+
+	"github.com/moov-io/base"
+	moovhttp "github.com/moov-io/base/http"
+	client "github.com/moov-io/customers/client"
+
+	"github.com/go-kit/kit/log"
+	"github.com/gorilla/mux"
+)
+
+var (
+	errNoDocumentId = errors.New("no Document ID found")
+
+	maxDocumentSize int64 = 20 * 1024 * 1024 // 20MB
+)
+
+func addDocumentRoutes(logger log.Logger, r *mux.Router, repo documentRepository, bucketFactory bucketFunc) {
+	r.Methods("GET").Path("/customers/{customerId}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
+	r.Methods("POST").Path("/customers/{customerId}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
+	r.Methods("GET").Path("/customers/{customerId}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo))
+}
+
+func getDocumentId(w http.ResponseWriter, r *http.Request) string {
+	v, ok := mux.Vars(r)["documentId"]
+	if !ok || v == "" {
+		moovhttp.Problem(w, errNoDocumentId)
+		return ""
+	}
+	return v
+}
+
+func getCustomerDocuments(logger log.Logger, repo documentRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = wrapResponseWriter(logger, w, r)
+
+		customerId := getCustomerId(w, r)
+		if customerId == "" {
+			return
+		}
+
+		docs, err := repo.getCustomerDocuments(customerId)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(docs)
+	}
+}
+
+func readDocumentType(v string) (string, error) {
+	return "", nil // TODO(adam): mime type detection
+}
+
+func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = wrapResponseWriter(logger, w, r)
+
+		documentType, err := readDocumentType(r.URL.Query().Get("type"))
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		contentType := "application/octet-stream" // TODO(adam): uhh
+		doc := &client.Document{
+			Id:          base.ID(),
+			Type:        documentType,
+			ContentType: contentType,
+			UploadedAt:  time.Now(),
+		}
+
+		// Grab our cloud bucket before writing into our database
+		bucket, err := bucketFactory()
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
+		if customerId == "" {
+			return
+		}
+		if err := repo.writeCustomerDocument(customerId, doc); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		logger.Log("documents", fmt.Sprintf("uploading document=%s for customer=%s", doc.Id, customerId), "requestId", requestId)
+
+		// Write our document from the request body
+		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
+		defer cancelFn()
+
+		documentKey := makeDocumentKey(customerId, doc.Id)
+		writer, err := bucket.NewWriter(ctx, documentKey, nil) // TODO(adam): *WriterOptions{...}
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		// WriterOptions
+		//  - ContentType string
+		//  - Metadata map[string]string (lowercase)
+		//  - ContentDisposition string
+		//    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
+		//  - CacheControl string
+		//    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+
+		n, err := io.Copy(writer, io.LimitReader(r.Body, maxDocumentSize))
+		if err != nil || n == 0 {
+			moovhttp.Problem(w, fmt.Errorf("documents: wrote %d bytes: %v", n, err))
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(doc)
+	}
+}
+
+func retrieveRawDocument(logger log.Logger, repo documentRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = wrapResponseWriter(logger, w, r)
+
+		customerId := getCustomerId(w, r)
+		fmt.Println(customerId)
+
+		// SignedURL(ctx context.Context, key string, opts *SignedURLOptions) (string, error)
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func makeDocumentKey(customerId, documentId string) string {
+	return fmt.Sprintf("customer-%s-document-%s", customerId, documentId)
+}
+
+type documentRepository interface {
+	getCustomerDocuments(customerId string) ([]*client.Document, error)
+	writeCustomerDocument(customerId string, doc *client.Document) error
+}
+
+type sqliteDocumentRepository struct {
+	db *sql.DB
+}
+
+func (r *sqliteDocumentRepository) close() error {
+	return r.db.Close()
+}
+
+func (r *sqliteDocumentRepository) getCustomerDocuments(customerId string) ([]*client.Document, error) {
+	return nil, nil
+}
+
+func (r *sqliteDocumentRepository) writeCustomerDocument(customerId string, doc *client.Document) error {
+	query := `insert into documents (document_id, customer_id, type, content_type, uploaded_at) values (?, ?, ?, ?, ?);`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("writeCustomerDocument: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(doc.Id, customerId, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
+		return fmt.Errorf("writeCustomerDocument: exec: %v", err)
+	}
+	return nil
+}
