@@ -84,7 +84,12 @@ func main() {
 	// Create our fileblob.URLSignerHMAC
 	bucketName, cloudProvider := os.Getenv("BUCKET_NAME"), strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
 	var signer *fileblob.URLSignerHMAC
-	if cloudProvider == "file" {
+	if cloudProvider == "file" || cloudProvider == "" {
+		if bucketName == "" {
+			bucketName = "./storage"
+			cloudProvider = "file"
+		}
+
 		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
 		if baseURL == "" {
 			baseURL = fmt.Sprintf("http://localhost%s/files", bind.HTTP("customers"))
