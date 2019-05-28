@@ -1,4 +1,4 @@
-// Copyright 2018 The Moov Authors
+// Copyright 2019 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/moov-io/base"
@@ -67,7 +68,15 @@ func getCustomerDocuments(logger log.Logger, repo documentRepository) http.Handl
 }
 
 func readDocumentType(v string) (string, error) {
-	return "", nil // TODO(adam): mime type detection
+	orig := v
+	v = strings.ToLower(strings.TrimSpace(v))
+	switch v {
+	case "driverslicense", "passport":
+		return v, nil
+	case "utilitybill", "bankstatement":
+		return v, nil
+	}
+	return "", fmt.Errorf("unknown Document type: %s", orig)
 }
 
 func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
@@ -117,14 +126,18 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			moovhttp.Problem(w, err)
 			return
 		}
-		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.Id, contentType, customerId), "requestId", requestId)
+		if logger != nil {
+			logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.Id, contentType, customerId), "requestId", requestId)
+		}
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
 		documentKey := makeDocumentKey(customerId, doc.Id)
-		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestId", requestId)
+		if logger != nil {
+			logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestId", requestId)
+		}
 
 		writer, err := bucket.NewWriter(ctx, documentKey, &blob.WriterOptions{
 			ContentDisposition: "inline",
@@ -135,14 +148,6 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			return
 		}
 		defer writer.Close()
-
-		// WriterOptions
-		//  - ContentType string
-		//  - Metadata map[string]string (lowercase)
-		//  - ContentDisposition string
-		//    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
-		//  - CacheControl string
-		//    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
 
 		// Concat our mime buffer back with the multipart file
 		n, err := io.Copy(writer, io.LimitReader(io.MultiReader(bytes.NewReader(buf), file), maxDocumentSize))
@@ -186,7 +191,9 @@ func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFacto
 			return
 		}
 
-		logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestId", requestId)
+		if logger != nil {
+			logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestId", requestId)
+		}
 		http.Redirect(w, r, signedURL, http.StatusFound)
 	}
 }
@@ -209,7 +216,28 @@ func (r *sqliteDocumentRepository) close() error {
 }
 
 func (r *sqliteDocumentRepository) getCustomerDocuments(customerId string) ([]*client.Document, error) {
-	return nil, nil
+	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ?`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("getCustomerDocuments: prepare %v", err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(customerId)
+	if err != nil {
+		return nil, fmt.Errorf("getCustomerDocuments: query %v", err)
+	}
+	defer rows.Close()
+
+	var docs []*client.Document
+	for rows.Next() {
+		var doc client.Document
+		if err := rows.Scan(&doc.Id, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
+			return nil, fmt.Errorf("getCustomerDocuments: scan: %v", err)
+		}
+		docs = append(docs, &doc)
+	}
+	return docs, nil
 }
 
 func (r *sqliteDocumentRepository) writeCustomerDocument(customerId string, doc *client.Document) error {

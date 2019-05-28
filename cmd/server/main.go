@@ -32,8 +32,6 @@ var (
 	adminAddr = flag.String("admin.addr", bind.Admin("customers"), "Admin HTTP listen address")
 
 	flagLogFormat = flag.String("log.format", "", "Format for log lines (Options: json, plain")
-
-	customersDataRefreshInterval = 12 * time.Hour
 )
 
 func main() {
@@ -84,7 +82,7 @@ func main() {
 	defer documentRepo.close()
 
 	// Create our fileblob.URLSignerHMAC
-	cloudProvider := strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
+	bucketName, cloudProvider := os.Getenv("BUCKET_NAME"), strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
 	var signer *fileblob.URLSignerHMAC
 	if cloudProvider == "file" {
 		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
@@ -107,12 +105,12 @@ func main() {
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
 	addCustomerRoutes(logger, router, customerRepo)
-	addDocumentRoutes(logger, router, documentRepo, getBucket(cloudProvider, signer))
+	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
 
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
 	if cloudProvider == "file" {
-		addFileblobRoutes(logger, router, signer, getBucket(cloudProvider, signer))
+		addFileblobRoutes(logger, router, signer, getBucket(bucketName, cloudProvider, signer))
 	}
 
 	// Start business HTTP server

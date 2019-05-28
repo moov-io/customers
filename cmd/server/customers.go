@@ -45,7 +45,7 @@ func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
 
 		cust, err := repo.getCustomer(getCustomerId(w, r))
 		if err != nil {
-			if requestId := moovhttp.GetRequestId(r); requestId != "" {
+			if requestId := moovhttp.GetRequestId(r); requestId != "" && logger != nil {
 				logger.Log("accounts", fmt.Sprintf("%v", err), "requestId", requestId)
 			}
 			moovhttp.Problem(w, err)
@@ -151,14 +151,16 @@ func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc
 
 		cust, err := repo.createCustomer(req)
 		if err != nil {
-			if requestId != "" {
+			if requestId != "" && logger != nil {
 				logger.Log("accounts", fmt.Sprintf("%v", err), "requestId", requestId)
 			}
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		logger.Log("customers", fmt.Sprintf("created customer=%s", cust.Id), "requestId", requestId)
+		if logger != nil {
+			logger.Log("customers", fmt.Sprintf("created customer=%s", cust.Id), "requestId", requestId)
+		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)

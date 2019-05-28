@@ -24,22 +24,21 @@ import (
 
 type bucketFunc func() (*blob.Bucket, error)
 
-func getBucket(cloudProvider string, fileblobSigner *fileblob.URLSignerHMAC) bucketFunc {
+func getBucket(bucketName, cloudProvider string, fileblobSigner *fileblob.URLSignerHMAC) bucketFunc {
 	return func() (*blob.Bucket, error) {
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()
 
-		bucketName := os.Getenv("BUCKET_NAME")
-		if cloudProvider == "" || bucketName == "" {
-			return nil, fmt.Errorf("storage: missing CLOUD_PROVIDER=%s and/or BUCKET_NAME=%s", cloudProvider, bucketName)
+		if bucketName == "" || cloudProvider == "" {
+			return nil, fmt.Errorf("storage: missing BUCKET_NAME=%s and/or CLOUD_PROVIDER=%s", bucketName, cloudProvider)
 		}
-		return openBucket(ctx, cloudProvider, bucketName, fileblobSigner)
+		return openBucket(ctx, bucketName, cloudProvider, fileblobSigner)
 	}
 }
 
 // openBucket returns a Go Cloud Development Kit (Go CDK) Bucket object which can be used to read and write arbitrary
 // blobs from a cloud provider blob store. Checkout https://gocloud.dev/ref/blob/ for more details
-func openBucket(ctx context.Context, cloudProvider, bucketName string, fileblobSigner *fileblob.URLSignerHMAC) (*blob.Bucket, error) {
+func openBucket(ctx context.Context, bucketName, cloudProvider string, fileblobSigner *fileblob.URLSignerHMAC) (*blob.Bucket, error) {
 	switch strings.ToLower(cloudProvider) {
 	case "aws":
 		return awsBucket(ctx, bucketName)

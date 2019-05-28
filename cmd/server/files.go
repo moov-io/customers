@@ -35,15 +35,14 @@ func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFac
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
-		ctx, cancelFn := context.WithTimeout(context.TODO(), 1*time.Second)
+		ctx, cancelFn := context.WithTimeout(context.TODO(), 30*time.Second)
+		defer cancelFn()
 
 		key, err := signer.KeyFromURL(ctx, r.URL)
 		if err != nil {
-			cancelFn()
 			moovhttp.Problem(w, err)
 			return
 		}
-		cancelFn()
 
 		bucket, err := bucketFactory()
 		if err != nil {
@@ -51,9 +50,6 @@ func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFac
 			return
 		}
 		defer bucket.Close()
-
-		ctx, cancelFn = context.WithTimeout(context.TODO(), 10*time.Second)
-		defer cancelFn()
 
 		// Grab the blob.Reader for proxying to endpoint
 		rdr, err := bucket.NewReader(ctx, key, nil)
@@ -63,7 +59,9 @@ func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFac
 		}
 		defer rdr.Close()
 
-		logger.Log("files", fmt.Sprintf("proxying document=%s contentType=%s", key, rdr.ContentType()), "requestId", moovhttp.GetRequestId(r))
+		if logger != nil {
+			logger.Log("files", fmt.Sprintf("proxying document=%s contentType=%s", key, rdr.ContentType()), "requestId", moovhttp.GetRequestId(r))
+		}
 
 		w.Header().Set("Content-Disposition", "inline")
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", rdr.Size()))
