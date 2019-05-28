@@ -96,7 +96,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		defer file.Close()
 
-		// Detect the content type by reading the first 512 bytes of r.Body (if provided)
+		// Detect the content type by reading the first 512 bytes of r.Body (read into file as we expect a multipart request)
 		buf := make([]byte, 512)
 		if _, err := file.Read(buf); err != nil && err != io.EOF {
 			moovhttp.Problem(w, err)
@@ -188,6 +188,10 @@ func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFacto
 		})
 		if err != nil {
 			moovhttp.Problem(w, err)
+			return
+		}
+		if signedURL == "" {
+			moovhttp.Problem(w, fmt.Errorf("document=%s not found", documentId))
 			return
 		}
 

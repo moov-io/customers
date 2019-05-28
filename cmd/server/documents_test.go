@@ -5,9 +5,17 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -69,6 +77,9 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 }
 
 func TestDocuments__readDocumentType(t *testing.T) {
+	if v, err := readDocumentType(" "); err == nil {
+		t.Errorf("expected error v=%q", v)
+	}
 	if v, err := readDocumentType("other"); err == nil {
 		t.Errorf("expected error v=%q", v)
 	}
@@ -86,12 +97,73 @@ func TestDocuments__readDocumentType(t *testing.T) {
 	}
 }
 
-func TestDocuments__uploadCustomerDocument(t *testing.T) {
-	// TODO(adam):
+func multipartRequest(t *testing.T) *http.Request {
+	fd, err := os.Open(filepath.Join("..", "..", "testdata", "colorado.jpg"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer fd.Close()
+
+	var body bytes.Buffer
+	w := multipart.NewWriter(&body)
+	part, err := w.CreateFormFile("file", fd.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err = io.Copy(part, fd); err != nil {
+		t.Fatal(err)
+	}
+	if err := w.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Not *actually* a drivers license photo...
+	req, err := http.NewRequest("POST", "/customers/foo/documents?type=DriversLicense", &body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", w.FormDataContentType())
+	return req
 }
 
-func TestDocuments__retrieveRawDocument(t *testing.T) {
-	// TODO(adam):
+func TestDocumentsUploadAndRetrieval(t *testing.T) {
+	repo := &testDocumentRepository{}
+
+	w := httptest.NewRecorder()
+	req := multipartRequest(t)
+
+	router := mux.NewRouter()
+	addDocumentRoutes(nil, router, repo, testBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus status code: %d", w.Code)
+	}
+
+	var doc client.Document
+	if err := json.NewDecoder(w.Body).Decode(&doc); err != nil {
+		t.Fatal(err)
+	}
+	if doc.Id == "" {
+		t.Fatal("failed to read document")
+	}
+	if doc.ContentType != "image/jpeg" {
+		t.Errorf("unknown content type: %s", doc.ContentType)
+	}
+
+	// Test the HTTP retrieval route
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("GET", fmt.Sprintf("/customers/foo/documents/%s", doc.Id), nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusFound {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.Id)) {
+		t.Errorf("unexpected SignedURL: %s", loc)
+	}
 }
 
 func TestDocuments__makeDocumentKey(t *testing.T) {
