@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -79,7 +80,20 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			return
 		}
 
-		contentType := "application/octet-stream" // TODO(adam): uhh
+		file, _, err := r.FormFile("file")
+		if file == nil || err != nil {
+			moovhttp.Problem(w, fmt.Errorf("expected multipart upload with key of 'file' error=%v", err))
+			return
+		}
+		defer file.Close()
+
+		// Detect the content type by reading the first 512 bytes of r.Body (if provided)
+		buf := make([]byte, 512)
+		if _, err := file.Read(buf); err != nil && err != io.EOF {
+			moovhttp.Problem(w, err)
+			return
+		}
+		contentType := http.DetectContentType(buf)
 		doc := &client.Document{
 			Id:          base.ID(),
 			Type:        documentType,
@@ -103,7 +117,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			moovhttp.Problem(w, err)
 			return
 		}
-		logger.Log("documents", fmt.Sprintf("uploading document=%s for customer=%s", doc.Id, customerId), "requestId", requestId)
+		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.Id, contentType, customerId), "requestId", requestId)
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
@@ -112,7 +126,10 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		documentKey := makeDocumentKey(customerId, doc.Id)
 		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestId", requestId)
 
-		writer, err := bucket.NewWriter(ctx, documentKey, nil) // TODO(adam): *WriterOptions{...}
+		writer, err := bucket.NewWriter(ctx, documentKey, &blob.WriterOptions{
+			ContentDisposition: "inline",
+			ContentType:        contentType,
+		})
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -127,7 +144,8 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		//  - CacheControl string
 		//    https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
 
-		n, err := io.Copy(writer, io.LimitReader(r.Body, maxDocumentSize))
+		// Concat our mime buffer back with the multipart file
+		n, err := io.Copy(writer, io.LimitReader(io.MultiReader(bytes.NewReader(buf), file), maxDocumentSize))
 		if err != nil || n == 0 {
 			moovhttp.Problem(w, fmt.Errorf("documents: wrote %d bytes: %v", n, err))
 			return

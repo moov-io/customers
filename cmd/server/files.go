@@ -55,19 +55,24 @@ func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFac
 		ctx, cancelFn = context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()
 
-		logger.Log("files", fmt.Sprintf("proxying document=%s", key), "requestId", moovhttp.GetRequestId(r))
-
+		// Grab the blob.Reader for proxying to endpoint
 		rdr, err := bucket.NewReader(ctx, key, nil)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
+		defer rdr.Close()
 
+		logger.Log("files", fmt.Sprintf("proxying document=%s contentType=%s", key, rdr.ContentType()), "requestId", moovhttp.GetRequestId(r))
+
+		w.Header().Set("Content-Disposition", "inline")
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", rdr.Size()))
+		w.Header().Set("Content-Type", rdr.ContentType())
 		w.WriteHeader(http.StatusOK)
+
 		if n, err := io.Copy(w, rdr); err != nil || n == 0 {
 			moovhttp.Problem(w, fmt.Errorf("proxyLocalFile: n=%d error=%v", n, err))
 			return
 		}
-
 	}
 }
