@@ -20,6 +20,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+	"gocloud.dev/blob"
 )
 
 var (
@@ -31,7 +32,7 @@ var (
 func addDocumentRoutes(logger log.Logger, r *mux.Router, repo documentRepository, bucketFactory bucketFunc) {
 	r.Methods("GET").Path("/customers/{customerId}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerId}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
-	r.Methods("GET").Path("/customers/{customerId}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo))
+	r.Methods("GET").Path("/customers/{customerId}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
 }
 
 func getDocumentId(w http.ResponseWriter, r *http.Request) string {
@@ -92,6 +93,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			moovhttp.Problem(w, err)
 			return
 		}
+		defer bucket.Close()
 
 		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
 		if customerId == "" {
@@ -108,11 +110,14 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		defer cancelFn()
 
 		documentKey := makeDocumentKey(customerId, doc.Id)
+		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestId", requestId)
+
 		writer, err := bucket.NewWriter(ctx, documentKey, nil) // TODO(adam): *WriterOptions{...}
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
+		defer writer.Close()
 
 		// WriterOptions
 		//  - ContentType string
@@ -134,16 +139,37 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 	}
 }
 
-func retrieveRawDocument(logger log.Logger, repo documentRepository) http.HandlerFunc {
+func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
-		customerId := getCustomerId(w, r)
-		fmt.Println(customerId)
+		customerId, documentId := getCustomerId(w, r), getDocumentId(w, r)
+		if customerId == "" || documentId == "" {
+			return
+		}
+		requestId := moovhttp.GetRequestId(r)
 
-		// SignedURL(ctx context.Context, key string, opts *SignedURLOptions) (string, error)
+		bucket, err := bucketFactory()
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		defer bucket.Close()
 
-		w.WriteHeader(http.StatusOK)
+		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
+		defer cancelFn()
+
+		documentKey := makeDocumentKey(customerId, documentId)
+		signedURL, err := bucket.SignedURL(ctx, documentKey, &blob.SignedURLOptions{
+			Expiry: 15 * time.Minute,
+		})
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestId", requestId)
+		http.Redirect(w, r, signedURL, http.StatusFound)
 	}
 }
 

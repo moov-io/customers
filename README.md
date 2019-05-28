@@ -38,6 +38,9 @@ GCP service account
 GOOGLE_APPLICATION_CREDENTIALS
 https://cloud.google.com/docs/authentication/getting-started
 
+FILEBLOB_BASE_URL
+FILEBLOB_HMAC_SECRET
+
 ## Getting Help
 
  channel | info
