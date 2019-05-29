@@ -99,6 +99,50 @@ paths:
                 $ref: '#/components/schemas/Customer'
         '404':
           description: A resource with the specified ID was not found
+  /customers/{customer_id}/metadata:
+    put:
+      tags: [Customers]
+      summary: Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+      operationId: replaceCustomerMetadata
+      parameters:
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerMetadata'
+      responses:
+        '200':
+          description: A customer object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Customer metadata was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /customers/{customer_id}/documents:
     post:
       tags: [Customers]
@@ -287,6 +331,13 @@ components:
           minimum: 1
           items:
             $ref: '#/components/schemas/CreateAddress'
+        metadata:
+          type: object
+          description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+          additionalProperties:
+            type: string
+          example:
+            paygateId: "23beb5fd"
       required:
         - firstName
         - lastName
@@ -349,6 +400,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Address'
+        metadata:
+          type: object
+          description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+          additionalProperties:
+            type: string
+          example:
+            paygateId: "23beb5fd"
         createdAt:
           type: string
           format: date-time
@@ -362,6 +420,17 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Customer'
+    CustomerMetadata:
+      properties:
+        metadata:
+          type: object
+          description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+          additionalProperties:
+            type: string
+          example:
+            paygateId: "23beb5fd"
+      required:
+        - metadata
     CreatePhone:
       properties:
         number:

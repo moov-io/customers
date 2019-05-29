@@ -32,4 +32,6 @@ type CreateCustomer struct {
 	SSN       string          `json:"SSN,omitempty"`
 	Phones    []CreatePhone   `json:"phones,omitempty"`
 	Addresses []CreateAddress `json:"addresses"`
+	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+	Metadata map[string]string `json:"metadata,omitempty"`
 }

@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **SSN** | **string** | Customer Social Security Number (SSN) | [optional] 
 **Phones** | [**[]CreatePhone**](CreatePhone.md) |  | [optional] 
 **Addresses** | [**[]CreateAddress**](CreateAddress.md) |  | 
+**Metadata** | **map[string]string** | Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

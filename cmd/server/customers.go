@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
@@ -28,6 +29,7 @@ var (
 func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository) {
 	r.Methods("GET").Path("/customers/{customerId}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo))
+	r.Methods("PUT").Path("/customers/{customerId}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
 }
 
 func getCustomerId(w http.ResponseWriter, r *http.Request) string {
@@ -43,14 +45,24 @@ func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
-		cust, err := repo.getCustomer(getCustomerId(w, r))
+		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
+		if customerId == "" {
+			return
+		}
+
+		cust, err := repo.getCustomer(customerId)
 		if err != nil {
-			if requestId := moovhttp.GetRequestId(r); requestId != "" {
-				logger.Log("accounts", fmt.Sprintf("%v", err), "requestId", requestId)
-			}
+			logger.Log("customers", fmt.Sprintf("getCustomer: lookup: %v", err), "requestId", requestId)
 			moovhttp.Problem(w, err)
 			return
 		}
+		metadata, err := repo.getCustomerMetadata(customerId)
+		if err != nil {
+			logger.Log("customers", fmt.Sprintf("getCustomer: metadata lookup: %v", err), "requestId", requestId)
+			moovhttp.Problem(w, err)
+			return
+		}
+		cust.Metadata = metadata
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
@@ -59,16 +71,17 @@ func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
 }
 
 type customerRequest struct {
-	FirstName  string    `json:"firstName"`
-	MiddleName string    `json:"middleName"`
-	LastName   string    `json:"lastName"`
-	NickName   string    `json:"nickName"`
-	Suffix     string    `json:"suffix"`
-	BirthDate  time.Time `json:"birthDate"`
-	Email      string    `json:"email"`
-	SSN        string    `json:"SSN"`
-	Phones     []phone   `json:"phones"`
-	Addresses  []address `json:"addresses"`
+	FirstName  string            `json:"firstName"`
+	MiddleName string            `json:"middleName"`
+	LastName   string            `json:"lastName"`
+	NickName   string            `json:"nickName"`
+	Suffix     string            `json:"suffix"`
+	BirthDate  time.Time         `json:"birthDate"`
+	Email      string            `json:"email"`
+	SSN        string            `json:"SSN"`
+	Phones     []phone           `json:"phones"`
+	Addresses  []address         `json:"addresses"`
+	Metadata   map[string]string `json:"metadata"`
 }
 
 type phone struct {
@@ -98,6 +111,22 @@ func (req customerRequest) validate() error {
 	if len(req.Addresses) == 0 {
 		return errors.New("create customer: address array is required")
 	}
+	if err := validateMetadata(req.Metadata); err != nil {
+		return fmt.Errorf("create customer: %v", err)
+	}
+	return nil
+}
+
+func validateMetadata(meta map[string]string) error {
+	// both are arbitrary limits, open an issue if this needs bumped
+	if len(meta) > 100 {
+		return errors.New("metadata is limited to 100 entries")
+	}
+	for k, v := range meta {
+		if utf8.RuneCountInString(v) > 1000 {
+			return fmt.Errorf("metadata key %s value is too long", k)
+		}
+	}
 	return nil
 }
 
@@ -113,6 +142,7 @@ func (req customerRequest) asCustomer() client.Customer {
 		BirthDate:  req.BirthDate,
 		Email:      req.Email,
 		Status:     "Applied",
+		Metadata:   req.Metadata,
 	}
 	for i := range req.Phones {
 		customer.Phones = append(customer.Phones, client.Phone{
@@ -152,8 +182,13 @@ func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc
 		cust, err := repo.createCustomer(req)
 		if err != nil {
 			if requestId != "" {
-				logger.Log("accounts", fmt.Sprintf("%v", err), "requestId", requestId)
+				logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestId", requestId)
 			}
+			moovhttp.Problem(w, err)
+			return
+		}
+		if err := repo.replaceCustomerMetadata(cust.Id, cust.Metadata); err != nil {
+			logger.Log("customers", fmt.Sprintf("updating metadata for customer=%s failed: %v", cust.Id, err), "requestId", requestId)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -166,9 +201,39 @@ func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc
 	}
 }
 
+type repalceMetadataRequest struct {
+	Metadata map[string]string `json:"metadata"`
+}
+
+func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var req repalceMetadataRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		if err := validateMetadata(req.Metadata); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		customerId := getCustomerId(w, r)
+		if customerId == "" {
+			return
+		}
+		if err := repo.replaceCustomerMetadata(customerId, req.Metadata); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		getCustomer(logger, repo)(w, r)
+	}
+}
+
 type customerRepository interface {
-	createCustomer(req customerRequest) (*client.Customer, error)
 	getCustomer(customerId string) (*client.Customer, error)
+	createCustomer(req customerRequest) (*client.Customer, error)
+
+	getCustomerMetadata(customerId string) (map[string]string, error)
+	replaceCustomerMetadata(customerId string, metadata map[string]string) error
 }
 
 type sqliteCustomerRepository struct {
@@ -321,4 +386,66 @@ func (r *sqliteCustomerRepository) readAddresses(customerId string) ([]client.Ad
 		adds = append(adds, a)
 	}
 	return adds, rows.Err()
+}
+
+func (r *sqliteCustomerRepository) getCustomerMetadata(customerId string) (map[string]string, error) {
+	out := make(map[string]string)
+
+	query := `select key, value from customer_metadata where customer_id = ?;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return out, fmt.Errorf("getCustomerMetadata: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(customerId)
+	if err != nil {
+		return out, fmt.Errorf("getCustomerMetadata: query: %v", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		key, value := "", ""
+		if err := rows.Scan(&key, &value); err != nil {
+			return out, fmt.Errorf("getCustomerMetadata: scan: %v", err)
+		}
+		out[key] = value
+	}
+	return out, nil
+}
+
+func (r *sqliteCustomerRepository) replaceCustomerMetadata(customerId string, metadata map[string]string) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("replaceCustomerMetadata: tx begin: %v", err)
+	}
+
+	// Delete each existing k/v pair
+	query := `delete from customer_metadata where customer_id = ?;`
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("replaceCustomerMetadata: delete prepare: %v", err)
+	}
+	if _, err := stmt.Exec(customerId); err != nil {
+		stmt.Close()
+		return fmt.Errorf("replaceCustomerMetadata: delete exec: %v", err)
+	}
+	stmt.Close()
+
+	// Insert each k/v pair
+	query = `insert into customer_metadata (customer_id, key, value) values (?, ?, ?);`
+	stmt, err = tx.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("replaceCustomerMetadata: insert prepare: %v", err)
+	}
+	defer stmt.Close()
+	for k, v := range metadata {
+		if _, err := stmt.Exec(customerId, k, v); err != nil {
+			return fmt.Errorf("replaceCustomerMetadata: insert %s: %v", k, err)
+		}
+	}
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf("replaceCustomerMetadata: commit: %v", err)
+	}
+	return nil
 }
