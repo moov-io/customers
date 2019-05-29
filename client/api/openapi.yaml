@@ -114,6 +114,60 @@ paths:
       summary: Retrieves a Customer object associated with the customer ID.
       tags:
       - Customers
+  /customers/{customer_id}/metadata:
+    put:
+      operationId: replaceCustomerMetadata
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer Id
+        explode: false
+        in: path
+        name: customer_id
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomerMetadata'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: A customer object
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer metadata was not updated, see error(s)
+      summary: Replace the metadata object for a customer
+      tags:
+      - Customers
   /customers/{customer_id}/documents:
     get:
       operationId: getCustomerDocuments
@@ -489,6 +543,19 @@ components:
       items:
         $ref: '#/components/schemas/Customer'
       type: array
+    CustomerMetadata:
+      example:
+        metadata:
+          paygateId: 23beb5fd
+      properties:
+        metadata:
+          additionalProperties:
+            type: string
+          example:
+            paygateId: 23beb5fd
+          type: object
+      required:
+      - metadata
     CreatePhone:
       example:
         number: +1.818.555.1212
