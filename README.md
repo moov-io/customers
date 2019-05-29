@@ -15,15 +15,17 @@ Docs: [docs.moov.io](https://docs.moov.io/en/latest/) | [api docs](https://api.m
 
 Moov Customers is under active development, so please star the project if you are interested in its progress. We are developing an extensible HTTP API for interactions along with an OpenAPI specification file for generating clients for integration projects.
 
-## Getting Started
+### Deployment
 
-TODO
+You can download [our docker image `moov/customers`](https://hub.docker.com/r/moov/customers/) from Docker Hub or use this repository. No configuration is required to serve on `:8087` and metrics at `:9097/metrics` in Prometheus format.
 
 ### Configuration
 
+The following environmental variables can be set to configure behavior in Accounts.
+
 | Environmental Variable | Description | Default |
 |-----|-----|-----|
-| TODO | Description | ` ` |
+| `SQLITE_DB_PATH`| Local filepath location for the paygate SQLite database. | `customers.db` |
 
 #### Document Storage
 
