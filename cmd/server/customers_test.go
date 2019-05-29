@@ -15,8 +15,18 @@ import (
 	"github.com/moov-io/base"
 	client "github.com/moov-io/customers/client"
 
+	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
+
+func TestCustomers__getCustomerId(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/ping", nil)
+
+	if id := getCustomerId(w, req); id != "" {
+		t.Errorf("unexpected id: %v", id)
+	}
+}
 
 func TestCustomers__GetCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
@@ -33,9 +43,10 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.Id), nil)
 	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(nil, router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -104,12 +115,13 @@ func TestCustomers__createCustomer(t *testing.T) {
 	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
 
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
 	router := mux.NewRouter()
-	addCustomerRoutes(nil, router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -129,6 +141,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("POST", "/customers", strings.NewReader("null"))
 	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
 	router.ServeHTTP(w, req)
 	w.Flush()
 

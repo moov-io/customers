@@ -24,6 +24,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/mattn/go-sqlite3"
+	"gocloud.dev/blob/fileblob"
 )
 
 var (
@@ -31,8 +32,6 @@ var (
 	adminAddr = flag.String("admin.addr", bind.Admin("customers"), "Admin HTTP listen address")
 
 	flagLogFormat = flag.String("log.format", "", "Format for log lines (Options: json, plain")
-
-	customersDataRefreshInterval = 12 * time.Hour
 )
 
 func main() {
@@ -79,12 +78,45 @@ func main() {
 
 	customerRepo := &sqliteCustomerRepository{db}
 	defer customerRepo.close()
+	documentRepo := &sqliteDocumentRepository{db}
+	defer documentRepo.close()
+
+	// Create our fileblob.URLSignerHMAC
+	bucketName, cloudProvider := os.Getenv("BUCKET_NAME"), strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
+	var signer *fileblob.URLSignerHMAC
+	if cloudProvider == "file" || cloudProvider == "" {
+		if bucketName == "" {
+			bucketName = "./storage"
+			cloudProvider = "file"
+		}
+
+		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
+		if baseURL == "" {
+			baseURL = fmt.Sprintf("http://localhost%s/files", bind.HTTP("customers"))
+		}
+		if secret == "" {
+			secret = "secret"
+			logger.Log("main", "WARNING!!!! USING INSECURE DEFAULT FILE STORAGE, set FILEBLOB_HMAC_SECRET for ANY production usage")
+		}
+		s, err := fileblobSigner(baseURL, secret)
+		if err != nil {
+			panic(fmt.Sprintf("fileBucket: %v", err))
+		}
+		signer = s
+	}
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
 	addCustomerRoutes(logger, router, customerRepo)
+	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
+
+	// Optionally serve /files/ as our fileblob routes
+	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
+	if cloudProvider == "file" {
+		addFileblobRoutes(logger, router, signer, getBucket(bucketName, cloudProvider, signer))
+	}
 
 	// Start business HTTP server
 	readTimeout, _ := time.ParseDuration("30s")

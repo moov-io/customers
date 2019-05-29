@@ -25,6 +25,33 @@ TODO
 |-----|-----|-----|
 | TODO | Description | ` ` |
 
+#### Document Storage
+
+The following environment variables control which backend service is initialized for Document persistence. These all follow a similar ["blob storage"](https://gocloud.dev/ref/blob/) API provided by a library that Google [build and maintains](https://github.com/google/go-cloud).
+
+- `BUCKET_NAME`: The name of the bucket to use. Must be created outside of Customers if using a cloud provider. Make sure proper access and encryption controls are setup on this bucket to prevent exposure or unauthorized access. Example: `./storage/` (For `file` type backends)
+- `CLOUD_PROVIDER`: Provider name which determines which of the following environmental variables are used to initialize Customer's persistence.
+
+##### AWS S3 Storage
+
+For more information see the [Go Cloud Development Kit docs for s3blob](https://godoc.org/gocloud.dev/blob/s3blob). Use `CLOUD_PROVIDER=aws` to read the following environmental variables:
+
+- `AWS_REGION`: Amazon region name of where the bucket exists.
+- `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`: Standard AWS access credentials used by applications.
+
+##### Google Cloud Storage
+
+For more information see the [Go Cloud Development Kit docs for gcsblob](https://godoc.org/gocloud.dev/blob/gcsblob). Google's auth uses the standard [service account authorization](https://cloud.google.com/docs/authentication/getting-started) when deploying services. Use `CLOUD_PROVIDER=gcp` to read the following environmental variables:
+
+- `GOOGLE_APPLICATION_CREDENTIALS`: A filepath to the GCP service account json file.
+
+##### Local filesystem Storage
+
+For more information see the [Go Cloud Development Kit docs for fileblob](https://godoc.org/gocloud.dev/blob/fileblob). This is the default if no other provider is specified. Use `CLOUD_PROVIDER=file` to read the following environmental variables:
+
+- `FILEBLOB_BASE_URL`: A filepath for storage on local disk. (Default: `./storage/`)
+- `FILEBLOB_HMAC_SECRET`: HMAC secret value used to sign URLs. You *MUST* change this for production usage! (Default: `secret`)
+
 ## Getting Help
 
  channel | info
