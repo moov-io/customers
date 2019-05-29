@@ -21,6 +21,7 @@ import (
 	"github.com/moov-io/base"
 	client "github.com/moov-io/customers/client"
 
+	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
 
@@ -51,7 +52,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	req := httptest.NewRequest("GET", "/customers/foo/documents", nil)
 
 	router := mux.NewRouter()
-	addDocumentRoutes(nil, router, repo, testBucket)
+	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -133,7 +134,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	req := multipartRequest(t)
 
 	router := mux.NewRouter()
-	addDocumentRoutes(nil, router, repo, testBucket)
+	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 

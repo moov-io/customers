@@ -15,6 +15,7 @@ import (
 	"github.com/moov-io/base"
 	client "github.com/moov-io/customers/client"
 
+	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
 
@@ -35,7 +36,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	req.Header.Set("x-user-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(nil, router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -109,7 +110,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	defer repo.close()
 
 	router := mux.NewRouter()
-	addCustomerRoutes(nil, router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 

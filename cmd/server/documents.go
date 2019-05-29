@@ -126,18 +126,14 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			moovhttp.Problem(w, err)
 			return
 		}
-		if logger != nil {
-			logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.Id, contentType, customerId), "requestId", requestId)
-		}
+		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.Id, contentType, customerId), "requestId", requestId)
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
 		documentKey := makeDocumentKey(customerId, doc.Id)
-		if logger != nil {
-			logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestId", requestId)
-		}
+		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestId", requestId)
 
 		writer, err := bucket.NewWriter(ctx, documentKey, &blob.WriterOptions{
 			ContentDisposition: "inline",
@@ -195,9 +191,7 @@ func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFacto
 			return
 		}
 
-		if logger != nil {
-			logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestId", requestId)
-		}
+		logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestId", requestId)
 		http.Redirect(w, r, signedURL, http.StatusFound)
 	}
 }

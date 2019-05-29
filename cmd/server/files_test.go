@@ -17,6 +17,7 @@ import (
 
 	"github.com/moov-io/base"
 
+	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"gocloud.dev/blob"
 )
@@ -71,7 +72,7 @@ func TestFiles__proxyLocalFile(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/files"+u.String(), nil)
 	router := mux.NewRouter()
-	addFileblobRoutes(nil, router, signer, func() (*blob.Bucket, error) { return bucket, nil })
+	addFileblobRoutes(log.NewNopLogger(), router, signer, func() (*blob.Bucket, error) { return bucket, nil })
 	router.ServeHTTP(w, req)
 	w.Flush()
 
