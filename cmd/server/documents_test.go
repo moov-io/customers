@@ -13,6 +13,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -42,6 +43,15 @@ func (r *testDocumentRepository) getCustomerDocuments(customerId string) ([]*cli
 func (r *testDocumentRepository) writeCustomerDocument(customerId string, doc *client.Document) error {
 	r.written = doc
 	return r.err
+}
+
+func TestDocuments__getDocumentId(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/ping", nil)
+
+	if id := getDocumentId(w, req); id != "" {
+		t.Errorf("unexpected id: %v", id)
+	}
 }
 
 func TestDocuments__getCustomerDocuments(t *testing.T) {
@@ -164,6 +174,28 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	}
 	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.Id)) {
 		t.Errorf("unexpected SignedURL: %s", loc)
+	}
+}
+
+func TestDocuments__uploadCustomerDocument(t *testing.T) {
+	repo := &testDocumentRepository{}
+
+	u, err := url.Parse("/customers/foo/documents?type=other")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	w := httptest.NewRecorder()
+	req := multipartRequest(t)
+	req.URL = u // replace query params with invalid values
+
+	router := mux.NewRouter()
+	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus status code: %d", w.Code)
 	}
 }
 

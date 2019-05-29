@@ -19,6 +19,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func TestCustomers__getCustomerId(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/ping", nil)
+
+	if id := getCustomerId(w, req); id != "" {
+		t.Errorf("unexpected id: %v", id)
+	}
+}
+
 func TestCustomers__GetCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()

@@ -44,4 +44,23 @@ func TestBucket__getBucket(t *testing.T) {
 	if bucket == nil {
 		t.Fatalf("nil blob.Bucket: %#v", bucket)
 	}
+
+	// error case
+	if _, err := getBucket("", "", nil)(); err == nil {
+		t.Fatal("expected error")
+	}
+}
+
+func TestBucketAWS(t *testing.T) {
+	bucket, err := openBucket(nil, "", "aws", nil)
+	if err == nil || bucket != nil {
+		t.Errorf("expected error bucket=%v", bucket)
+	}
+}
+
+func TestBucketGCP(t *testing.T) {
+	bucket, err := openBucket(nil, "", "gcp", nil)
+	if err == nil || bucket != nil {
+		t.Errorf("expected error bucket=%v", bucket)
+	}
 }
