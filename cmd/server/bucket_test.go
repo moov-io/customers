@@ -29,6 +29,18 @@ var (
 	}
 )
 
+func TestBucket__openBucket(t *testing.T) {
+	// test the invalid cases
+	bucket, err := openBucket(nil, "", "", nil)
+	if bucket != nil || err == nil {
+		t.Errorf("expected error: bucket=%v error=%v", bucket, err)
+	}
+	bucket, err = openBucket(nil, "", "other", nil)
+	if bucket != nil || err == nil {
+		t.Errorf("expected error: bucket=%v error=%v", bucket, err)
+	}
+}
+
 func TestBucket__getBucket(t *testing.T) {
 	dir, _ := ioutil.TempDir("", "customers-getBucket")
 
