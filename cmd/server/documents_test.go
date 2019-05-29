@@ -48,6 +48,7 @@ func (r *testDocumentRepository) writeCustomerDocument(customerId string, doc *c
 func TestDocuments__getDocumentId(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
+	req.Header.Set("x-request-id", "test")
 
 	if id := getDocumentId(w, req); id != "" {
 		t.Errorf("unexpected id: %v", id)
@@ -60,6 +61,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers/foo/documents", nil)
+	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
 	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
@@ -142,6 +144,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := multipartRequest(t)
+	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
 	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
@@ -187,6 +190,7 @@ func TestDocuments__uploadCustomerDocument(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := multipartRequest(t)
+	req.Header.Set("x-request-id", "test")
 	req.URL = u // replace query params with invalid values
 
 	router := mux.NewRouter()

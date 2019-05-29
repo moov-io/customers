@@ -43,6 +43,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.Id), nil)
 	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
 	addCustomerRoutes(log.NewNopLogger(), router, repo)
@@ -114,6 +115,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
 
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
@@ -139,6 +141,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("POST", "/customers", strings.NewReader("null"))
 	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
 	router.ServeHTTP(w, req)
 	w.Flush()
 
