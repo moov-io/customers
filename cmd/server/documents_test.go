@@ -182,6 +182,7 @@ func TestDocumentRepository(t *testing.T) {
 
 	customerId := base.ID()
 	repo := &sqliteDocumentRepository{db.db}
+	defer repo.close()
 
 	docs, err := repo.getCustomerDocuments(customerId)
 	if err != nil {
