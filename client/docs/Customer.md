@@ -15,6 +15,7 @@ Name | Type | Description | Notes
 **Email** | **string** | Primary email address of customer name@domain.com | [optional] 
 **Phones** | [**[]Phone**](Phone.md) |  | [optional] 
 **Addresses** | [**[]Address**](Address.md) |  | [optional] 
+**Metadata** | **map[string]string** |  | [optional] 
 **CreatedAt** | [**time.Time**](time.Time.md) |  | [optional] 
 **LastModified** | [**time.Time**](time.Time.md) | Last time the object was modified | [optional] 
 

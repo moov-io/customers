@@ -287,6 +287,12 @@ components:
           minimum: 1
           items:
             $ref: '#/components/schemas/CreateAddress'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            paygateId: "23beb5fd"
       required:
         - firstName
         - lastName
@@ -349,6 +355,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Address'
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            paygateId: "23beb5fd"
         createdAt:
           type: string
           format: date-time

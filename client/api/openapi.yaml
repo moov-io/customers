@@ -308,6 +308,8 @@ components:
           postalCode: postalCode
           state: state
           type: Primary
+        metadata:
+          paygateId: 23beb5fd
         nickName: Bob
         phones:
         - number: +1.818.555.1212
@@ -362,6 +364,12 @@ components:
             $ref: '#/components/schemas/CreateAddress'
           minimum: 1
           type: array
+        metadata:
+          additionalProperties:
+            type: string
+          example:
+            paygateId: 23beb5fd
+          type: object
       required:
       - addresses
       - birthDate
@@ -391,6 +399,8 @@ components:
           active: true
           state: state
           type: Primary
+        metadata:
+          paygateId: 23beb5fd
         nickName: Bob
         phones:
         - valid: true
@@ -461,6 +471,12 @@ components:
           items:
             $ref: '#/components/schemas/Address'
           type: array
+        metadata:
+          additionalProperties:
+            type: string
+          example:
+            paygateId: 23beb5fd
+          type: object
         createdAt:
           format: date-time
           type: string
