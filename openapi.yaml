@@ -102,7 +102,7 @@ paths:
   /customers/{customer_id}/metadata:
     put:
       tags: [Customers]
-      summary: Replace the metadata object for a customer
+      summary: Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
       operationId: replaceCustomerMetadata
       parameters:
         - name: X-Request-Id
@@ -333,6 +333,7 @@ components:
             $ref: '#/components/schemas/CreateAddress'
         metadata:
           type: object
+          description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
           additionalProperties:
             type: string
           example:
@@ -401,6 +402,7 @@ components:
             $ref: '#/components/schemas/Address'
         metadata:
           type: object
+          description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
           additionalProperties:
             type: string
           example:
@@ -422,6 +424,7 @@ components:
       properties:
         metadata:
           type: object
+          description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
           additionalProperties:
             type: string
           example:

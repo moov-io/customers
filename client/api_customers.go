@@ -513,7 +513,7 @@ func (a *CustomersApiService) Ping(ctx context.Context) (*http.Response, error) 
 }
 
 /*
-CustomersApiService Replace the metadata object for a customer
+CustomersApiService Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerId Customer Id
  * @param customerMetadata

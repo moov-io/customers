@@ -165,7 +165,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
-      summary: Replace the metadata object for a customer
+      summary: Replace the metadata object for a customer. Metadata is a map of unique
+        keys associated to values to act as foreign key relationships or arbitrary
+        data associated to a Customer.
       tags:
       - Customers
   /customers/{customer_id}/documents:
@@ -421,6 +423,8 @@ components:
         metadata:
           additionalProperties:
             type: string
+          description: Map of unique keys associated to values to act as foreign key
+            relationships or arbitrary data associated to a Customer.
           example:
             paygateId: 23beb5fd
           type: object
@@ -528,6 +532,8 @@ components:
         metadata:
           additionalProperties:
             type: string
+          description: Map of unique keys associated to values to act as foreign key
+            relationships or arbitrary data associated to a Customer.
           example:
             paygateId: 23beb5fd
           type: object
@@ -551,6 +557,8 @@ components:
         metadata:
           additionalProperties:
             type: string
+          description: Map of unique keys associated to values to act as foreign key
+            relationships or arbitrary data associated to a Customer.
           example:
             paygateId: 23beb5fd
           type: object

@@ -9,7 +9,7 @@ Method | HTTP request | Description
 [**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customer_id}/documents/{document_id} | Retrieve the referenced document
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customer_id}/documents | Get documents for a customer
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping the Customers service to check if running
-[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customer_id}/metadata | Replace the metadata object for a customer
+[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customer_id}/metadata | Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customer_id}/documents | Upload a document for the given customer.
 
 
@@ -218,7 +218,7 @@ No authorization required
 ## ReplaceCustomerMetadata
 
 > Customer ReplaceCustomerMetadata(ctx, customerId, customerMetadata, optional)
-Replace the metadata object for a customer
+Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 
 ### Required Parameters
 

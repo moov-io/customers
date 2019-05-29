@@ -31,9 +31,10 @@ type Customer struct {
 	// State of the customer
 	Status string `json:"status,omitempty"`
 	// Primary email address of customer name@domain.com
-	Email     string            `json:"email,omitempty"`
-	Phones    []Phone           `json:"phones,omitempty"`
-	Addresses []Address         `json:"addresses,omitempty"`
+	Email     string    `json:"email,omitempty"`
+	Phones    []Phone   `json:"phones,omitempty"`
+	Addresses []Address `json:"addresses,omitempty"`
+	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 	Metadata  map[string]string `json:"metadata,omitempty"`
 	CreatedAt time.Time         `json:"createdAt,omitempty"`
 	// Last time the object was modified
