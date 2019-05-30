@@ -24,6 +24,8 @@ import (
 type testCustomerRepository struct {
 	err      error
 	customer *client.Customer
+
+	updatedStatus CustomerStatus
 }
 
 func (r *testCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
@@ -38,6 +40,11 @@ func (r *testCustomerRepository) createCustomer(req customerRequest) (*client.Cu
 		return nil, r.err
 	}
 	return r.customer, nil
+}
+
+func (r *testCustomerRepository) updateCustomerStatus(customerId string, status CustomerStatus, comment string) error {
+	r.updatedStatus = status
+	return r.err
 }
 
 func (r *testCustomerRepository) getCustomerMetadata(customerId string) (map[string]string, error) {
@@ -55,6 +62,34 @@ func TestCustomers__getCustomerId(t *testing.T) {
 
 	if id := getCustomerId(w, req); id != "" {
 		t.Errorf("unexpected id: %v", id)
+	}
+}
+
+func TestCustomerStatus__json(t *testing.T) {
+	cs := CustomerStatus("invalid")
+	valid := map[string]CustomerStatus{
+		"deCEAsed":       CustomerStatusDeceased,
+		"Rejected":       CustomerStatusRejected,
+		"ReviewRequired": CustomerStatusReviewRequired,
+		"NONE":           CustomerStatusNone,
+		"KYC":            CustomerStatusKYC,
+		"ofaC":           CustomerStatusOFAC,
+		"cip":            CustomerStatusCIP,
+	}
+	for k, v := range valid {
+		in := []byte(fmt.Sprintf(`"%v"`, k))
+		if err := json.Unmarshal(in, &cs); err != nil {
+			t.Error(err.Error())
+		}
+		if cs != v {
+			t.Errorf("got cs=%#v, v=%#v", cs, v)
+		}
+	}
+
+	// make sure other values fail
+	in := []byte(fmt.Sprintf(`"%v"`, base.ID()))
+	if err := json.Unmarshal(in, &cs); err == nil {
+		t.Error("expected error")
 	}
 }
 
@@ -264,6 +299,69 @@ func TestCustomers__repository(t *testing.T) {
 	}
 	if len(cust.Phones) != 1 || len(cust.Addresses) != 1 {
 		t.Errorf("len(cust.Phones)=%d and len(cust.Addresses)=%d", len(cust.Phones), len(cust.Addresses))
+	}
+}
+
+func TestCustomers__updateCustomerStatus(t *testing.T) {
+	repo := &testCustomerRepository{
+		customer: &client.Customer{
+			Id: base.ID(),
+		},
+	}
+
+	body := strings.NewReader(`{"status": "OFAC", "comment": "test comment"}`)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("PUT", "/customers/foo/status", body)
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	router := mux.NewRouter()
+	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	var customer client.Customer
+	if err := json.NewDecoder(w.Body).Decode(&customer); err != nil {
+		t.Fatal(err)
+	}
+	if customer.Id == "" {
+		t.Errorf("missing customer JSON: %#v", customer)
+	}
+	if repo.updatedStatus != CustomerStatusOFAC {
+		t.Errorf("unexpected status: %s", repo.updatedStatus)
+	}
+}
+
+func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	cust, err := repo.createCustomer(customerRequest{
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Email:     "jane@example.com",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// update status
+	if err := repo.updateCustomerStatus(cust.Id, CustomerStatusKYC, "test comment"); err != nil {
+		t.Fatal(err)
+	}
+
+	// read the status back
+	customer, err := repo.getCustomer(cust.Id)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if customer.Status != CustomerStatusKYC {
+		t.Errorf("unexpected status: %s", customer.Status)
 	}
 }
 
