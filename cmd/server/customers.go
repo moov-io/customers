@@ -246,7 +246,7 @@ func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc
 }
 
 type updateCustomerStatusRequest struct {
-	Comment string         `json:"comment"`
+	Comment string         `json:"comment,omitempty"`
 	Status  CustomerStatus `json:"status"`
 }
 

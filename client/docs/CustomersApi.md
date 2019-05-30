@@ -10,6 +10,7 @@ Method | HTTP request | Description
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customer_id}/documents | Get documents for a customer
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping the Customers service to check if running
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customer_id}/metadata | Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customer_id}/status | Update the status for a customer, which can only be updated by authenticated users with permissions.
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customer_id}/documents | Upload a document for the given customer.
 
 
@@ -233,6 +234,51 @@ Name | Type | Description  | Notes
 ### Optional Parameters
 
 Optional parameters are passed through a pointer to a ReplaceCustomerMetadataOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **xRequestId** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
+ **xUserId** | **optional.String**| Moov User ID header, required in all requests | 
+
+### Return type
+
+[**Customer**](Customer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateCustomerStatus
+
+> Customer UpdateCustomerStatus(ctx, customerId, updateCustomerStatus, optional)
+Update the status for a customer, which can only be updated by authenticated users with permissions.
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerId** | **string**| Customer Id | 
+**updateCustomerStatus** | [**UpdateCustomerStatus**](UpdateCustomerStatus.md)|  | 
+ **optional** | ***UpdateCustomerStatusOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a UpdateCustomerStatusOpts struct
 
 
 Name | Type | Description  | Notes

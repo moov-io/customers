@@ -170,6 +170,61 @@ paths:
         data associated to a Customer.
       tags:
       - Customers
+  /customers/{customer_id}/status:
+    put:
+      operationId: updateCustomerStatus
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer Id
+        explode: false
+        in: path
+        name: customer_id
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerStatus'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: A customer object
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer metadata was not updated, see error(s)
+      summary: Update the status for a customer, which can only be updated by authenticated
+        users with permissions.
+      tags:
+      - Customers
   /customers/{customer_id}/documents:
     get:
       operationId: getCustomerDocuments
@@ -511,8 +566,8 @@ components:
           enum:
           - Deceased
           - Rejected
-          - ReviewRequired
           - None
+          - ReviewRequired
           - KYC
           - OFAC
           - CIP
@@ -564,6 +619,28 @@ components:
           type: object
       required:
       - metadata
+    UpdateCustomerStatus:
+      example:
+        comment: Customer was approved from KYC confirmation
+        status: Deceased
+      properties:
+        comment:
+          description: Free form comment about the customer status update
+          example: Customer was approved from KYC confirmation
+          type: string
+        status:
+          description: State of the customer
+          enum:
+          - Deceased
+          - Rejected
+          - None
+          - ReviewRequired
+          - KYC
+          - OFAC
+          - CIP
+          type: string
+      required:
+      - status
     CreatePhone:
       example:
         number: +1.818.555.1212
