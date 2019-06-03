@@ -143,6 +143,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /customers/{customer_id}/status:
+    put:
+      tags: [Customers]
+      summary: Update the status for a customer, which can only be updated by authenticated users with permissions.
+      operationId: updateCustomerStatus
+      parameters:
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerStatus'
+      responses:
+        '200':
+          description: A customer object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Customer metadata was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /customers/{customer_id}/documents:
     post:
       tags: [Customers]
@@ -383,8 +427,8 @@ components:
           enum:
             - Deceased
             - Rejected
-            - ReviewRequired
             - None
+            - ReviewRequired
             - KYC
             - OFAC
             - CIP
@@ -431,6 +475,25 @@ components:
             paygateId: "23beb5fd"
       required:
         - metadata
+    UpdateCustomerStatus:
+      properties:
+        comment:
+          type: string
+          description: Free form comment about the customer status update
+          example: Customer was approved from KYC confirmation
+        status:
+          type: string
+          description: State of the customer
+          enum:
+            - Deceased
+            - Rejected
+            - None
+            - ReviewRequired
+            - KYC
+            - OFAC
+            - CIP
+      required:
+        - status
     CreatePhone:
       properties:
         number:

@@ -26,10 +26,50 @@ var (
 	errNoCustomerId = errors.New("no Customer ID found")
 )
 
+type CustomerStatus string
+
+const (
+	CustomerStatusDeceased       = "deceased"
+	CustomerStatusRejected       = "rejected"
+	CustomerStatusNone           = "none"
+	CustomerStatusReviewRequired = "reviewrequired"
+	CustomerStatusKYC            = "kyc"
+	CustomerStatusOFAC           = "ofac"
+	CustomerStatusCIP            = "cip"
+)
+
+func (cs CustomerStatus) validate() error {
+	switch cs {
+	case CustomerStatusDeceased, CustomerStatusRejected:
+		return nil
+	case CustomerStatusReviewRequired, CustomerStatusNone:
+		return nil
+	case CustomerStatusKYC, CustomerStatusOFAC, CustomerStatusCIP:
+		return nil
+	default:
+		return fmt.Errorf("CustomerStatus(%s) is invalid", cs)
+	}
+}
+
+func (cs *CustomerStatus) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	*cs = CustomerStatus(strings.TrimSpace(strings.ToLower(s)))
+	if err := cs.validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository) {
 	r.Methods("GET").Path("/customers/{customerId}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerId}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
+
+	// TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now
+	r.Methods("PUT").Path("/customers/{customerId}/status").HandlerFunc(updateCustomerStatus(logger, repo))
 }
 
 func getCustomerId(w http.ResponseWriter, r *http.Request) string {
@@ -50,24 +90,28 @@ func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
 			return
 		}
 
-		cust, err := repo.getCustomer(customerId)
-		if err != nil {
-			logger.Log("customers", fmt.Sprintf("getCustomer: lookup: %v", err), "requestId", requestId)
-			moovhttp.Problem(w, err)
-			return
-		}
-		metadata, err := repo.getCustomerMetadata(customerId)
-		if err != nil {
-			logger.Log("customers", fmt.Sprintf("getCustomer: metadata lookup: %v", err), "requestId", requestId)
-			moovhttp.Problem(w, err)
-			return
-		}
-		cust.Metadata = metadata
-
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(cust)
+		respondWithCustomer(logger, w, customerId, requestId, repo)
 	}
+}
+
+func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerId string, requestId string, repo customerRepository) {
+	cust, err := repo.getCustomer(customerId)
+	if err != nil {
+		logger.Log("customers", fmt.Sprintf("getCustomer: lookup: %v", err), "requestId", requestId)
+		moovhttp.Problem(w, err)
+		return
+	}
+	metadata, err := repo.getCustomerMetadata(customerId)
+	if err != nil {
+		logger.Log("customers", fmt.Sprintf("getCustomer: metadata lookup: %v", err), "requestId", requestId)
+		moovhttp.Problem(w, err)
+		return
+	}
+	cust.Metadata = metadata
+
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(cust)
 }
 
 type customerRequest struct {
@@ -141,7 +185,7 @@ func (req customerRequest) asCustomer() client.Customer {
 		Suffix:     req.Suffix,
 		BirthDate:  req.BirthDate,
 		Email:      req.Email,
-		Status:     "Applied",
+		Status:     CustomerStatusNone,
 		Metadata:   req.Metadata,
 	}
 	for i := range req.Phones {
@@ -201,6 +245,36 @@ func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc
 	}
 }
 
+type updateCustomerStatusRequest struct {
+	Comment string         `json:"comment,omitempty"`
+	Status  CustomerStatus `json:"status"`
+}
+
+func updateCustomerStatus(logger log.Logger, repo customerRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = wrapResponseWriter(logger, w, r)
+
+		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
+		if customerId == "" {
+			return
+		}
+
+		var req updateCustomerStatusRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		// Update Customer's status in the database
+		if err := repo.updateCustomerStatus(customerId, req.Status, req.Comment); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		respondWithCustomer(logger, w, customerId, requestId, repo)
+	}
+}
+
 type repalceMetadataRequest struct {
 	Metadata map[string]string `json:"metadata"`
 }
@@ -216,7 +290,7 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 			moovhttp.Problem(w, err)
 			return
 		}
-		customerId := getCustomerId(w, r)
+		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
 		if customerId == "" {
 			return
 		}
@@ -224,13 +298,15 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 			moovhttp.Problem(w, err)
 			return
 		}
-		getCustomer(logger, repo)(w, r)
+
+		respondWithCustomer(logger, w, customerId, requestId, repo)
 	}
 }
 
 type customerRepository interface {
 	getCustomer(customerId string) (*client.Customer, error)
 	createCustomer(req customerRequest) (*client.Customer, error)
+	updateCustomerStatus(customerId string, status CustomerStatus, comment string) error
 
 	getCustomerMetadata(customerId string) (map[string]string, error)
 	replaceCustomerMetadata(customerId string, metadata map[string]string) error
@@ -386,6 +462,37 @@ func (r *sqliteCustomerRepository) readAddresses(customerId string) ([]client.Ad
 		adds = append(adds, a)
 	}
 	return adds, rows.Err()
+}
+
+func (r *sqliteCustomerRepository) updateCustomerStatus(customerId string, status CustomerStatus, comment string) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return fmt.Errorf("updateCustomerStatus: tx begin: %v", err)
+	}
+
+	// update 'customers' table
+	query := `update customers set status = ? where customer_id = ?;`
+	stmt, err := tx.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("updateCustomerStatus: update customers prepare: %v", err)
+	}
+	if _, err := stmt.Exec(status, customerId); err != nil {
+		stmt.Close()
+		return fmt.Errorf("updateCustomerStatus: update customers exec: %v", err)
+	}
+	stmt.Close()
+
+	// update 'customer_status_updates' table
+	query = `insert into customer_status_updates (customer_id, future_status, comment, changed_at) values (?, ?, ?, ?);`
+	stmt, err = tx.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("updateCustomerStatus: insert status prepare: %v", err)
+	}
+	defer stmt.Close()
+	if _, err := stmt.Exec(customerId, status, comment, time.Now()); err != nil {
+		return fmt.Errorf("updateCustomerStatus: insert status exec: %v", err)
+	}
+	return tx.Commit()
 }
 
 func (r *sqliteCustomerRepository) getCustomerMetadata(customerId string) (map[string]string, error) {
