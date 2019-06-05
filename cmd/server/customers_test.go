@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/moov-io/base"
 	client "github.com/moov-io/customers/client"
@@ -309,7 +310,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 		},
 	}
 
-	body := strings.NewReader(`{"status": "OFAC", "comment": "test comment"}`)
+	body := strings.NewReader(`{"status": "ReviewRequired", "comment": "test comment"}`)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", "/customers/foo/status", body)
@@ -322,7 +323,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	w.Flush()
 
 	if w.Code != http.StatusOK {
-		t.Errorf("bogus HTTP status: %d", w.Code)
+		t.Errorf("bogus HTTP status: %d: %v", w.Code, w.Body.String())
 	}
 
 	var customer client.Customer
@@ -332,7 +333,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	if customer.Id == "" {
 		t.Errorf("missing customer JSON: %#v", customer)
 	}
-	if repo.updatedStatus != CustomerStatusOFAC {
+	if repo.updatedStatus != CustomerStatusReviewRequired {
 		t.Errorf("unexpected status: %s", repo.updatedStatus)
 	}
 }
@@ -538,5 +539,74 @@ func TestCustomers__validateMetadata(t *testing.T) {
 	}
 	if err := validateMetadata(meta); err == nil {
 		t.Error("expected error")
+	}
+}
+
+func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
+	if containsValidPrimaryAddress(nil) {
+		t.Error("no addresses, so can't be found")
+	}
+	addresses := []client.Address{
+		{
+			Type:      "Primary",
+			Validated: false,
+		},
+	}
+	if containsValidPrimaryAddress(addresses) {
+		t.Error("Address isn't validated")
+	}
+	addresses[0].Validated = true
+	if !containsValidPrimaryAddress(addresses) {
+		t.Error("Address should be Primary and Validated")
+	}
+	addresses[0].Type = "Secondary"
+	if containsValidPrimaryAddress(addresses) {
+		t.Error("Address is Secondary")
+	}
+}
+
+func TestCustomers__validCustomerStatusTransition(t *testing.T) {
+	cust := &client.Customer{
+		Id:     base.ID(),
+		Status: CustomerStatusNone,
+	}
+
+	if err := validCustomerStatusTransition(cust, CustomerStatusDeceased); err != nil {
+		t.Errorf("expected no error: %v", err)
+	}
+
+	// block Deceased and Rejected customers
+	cust.Status = CustomerStatusDeceased
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+		t.Error("expected error")
+	}
+	cust.Status = CustomerStatusRejected
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+		t.Error("expected error")
+	}
+
+	// normal KYC approval (rejected due to missing info)
+	cust.FirstName, cust.LastName = "Jane", "Doe"
+	cust.Status = CustomerStatusReviewRequired
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+		t.Error("expected error")
+	}
+	cust.BirthDate = time.Now()
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+		t.Error("expected error")
+	}
+	cust.Addresses = append(cust.Addresses, client.Address{
+		Type:     "primary",
+		Address1: "123 1st st",
+	})
+
+	// OFAC and CIP transistions are WIP // TODO(adam): impl both transistions
+	cust.Status = CustomerStatusReviewRequired
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC); err == nil {
+		t.Error("OFAC transition is WIP")
+	}
+	cust.Status = CustomerStatusReviewRequired
+	if err := validCustomerStatusTransition(cust, CustomerStatusCIP); err == nil {
+		t.Error("CIP transition is WIP")
 	}
 }

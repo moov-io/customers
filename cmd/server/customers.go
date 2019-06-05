@@ -250,6 +250,48 @@ type updateCustomerStatusRequest struct {
 	Status  CustomerStatus `json:"status"`
 }
 
+// validCustomerStatusTransition determines if a future CustomerStatus is valid for a given
+// Customer. There are several rules which apply to a CustomerStatus, such as:
+//  - Deceased, Rejected statuses can never be changed
+//  - KYC is only valid if the Customer has first, last, address, and date of birth
+//  - OFAC can only be after an OFAC search has been performed (and search info recorded)
+//  - CIP can only be if the SSN has been set
+func validCustomerStatusTransition(existing *client.Customer, futureStatus CustomerStatus) error {
+	eql := func(s string, status CustomerStatus) bool {
+		return strings.EqualFold(s, string(status))
+	}
+	// Check Deceased and Rejected
+	if eql(existing.Status, CustomerStatusDeceased) || eql(existing.Status, CustomerStatusRejected) {
+		return fmt.Errorf("customer status '%s' cannot be changed", existing.Status)
+	}
+	switch futureStatus {
+	case CustomerStatusKYC:
+		if existing.FirstName == "" || existing.LastName == "" {
+			return fmt.Errorf("customer=%s is missing fist/last name", existing.Id)
+		}
+		if existing.BirthDate.IsZero() {
+			return fmt.Errorf("customer=%s is missing date of birth", existing.Id)
+		}
+		if !containsValidPrimaryAddress(existing.Addresses) {
+			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.Id)
+		}
+	case CustomerStatusOFAC: // TODO(adam): need to impl lookup
+		return fmt.Errorf("customers=%s %s to OFAC transition needs to lookup OFAC search results", existing.Id, existing.Status)
+	case CustomerStatusCIP: // TODO(adam): need to impl lookup
+		return fmt.Errorf("customers=%s %s to CIP transition needs to lookup encrypted SSN", existing.Id, existing.Status)
+	}
+	return nil
+}
+
+func containsValidPrimaryAddress(addrs []client.Address) bool {
+	for i := range addrs {
+		if strings.EqualFold(addrs[i].Type, "primary") && addrs[i].Validated {
+			return true
+		}
+	}
+	return false
+}
+
 func updateCustomerStatus(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
@@ -261,6 +303,16 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository) http.Handl
 
 		var req updateCustomerStatusRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		cust, err := repo.getCustomer(customerId)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		if err := validCustomerStatusTransition(cust, req.Status); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
