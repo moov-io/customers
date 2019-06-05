@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
@@ -18,6 +19,7 @@ import (
 	client "github.com/moov-io/customers/client"
 
 	"github.com/go-kit/kit/log"
+	"github.com/gorilla/mux"
 )
 
 func TestCustomers__updateCustomerStatus(t *testing.T) {
@@ -59,6 +61,51 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	}
 	if repo.updatedStatus != CustomerStatusReviewRequired {
 		t.Errorf("unexpected status: %s", repo.updatedStatus)
+	}
+}
+
+func TestCustomers__getAddressId(t *testing.T) {
+	var addr string
+
+	router := mux.NewRouter()
+	router.Methods("GET").Path("/addresses/{addressId}").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		addr = getAddressId(w, r)
+		w.WriteHeader(http.StatusOK)
+	})
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/addresses/foobar", nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if addr != "foobar" {
+		t.Errorf("addr=%s", addr)
+	}
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+}
+
+func TestCustomers__updateCustomerStatusFailure(t *testing.T) {
+	repo := &testCustomerRepository{}
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/customers/foo/status", nil)
+	updateCustomerStatus(log.NewNopLogger(), repo)(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	// try the proper HTTP verb
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("PUT", "/customers/foo/status", nil)
+	updateCustomerStatus(log.NewNopLogger(), repo)(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 }
 
@@ -159,6 +206,35 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
+	}
+
+	// quick updateCustomerAddressRequest.validate() call
+	request := &updateCustomerAddressRequest{}
+	if err := request.validate(); err == nil {
+		t.Errorf("expected error")
+	}
+}
+
+func TestCustomers__updateCustomerAddressFailure(t *testing.T) {
+	repo := &testCustomerRepository{}
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", "/customers/foo/address/bar", nil)
+	updateCustomerAddress(log.NewNopLogger(), repo)(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	// try the proper HTTP verb
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("PUT", "/customers/foo/address/bar", nil)
+	updateCustomerAddress(log.NewNopLogger(), repo)(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 }
 
