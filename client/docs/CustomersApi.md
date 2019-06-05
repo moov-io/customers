@@ -4,6 +4,7 @@ All URIs are relative to *http://localhost:8087*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customer_id}/address | Add an Address onto an existing Customer record
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create a new customer
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customer_id} | Retrieves a Customer object associated with the customer ID.
 [**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customer_id}/documents/{document_id} | Retrieve the referenced document
@@ -13,6 +14,51 @@ Method | HTTP request | Description
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customer_id}/status | Update the status for a customer, which can only be updated by authenticated users with permissions.
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customer_id}/documents | Upload a document for the given customer.
 
+
+
+## AddCustomerAddress
+
+> Customer AddCustomerAddress(ctx, customerId, createAddress, optional)
+Add an Address onto an existing Customer record
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerId** | **string**| Customer Id | 
+**createAddress** | [**CreateAddress**](CreateAddress.md)|  | 
+ **optional** | ***AddCustomerAddressOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a AddCustomerAddressOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **xRequestId** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
+ **xUserId** | **optional.String**| Moov User ID header, required in all requests | 
+
+### Return type
+
+[**Customer**](Customer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
 
 
 ## CreateCustomer

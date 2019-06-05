@@ -114,6 +114,60 @@ paths:
       summary: Retrieves a Customer object associated with the customer ID.
       tags:
       - Customers
+  /customers/{customer_id}/address:
+    post:
+      operationId: addCustomerAddress
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-Id
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID header, required in all requests
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-Id
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer Id
+        explode: false
+        in: path
+        name: customer_id
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddress'
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: A customer object
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer metadata was not updated, see error(s)
+      summary: Add an Address onto an existing Customer record
+      tags:
+      - Customers
   /customers/{customer_id}/metadata:
     put:
       operationId: replaceCustomerMetadata
@@ -501,6 +555,7 @@ components:
           address1: address1
           postalCode: postalCode
           active: true
+          id: 851233a1
           state: state
           type: Primary
         - country: US
@@ -510,6 +565,7 @@ components:
           address1: address1
           postalCode: postalCode
           active: true
+          id: 851233a1
           state: state
           type: Primary
         metadata:
@@ -730,9 +786,14 @@ components:
         address1: address1
         postalCode: postalCode
         active: true
+        id: 851233a1
         state: state
         type: Primary
       properties:
+        id:
+          description: Unique identifier for this Address
+          example: 851233a1
+          type: string
         type:
           enum:
           - Primary

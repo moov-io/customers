@@ -99,6 +99,50 @@ paths:
                 $ref: '#/components/schemas/Customer'
         '404':
           description: A resource with the specified ID was not found
+  /customers/{customer_id}/address:
+    post:
+      tags: [Customers]
+      summary: Add an Address onto an existing Customer record
+      operationId: addCustomerAddress
+      parameters:
+        - name: X-Request-Id
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: Moov User ID header, required in all requests
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customer_id
+          in: path
+          description: Customer Id
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddress'
+      responses:
+        '200':
+          description: A customer object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Customer metadata was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /customers/{customer_id}/metadata:
     put:
       tags: [Customers]
@@ -562,9 +606,13 @@ components:
     Address:
       type: object
       properties:
+        id:
+          type: string
+          description: Unique identifier for this Address
+          example: 851233a1
         type:
           type: string
-          enum:
+          enum: # TODO(adam): What about adding Previous?
             - Primary
             - Secondary
         address1:

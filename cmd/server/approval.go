@@ -62,7 +62,7 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 		}
 	case CustomerStatusOFAC: // TODO(adam): need to impl lookup
 		// I think we should perform the OFAC search when requested and store the highest match EntityId, name and match % in a new database table.
-		// Then it's a valid transistion only when a record exists and is below the threshold.
+		// Then it's a valid transition only when a record exists and is below the threshold.
 		return fmt.Errorf("customers=%s %s to OFAC transition needs to lookup OFAC search results", existing.Id, existing.Status)
 	case CustomerStatusCIP: // TODO(adam): need to impl lookup
 		// What can we do to validate an SSN?
