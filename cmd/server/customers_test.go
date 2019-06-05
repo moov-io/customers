@@ -542,6 +542,29 @@ func TestCustomers__validateMetadata(t *testing.T) {
 	}
 }
 
+func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
+	if containsValidPrimaryAddress(nil) {
+		t.Error("no addresses, so can't be found")
+	}
+	addresses := []client.Address{
+		{
+			Type:      "Primary",
+			Validated: false,
+		},
+	}
+	if containsValidPrimaryAddress(addresses) {
+		t.Error("Address isn't validated")
+	}
+	addresses[0].Validated = true
+	if !containsValidPrimaryAddress(addresses) {
+		t.Error("Address should be Primary and Validated")
+	}
+	addresses[0].Type = "Secondary"
+	if containsValidPrimaryAddress(addresses) {
+		t.Error("Address is Secondary")
+	}
+}
+
 func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	cust := &client.Customer{
 		Id:     base.ID(),

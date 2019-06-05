@@ -272,8 +272,8 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 		if existing.BirthDate.IsZero() {
 			return fmt.Errorf("customer=%s is missing date of birth", existing.Id)
 		}
-		if len(existing.Addresses) == 0 { // TODO(adam): we should probably check existing.Addresses.exists(_.Validated)
-			return fmt.Errorf("customer=%s is missing an Address", existing.Id)
+		if !containsValidPrimaryAddress(existing.Addresses) {
+			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.Id)
 		}
 	case CustomerStatusOFAC: // TODO(adam): need to impl lookup
 		return fmt.Errorf("customers=%s %s to OFAC transition needs to lookup OFAC search results", existing.Id, existing.Status)
@@ -281,6 +281,15 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 		return fmt.Errorf("customers=%s %s to CIP transition needs to lookup encrypted SSN", existing.Id, existing.Status)
 	}
 	return nil
+}
+
+func containsValidPrimaryAddress(addrs []client.Address) bool {
+	for i := range addrs {
+		if strings.EqualFold(addrs[i].Type, "primary") && addrs[i].Validated {
+			return true
+		}
+	}
+	return false
 }
 
 func updateCustomerStatus(logger log.Logger, repo customerRepository) http.HandlerFunc {
