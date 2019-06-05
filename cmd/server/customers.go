@@ -67,9 +67,7 @@ func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository
 	r.Methods("GET").Path("/customers/{customerId}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerId}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
-
-	// TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now
-	r.Methods("PUT").Path("/customers/{customerId}/status").HandlerFunc(updateCustomerStatus(logger, repo))
+	r.Methods("POST").Path("/customers/{customerId}/address").HandlerFunc(addCustomerAddress(logger, repo)) // TODO(adam): openapi docs
 }
 
 func getCustomerId(w http.ResponseWriter, r *http.Request) string {
@@ -196,6 +194,7 @@ func (req customerRequest) asCustomer() client.Customer {
 	}
 	for i := range req.Addresses {
 		customer.Addresses = append(customer.Addresses, client.Address{
+			Id:         base.ID(),
 			Address1:   req.Addresses[i].Address1,
 			Address2:   req.Addresses[i].Address2,
 			City:       req.Addresses[i].City,
@@ -245,88 +244,6 @@ func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc
 	}
 }
 
-type updateCustomerStatusRequest struct {
-	Comment string         `json:"comment,omitempty"`
-	Status  CustomerStatus `json:"status"`
-}
-
-// validCustomerStatusTransition determines if a future CustomerStatus is valid for a given
-// Customer. There are several rules which apply to a CustomerStatus, such as:
-//  - Deceased, Rejected statuses can never be changed
-//  - KYC is only valid if the Customer has first, last, address, and date of birth
-//  - OFAC can only be after an OFAC search has been performed (and search info recorded)
-//  - CIP can only be if the SSN has been set
-func validCustomerStatusTransition(existing *client.Customer, futureStatus CustomerStatus) error {
-	eql := func(s string, status CustomerStatus) bool {
-		return strings.EqualFold(s, string(status))
-	}
-	// Check Deceased and Rejected
-	if eql(existing.Status, CustomerStatusDeceased) || eql(existing.Status, CustomerStatusRejected) {
-		return fmt.Errorf("customer status '%s' cannot be changed", existing.Status)
-	}
-	switch futureStatus {
-	case CustomerStatusKYC:
-		if existing.FirstName == "" || existing.LastName == "" {
-			return fmt.Errorf("customer=%s is missing fist/last name", existing.Id)
-		}
-		if existing.BirthDate.IsZero() {
-			return fmt.Errorf("customer=%s is missing date of birth", existing.Id)
-		}
-		if !containsValidPrimaryAddress(existing.Addresses) {
-			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.Id)
-		}
-	case CustomerStatusOFAC: // TODO(adam): need to impl lookup
-		return fmt.Errorf("customers=%s %s to OFAC transition needs to lookup OFAC search results", existing.Id, existing.Status)
-	case CustomerStatusCIP: // TODO(adam): need to impl lookup
-		return fmt.Errorf("customers=%s %s to CIP transition needs to lookup encrypted SSN", existing.Id, existing.Status)
-	}
-	return nil
-}
-
-func containsValidPrimaryAddress(addrs []client.Address) bool {
-	for i := range addrs {
-		if strings.EqualFold(addrs[i].Type, "primary") && addrs[i].Validated {
-			return true
-		}
-	}
-	return false
-}
-
-func updateCustomerStatus(logger log.Logger, repo customerRepository) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
-
-		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
-		if customerId == "" {
-			return
-		}
-
-		var req updateCustomerStatusRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-
-		cust, err := repo.getCustomer(customerId)
-		if err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-		if err := validCustomerStatusTransition(cust, req.Status); err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-
-		// Update Customer's status in the database
-		if err := repo.updateCustomerStatus(customerId, req.Status, req.Comment); err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-
-		respondWithCustomer(logger, w, customerId, requestId, repo)
-	}
-}
-
 type repalceMetadataRequest struct {
 	Metadata map[string]string `json:"metadata"`
 }
@@ -355,6 +272,30 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 	}
 }
 
+func addCustomerAddress(logger log.Logger, repo customerRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
+		if customerId == "" {
+			return
+		}
+
+		var req address
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		if err := repo.addCustomerAddress(customerId, req); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		logger.Log("customers", fmt.Sprintf("added address for customer=%s", customerId), "requestId", requestId)
+
+		respondWithCustomer(logger, w, customerId, requestId, repo)
+	}
+}
+
 type customerRepository interface {
 	getCustomer(customerId string) (*client.Customer, error)
 	createCustomer(req customerRequest) (*client.Customer, error)
@@ -362,6 +303,9 @@ type customerRepository interface {
 
 	getCustomerMetadata(customerId string) (map[string]string, error)
 	replaceCustomerMetadata(customerId string, metadata map[string]string) error
+
+	addCustomerAddress(customerId string, address address) error
+	updateCustomerAddress(customerId, addressId string, _type string, validated bool) error
 }
 
 type sqliteCustomerRepository struct {
@@ -410,13 +354,13 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt.Close()
 
 	// Insert customer addresses
-	query = `insert or replace into customers_addresses(customer_id, type, address1, address2, city, state, postal_code, country, validated, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query = `insert or replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("createCustomer: insert into customers_addresses err=%v | rollback=%v", err, tx.Rollback())
 	}
 	for i := range c.Addresses {
-		_, err := stmt.Exec(c.Id, c.Addresses[i].Type, c.Addresses[i].Address1, c.Addresses[i].Address2, c.Addresses[i].City, c.Addresses[i].State, c.Addresses[i].PostalCode, c.Addresses[i].Country, c.Addresses[i].Validated, c.Addresses[i].Active)
+		_, err := stmt.Exec(c.Addresses[i].Id, c.Id, c.Addresses[i].Type, c.Addresses[i].Address1, c.Addresses[i].Address2, c.Addresses[i].City, c.Addresses[i].State, c.Addresses[i].PostalCode, c.Addresses[i].Country, c.Addresses[i].Validated, c.Addresses[i].Active)
 		if err != nil {
 			stmt.Close()
 			return nil, fmt.Errorf("createCustomer: customers_addresses exec err=%v | rollback=%v", err, tx.Rollback())
@@ -492,7 +436,7 @@ func (r *sqliteCustomerRepository) readPhones(customerId string) ([]client.Phone
 }
 
 func (r *sqliteCustomerRepository) readAddresses(customerId string) ([]client.Address, error) {
-	query := `select type, address1, address2, city, state, postal_code, country, validated, active from customers_addresses where customer_id = ?;`
+	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated, active from customers_addresses where customer_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("readAddresses: prepare customers_addresses: err=%v", err)
@@ -508,7 +452,7 @@ func (r *sqliteCustomerRepository) readAddresses(customerId string) ([]client.Ad
 	var adds []client.Address
 	for rows.Next() {
 		var a client.Address
-		if err := rows.Scan(&a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated, &a.Active); err != nil {
+		if err := rows.Scan(&a.Id, &a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated, &a.Active); err != nil {
 			return nil, fmt.Errorf("readAddresses: scan customers_addresses: err=%v", err)
 		}
 		adds = append(adds, a)
@@ -605,6 +549,34 @@ func (r *sqliteCustomerRepository) replaceCustomerMetadata(customerId string, me
 	}
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("replaceCustomerMetadata: commit: %v", err)
+	}
+	return nil
+}
+
+func (r *sqliteCustomerRepository) addCustomerAddress(customerId string, req address) error {
+	query := `insert into customers_addresses (address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("addCustomerAddress: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(base.ID(), customerId, "Secondary", req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false, true); err != nil {
+		return fmt.Errorf("addCustomerAddress: exec: %v", err)
+	}
+	return nil
+}
+
+func (r *sqliteCustomerRepository) updateCustomerAddress(customerId, addressId string, _type string, validated bool) error {
+	query := `update customers_addresses set type = ?, validated = ? where customer_id = ? and address_id = ?;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("updateCustomerAddress: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(_type, validated, customerId, addressId); err != nil {
+		return fmt.Errorf("updateCustomerAddress: exec: %v", err)
 	}
 	return nil
 }
