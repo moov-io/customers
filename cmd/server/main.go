@@ -153,6 +153,9 @@ func main() {
 	}()
 	defer adminServer.Shutdown()
 
+	// Register our admin routes
+	addApprovalRoutes(logger, adminServer, customerRepo)
+
 	// Start business logic HTTP server
 	go func() {
 		logger.Log("transport", "HTTP", "addr", *httpAddr)

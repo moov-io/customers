@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Id** | **string** | Unique identifier for this Address | [optional] 
 **Type** | **string** |  | [optional] 
 **Address1** | **string** | First line of the address | [optional] 
 **Address2** | **string** | Second line of the address | [optional] 
