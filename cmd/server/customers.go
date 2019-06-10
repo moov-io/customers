@@ -99,14 +99,6 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerId st
 		moovhttp.Problem(w, err)
 		return
 	}
-	metadata, err := repo.getCustomerMetadata(customerId)
-	if err != nil {
-		logger.Log("customers", fmt.Sprintf("getCustomer: metadata lookup: %v", err), "requestId", requestId)
-		moovhttp.Problem(w, err)
-		return
-	}
-	cust.Metadata = metadata
-
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(cust)
@@ -409,6 +401,12 @@ func (r *sqliteCustomerRepository) getCustomer(customerId string) (*client.Custo
 		return nil, fmt.Errorf("getCustomer: readAddresses: %v", err)
 	}
 	cust.Addresses = addresses
+
+	metadata, err := r.getCustomerMetadata(customerId)
+	if err != nil {
+		return nil, fmt.Errorf("getCustomer: getCustomerMetadata: %v", err)
+	}
+	cust.Metadata = metadata
 
 	return &cust, nil
 }
