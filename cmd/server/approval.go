@@ -24,7 +24,8 @@ var (
 )
 
 // addApprovalRoutes contains "back office" endpoints used to validate (or reject) a Customer
-// TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now 'x-admin-id' ??
+// TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now.
+// What about a header like x-admin-id ??
 func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerRepository) {
 	svc.AddHandler("/customers/{customerId}/status", updateCustomerStatus(logger, repo))
 	svc.AddHandler("/customers/{customerId}/addresses/{addressId}", updateCustomerAddress(logger, repo))
@@ -131,6 +132,7 @@ func getAddressId(w http.ResponseWriter, r *http.Request) string {
 }
 
 // TODO(adam): Should Addresses have a 'Type: Previous'? I don't think we ever want to delete an address, but it can be marked as old.
+// If we keep address info around does it have GDPR implications?
 // PUT /customers/{customerId}/addresses/{addressId} only accept {"type": "Primary/Secondary", "validated": true/false}
 
 type updateCustomerAddressRequest struct {

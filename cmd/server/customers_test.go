@@ -104,6 +104,7 @@ func TestCustomerStatus__json(t *testing.T) {
 func TestCustomers__GetCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
+
 	cust, err := repo.createCustomer(customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
@@ -127,7 +128,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 		t.Errorf("bogus status code: %d", w.Code)
 	}
 
-	var customer client.Customer // TODO(adam): check more of Customer response?
+	var customer client.Customer
 	if err := json.NewDecoder(w.Body).Decode(&customer); err != nil {
 		t.Fatal(err)
 	}
@@ -220,7 +221,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 		t.Errorf("bogus status code: %d", w.Code)
 	}
 
-	var cust client.Customer // TODO(adam): check more of Customer response?
+	var cust client.Customer
 	if err := json.NewDecoder(w.Body).Decode(&cust); err != nil {
 		t.Fatal(err)
 	}

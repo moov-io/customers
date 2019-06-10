@@ -67,7 +67,7 @@ func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository
 	r.Methods("GET").Path("/customers/{customerId}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerId}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
-	r.Methods("POST").Path("/customers/{customerId}/address").HandlerFunc(addCustomerAddress(logger, repo)) // TODO(adam): openapi docs
+	r.Methods("POST").Path("/customers/{customerId}/address").HandlerFunc(addCustomerAddress(logger, repo))
 }
 
 func getCustomerId(w http.ResponseWriter, r *http.Request) string {
@@ -112,6 +112,10 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerId st
 	json.NewEncoder(w).Encode(cust)
 }
 
+// customerRequest holds the information for creating a Customer from the HTTP api
+//
+// TODO(adam): What GDPR implications does this information have? IIRC if any EU citizen uses
+// this software we have to fully comply.
 type customerRequest struct {
 	FirstName  string            `json:"firstName"`
 	MiddleName string            `json:"middleName"`
@@ -375,7 +379,6 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 }
 
 func (r *sqliteCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
-	// TODO(adam): read all DB fields once we handle all in the request
 	query := `select first_name, middle_name, last_name, nick_name, suffix, birthdate, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

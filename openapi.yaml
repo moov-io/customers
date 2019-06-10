@@ -432,6 +432,9 @@ components:
         - birthDate
         - email
         - addresses
+        # - SSN # TODO(adam): required, but we need to impl storage and crypto
+        # - phones
+        # - addresses
     Customer:
       type: object
       properties:
