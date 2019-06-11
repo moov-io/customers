@@ -64,6 +64,10 @@ func (r *testCustomerRepository) updateCustomerAddress(customerId, addressId str
 	return r.err
 }
 
+func (r *testCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
+	return r.err
+}
+
 func TestCustomers__getCustomerId(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
@@ -101,6 +105,32 @@ func TestCustomerStatus__json(t *testing.T) {
 	}
 }
 
+func TestCustomers__formatCustomerName(t *testing.T) {
+	if out := formatCustomerName(nil); out != "" {
+		t.Errorf("got %q", out)
+	}
+
+	cases := []struct {
+		output, expected string
+	}{
+		{formatCustomerName(&client.Customer{FirstName: "Jane"}), "Jane"},
+		{formatCustomerName(&client.Customer{FirstName: "Jane", LastName: "Doe"}), "Jane Doe"},
+		{formatCustomerName(&client.Customer{FirstName: "Jane", MiddleName: " B ", LastName: "Doe"}), "Jane B Doe"},
+		{formatCustomerName(&client.Customer{FirstName: " John", MiddleName: "M", LastName: "Doe", Suffix: "Jr"}), "John M Doe Jr"},
+		{formatCustomerName(&client.Customer{FirstName: "John ", MiddleName: "M", LastName: " Doe ", Suffix: "Jr "}), "John M Doe Jr"},
+		{formatCustomerName(&client.Customer{FirstName: "John ", MiddleName: "M", Suffix: "Jr "}), "John M Jr"},
+		{formatCustomerName(&client.Customer{FirstName: "John ", Suffix: "Jr "}), "John Jr"},
+		{formatCustomerName(&client.Customer{MiddleName: "M", LastName: " Doe ", Suffix: "Jr "}), "M Doe Jr"},
+		{formatCustomerName(&client.Customer{MiddleName: "M", LastName: " Doe "}), "M Doe"},
+		{formatCustomerName(&client.Customer{LastName: " Doe "}), "Doe"},
+	}
+	for i := range cases {
+		if cases[i].output != cases[i].expected {
+			t.Errorf("got %q expected %q", cases[i].output, cases[i].expected)
+		}
+	}
+}
+
 func TestCustomers__GetCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
@@ -120,7 +150,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -146,7 +176,7 @@ func TestCustomers__GetCustomersError(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -213,7 +243,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	defer repo.close()
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -360,7 +390,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -385,7 +415,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router2 := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router2, repo2)
+	addCustomerRoutes(log.NewNopLogger(), router2, repo2, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -421,7 +451,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -454,7 +484,7 @@ func TestCustomers__replaceCustomerMetadataError(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -531,7 +561,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
 	router.ServeHTTP(w, req)
 	w.Flush()
 

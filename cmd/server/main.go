@@ -81,6 +81,21 @@ func main() {
 	documentRepo := &sqliteDocumentRepository{db}
 	defer documentRepo.close()
 
+	// Start Admin server (with Prometheus metrics)
+	adminServer := admin.NewServer(*adminAddr)
+	go func() {
+		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		if err := adminServer.Listen(); err != nil {
+			err = fmt.Errorf("problem starting admin http: %v", err)
+			logger.Log("admin", err)
+			errs <- err
+		}
+	}()
+	defer adminServer.Shutdown()
+
+	// Register our admin routes
+	addApprovalRoutes(logger, adminServer, customerRepo)
+
 	// Create our fileblob.URLSignerHMAC
 	bucketName, cloudProvider := os.Getenv("BUCKET_NAME"), strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
 	var signer *fileblob.URLSignerHMAC
@@ -105,11 +120,22 @@ func main() {
 		signer = s
 	}
 
+	// Create our OFAC searcher
+	ofacClient := newOFACClient(logger, os.Getenv("OFAC_ENDPOINT"))
+	if ofacClient == nil {
+		panic("No OFAC client created, see OFAC_ENDPOINT")
+	}
+	adminServer.AddLivenessCheck("ofac", ofacClient.Ping)
+	ofac := &ofacSearcher{
+		repo:       customerRepo,
+		ofacClient: ofacClient,
+	}
+
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	addCustomerRoutes(logger, router, customerRepo)
+	addCustomerRoutes(logger, router, customerRepo, ofac)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
 
 	// Optionally serve /files/ as our fileblob routes
@@ -140,21 +166,6 @@ func main() {
 			logger.Log("shutdown", err)
 		}
 	}
-
-	// Start Admin server (with Prometheus metrics)
-	adminServer := admin.NewServer(*adminAddr)
-	go func() {
-		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
-		if err := adminServer.Listen(); err != nil {
-			err = fmt.Errorf("problem starting admin http: %v", err)
-			logger.Log("admin", err)
-			errs <- err
-		}
-	}()
-	defer adminServer.Shutdown()
-
-	// Register our admin routes
-	addApprovalRoutes(logger, adminServer, customerRepo)
 
 	// Start business logic HTTP server
 	go func() {
