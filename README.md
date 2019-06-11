@@ -54,6 +54,10 @@ For more information see the [Go Cloud Development Kit docs for fileblob](https:
 - `FILEBLOB_BASE_URL`: A filepath for storage on local disk. (Default: `./storage/`)
 - `FILEBLOB_HMAC_SECRET`: HMAC secret value used to sign URLs. You *MUST* change this for production usage! (Default: `secret`)
 
+## Customer Approval
+
+Currently approval of Customers is represented by the [`status` field of a `Customer`](https://api.moov.io/#operation/getCustomer) and can have the following values: `Deceased`, `Rejected`, `None` (Default), `ReviewRequired`, `KYC`, `OFAC`, and `CIP`. These values can only be changed via the "admin" endpoints exposed in Customers. Admin endpoints are served from Customer's admin port (`9097`). Approvals (updates to a Customer status) can only be done manually, but we are aiming for automated approval. In order for a Customer to be approved into OFAC or higher there must be an [OFAC search](https://github.com/moov-io/ofac#moov-ioofac) performed without positive matches and CIP requires a valid Social Security Number (SSN).
+
 ## Getting Help
 
  channel | info
