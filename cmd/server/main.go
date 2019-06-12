@@ -93,9 +93,6 @@ func main() {
 	}()
 	defer adminServer.Shutdown()
 
-	// Register our admin routes
-	addApprovalRoutes(logger, adminServer, customerRepo)
-
 	// Create our fileblob.URLSignerHMAC
 	bucketName, cloudProvider := os.Getenv("BUCKET_NAME"), strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
 	var signer *fileblob.URLSignerHMAC
@@ -130,6 +127,9 @@ func main() {
 		repo:       customerRepo,
 		ofacClient: ofacClient,
 	}
+
+	// Register our admin routes
+	addApprovalRoutes(logger, adminServer, customerRepo, ofac)
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()

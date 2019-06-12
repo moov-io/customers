@@ -28,10 +28,11 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 			Id: base.ID(),
 		},
 	}
+	searcher := createTestOFACSearcher(repo, nil)
 
 	svc := admin.NewServer(":10001")
 	defer svc.Shutdown()
-	addApprovalRoutes(log.NewNopLogger(), svc, repo)
+	addApprovalRoutes(log.NewNopLogger(), svc, repo, searcher)
 	go svc.Listen()
 
 	body := strings.NewReader(`{"status": "ReviewRequired", "comment": "test comment"}`)
@@ -88,10 +89,11 @@ func TestCustomers__getAddressId(t *testing.T) {
 
 func TestCustomers__updateCustomerStatusFailure(t *testing.T) {
 	repo := &testCustomerRepository{}
+	searcher := createTestOFACSearcher(repo, nil)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers/foo/status", nil)
-	updateCustomerStatus(log.NewNopLogger(), repo)(w, req)
+	updateCustomerStatus(log.NewNopLogger(), repo, searcher)(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusBadRequest {
@@ -101,7 +103,7 @@ func TestCustomers__updateCustomerStatusFailure(t *testing.T) {
 	// try the proper HTTP verb
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("PUT", "/customers/foo/status", nil)
-	updateCustomerStatus(log.NewNopLogger(), repo)(w, req)
+	updateCustomerStatus(log.NewNopLogger(), repo, searcher)(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusBadRequest {
@@ -137,29 +139,31 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 		Id:     base.ID(),
 		Status: CustomerStatusNone,
 	}
+	repo := &testCustomerRepository{}
+	searcher := createTestOFACSearcher(repo, nil)
 
-	if err := validCustomerStatusTransition(cust, CustomerStatusDeceased); err != nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusDeceased, repo, searcher, "requestId"); err != nil {
 		t.Errorf("expected no error: %v", err)
 	}
 
 	// block Deceased and Rejected customers
 	cust.Status = CustomerStatusDeceased
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
 		t.Error("expected error")
 	}
 	cust.Status = CustomerStatusRejected
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
 		t.Error("expected error")
 	}
 
 	// normal KYC approval (rejected due to missing info)
 	cust.FirstName, cust.LastName = "Jane", "Doe"
 	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
 		t.Error("expected error")
 	}
 	cust.BirthDate = time.Now()
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
 		t.Error("expected error")
 	}
 	cust.Addresses = append(cust.Addresses, client.Address{
@@ -167,13 +171,26 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 		Address1: "123 1st st",
 	})
 
-	// OFAC and CIP transistions are WIP // TODO(adam): impl both transistions
+	// OFAC transition
 	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC); err == nil {
-		t.Error("OFAC transition is WIP")
+	repo.ofacSearchResult = &ofacSearchResult{
+		sdnName: "Jane Doe",
+		match:   0.10,
 	}
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
+		t.Errorf("unexpected error in OFAC transition: %v", err)
+	}
+	// OFAC transition with positive match
+	repo.ofacSearchResult.match = 0.99
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
+		if !strings.Contains(err.Error(), "positive OFAC match") {
+			t.Errorf("unexpected error in OFAC transition: %v", err)
+		}
+	}
+
+	// CIP transistions are WIP // TODO(adam):
 	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, CustomerStatusCIP); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusCIP, repo, searcher, "requestId"); err == nil {
 		t.Error("CIP transition is WIP")
 	}
 }
@@ -184,10 +201,11 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 			Id: base.ID(),
 		},
 	}
+	searcher := createTestOFACSearcher(repo, nil)
 
 	svc := admin.NewServer(":10002")
 	defer svc.Shutdown()
-	addApprovalRoutes(log.NewNopLogger(), svc, repo)
+	addApprovalRoutes(log.NewNopLogger(), svc, repo, searcher)
 	go svc.Listen()
 
 	body := strings.NewReader(`{"type": "primary", "validated": true}`)

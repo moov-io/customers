@@ -22,8 +22,9 @@ import (
 )
 
 type testCustomerRepository struct {
-	err      error
-	customer *client.Customer
+	err              error
+	customer         *client.Customer
+	ofacSearchResult *ofacSearchResult
 
 	updatedStatus CustomerStatus
 }
@@ -62,6 +63,13 @@ func (r *testCustomerRepository) addCustomerAddress(customerId string, address a
 
 func (r *testCustomerRepository) updateCustomerAddress(customerId, addressId string, _type string, validated bool) error {
 	return r.err
+}
+
+func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
+	return r.ofacSearchResult, nil
 }
 
 func (r *testCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
@@ -150,7 +158,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -176,7 +184,7 @@ func TestCustomers__GetCustomersError(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -243,7 +251,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	defer repo.close()
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -390,7 +398,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -415,7 +423,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router2 := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router2, repo2, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router2, repo2, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -451,7 +459,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -484,7 +492,7 @@ func TestCustomers__replaceCustomerMetadataError(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -561,7 +569,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testOFACSearcher)
+	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -619,5 +627,44 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	}
 	if cust.Addresses[0].Address1 != "123 1st st" {
 		t.Errorf("cust.Addresses[0].Address1=%s", cust.Addresses[0].Address1)
+	}
+}
+
+func TestCustomerRepository__OFAC(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	customerId := base.ID()
+
+	res, err := repo.getLatestCustomerOFACSearch(customerId)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res != nil {
+		t.Errorf("unexpected ofacSearchResult: %#v", res)
+	}
+
+	// save a record and read it back
+	if err := repo.saveCustomerOFACSearch(customerId, ofacSearchResult{entityId: "14141"}); err != nil {
+		t.Fatal(err)
+	}
+	res, err = repo.getLatestCustomerOFACSearch(customerId)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res == nil || res.entityId != "14141" {
+		t.Errorf("ofacSearchResult: %#v", res)
+	}
+
+	// save another and get it back
+	if err := repo.saveCustomerOFACSearch(customerId, ofacSearchResult{entityId: "777121"}); err != nil {
+		t.Fatal(err)
+	}
+	res, err = repo.getLatestCustomerOFACSearch(customerId)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res == nil || res.entityId != "777121" {
+		t.Errorf("ofacSearchResult: %#v", res)
 	}
 }

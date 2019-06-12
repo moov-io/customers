@@ -58,8 +58,6 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestId 
 			sdnType:  sdn.SdnType,
 			match:    sdn.Match,
 		})
-	default:
-		err = fmt.Errorf("no SDN(s) found for customer=%s", cust.Id)
 	}
 	if err != nil {
 		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: saveCustomerOFACSearch customer=%s: %v", cust.Id, err)

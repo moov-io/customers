@@ -327,6 +327,7 @@ type customerRepository interface {
 	addCustomerAddress(customerId string, address address) error
 	updateCustomerAddress(customerId, addressId string, _type string, validated bool) error
 
+	getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error)
 	saveCustomerOFACSearch(customerId string, result ofacSearchResult) error
 }
 
@@ -606,6 +607,25 @@ func (r *sqliteCustomerRepository) updateCustomerAddress(customerId, addressId s
 		return fmt.Errorf("updateCustomerAddress: exec: %v", err)
 	}
 	return nil
+}
+
+func (r *sqliteCustomerRepository) getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error) {
+	query := `select entity_id, sdn_name, sdn_type, match from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("getLatestCustomerOFACSearch: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(customerId)
+	var res ofacSearchResult
+	if err := row.Scan(&res.entityId, &res.sdnName, &res.sdnType, &res.match); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // nothing found
+		}
+		return nil, fmt.Errorf("getLatestCustomerOFACSearch: scan: %v", err)
+	}
+	return &res, nil
 }
 
 func (r *sqliteCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
