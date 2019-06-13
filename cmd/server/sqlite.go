@@ -23,6 +23,7 @@ var (
 		`create table if not exists customers_addresses(address_id primary key, customer_id, type, address1, address2, city, state, postal_code, country, validated, active, unique (customer_id, address1) on conflict abort);`,
 		`create table if not exists customer_metadata(customer_id, key, value, unique(key, value));`,
 		`create table if not exists customer_status_updates(customer_id, future_status, comment, changed_at datetime);`,
+		`create table if not exists customer_ofac_searches(customer_id, entity_id, sdn_name, sdn_type, match, created_at datetime);`,
 
 		// Document tables
 		`create table if not exists documents(document_id primary key, customer_id, type, content_type, uploaded_at datetime);`,

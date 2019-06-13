@@ -9,6 +9,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"strings"
 
 	"github.com/moov-io/base/admin"
@@ -20,14 +22,24 @@ import (
 )
 
 var (
+	ofacMatchThreshold float32 = func() float32 {
+		if v := os.Getenv("OFAC_MATCH_THRESHOLD"); v != "" {
+			f, err := strconv.ParseFloat(v, 32)
+			if err == nil && f > 0.00 {
+				return float32(f)
+			}
+		}
+		return 0.90 // default, 90%
+	}()
+
 	errNoAddressId = errors.New("no Address ID found")
 )
 
 // addApprovalRoutes contains "back office" admin endpoints used to validate (or reject) a Customer
 // TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now.
 // What about a header like x-admin-id ??
-func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerRepository) {
-	svc.AddHandler("/customers/{customerId}/status", updateCustomerStatus(logger, repo))
+func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerRepository, ofac *ofacSearcher) {
+	svc.AddHandler("/customers/{customerId}/status", updateCustomerStatus(logger, repo, ofac))
 	svc.AddHandler("/customers/{customerId}/addresses/{addressId}", updateCustomerAddress(logger, repo))
 }
 
@@ -42,7 +54,7 @@ type updateCustomerStatusRequest struct {
 //  - KYC is only valid if the Customer has first, last, address, and date of birth
 //  - OFAC can only be after an OFAC search has been performed (and search info recorded)
 //  - CIP can only be if the SSN has been set
-func validCustomerStatusTransition(existing *client.Customer, futureStatus CustomerStatus) error {
+func validCustomerStatusTransition(existing *client.Customer, futureStatus CustomerStatus, repo customerRepository, ofac *ofacSearcher, requestId string) error {
 	eql := func(s string, status CustomerStatus) bool {
 		return strings.EqualFold(s, string(status))
 	}
@@ -61,10 +73,24 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 		if !containsValidPrimaryAddress(existing.Addresses) {
 			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.Id)
 		}
-	case CustomerStatusOFAC: // TODO(adam): need to impl lookup
-		// I think we should perform the OFAC search when requested and store the highest match EntityId, name and match % in a new database table.
-		// Then it's a valid transition only when a record exists and is below the threshold.
-		return fmt.Errorf("customers=%s %s to OFAC transition needs to lookup OFAC search results", existing.Id, existing.Status)
+	case CustomerStatusOFAC:
+		searchResult, err := repo.getLatestCustomerOFACSearch(existing.Id)
+		if err != nil {
+			return fmt.Errorf("validCustomerStatusTransition: error getting OFAC search: %v", err)
+		}
+		if searchResult == nil {
+			if err := ofac.storeCustomerOFACSearch(existing, ""); err != nil {
+				return fmt.Errorf("validCustomerStatusTransition: problem with OFAC search: %v", err)
+			}
+			searchResult, err = repo.getLatestCustomerOFACSearch(existing.Id)
+			if err != nil || searchResult == nil {
+				return fmt.Errorf("validCustomerStatusTransition: inner lookup searchResult=%#v: %v", searchResult, err)
+			}
+		}
+		if searchResult.match > ofacMatchThreshold {
+			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.Id, searchResult.match, searchResult.entityId)
+		}
+		return nil
 	case CustomerStatusCIP: // TODO(adam): need to impl lookup
 		// What can we do to validate an SSN?
 		// https://www.ssa.gov/employer/randomization.html (not much)
@@ -82,7 +108,7 @@ func containsValidPrimaryAddress(addrs []client.Address) bool {
 	return false
 }
 
-func updateCustomerStatus(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func updateCustomerStatus(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
@@ -107,7 +133,7 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository) http.Handl
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err := validCustomerStatusTransition(cust, req.Status); err != nil {
+		if err := validCustomerStatusTransition(cust, req.Status, repo, ofac, requestId); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}

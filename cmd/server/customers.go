@@ -63,9 +63,9 @@ func (cs *CustomerStatus) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository) {
+func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, ofac *ofacSearcher) {
 	r.Methods("GET").Path("/customers/{customerId}").HandlerFunc(getCustomer(logger, repo))
-	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo))
+	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, ofac))
 	r.Methods("PUT").Path("/customers/{customerId}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
 	r.Methods("POST").Path("/customers/{customerId}/address").HandlerFunc(addCustomerAddress(logger, repo))
 }
@@ -77,6 +77,23 @@ func getCustomerId(w http.ResponseWriter, r *http.Request) string {
 		return ""
 	}
 	return v
+}
+
+// formatCustomerName returns a Customer's name joined as one string. It accounts for
+// first, middle, last and suffix. Each field is whitespace trimmed.
+func formatCustomerName(c *client.Customer) string {
+	if c == nil {
+		return ""
+	}
+	out := strings.TrimSpace(c.FirstName)
+	if c.MiddleName != "" {
+		out += " " + strings.TrimSpace(c.MiddleName)
+	}
+	out = strings.TrimSpace(out + " " + strings.TrimSpace(c.LastName))
+	if c.Suffix != "" {
+		out += " " + c.Suffix
+	}
+	return strings.TrimSpace(out)
 }
 
 func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
@@ -203,7 +220,7 @@ func (req customerRequest) asCustomer() client.Customer {
 	return customer
 }
 
-func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func createCustomer(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
@@ -231,6 +248,13 @@ func createCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc
 			moovhttp.Problem(w, err)
 			return
 		}
+
+		// Try an OFAC search with the Customer information
+		go func(logger log.Logger, cust *client.Customer, requestId string) {
+			if err := ofac.storeCustomerOFACSearch(cust, requestId); err != nil {
+				logger.Log("customers", fmt.Sprintf("error with OFAC search for customer=%s: %v", cust.Id, err), "requestId", requestId)
+			}
+		}(logger, cust, requestId)
 
 		logger.Log("customers", fmt.Sprintf("created customer=%s", cust.Id), "requestId", requestId)
 
@@ -302,6 +326,9 @@ type customerRepository interface {
 
 	addCustomerAddress(customerId string, address address) error
 	updateCustomerAddress(customerId, addressId string, _type string, validated bool) error
+
+	getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error)
+	saveCustomerOFACSearch(customerId string, result ofacSearchResult) error
 }
 
 type sqliteCustomerRepository struct {
@@ -578,6 +605,39 @@ func (r *sqliteCustomerRepository) updateCustomerAddress(customerId, addressId s
 
 	if _, err := stmt.Exec(_type, validated, customerId, addressId); err != nil {
 		return fmt.Errorf("updateCustomerAddress: exec: %v", err)
+	}
+	return nil
+}
+
+func (r *sqliteCustomerRepository) getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error) {
+	query := `select entity_id, sdn_name, sdn_type, match from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("getLatestCustomerOFACSearch: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(customerId)
+	var res ofacSearchResult
+	if err := row.Scan(&res.entityId, &res.sdnName, &res.sdnType, &res.match); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // nothing found
+		}
+		return nil, fmt.Errorf("getLatestCustomerOFACSearch: scan: %v", err)
+	}
+	return &res, nil
+}
+
+func (r *sqliteCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
+	query := `insert into customer_ofac_searches (customer_id, entity_id, sdn_name, sdn_type, match, created_at) values (?, ?, ?, ?, ?, ?);`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("saveCustomerOFACSearch: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	if _, err := stmt.Exec(customerId, result.entityId, result.sdnName, result.sdnType, result.match, time.Now()); err != nil {
+		return fmt.Errorf("saveCustomerOFACSearch: exec: %v", err)
 	}
 	return nil
 }
