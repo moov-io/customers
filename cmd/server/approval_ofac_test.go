@@ -45,4 +45,10 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	if res.entityId != "1241421" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
+
+	// retry but with NickName set (test coverage)
+	customerId = base.ID()
+	if err := searcher.storeCustomerOFACSearch(&client.Customer{Id: customerId, NickName: "John Doe"}, "requestId"); err != nil {
+		t.Fatal(err)
+	}
 }

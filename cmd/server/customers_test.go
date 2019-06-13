@@ -26,7 +26,8 @@ type testCustomerRepository struct {
 	customer         *client.Customer
 	ofacSearchResult *ofacSearchResult
 
-	updatedStatus CustomerStatus
+	updatedStatus         CustomerStatus
+	savedOFACSearchResult *ofacSearchResult
 }
 
 func (r *testCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
@@ -69,10 +70,14 @@ func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerId string) 
 	if r.err != nil {
 		return nil, r.err
 	}
+	if r.savedOFACSearchResult != nil {
+		return r.savedOFACSearchResult, nil
+	}
 	return r.ofacSearchResult, nil
 }
 
 func (r *testCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
+	r.savedOFACSearchResult = &result
 	return r.err
 }
 

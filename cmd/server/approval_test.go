@@ -17,6 +17,7 @@ import (
 	"github.com/moov-io/base"
 	"github.com/moov-io/base/admin"
 	client "github.com/moov-io/customers/client"
+	ofac "github.com/moov-io/ofac/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -171,8 +172,21 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 		Address1: "123 1st st",
 	})
 
-	// OFAC transition
+	// CIP transistions are WIP // TODO(adam):
 	cust.Status = CustomerStatusReviewRequired
+	if err := validCustomerStatusTransition(cust, CustomerStatusCIP, repo, searcher, "requestId"); err == nil {
+		t.Error("CIP transition is WIP")
+	}
+}
+
+func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
+	cust := &client.Customer{
+		Id:     base.ID(),
+		Status: CustomerStatusReviewRequired,
+	}
+	repo := &testCustomerRepository{}
+	searcher := createTestOFACSearcher(repo, nil)
+
 	repo.ofacSearchResult = &ofacSearchResult{
 		sdnName: "Jane Doe",
 		match:   0.10,
@@ -180,6 +194,7 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
 		t.Errorf("unexpected error in OFAC transition: %v", err)
 	}
+
 	// OFAC transition with positive match
 	repo.ofacSearchResult.match = 0.99
 	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
@@ -188,10 +203,18 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 		}
 	}
 
-	// CIP transistions are WIP // TODO(adam):
-	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, CustomerStatusCIP, repo, searcher, "requestId"); err == nil {
-		t.Error("CIP transition is WIP")
+	// OFAC transition with no stored result
+	repo.ofacSearchResult = nil
+	if c, ok := searcher.ofacClient.(*testOFACClient); ok {
+		c.sdn = &ofac.Sdn{
+			EntityID: "12124",
+		}
+	}
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	if repo.savedOFACSearchResult.entityId != "12124" {
+		t.Errorf("unexpected saved OFAC result: %#v", repo.savedOFACSearchResult)
 	}
 }
 
