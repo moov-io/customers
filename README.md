@@ -25,6 +25,8 @@ The following environmental variables can be set to configure behavior in Accoun
 
 | Environmental Variable | Description | Default |
 |-----|-----|-----|
+| `OFAC_ENDPOINT` | HTTP address for [OFAC](https://github.com/moov-io/ofac) interaction, defaults to Kubernetes inside clusters and local dev otherwise. | Kubernetes DNS |
+| `OFAC_MATCH_THRESHOLD` | Percent match against OFAC data that's required for paygate to block a transaction. | `0.90` |
 | `SQLITE_DB_PATH`| Local filepath location for the paygate SQLite database. | `customers.db` |
 
 #### Document Storage
