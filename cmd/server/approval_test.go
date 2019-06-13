@@ -7,6 +7,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -176,6 +177,27 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	cust.Status = CustomerStatusReviewRequired
 	if err := validCustomerStatusTransition(cust, CustomerStatusCIP, repo, searcher, "requestId"); err == nil {
 		t.Error("CIP transition is WIP")
+	}
+}
+
+func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
+	cust := &client.Customer{
+		Id:     base.ID(),
+		Status: CustomerStatusReviewRequired,
+	}
+	repo := &testCustomerRepository{}
+	ofacClient := &testOFACClient{}
+	searcher := createTestOFACSearcher(repo, ofacClient)
+
+	repo.err = errors.New("bad error")
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, ""); err == nil {
+		t.Error("expected error, but got none")
+	}
+	repo.err = nil
+
+	ofacClient.err = errors.New("bad error")
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, ""); err == nil {
+		t.Error("expected error, but got none")
 	}
 }
 
