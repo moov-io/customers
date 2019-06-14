@@ -26,6 +26,7 @@ type testCustomerRepository struct {
 	customer         *client.Customer
 	ofacSearchResult *ofacSearchResult
 
+	createdCustomer       *client.Customer
 	updatedStatus         CustomerStatus
 	savedOFACSearchResult *ofacSearchResult
 }
@@ -37,11 +38,9 @@ func (r *testCustomerRepository) getCustomer(customerId string) (*client.Custome
 	return r.customer, nil
 }
 
-func (r *testCustomerRepository) createCustomer(req customerRequest) (*client.Customer, error) {
-	if r.err != nil {
-		return nil, r.err
-	}
-	return r.customer, nil
+func (r *testCustomerRepository) createCustomer(c *client.Customer) error {
+	r.createdCustomer = c
+	return r.err
 }
 
 func (r *testCustomerRepository) updateCustomerStatus(customerId string, status CustomerStatus, comment string) error {
@@ -148,12 +147,12 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	cust, err := repo.createCustomer(customerRequest{
+	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	})
-	if err != nil {
+	}).asCustomer()
+	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
 
@@ -163,7 +162,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -189,7 +188,7 @@ func TestCustomers__GetCustomersError(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -231,7 +230,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 	}
 
 	// asCustomer
-	cust := req.asCustomer()
+	cust, _, _ := req.asCustomer()
 	if cust.Id == "" {
 		t.Errorf("empty Customer: %#v", cust)
 	}
@@ -256,7 +255,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	defer repo.close()
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -310,7 +309,7 @@ func TestCustomers__repository(t *testing.T) {
 	}
 
 	// write
-	req := customerRequest{
+	cust, _, _ = (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
@@ -329,9 +328,8 @@ func TestCustomers__repository(t *testing.T) {
 				Country:    "US",
 			},
 		},
-	}
-	cust, err = repo.createCustomer(req)
-	if err != nil {
+	}).asCustomer()
+	if err := repo.createCustomer(cust); err != nil {
 		t.Error(err)
 	}
 	if cust == nil {
@@ -358,12 +356,12 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	cust, err := repo.createCustomer(customerRequest{
+	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	})
-	if err != nil {
+	}).asCustomer()
+	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
 
@@ -386,12 +384,12 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	cust, err := repo.createCustomer(customerRequest{
+	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	})
-	if err != nil {
+	}).asCustomer()
+	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
 
@@ -403,7 +401,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -428,7 +426,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router2 := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router2, repo2, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router2, repo2, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -441,12 +439,12 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	cust, err := repo.createCustomer(customerRequest{
+	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	})
-	if err != nil {
+	}).asCustomer()
+	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
 
@@ -464,7 +462,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -497,7 +495,7 @@ func TestCustomers__replaceCustomerMetadataError(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -574,7 +572,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -602,12 +600,12 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	cust, err := repo.createCustomer(customerRequest{
+	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	})
-	if err != nil {
+	}).asCustomer()
+	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
 
@@ -623,7 +621,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	}
 
 	// re-read
-	cust, err = repo.getCustomer(cust.Id)
+	cust, err := repo.getCustomer(cust.Id)
 	if err != nil {
 		t.Fatal(err)
 	}

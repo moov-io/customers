@@ -305,7 +305,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	req := customerRequest{
+	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
@@ -324,9 +324,8 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 				Country:    "US",
 			},
 		},
-	}
-	cust, err := repo.createCustomer(req)
-	if err != nil {
+	}).asCustomer()
+	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
 
@@ -335,7 +334,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 		t.Error(err)
 	}
 
-	cust, err = repo.getCustomer(cust.Id)
+	cust, err := repo.getCustomer(cust.Id)
 	if err != nil {
 		t.Error(err)
 	}

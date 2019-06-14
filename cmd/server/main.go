@@ -78,6 +78,8 @@ func main() {
 
 	customerRepo := &sqliteCustomerRepository{db}
 	defer customerRepo.close()
+	customerSSNRepo := &sqliteCustomerSSNRepository{db}
+	defer customerSSNRepo.close()
 	documentRepo := &sqliteDocumentRepository{db}
 	defer documentRepo.close()
 
@@ -131,11 +133,17 @@ func main() {
 	// Register our admin routes
 	addApprovalRoutes(logger, adminServer, customerRepo, ofac)
 
+	// Setup Customer SSN storage wrapper
+	customerSSNStorage := &ssnStorage{
+		keeperFactory: getSecretKeeper,
+		repo:          customerSSNRepo,
+	}
+
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	addCustomerRoutes(logger, router, customerRepo, ofac)
+	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
 
 	// Optionally serve /files/ as our fileblob routes

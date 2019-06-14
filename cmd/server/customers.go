@@ -63,9 +63,9 @@ func (cs *CustomerStatus) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, ofac *ofacSearcher) {
+func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
 	r.Methods("GET").Path("/customers/{customerId}").HandlerFunc(getCustomer(logger, repo))
-	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, ofac))
+	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
 	r.Methods("PUT").Path("/customers/{customerId}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
 	r.Methods("POST").Path("/customers/{customerId}/address").HandlerFunc(addCustomerAddress(logger, repo))
 }
@@ -185,9 +185,9 @@ func validateMetadata(meta map[string]string) error {
 	return nil
 }
 
-func (req customerRequest) asCustomer() client.Customer {
+func (req customerRequest) asCustomer() (*client.Customer, *SSN, error) {
 	// TODO(adam): How do we store off SSN (and wipe from models)
-	customer := client.Customer{
+	customer := &client.Customer{
 		Id:         base.ID(),
 		FirstName:  req.FirstName,
 		MiddleName: req.MiddleName,
@@ -217,10 +217,10 @@ func (req customerRequest) asCustomer() client.Customer {
 			Active:     true,
 		})
 	}
-	return customer
+	return customer, nil, nil // TODO(adam): impl *SSN, error
 }
 
-func createCustomer(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
+func createCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
@@ -235,8 +235,12 @@ func createCustomer(logger log.Logger, repo customerRepository, ofac *ofacSearch
 		}
 		requestId := moovhttp.GetRequestId(r)
 
-		cust, err := repo.createCustomer(req)
+		cust, _, err := req.asCustomer() // TODO(adam):
 		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		if err := repo.createCustomer(cust); err != nil {
 			if requestId != "" {
 				logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestId", requestId)
 			}
@@ -318,7 +322,7 @@ func addCustomerAddress(logger log.Logger, repo customerRepository) http.Handler
 
 type customerRepository interface {
 	getCustomer(customerId string) (*client.Customer, error)
-	createCustomer(req customerRequest) (*client.Customer, error)
+	createCustomer(c *client.Customer) error
 	updateCustomerStatus(customerId string, status CustomerStatus, comment string) error
 
 	getCustomerMetadata(customerId string) (map[string]string, error)
@@ -339,12 +343,10 @@ func (r *sqliteCustomerRepository) close() error {
 	return r.db.Close()
 }
 
-func (r *sqliteCustomerRepository) createCustomer(req customerRequest) (*client.Customer, error) {
-	c := req.asCustomer()
-
+func (r *sqliteCustomerRepository) createCustomer(c *client.Customer) error {
 	tx, err := r.db.Begin()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// Insert customer record
@@ -352,12 +354,12 @@ func (r *sqliteCustomerRepository) createCustomer(req customerRequest) (*client.
 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	now := time.Now()
 	_, err = stmt.Exec(c.Id, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.BirthDate, c.Status, c.Email, now, now)
 	if err != nil {
-		return nil, fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
+		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
 	stmt.Close()
 
@@ -365,13 +367,13 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	query = `insert or replace into customers_phones (customer_id, number, valid, type) values (?, ?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
-		return nil, fmt.Errorf("createCustomer: insert into customers_phones err=%v | rollback=%v", err, tx.Rollback())
+		return fmt.Errorf("createCustomer: insert into customers_phones err=%v | rollback=%v", err, tx.Rollback())
 	}
 	for i := range c.Phones {
 		_, err := stmt.Exec(c.Id, c.Phones[i].Number, c.Phones[i].Valid, c.Phones[i].Type)
 		if err != nil {
 			stmt.Close()
-			return nil, fmt.Errorf("createCustomer: customers_phones exec err=%v | rollback=%v", err, tx.Rollback())
+			return fmt.Errorf("createCustomer: customers_phones exec err=%v | rollback=%v", err, tx.Rollback())
 		}
 	}
 	stmt.Close()
@@ -380,21 +382,21 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	query = `insert or replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
-		return nil, fmt.Errorf("createCustomer: insert into customers_addresses err=%v | rollback=%v", err, tx.Rollback())
+		return fmt.Errorf("createCustomer: insert into customers_addresses err=%v | rollback=%v", err, tx.Rollback())
 	}
 	for i := range c.Addresses {
 		_, err := stmt.Exec(c.Addresses[i].Id, c.Id, c.Addresses[i].Type, c.Addresses[i].Address1, c.Addresses[i].Address2, c.Addresses[i].City, c.Addresses[i].State, c.Addresses[i].PostalCode, c.Addresses[i].Country, c.Addresses[i].Validated, c.Addresses[i].Active)
 		if err != nil {
 			stmt.Close()
-			return nil, fmt.Errorf("createCustomer: customers_addresses exec err=%v | rollback=%v", err, tx.Rollback())
+			return fmt.Errorf("createCustomer: customers_addresses exec err=%v | rollback=%v", err, tx.Rollback())
 		}
 	}
 	stmt.Close()
 
 	if err := tx.Commit(); err != nil {
-		return nil, fmt.Errorf("createCustomer: tx.Commit: %v", err)
+		return fmt.Errorf("createCustomer: tx.Commit: %v", err)
 	}
-	return &c, nil
+	return nil
 }
 
 func (r *sqliteCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
