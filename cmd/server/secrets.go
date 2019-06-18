@@ -29,7 +29,9 @@ var (
 	}
 )
 
-// openSecretKeeper ...
+// openSecretKeeper returns a Go Cloud Development Kit (Go CDK) Keeper object which can be used
+// to encrypt and decrypt byte slices and stored in various services.
+// Checkout https://gocloud.dev/ref/secrets/ for more details.
 func openSecretKeeper(ctx context.Context, path, cloudProvider string) (*secrets.Keeper, error) {
 	switch strings.ToLower(cloudProvider) {
 	case "", "local":
@@ -42,9 +44,9 @@ func openSecretKeeper(ctx context.Context, path, cloudProvider string) (*secrets
 	return nil, fmt.Errorf("unknown secrets cloudProvider=%s", cloudProvider)
 }
 
-// openLocal ...
+// openLocal returns an inmemory Keeper based on a provided key.
 //
-// 'base64key://'
+// The scheme for the base64 key should look like: 'base64key://'
 // The URL hostname must be a base64-encoded key, of length 32 bytes when decoded.
 func openLocal(base64Key string) (*secrets.Keeper, error) {
 	var key [32]byte
@@ -64,7 +66,7 @@ func openLocal(base64Key string) (*secrets.Keeper, error) {
 	return localsecrets.NewKeeper(key), nil
 }
 
-// openGCPKMS ...
+// openGCPKMS returns a Google Cloud Key Management Service Keeper for managing secrets in Google's cloud
 //
 // The environmental variable SECRETS_GCP_KEY_RESOURCE_ID is required and has the following form:
 //  'projects/MYPROJECT/locations/MYLOCATION/keyRings/MYKEYRING/cryptoKeys/MYKEY'
@@ -85,9 +87,9 @@ func openGCPKMS() (*secrets.Keeper, error) {
 	return gcpkms.OpenKeeper(client, os.Getenv("SECRETS_GCP_KEY_RESOURCE_ID"), nil), nil
 }
 
-// openVault ...
+// openVault returns a Keeper for storing values inside of a Vault instance.
 //
-// vault://mykey
+// The scheme for key values should be: vault://mykey
 func openVault(path string) (*secrets.Keeper, error) {
 	defaultVaultConfig := vaultapi.DefaultConfig()
 	cfg := &vault.Config{
