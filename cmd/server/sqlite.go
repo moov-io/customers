@@ -24,6 +24,7 @@ var (
 		`create table if not exists customer_metadata(customer_id, key, value, unique(key, value));`,
 		`create table if not exists customer_status_updates(customer_id, future_status, comment, changed_at datetime);`,
 		`create table if not exists customer_ofac_searches(customer_id, entity_id, sdn_name, sdn_type, match, created_at datetime);`,
+		`create table if not exists customer_ssn(customer_id primary key, ssn, ssn_masked, created_at datetime);`,
 
 		// Document tables
 		`create table if not exists documents(document_id primary key, customer_id, type, content_type, uploaded_at datetime);`,

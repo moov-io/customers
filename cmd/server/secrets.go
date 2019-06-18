@@ -33,7 +33,7 @@ var (
 func openSecretKeeper(ctx context.Context, path, cloudProvider string) (*secrets.Keeper, error) {
 	switch strings.ToLower(cloudProvider) {
 	case "", "local":
-		return openLocal()
+		return openLocal(os.Getenv("SECRETS_LOCAL_BASE64_KEY"))
 	case "gcp":
 		return openGCPKMS()
 	case "vault":
@@ -46,10 +46,10 @@ func openSecretKeeper(ctx context.Context, path, cloudProvider string) (*secrets
 //
 // 'base64key://'
 // The URL hostname must be a base64-encoded key, of length 32 bytes when decoded.
-func openLocal() (*secrets.Keeper, error) {
+func openLocal(base64Key string) (*secrets.Keeper, error) {
 	var key [32]byte
-	if v := os.Getenv("SECRETS_LOCAL_BASE64_KEY"); v != "" {
-		k, err := localsecrets.Base64Key(v)
+	if base64Key != "" {
+		k, err := localsecrets.Base64Key(base64Key)
 		if err != nil {
 			return nil, fmt.Errorf("problem reading SECRETS_LOCAL_BASE64_KEY: %v", err)
 		}

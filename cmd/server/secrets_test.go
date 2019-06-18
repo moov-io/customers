@@ -5,15 +5,20 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/base64"
 	"testing"
 
 	"gocloud.dev/secrets"
 )
 
 var (
-	testSecretKeeper secretFunc = func(_ string) (*secrets.Keeper, error) {
-		return openLocal()
+	testSecretKey    = base64.StdEncoding.EncodeToString(bytes.Repeat([]byte("1"), 32))
+	testSecretKeeper = func(base64Key string) secretFunc {
+		return func(path string) (*secrets.Keeper, error) {
+			return openLocal(base64Key)
+		}
 	}
 )
 

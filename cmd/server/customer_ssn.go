@@ -7,8 +7,10 @@ package main
 import (
 	"context"
 	"database/sql"
+	"encoding/base64"
 	"fmt"
 	"strings"
+	"time"
 	"unicode/utf8"
 )
 
@@ -32,7 +34,9 @@ func (s *ssnStorage) encryptRaw(customerId, raw string) (*SSN, error) {
 	defer func() {
 		raw = ""
 	}()
-
+	if customerId == "" || raw == "" {
+		return nil, fmt.Errorf("missing customer=%s and/or SSN", customerId)
+	}
 	keeper, err := s.keeperFactory(fmt.Sprintf("customer-%s-ssn", customerId))
 	if err != nil {
 		return nil, fmt.Errorf("ssnStorage: keeper init customer=%s: %v", customerId, err)
@@ -72,10 +76,46 @@ func (r *sqliteCustomerSSNRepository) close() error {
 	return r.db.Close()
 }
 
-func (r *sqliteCustomerSSNRepository) saveCustomerSSN(*SSN) error {
+func (r *sqliteCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {
+	query := `insert or replace into customer_ssn (customer_id, ssn, ssn_masked, created_at) values (?, ?, ?, ?);`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("sqliteCustomerSSNRepository: saveCustomerSSN prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	encoded := base64.StdEncoding.EncodeToString(ssn.encrypted)
+	if _, err := stmt.Exec(ssn.customerId, encoded, ssn.masked, time.Now()); err != nil {
+		return fmt.Errorf("sqliteCustomerSSNRepository: saveCustomerSSN: exec: %v", err)
+	}
 	return nil
 }
 
 func (r *sqliteCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, error) {
-	return nil, nil
+	query := `select ssn, ssn_masked from customer_ssn where customer_id = ? limit 1;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("sqliteCustomerSSNRepository: getCustomerSSN prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(customerId)
+
+	var encoded string
+	ssn := SSN{
+		customerId: customerId,
+	}
+	if err := row.Scan(&encoded, &ssn.masked); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // not found
+		}
+		return nil, fmt.Errorf("sqliteCustomerSSNRepository: getCustomerSSN scan: %v", err)
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, fmt.Errorf("sqliteCustomerSSNRepository: getCustomerSSN decode: %v", err)
+	}
+	ssn.encrypted = decoded
+	return &ssn, nil
 }
