@@ -7,10 +7,14 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"errors"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
+
+	"gocloud.dev/secrets"
 )
 
 var (
@@ -34,6 +38,28 @@ func (r *testCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, err
 		return r.ssn, nil
 	}
 	return nil, r.err
+}
+
+func TestSSN(t *testing.T) {
+	customerId := base.ID()
+	ssn := &SSN{customerId: customerId, masked: "1###5"}
+	if v := ssn.String(); v != fmt.Sprintf("SSN: customerId=%s masked=1###5", customerId) {
+		t.Errorf("got %s", v)
+	}
+
+	// ssn storage error case
+	storage := &ssnStorage{
+		keeperFactory: func(path string) (*secrets.Keeper, error) {
+			return nil, errors.New("bad error")
+		},
+	}
+	if _, err := storage.encryptRaw(customerId, "1###5"); err == nil {
+		t.Error("expected error")
+	} else {
+		if !strings.Contains(err.Error(), "ssnStorage: keeper init") {
+			t.Errorf("unexpected error: %v", err)
+		}
+	}
 }
 
 func TestCustomerSSNStorage(t *testing.T) {
@@ -83,6 +109,7 @@ func TestCustomerSSNRepository(t *testing.T) {
 
 	customerId := base.ID()
 	repo := &sqliteCustomerSSNRepository{db.db}
+	defer repo.close()
 
 	if ssn, err := repo.getCustomerSSN(customerId); ssn != nil || err != nil {
 		t.Fatalf("ssn=%v error=%v", ssn, err)

@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"strings"
 	"testing"
 
 	"gocloud.dev/secrets"
@@ -39,5 +40,15 @@ func TestSecrets(t *testing.T) {
 	}
 	if v := string(out); v != "hello, world" {
 		t.Errorf("got %q", v)
+	}
+}
+
+func TestSecrets__openLocal(t *testing.T) {
+	if _, err := openLocal("invalid key"); err == nil {
+		t.Error("expected error")
+	} else {
+		if !strings.Contains(err.Error(), "SECRETS_LOCAL_BASE64_KEY") {
+			t.Errorf("unexpected error: %v", err)
+		}
 	}
 }

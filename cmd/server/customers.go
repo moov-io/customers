@@ -244,7 +244,7 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 		}
 		if err := customerSSNStorage.repo.saveCustomerSSN(ssn); err != nil {
 			logger.Log("customers", fmt.Sprintf("problem saving SSN for Customer=%s: %v", cust.Id, err), "requestId", requestId)
-			moovhttp.Problem(w, err)
+			moovhttp.Problem(w, fmt.Errorf("saveCustomerSSN: %v", err))
 			return
 		}
 		if err := repo.createCustomer(cust); err != nil {

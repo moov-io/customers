@@ -254,8 +254,10 @@ func TestCustomers__createCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	customerSSNStorage := testCustomerSSNStorage
+
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage, createTestOFACSearcher(nil, nil))
+	addCustomerRoutes(log.NewNopLogger(), router, repo, customerSSNStorage, createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -281,6 +283,26 @@ func TestCustomers__createCustomer(t *testing.T) {
 
 	if w.Code != http.StatusBadRequest {
 		t.Fatalf("bogus HTTP status code: %d", w.Code)
+	}
+
+	// customerSSNStorage sad path
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("POST", "/customers", strings.NewReader(body))
+	req.Header.Set("x-user-id", "test")
+
+	if r, ok := customerSSNStorage.repo.(*testCustomerSSNRepository); !ok {
+		t.Fatalf("got %T", customerSSNStorage.repo)
+	} else {
+		r.err = errors.New("bad error")
+	}
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status code: %d: %v", w.Code, w.Body.String())
+	}
+	if s := w.Body.String(); !strings.Contains(s, "saveCustomerSSN: ") {
+		t.Errorf("unexpected error: %v", s)
 	}
 }
 
