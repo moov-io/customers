@@ -185,7 +185,7 @@ func validateMetadata(meta map[string]string) error {
 	return nil
 }
 
-func (req customerRequest) asCustomer() (*client.Customer, *SSN, error) {
+func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *SSN, error) {
 	// TODO(adam): How do we store off SSN (and wipe from models)
 	customer := &client.Customer{
 		Id:         base.ID(),
@@ -217,7 +217,8 @@ func (req customerRequest) asCustomer() (*client.Customer, *SSN, error) {
 			Active:     true,
 		})
 	}
-	return customer, nil, nil // TODO(adam): impl *SSN, error
+	ssn, err := storage.encryptRaw(customer.Id, req.SSN)
+	return customer, ssn, err
 }
 
 func createCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
@@ -235,8 +236,14 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 		}
 		requestId := moovhttp.GetRequestId(r)
 
-		cust, _, err := req.asCustomer() // TODO(adam):
+		cust, ssn, err := req.asCustomer(customerSSNStorage)
 		if err != nil {
+			logger.Log("customers", fmt.Sprintf("problem transforming request into Customer=%s: %v", cust.Id, err), "requestId", requestId)
+			moovhttp.Problem(w, err)
+			return
+		}
+		if err := customerSSNStorage.repo.saveCustomerSSN(ssn); err != nil {
+			logger.Log("customers", fmt.Sprintf("problem saving SSN for Customer=%s: %v", cust.Id, err), "requestId", requestId)
 			moovhttp.Problem(w, err)
 			return
 		}

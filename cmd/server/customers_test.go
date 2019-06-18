@@ -151,7 +151,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	}).asCustomer()
+	}).asCustomer(testCustomerSSNStorage)
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
@@ -230,7 +230,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 	}
 
 	// asCustomer
-	cust, _, _ := req.asCustomer()
+	cust, _, _ := req.asCustomer(testCustomerSSNStorage)
 	if cust.Id == "" {
 		t.Errorf("empty Customer: %#v", cust)
 	}
@@ -246,7 +246,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
 	phone := `{"number": "555.555.5555", "type": "mobile"}`
 	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
-	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "phones": [%s], "addresses": [%s]}`, phone, address)
+	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "ssn": "123456789", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
@@ -260,7 +260,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	w.Flush()
 
 	if w.Code != http.StatusOK {
-		t.Errorf("bogus status code: %d", w.Code)
+		t.Errorf("bogus status code: %d: %v", w.Code, w.Body.String())
 	}
 
 	var cust client.Customer
@@ -328,7 +328,7 @@ func TestCustomers__repository(t *testing.T) {
 				Country:    "US",
 			},
 		},
-	}).asCustomer()
+	}).asCustomer(testCustomerSSNStorage)
 	if err := repo.createCustomer(cust); err != nil {
 		t.Error(err)
 	}
@@ -360,7 +360,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	}).asCustomer()
+	}).asCustomer(testCustomerSSNStorage)
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
@@ -388,7 +388,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	}).asCustomer()
+	}).asCustomer(testCustomerSSNStorage)
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
@@ -443,7 +443,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	}).asCustomer()
+	}).asCustomer(testCustomerSSNStorage)
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
@@ -604,7 +604,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
-	}).asCustomer()
+	}).asCustomer(testCustomerSSNStorage)
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}

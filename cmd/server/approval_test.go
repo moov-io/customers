@@ -324,7 +324,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 				Country:    "US",
 			},
 		},
-	}).asCustomer()
+	}).asCustomer(testCustomerSSNStorage)
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
