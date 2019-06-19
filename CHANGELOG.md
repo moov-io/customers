@@ -1,3 +1,9 @@
+## v0.1.1 (Released 2019-06-19)
+
+BUG FIXES
+
+- Only read `VAULT_SERVER_TOKEN` not `VAULT_TOKEN`.
+
 ## v0.1.0 (Released 2019-06-19)
 
 ADDITIONS
