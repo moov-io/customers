@@ -62,17 +62,16 @@ For more information see the [Go Cloud Development Kit docs for fileblob](https:
 
 ##### Local storage
 
-- `SECRETS_LOCAL_BASE64_KEY`:
+- `SECRETS_LOCAL_BASE64_KEY`: A base64 encoded key used to encrypt and decrypt secrets in memory. This value needs to look like `base64key://value` where `value` is a 32 byte random key.
 
 ##### Google Cloud Storage
 
-- `SECRETS_GCP_KEY_RESOURCE_ID`:
+- `SECRETS_GCP_KEY_RESOURCE_ID`: A Google Cloud resource ID used to interact with their Key Management Service (KMS). This value has the form `projects/MYPROJECT/locations/MYLOCATION/keyRings/MYKEYRING/cryptoKeys/MYKEY` and [their documentation has more details](https://cloud.google.com/kms/docs/object-hierarchy#key).
 
 ##### Vault storage
 
-- `VAULT_TOKEN`:
-- `VAULT_SERVER_TOKEN`:
-- `VAULT_SERVER_URL`:
+- `VAULT_SERVER_TOKEN`: A Vault generated value used to authenticate. See [the Hashicorp Vault documentation](https://www.vaultproject.io/docs/concepts/tokens.html) for more details.
+- `VAULT_SERVER_URL`: A URL for accessing the vault instance. In production environments this should be an HTTPS (TLS) secured connection.
 
 ## Customer Approval
 

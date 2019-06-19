@@ -93,11 +93,8 @@ func openGCPKMS() (*secrets.Keeper, error) {
 func openVault(path string) (*secrets.Keeper, error) {
 	defaultVaultConfig := vaultapi.DefaultConfig()
 	cfg := &vault.Config{
-		Token:     os.Getenv("VAULT_TOKEN"),
+		Token:     os.Getenv("VAULT_SERVER_TOKEN"),
 		APIConfig: *defaultVaultConfig,
-	}
-	if v := os.Getenv("VAULT_SERVER_TOKEN"); v != "" {
-		cfg.Token = v
 	}
 	if v := os.Getenv("VAULT_SERVER_URL"); v != "" {
 		cfg.APIConfig.Address = v
