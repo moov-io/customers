@@ -23,7 +23,7 @@ require (
 	github.com/opencontainers/image-spec v1.0.1 // indirect
 	github.com/opencontainers/runc v0.1.1 // indirect
 	github.com/ory/dockertest v3.3.4+incompatible
-	github.com/prometheus/client_golang v0.9.3
+	github.com/prometheus/client_golang v1.0.0
 	gocloud.dev v0.14.0
 	golang.org/x/oauth2 v0.0.0-20190520144631-950ef44c6e07
 	gotest.tools v2.2.0+incompatible // indirect
