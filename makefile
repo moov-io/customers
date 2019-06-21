@@ -47,6 +47,7 @@ release: docker AUTHORS
 
 release-push:
 	docker push moov/customers:$(VERSION)
+	docker push moov/customers:latest
 
 .PHONY: cover-test cover-web
 cover-test:
