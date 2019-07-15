@@ -11,8 +11,8 @@ Name | Type | Description | Notes
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **BirthDate** | [**time.Time**](time.Time.md) | Legal date of birth | 
 **Email** | **string** | Primary email address of customer name@domain.com | 
-**SSN** | **string** | Customer Social Security Number (SSN) | [optional] 
-**Phones** | [**[]CreatePhone**](CreatePhone.md) |  | [optional] 
+**SSN** | **string** | Customer Social Security Number (SSN) | 
+**Phones** | [**[]CreatePhone**](CreatePhone.md) |  | 
 **Addresses** | [**[]CreateAddress**](CreateAddress.md) |  | 
 **Metadata** | **map[string]string** | Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer. | [optional] 
 

@@ -45,7 +45,7 @@ type AddCustomerAddressOpts struct {
 
 func (a *CustomersApiService) AddCustomerAddress(ctx context.Context, customerId string, createAddress CreateAddress, localVarOptionals *AddCustomerAddressOpts) (Customer, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Post")
+		localVarHttpMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -159,7 +159,7 @@ type CreateCustomerOpts struct {
 
 func (a *CustomersApiService) CreateCustomer(ctx context.Context, createCustomer CreateCustomer, localVarOptionals *CreateCustomerOpts) (Customer, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Post")
+		localVarHttpMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -272,7 +272,7 @@ type GetCustomerOpts struct {
 
 func (a *CustomersApiService) GetCustomer(ctx context.Context, customerId string, localVarOptionals *GetCustomerOpts) (Customer, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Get")
+		localVarHttpMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -375,7 +375,7 @@ type GetCustomerDocumentContentsOpts struct {
 
 func (a *CustomersApiService) GetCustomerDocumentContents(ctx context.Context, customerId string, documentId string, localVarOptionals *GetCustomerDocumentContentsOpts) (*os.File, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Get")
+		localVarHttpMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -478,7 +478,7 @@ type GetCustomerDocumentsOpts struct {
 
 func (a *CustomersApiService) GetCustomerDocuments(ctx context.Context, customerId string, localVarOptionals *GetCustomerDocumentsOpts) ([]Document, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Get")
+		localVarHttpMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -569,7 +569,7 @@ CustomersApiService Ping the Customers service to check if running
 */
 func (a *CustomersApiService) Ping(ctx context.Context) (*http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Get")
+		localVarHttpMethod   = http.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -645,7 +645,7 @@ type ReplaceCustomerMetadataOpts struct {
 
 func (a *CustomersApiService) ReplaceCustomerMetadata(ctx context.Context, customerId string, customerMetadata CustomerMetadata, localVarOptionals *ReplaceCustomerMetadataOpts) (Customer, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Put")
+		localVarHttpMethod   = http.MethodPut
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -760,7 +760,7 @@ type UpdateCustomerStatusOpts struct {
 
 func (a *CustomersApiService) UpdateCustomerStatus(ctx context.Context, customerId string, updateCustomerStatus UpdateCustomerStatus, localVarOptionals *UpdateCustomerStatusOpts) (Customer, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Put")
+		localVarHttpMethod   = http.MethodPut
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
@@ -876,7 +876,7 @@ type UploadCustomerDocumentOpts struct {
 
 func (a *CustomersApiService) UploadCustomerDocument(ctx context.Context, customerId string, type_ string, file *os.File, localVarOptionals *UploadCustomerDocumentOpts) (Document, *http.Response, error) {
 	var (
-		localVarHttpMethod   = strings.ToUpper("Post")
+		localVarHttpMethod   = http.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
