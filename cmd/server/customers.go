@@ -186,7 +186,6 @@ func validateMetadata(meta map[string]string) error {
 }
 
 func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *SSN, error) {
-	// TODO(adam): How do we store off SSN (and wipe from models)
 	customer := &client.Customer{
 		Id:         base.ID(),
 		FirstName:  req.FirstName,
