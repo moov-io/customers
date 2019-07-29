@@ -13,9 +13,11 @@ require (
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-units v0.3.3 // indirect
 	github.com/go-kit/kit v0.8.0
+	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gorilla/mux v1.7.2
 	github.com/gotestyourself/gotestyourself v2.2.0+incompatible // indirect
 	github.com/hashicorp/vault/api v1.0.1
+	github.com/lopezator/migrator v0.1.0
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/moov-io/base v0.9.1-0.20190509232802-5e13ea2b1490
 	github.com/moov-io/ofac v0.7.1-0.20190611152258-a1fb72e71c46

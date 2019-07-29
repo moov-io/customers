@@ -2,6 +2,6 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package version
 
 const Version = "v0.1.2-dev"
