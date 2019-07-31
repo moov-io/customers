@@ -32,36 +32,36 @@ var (
 	// https://dev.mysql.com/doc/refman/8.0/en/server-error-reference.html#error_er_dup_entry
 	mySQLErrDuplicateKey uint16 = 1062
 
-	// ToDo:  Add attributes: Type and length
+	// ToDo: Consideration: For _type _status integer (1,2,3,4,5,6...) or string ("01", "1", "ABC")
 
 	mysqlMigrator = migrator.New(
 		execsql(
 			"create_customer",
-			`create table if not exists customer(customer_id primary key, first_name, middle_name, last_name, nick_name, suffix, birthdate datetime, status, email, created_at datetime, last_modified datetime, deleted_at datetime)`,
-		),
+			`create table if not exists customer(customer_id varchar(40), first_name varchar(40), middle_name varchar(40), last_name varchar(40), nick_name varchar(40), suffix varchar(3), birth_date datetime, status integer, email varchar(120), created_at datetime(6), last_modified datetime(6), deleted_at datetime(6), PRIMARY KEY (customer_id));`),
+
 		execsql(
 			"create_customer_phones",
-			`create table if not exists customer_phones(customer_id, number, valid, type, unique (customer_id, number) on conflict abort)`,
+			`create table if not exists customer_phones (customer_id VARCHAR(40), number VARCHAR(20), valid BOOLEAN, type integer, unique (customer_id, number));`,
 		),
 		execsql(
 			"create_customer_addresses",
-			`create table if not exists customer_addresses(address_id primary key, customer_id, type, address1, address2, city, state, postal_code, country, validated, active, unique (customer_id, address1) on conflict abort);`,
+			`create table if not exists customer_addresses(address_id varchar(40) primary key, customer_id varchar(40), type SMALLINT, address1 varchar(120), address2 varchar(120), city varchar(50), state varchar(2), postal_code varchar(9), country varchar(3), validated BOOLEAN, active BOOLEAN, unique (customer_id, address1));`,
 		),
 		execsql(
 			"create_customer_metadata",
-			`create table if not exists customer_metadata(customer_id, key, value, unique(key, value));`,
+			`create table if not exists customer_metadata(customer_id varchar(40), key varchar(40), value varchar(512), unique(key, value));`,
 		),
 		execsql(
 			"customer_status_updates",
-			`create table if not exists customer_status_updates(customer_id, future_status, comment, changed_at datetime);`,
+			`create table if not exists customer_status_updates(customer_id varchar(40), future_status integer, comment varchar(512), changed_at datetime(6));`,
 		),
 		execsql(
 			"create_customer_ofac_searches",
-			`create table if not exists customer_ofac_searches(customer_id, entity_id, sdn_name, sdn_type, match, created_at datetime);`,
+			`create table if not exists customer_ofac_searches(customer_id varchar(40), entity_id varchar(40), sdn_name varchar(40), sdn_type SMALLINT, match Double(5,2), created_at datetime(6));`,
 		),
 		execsql(
 			"create_customer_ssn",
-			`create table if not exists customer_ssn(customer_id primary key, ssn, ssn_masked, created_at datetime);`,
+			`create table if not exists customer_ssn(customer_id varchar(40) primary key, ssn varchar(9), ssn_masked varchar(9), created_at datetime(6));`,
 		),
 	)
 )
