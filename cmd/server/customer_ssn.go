@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"fmt"
+	"github.com/go-kit/kit/log"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -69,7 +70,8 @@ type customerSSNRepository interface {
 }
 
 type sqliteCustomerSSNRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger log.Logger
 }
 
 func (r *sqliteCustomerSSNRepository) close() error {

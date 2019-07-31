@@ -342,7 +342,8 @@ type customerRepository interface {
 }
 
 type sqliteCustomerRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger log.Logger
 }
 
 func (r *sqliteCustomerRepository) close() error {
@@ -356,7 +357,7 @@ func (r *sqliteCustomerRepository) createCustomer(c *client.Customer) error {
 	}
 
 	// Insert customer record
-	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, birthdate, status, email, created_at, last_modified)
+	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, birth_date, status, email, created_at, last_modified)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -406,7 +407,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 }
 
 func (r *sqliteCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
-	query := `select first_name, middle_name, last_name, nick_name, suffix, birthdate, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
+	query := `select first_name, middle_name, last_name, nick_name, suffix, birth_date, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err

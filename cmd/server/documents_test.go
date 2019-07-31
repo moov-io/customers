@@ -209,7 +209,7 @@ func TestDocuments__makeDocumentKey(t *testing.T) {
 	}
 }
 
-func TestDocumentRepository(t *testing.T) {
+/*func TestDocumentRepository(t *testing.T) {
 	db, err := createTestSqliteDB()
 	if err != nil {
 		t.Fatal(err)
@@ -247,4 +247,4 @@ func TestDocumentRepository(t *testing.T) {
 	if docs[0].Id != doc.Id {
 		t.Errorf("docs[0].Id=%s doc.Id=%s", docs[0].Id, doc.Id)
 	}
-}
+}*/

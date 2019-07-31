@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/moov-io/customers/internal/database"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -308,14 +309,9 @@ func TestCustomers__createCustomer(t *testing.T) {
 
 func createTestCustomerRepository(t *testing.T) *sqliteCustomerRepository {
 	t.Helper()
-	db, err := createTestSqliteDB()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if err := migrate(nil, db.db); err != nil {
-		t.Fatal(err)
-	}
-	return &sqliteCustomerRepository{db.db}
+
+	db := database.CreateTestSqliteDB(t)
+	return &sqliteCustomerRepository{db.DB, log.NewNopLogger()}
 }
 
 func TestCustomers__repository(t *testing.T) {

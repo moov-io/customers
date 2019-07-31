@@ -36,16 +36,16 @@ var (
 
 	mysqlMigrator = migrator.New(
 		execsql(
-			"create_customer",
-			`create table if not exists customer(customer_id varchar(40), first_name varchar(40), middle_name varchar(40), last_name varchar(40), nick_name varchar(40), suffix varchar(3), birth_date datetime, status integer, email varchar(120), created_at datetime(6), last_modified datetime(6), deleted_at datetime(6), PRIMARY KEY (customer_id));`),
+			"create_customers",
+			`create table if not exists customers(customer_id varchar(40), first_name varchar(40), middle_name varchar(40), last_name varchar(40), nick_name varchar(40), suffix varchar(3), birth_date datetime, status integer, email varchar(120), created_at datetime(6), last_modified datetime(6), deleted_at datetime(6), PRIMARY KEY (customer_id));`),
 
 		execsql(
-			"create_customer_phones",
-			`create table if not exists customer_phones (customer_id VARCHAR(40), number VARCHAR(20), valid BOOLEAN, type integer, unique (customer_id, number));`,
+			"create_customers_phones",
+			`create table if not exists customers_phones (customer_id VARCHAR(40), number VARCHAR(20), valid BOOLEAN, type integer, unique (customer_id, number));`,
 		),
 		execsql(
-			"create_customer_addresses",
-			`create table if not exists customer_addresses(address_id varchar(40) primary key, customer_id varchar(40), type SMALLINT, address1 varchar(120), address2 varchar(120), city varchar(50), state varchar(2), postal_code varchar(9), country varchar(3), validated BOOLEAN, active BOOLEAN, unique (customer_id, address1));`,
+			"create_customers_addresses",
+			`create table if not exists customers_addresses(address_id varchar(40) primary key, customer_id varchar(40), type SMALLINT, address1 varchar(120), address2 varchar(120), city varchar(50), state varchar(2), postal_code varchar(9), country varchar(3), validated BOOLEAN, active BOOLEAN, unique (customer_id, address1));`,
 		),
 		execsql(
 			"create_customer_metadata",

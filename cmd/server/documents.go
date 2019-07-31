@@ -206,7 +206,8 @@ type documentRepository interface {
 }
 
 type sqliteDocumentRepository struct {
-	db *sql.DB
+	db     *sql.DB
+	logger log.Logger
 }
 
 func (r *sqliteDocumentRepository) close() error {
