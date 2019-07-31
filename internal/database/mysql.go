@@ -49,7 +49,7 @@ var (
 		),
 		execsql(
 			"create_customer_metadata",
-			`create table if not exists customer_metadata(customer_id varchar(40), key varchar(40), value varchar(512), unique(key, value));`,
+			`create table if not exists customer_metadata(customer_id varchar(40), meta_key varchar(40), meta_value varchar(512), unique(meta_key, meta_value));`,
 		),
 		execsql(
 			"customer_status_updates",
@@ -57,7 +57,7 @@ var (
 		),
 		execsql(
 			"create_customer_ofac_searches",
-			`create table if not exists customer_ofac_searches(customer_id varchar(40), entity_id varchar(40), sdn_name varchar(40), sdn_type SMALLINT, match Double(5,2), created_at datetime(6));`,
+			`create table if not exists customer_ofac_searches(customer_id varchar(40), entity_id varchar(40), sdn_name varchar(40), sdn_type integer, percentage_match double precision (5,2), created_at datetime(6));`,
 		),
 		execsql(
 			"create_customer_ssn",
