@@ -161,14 +161,14 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 			"MYSQL_USER=moov",
 			"MYSQL_PASSWORD=secret",
 			"MYSQL_ROOT_PASSWORD=secret",
-			"MYSQL_DATABASE=customer",
+			"MYSQL_DATABASE=customers",
 		},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	err = pool.Retry(func() error {
-		db, err := sql.Open("mysql", fmt.Sprintf("moov:secret@tcp(localhost:%s)/customer", resource.GetPort("3306/tcp")))
+		db, err := sql.Open("mysql", fmt.Sprintf("moov:secret@tcp(localhost:%s)/customers", resource.GetPort("3306/tcp")))
 		if err != nil {
 			return err
 		}
@@ -183,7 +183,7 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 	logger := log.NewNopLogger()
 	address := fmt.Sprintf("tcp(localhost:%s)", resource.GetPort("3306/tcp"))
 
-	db, err := mysqlConnection(logger, "moov", "secret", address, "customer").Connect()
+	db, err := mysqlConnection(logger, "moov", "secret", address, "customers").Connect()
 	if err != nil {
 		t.Fatal(err)
 	}

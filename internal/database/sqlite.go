@@ -67,7 +67,7 @@ func getSqlitePath() string {
 	if path == "" || strings.Contains(path, "..") {
 		// set default if empty or trying to escape
 		// don't filepath.ABS to avoid full-fs reads
-		path = "customer.db"
+		path = "customers.db"
 	}
 	return path
 }
@@ -148,12 +148,12 @@ func (r *TestSQLiteDB) Close() error {
 //
 // Callers should call close on the returned *TestSQLiteDB.
 func CreateTestSqliteDB(t *testing.T) *TestSQLiteDB {
-	dir, err := ioutil.TempDir("", "ofac-sqlite")
+	dir, err := ioutil.TempDir("", "customers-sqlite")
 	if err != nil {
 		t.Fatalf("sqlite test: %v", err)
 	}
 
-	db, err := sqliteConnection(log.NewNopLogger(), filepath.Join(dir, "ofac.db")).Connect()
+	db, err := sqliteConnection(log.NewNopLogger(), filepath.Join(dir, "customers.db")).Connect()
 	if err != nil {
 		t.Fatalf("sqlite test: %v", err)
 	}
