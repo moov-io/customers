@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/moov-io/customers/internal/database"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -209,42 +210,46 @@ func TestDocuments__makeDocumentKey(t *testing.T) {
 	}
 }
 
-/*func TestDocumentRepository(t *testing.T) {
-	db, err := createTestSqliteDB()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.close()
-
+func TestDocumentRepository(t *testing.T) {
 	customerId := base.ID()
-	repo := &sqliteDocumentRepository{db.db}
-	defer repo.close()
 
-	docs, err := repo.getCustomerDocuments(customerId)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(docs) != 0 {
-		t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
-	}
+	check := func(t *testing.T, repo *sqliteDocumentRepository) {
+		docs, err := repo.getCustomerDocuments(customerId)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(docs) != 0 {
+			t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
+		}
 
-	// Write a Document and read it back
-	doc := &client.Document{
-		Id:          base.ID(),
-		Type:        "DriversLicense",
-		ContentType: "image/png",
+		// Write a Document and read it back
+		doc := &client.Document{
+			Id:          base.ID(),
+			Type:        "DriversLicense",
+			ContentType: "image/png",
+		}
+		if err := repo.writeCustomerDocument(customerId, doc); err != nil {
+			t.Fatal(err)
+		}
+		docs, err = repo.getCustomerDocuments(customerId)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(docs) != 1 {
+			t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
+		}
+		if docs[0].Id != doc.Id {
+			t.Errorf("docs[0].Id=%s doc.Id=%s", docs[0].Id, doc.Id)
+		}
 	}
-	if err := repo.writeCustomerDocument(customerId, doc); err != nil {
-		t.Fatal(err)
-	}
-	docs, err = repo.getCustomerDocuments(customerId)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(docs) != 1 {
-		t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
-	}
-	if docs[0].Id != doc.Id {
-		t.Errorf("docs[0].Id=%s doc.Id=%s", docs[0].Id, doc.Id)
-	}
-}*/
+	// SQLite tests
+	sqliteDB := database.CreateTestSqliteDB(t)
+	defer sqliteDB.Close()
+	check(t, &sqliteDocumentRepository{sqliteDB.DB, log.NewNopLogger()})
+
+	// MySQL tests
+	mysqlDB := database.CreateTestMySQLDB(t)
+	defer mysqlDB.Close()
+	check(t, &sqliteDocumentRepository{mysqlDB.DB, log.NewNopLogger()})
+
+}

@@ -37,7 +37,7 @@ var (
 	mysqlMigrator = migrator.New(
 		execsql(
 			"create_customers",
-			`create table if not exists customers(customer_id varchar(40), first_name varchar(40), middle_name varchar(40), last_name varchar(40), nick_name varchar(40), suffix varchar(3), birth_date datetime, status integer, email varchar(120), created_at datetime(6), last_modified datetime(6), deleted_at datetime(6), PRIMARY KEY (customer_id));`),
+			`create table if not exists customers(customer_id varchar(40), first_name varchar(40), middle_name varchar(40), last_name varchar(40), nick_name varchar(40), suffix varchar(3), birth_date datetime, status integer, email varchar(120), created_at datetime, last_modified datetime, deleted_at datetime, PRIMARY KEY (customer_id));`),
 
 		execsql(
 			"create_customers_phones",
@@ -53,15 +53,19 @@ var (
 		),
 		execsql(
 			"customer_status_updates",
-			`create table if not exists customer_status_updates(customer_id varchar(40), future_status integer, comment varchar(512), changed_at datetime(6));`,
+			`create table if not exists customer_status_updates(customer_id varchar(40), future_status integer, comment varchar(512), changed_at datetime);`,
 		),
 		execsql(
 			"create_customer_ofac_searches",
-			`create table if not exists customer_ofac_searches(customer_id varchar(40), entity_id varchar(40), sdn_name varchar(40), sdn_type integer, percentage_match double precision (5,2), created_at datetime(6));`,
+			`create table if not exists customer_ofac_searches(customer_id varchar(40), entity_id varchar(40), sdn_name varchar(40), sdn_type integer, percentage_match double precision (5,2), created_at datetime);`,
 		),
 		execsql(
 			"create_customer_ssn",
-			`create table if not exists customer_ssn(customer_id varchar(40) primary key, ssn BLOB, ssn_masked varchar(9), created_at datetime(6));`,
+			`create table if not exists customer_ssn(customer_id varchar(40) primary key, ssn BLOB, ssn_masked varchar(9), created_at datetime);`,
+		),
+		execsql(
+			"create_documents",
+			`create table if not exists documents(document_id varchar(40) primary key, customer_id varchar(40), type varchar(120), content_type integer, uploaded_at datetime);`,
 		),
 	)
 )

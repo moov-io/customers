@@ -59,6 +59,10 @@ var (
 			"create_customer_ssn",
 			`create table if not exists customer_ssn(customer_id primary key, ssn, ssn_masked, created_at datetime);`,
 		),
+		execsql(
+			"create_documents",
+			`create table if not exists documents(document_id primary key, customer_id, type, content_type, uploaded_at datetime);`,
+		),
 	)
 )
 
