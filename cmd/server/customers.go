@@ -531,7 +531,7 @@ func (r *sqliteCustomerRepository) updateCustomerStatus(customerId string, statu
 func (r *sqliteCustomerRepository) getCustomerMetadata(customerId string) (map[string]string, error) {
 	out := make(map[string]string)
 
-	query := `select key, value from customer_metadata where customer_id = ?;`
+	query := `select meta_key, meta_value from customer_metadata where customer_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return out, fmt.Errorf("getCustomerMetadata: prepare: %v", err)
@@ -573,7 +573,7 @@ func (r *sqliteCustomerRepository) replaceCustomerMetadata(customerId string, me
 	stmt.Close()
 
 	// Insert each k/v pair
-	query = `insert into customer_metadata (customer_id, key, value) values (?, ?, ?);`
+	query = `insert into customer_metadata (customer_id, meta_key, meta_value) values (?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("replaceCustomerMetadata: insert prepare: %v", err)

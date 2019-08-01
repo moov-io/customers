@@ -61,7 +61,7 @@ var (
 		),
 		execsql(
 			"create_customer_ssn",
-			`create table if not exists customer_ssn(customer_id varchar(40) primary key, ssn varchar(9), ssn_masked varchar(9), created_at datetime(6));`,
+			`create table if not exists customer_ssn(customer_id varchar(40) primary key, ssn BLOB, ssn_masked varchar(9), created_at datetime(6));`,
 		),
 	)
 )

@@ -78,8 +78,10 @@ func (r *sqliteCustomerSSNRepository) close() error {
 	return r.db.Close()
 }
 
+//
+
 func (r *sqliteCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {
-	query := `insert or replace into customer_ssn (customer_id, ssn, ssn_masked, created_at) values (?, ?, ?, ?);`
+	query := `replace into customer_ssn (customer_id, ssn, ssn_masked, created_at) values (?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("sqliteCustomerSSNRepository: saveCustomerSSN prepare: %v", err)

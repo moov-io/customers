@@ -45,7 +45,7 @@ var (
 		),
 		execsql(
 			"create_customer_metadata",
-			`create table if not exists customer_metadata(customer_id, key, value, unique(key, value));`,
+			`create table if not exists customer_metadata(customer_id, meta_key, meta_value, unique(meta_key, meta_value));`,
 		),
 		execsql(
 			"customer_status_updates",
