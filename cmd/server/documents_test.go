@@ -213,7 +213,7 @@ func TestDocuments__makeDocumentKey(t *testing.T) {
 func TestDocumentRepository(t *testing.T) {
 	customerId := base.ID()
 
-	check := func(t *testing.T, repo *sqliteDocumentRepository) {
+	check := func(t *testing.T, repo *sqlDocumentRepository) {
 		docs, err := repo.getCustomerDocuments(customerId)
 		if err != nil {
 			t.Fatal(err)
@@ -245,11 +245,11 @@ func TestDocumentRepository(t *testing.T) {
 	// SQLite tests
 	sqliteDB := database.CreateTestSqliteDB(t)
 	defer sqliteDB.Close()
-	check(t, &sqliteDocumentRepository{sqliteDB.DB, log.NewNopLogger()})
+	check(t, &sqlDocumentRepository{sqliteDB.DB, log.NewNopLogger()})
 
 	// MySQL tests
 	mysqlDB := database.CreateTestMySQLDB(t)
 	defer mysqlDB.Close()
-	check(t, &sqliteDocumentRepository{mysqlDB.DB, log.NewNopLogger()})
+	check(t, &sqlDocumentRepository{mysqlDB.DB, log.NewNopLogger()})
 
 }

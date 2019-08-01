@@ -104,7 +104,7 @@ func TestCustomerSSNStorage(t *testing.T) {
 
 func TestCustomerSSNRepository(t *testing.T) {
 	customerId := base.ID()
-	check := func(t *testing.T, customerSSNRepo *sqliteCustomerSSNRepository) {
+	check := func(t *testing.T, customerSSNRepo *sqlCustomerSSNRepository) {
 
 		if ssn, err := customerSSNRepo.getCustomerSSN(customerId); ssn != nil || err != nil {
 			t.Fatalf("ssn=%v error=%v", ssn, err)
@@ -137,10 +137,10 @@ func TestCustomerSSNRepository(t *testing.T) {
 	// SQLite tests
 	sqliteDB := database.CreateTestSqliteDB(t)
 	defer sqliteDB.Close()
-	check(t, &sqliteCustomerSSNRepository{sqliteDB.DB, log.NewNopLogger()})
+	check(t, &sqlCustomerSSNRepository{sqliteDB.DB, log.NewNopLogger()})
 
 	// MySQL tests
 	mysqlDB := database.CreateTestMySQLDB(t)
 	defer mysqlDB.Close()
-	check(t, &sqliteCustomerSSNRepository{mysqlDB.DB, log.NewNopLogger()})
+	check(t, &sqlCustomerSSNRepository{mysqlDB.DB, log.NewNopLogger()})
 }

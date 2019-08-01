@@ -341,16 +341,16 @@ type customerRepository interface {
 	saveCustomerOFACSearch(customerId string, result ofacSearchResult) error
 }
 
-type sqliteCustomerRepository struct {
+type sqlCustomerRepository struct {
 	db     *sql.DB
 	logger log.Logger
 }
 
-func (r *sqliteCustomerRepository) close() error {
+func (r *sqlCustomerRepository) close() error {
 	return r.db.Close()
 }
 
-func (r *sqliteCustomerRepository) createCustomer(c *client.Customer) error {
+func (r *sqlCustomerRepository) createCustomer(c *client.Customer) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
@@ -406,7 +406,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	return nil
 }
 
-func (r *sqliteCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
+func (r *sqlCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
 	query := `select first_name, middle_name, last_name, nick_name, suffix, birth_date, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -447,7 +447,7 @@ func (r *sqliteCustomerRepository) getCustomer(customerId string) (*client.Custo
 	return &cust, nil
 }
 
-func (r *sqliteCustomerRepository) readPhones(customerId string) ([]client.Phone, error) {
+func (r *sqlCustomerRepository) readPhones(customerId string) ([]client.Phone, error) {
 	query := `select number, valid, type from customers_phones where customer_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -472,7 +472,7 @@ func (r *sqliteCustomerRepository) readPhones(customerId string) ([]client.Phone
 	return phones, rows.Err()
 }
 
-func (r *sqliteCustomerRepository) readAddresses(customerId string) ([]client.Address, error) {
+func (r *sqlCustomerRepository) readAddresses(customerId string) ([]client.Address, error) {
 	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated, active from customers_addresses where customer_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -497,7 +497,7 @@ func (r *sqliteCustomerRepository) readAddresses(customerId string) ([]client.Ad
 	return adds, rows.Err()
 }
 
-func (r *sqliteCustomerRepository) updateCustomerStatus(customerId string, status CustomerStatus, comment string) error {
+func (r *sqlCustomerRepository) updateCustomerStatus(customerId string, status CustomerStatus, comment string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("updateCustomerStatus: tx begin: %v", err)
@@ -528,7 +528,7 @@ func (r *sqliteCustomerRepository) updateCustomerStatus(customerId string, statu
 	return tx.Commit()
 }
 
-func (r *sqliteCustomerRepository) getCustomerMetadata(customerId string) (map[string]string, error) {
+func (r *sqlCustomerRepository) getCustomerMetadata(customerId string) (map[string]string, error) {
 	out := make(map[string]string)
 
 	query := `select meta_key, meta_value from customer_metadata where customer_id = ?;`
@@ -554,7 +554,7 @@ func (r *sqliteCustomerRepository) getCustomerMetadata(customerId string) (map[s
 	return out, nil
 }
 
-func (r *sqliteCustomerRepository) replaceCustomerMetadata(customerId string, metadata map[string]string) error {
+func (r *sqlCustomerRepository) replaceCustomerMetadata(customerId string, metadata map[string]string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("replaceCustomerMetadata: tx begin: %v", err)
@@ -590,7 +590,7 @@ func (r *sqliteCustomerRepository) replaceCustomerMetadata(customerId string, me
 	return nil
 }
 
-func (r *sqliteCustomerRepository) addCustomerAddress(customerId string, req address) error {
+func (r *sqlCustomerRepository) addCustomerAddress(customerId string, req address) error {
 	query := `insert into customers_addresses (address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -604,7 +604,7 @@ func (r *sqliteCustomerRepository) addCustomerAddress(customerId string, req add
 	return nil
 }
 
-func (r *sqliteCustomerRepository) updateCustomerAddress(customerId, addressId string, _type string, validated bool) error {
+func (r *sqlCustomerRepository) updateCustomerAddress(customerId, addressId string, _type string, validated bool) error {
 	query := `update customers_addresses set type = ?, validated = ? where customer_id = ? and address_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -618,7 +618,7 @@ func (r *sqliteCustomerRepository) updateCustomerAddress(customerId, addressId s
 	return nil
 }
 
-func (r *sqliteCustomerRepository) getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error) {
+func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error) {
 	query := `select entity_id, sdn_name, sdn_type, match from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -637,7 +637,7 @@ func (r *sqliteCustomerRepository) getLatestCustomerOFACSearch(customerId string
 	return &res, nil
 }
 
-func (r *sqliteCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
+func (r *sqlCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
 	query := `insert into customer_ofac_searches (customer_id, entity_id, sdn_name, sdn_type, match, created_at) values (?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

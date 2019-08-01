@@ -307,11 +307,11 @@ func TestCustomers__createCustomer(t *testing.T) {
 	}
 }
 
-func createTestCustomerRepository(t *testing.T) *sqliteCustomerRepository {
+func createTestCustomerRepository(t *testing.T) *sqlCustomerRepository {
 	t.Helper()
 
 	db := database.CreateTestSqliteDB(t)
-	return &sqliteCustomerRepository{db.DB, log.NewNopLogger()}
+	return &sqlCustomerRepository{db.DB, log.NewNopLogger()}
 }
 
 func TestCustomers__repository(t *testing.T) {

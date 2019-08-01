@@ -74,11 +74,11 @@ func main() {
 		}
 	}()
 
-	customerRepo := &sqliteCustomerRepository{db, logger}
+	customerRepo := &sqlCustomerRepository{db, logger}
 	defer customerRepo.close()
-	customerSSNRepo := &sqliteCustomerSSNRepository{db, logger}
+	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
 	defer customerSSNRepo.close()
-	documentRepo := &sqliteDocumentRepository{db, logger}
+	documentRepo := &sqlDocumentRepository{db, logger}
 	defer documentRepo.close()
 
 	// Start Admin server (with Prometheus metrics)
