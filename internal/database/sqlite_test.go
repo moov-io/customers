@@ -6,6 +6,7 @@ package database
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/go-kit/kit/log"
@@ -24,9 +25,6 @@ func TestSQLite__basic(t *testing.T) {
 
 	conn, err := s.Connect()
 
-	/*	if err != nil {
-		t.Fatalf("conn error %v", err)
-	}*/
 	defer conn.Close()
 
 	if err := conn.Ping(); err == nil {
@@ -47,5 +45,20 @@ func TestSqliteUniqueViolation(t *testing.T) {
 	err := errors.New(`problem upserting customer="7d676c65eccd48090ff238a0d5e35eb6126c23f2", first_name="John", middle_name="B", last_name="Doe": : UNIQUE constraint failed: customer.customer_id`)
 	if !UniqueViolation(err) {
 		t.Error("should have matched unique violation")
+	}
+}
+
+// TestSQLite__SERR validates sqliteConnection doesn't contain an error
+func TestSQLite__SERR(t *testing.T) {
+	// error case
+	s := sqliteConnection(log.NewNopLogger(), "/tmp/path/doesnt/exist")
+
+	s.err = errors.New(": invalid")
+	_, err := s.Connect()
+
+	if err != nil {
+		if !strings.Contains(err.Error(), ": invalid") {
+			t.Fatal("Expected invalid")
+		}
 	}
 }

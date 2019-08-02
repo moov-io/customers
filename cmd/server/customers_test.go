@@ -12,6 +12,7 @@ import (
 	"github.com/moov-io/customers/internal/database"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -466,7 +467,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	r := repalceMetadataRequest{
+	r := replaceMetadataRequest{
 		Metadata: map[string]string{"key": strings.Repeat("a", 100000)},
 	}
 	var buf bytes.Buffer
@@ -687,5 +688,119 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	}
 	if res == nil || res.entityId != "777121" {
 		t.Errorf("ofacSearchResult: %#v", res)
+	}
+}
+
+func mockCustomerRequest() customerRequest {
+	c := customerRequest{}
+	c.FirstName = "John"
+	c.LastName = "Doe"
+	c.Email = "johndoe@example.net"
+	c.SSN = "123456789"
+
+	p := phone{}
+	p.Number = "123-456-7892"
+	p.Type = "cell"
+	c.Phones = append(c.Phones, p)
+
+	a := address{}
+	a.Address1 = "Any Street"
+	a.Address2 = ""
+	a.City = "Any City"
+	a.Country = "USA"
+	a.PostalCode = "19456"
+	a.State = "MA"
+	c.Addresses = append(c.Addresses, a)
+	return c
+}
+
+func mockClientRequest() client.Customer {
+	cli := client.Customer{}
+	cli.FirstName = "John"
+	cli.LastName = "Doe"
+	cli.Email = "johndoe@example.net"
+
+	p := client.Phone{}
+	p.Number = "123-456-7892"
+	p.Type = "cell"
+	cli.Phones = append(cli.Phones, p)
+
+	a := client.Address{}
+	a.Address1 = "Any Street"
+	a.Address2 = ""
+	a.City = "Any City"
+	a.Country = "USA"
+	a.PostalCode = "19456"
+	a.State = "MA"
+	cli.Addresses = append(cli.Addresses, a)
+	return cli
+}
+
+// TestCustomers__MetaDataValidate validates customer meta data
+func TestCustomers__MetaDataValidate(t *testing.T) {
+	c := mockCustomerRequest()
+	m := make(map[string]string)
+	for i := 0; i < 101; i++ {
+		s := strconv.Itoa(i)
+
+		m[s] = s
+	}
+	c.Metadata = m
+
+	if err := c.validate(); err != nil {
+		if err != nil {
+			if !strings.Contains(err.Error(), ": metadata") {
+				t.Fatal("Expected metadata error")
+			}
+		}
+	}
+}
+
+func TestCustomers__NoSSN(t *testing.T) {
+	w := httptest.NewRecorder()
+	phone := `{"number": "555.555.5555", "type": "mobile"}`
+	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
+	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "ssn": "", "phones": [%s], "addresses": [%s]}`, phone, address)
+	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	customerSSNStorage := testCustomerSSNStorage
+
+	router := mux.NewRouter()
+	addCustomerRoutes(log.NewNopLogger(), router, repo, customerSSNStorage, createTestOFACSearcher(nil, nil))
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus status code: %d: %v", w.Code, w.Body.String())
+	}
+
+	if !strings.Contains(w.Body.String(), "SSN") {
+		t.Errorf("Expected SSN error received %s", w.Body.String())
+	}
+}
+
+func TestCustomers__BadReq(t *testing.T) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", "/customers", strings.NewReader("®"))
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	customerSSNStorage := testCustomerSSNStorage
+
+	router := mux.NewRouter()
+	addCustomerRoutes(log.NewNopLogger(), router, nil, customerSSNStorage, createTestOFACSearcher(nil, nil))
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if !strings.Contains(w.Body.String(), "invalid character") {
+		t.Errorf("Expected SSN error received %s", w.Body.String())
 	}
 }

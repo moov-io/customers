@@ -274,13 +274,13 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 	}
 }
 
-type repalceMetadataRequest struct {
+type replaceMetadataRequest struct {
 	Metadata map[string]string `json:"metadata"`
 }
 
 func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req repalceMetadataRequest
+		var req replaceMetadataRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			moovhttp.Problem(w, err)
 			return
