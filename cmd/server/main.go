@@ -94,29 +94,10 @@ func main() {
 	}()
 	defer adminServer.Shutdown()
 
-	// Create our fileblob.URLSignerHMAC
-	bucketName, cloudProvider := os.Getenv("BUCKET_NAME"), strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
-	var signer *fileblob.URLSignerHMAC
-	if cloudProvider == "file" || cloudProvider == "" {
-		if bucketName == "" {
-			bucketName = "./storage"
-			cloudProvider = "file"
-		}
-
-		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
-		if baseURL == "" {
-			baseURL = fmt.Sprintf("http://localhost%s/files", bind.HTTP("customers"))
-		}
-		if secret == "" {
-			secret = "secret"
-			logger.Log("main", "WARNING!!!! USING INSECURE DEFAULT FILE STORAGE, set FILEBLOB_HMAC_SECRET for ANY production usage")
-		}
-		s, err := fileblobSigner(baseURL, secret)
-		if err != nil {
-			panic(fmt.Sprintf("fileBucket: %v", err))
-		}
-		signer = s
-	}
+	// Setup our cloud Storage object
+	bucketName := os.Getenv("BUCKET_NAME")
+	cloudProvider := strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
+	signer := setupStorageBucket(logger, bucketName, cloudProvider)
 
 	// Create our OFAC searcher
 	ofacClient := newOFACClient(logger, os.Getenv("OFAC_ENDPOINT"))
@@ -176,10 +157,17 @@ func main() {
 
 	// Start business logic HTTP server
 	go func() {
-		logger.Log("transport", "HTTP", "addr", *httpAddr)
-		errs <- serve.ListenAndServe()
-		// TODO(adam): support TLS
-		// func (srv *Server) ListenAndServeTLS(certFile, keyFile string) error
+		if certFile, keyFile := os.Getenv("HTTPS_CERT_FILE"), os.Getenv("HTTPS_KEY_FILE"); certFile != "" && keyFile != "" {
+			logger.Log("startup", fmt.Sprintf("binding to %s for secure HTTP server", *httpAddr))
+			if err := serve.ListenAndServeTLS(certFile, keyFile); err != nil {
+				logger.Log("exit", err)
+			}
+		} else {
+			logger.Log("startup", fmt.Sprintf("binding to %s for HTTP server", *httpAddr))
+			if err := serve.ListenAndServe(); err != nil {
+				logger.Log("exit", err)
+			}
+		}
 	}()
 
 	// Block/Wait for an error
@@ -196,4 +184,28 @@ func addPingRoute(r *mux.Router) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("PONG"))
 	})
+}
+
+func setupStorageBucket(logger log.Logger, bucketName, cloudProvider string) *fileblob.URLSignerHMAC {
+	if cloudProvider == "file" || cloudProvider == "" {
+		if bucketName == "" {
+			bucketName = "./storage"
+			cloudProvider = "file"
+		}
+
+		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
+		if baseURL == "" {
+			baseURL = fmt.Sprintf("http://localhost%s/files", bind.HTTP("customers"))
+		}
+		if secret == "" {
+			secret = "secret"
+			logger.Log("main", "WARNING!!!! USING INSECURE DEFAULT FILE STORAGE, set FILEBLOB_HMAC_SECRET for ANY production usage")
+		}
+		signer, err := fileblobSigner(baseURL, secret)
+		if err != nil {
+			panic(fmt.Sprintf("fileBucket: %v", err))
+		}
+		return signer
+	}
+	return nil
 }
