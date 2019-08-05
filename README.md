@@ -27,7 +27,28 @@ The following environmental variables can be set to configure behavior in Accoun
 |-----|-----|-----|
 | `OFAC_ENDPOINT` | HTTP address for [OFAC](https://github.com/moov-io/ofac) interaction, defaults to Kubernetes inside clusters and local dev otherwise. | Kubernetes DNS |
 | `OFAC_MATCH_THRESHOLD` | Percent match against OFAC data that's required for paygate to block a transaction. | `0.90` |
-| `SQLITE_DB_PATH`| Local filepath location for the paygate SQLite database. | `customers.db` |
+| `DATABASE_TYPE` | Which database option to use (Options: `sqlite`, `mysql`) | Default: `sqlite` |
+
+#### Storage
+
+Based on `DATABASE_TYPE` the following environment variables will be read to configure connections for a specific database.
+
+##### MySQL
+
+- `MYSQL_ADDRESS`: TCP address for connecting to the mysql server. (example: `tcp(hostname:3306)`)
+- `MYSQL_DATABASE`: Name of database to connect into.
+- `MYSQL_PASSWORD`: Password of user account for authentication.
+- `MYSQL_USER`: Username used for authentication,
+
+Refer to the mysql driver documentation for [connection parameters](https://github.com/go-sql-driver/mysql#dsn-data-source-name).
+
+- `MYSQL_TIMEOUT`: Timeout parameter specified on (DSN) data source name. (Default: `30s`)
+
+##### SQLite
+
+- `SQLITE_DB_PATH`: Local filepath location for the customers SQLite database. (Default: `customers.db`)
+
+Refer to the sqlite driver documentation for [connection parameters](https://github.com/mattn/go-sqlite3#connection-string).
 
 #### Document Storage
 
