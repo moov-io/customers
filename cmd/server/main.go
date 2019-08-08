@@ -9,6 +9,8 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/customers/internal/version"
 	"net/http"
 	"os"
 	"os/signal"
@@ -19,7 +21,6 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
-	"github.com/moov-io/customers"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -46,7 +47,7 @@ func main() {
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 	logger = log.With(logger, "caller", log.DefaultCaller)
 
-	logger.Log("startup", fmt.Sprintf("Starting moov-io/customers server version %s", customers.Version))
+	logger.Log("startup", fmt.Sprintf("Starting moov-io/customers server version %s", version.Version))
 
 	// Channel for errors
 	errs := make(chan error)
@@ -61,12 +62,10 @@ func main() {
 	if sqliteVersion, _, _ := sqlite3.Version(); sqliteVersion != "" {
 		logger.Log("main", fmt.Sprintf("sqlite version %s", sqliteVersion))
 	}
-	db, err := createSqliteConnection(logger, getSqlitePath())
+
+	// Setup database connection
+	db, err := database.New(logger, os.Getenv("DATABASE_TYPE"))
 	if err != nil {
-		logger.Log("main", err)
-		os.Exit(1)
-	}
-	if err := migrate(logger, db); err != nil {
 		logger.Log("main", err)
 		os.Exit(1)
 	}
@@ -76,11 +75,11 @@ func main() {
 		}
 	}()
 
-	customerRepo := &sqliteCustomerRepository{db}
+	customerRepo := &sqlCustomerRepository{db, logger}
 	defer customerRepo.close()
-	customerSSNRepo := &sqliteCustomerSSNRepository{db}
+	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
 	defer customerSSNRepo.close()
-	documentRepo := &sqliteDocumentRepository{db}
+	documentRepo := &sqlDocumentRepository{db, logger}
 	defer documentRepo.close()
 
 	// Start Admin server (with Prometheus metrics)

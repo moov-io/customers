@@ -9,9 +9,11 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/moov-io/customers/internal/database"
 	"strings"
 	"testing"
 
+	"github.com/go-kit/kit/log"
 	"github.com/moov-io/base"
 
 	"gocloud.dev/secrets"
@@ -101,40 +103,44 @@ func TestCustomerSSNStorage(t *testing.T) {
 }
 
 func TestCustomerSSNRepository(t *testing.T) {
-	db, err := createTestSqliteDB()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.close()
-
 	customerId := base.ID()
-	repo := &sqliteCustomerSSNRepository{db.db}
-	defer repo.close()
+	check := func(t *testing.T, customerSSNRepo *sqlCustomerSSNRepository) {
 
-	if ssn, err := repo.getCustomerSSN(customerId); ssn != nil || err != nil {
-		t.Fatalf("ssn=%v error=%v", ssn, err)
+		if ssn, err := customerSSNRepo.getCustomerSSN(customerId); ssn != nil || err != nil {
+			t.Fatalf("ssn=%v error=%v", ssn, err)
+		}
+
+		// write
+		bs := base64.StdEncoding.EncodeToString([]byte("123456789"))
+		ssn := &SSN{customerId: customerId, encrypted: []byte(bs), masked: "1#######9"}
+		if err := customerSSNRepo.saveCustomerSSN(ssn); err != nil {
+			t.Fatal(err)
+		}
+
+		// read again
+		ssn, err := customerSSNRepo.getCustomerSSN(customerId)
+		if ssn == nil || err != nil {
+			t.Fatalf("ssn=%v error=%v", ssn, err)
+		}
+		out, err := base64.StdEncoding.DecodeString(string(ssn.encrypted))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if v := string(out); v != "123456789" {
+			t.Errorf("ssn.encrypte=%s", v)
+		}
+		if ssn.masked != "1#######9" {
+			t.Errorf("ssn.masked=%s", ssn.masked)
+		}
 	}
 
-	// write
-	bs := base64.StdEncoding.EncodeToString([]byte("123456789"))
-	ssn := &SSN{customerId: customerId, encrypted: []byte(bs), masked: "1########9"}
-	if err := repo.saveCustomerSSN(ssn); err != nil {
-		t.Fatal(err)
-	}
+	// SQLite tests
+	sqliteDB := database.CreateTestSqliteDB(t)
+	defer sqliteDB.Close()
+	check(t, &sqlCustomerSSNRepository{sqliteDB.DB, log.NewNopLogger()})
 
-	// read again
-	ssn, err = repo.getCustomerSSN(customerId)
-	if ssn == nil || err != nil {
-		t.Fatalf("ssn=%v error=%v", ssn, err)
-	}
-	out, err := base64.StdEncoding.DecodeString(string(ssn.encrypted))
-	if err != nil {
-		t.Fatal(err)
-	}
-	if v := string(out); v != "123456789" {
-		t.Errorf("ssn.encrypte=%s", v)
-	}
-	if ssn.masked != "1########9" {
-		t.Errorf("ssn.masked=%s", ssn.masked)
-	}
+	// MySQL tests
+	mysqlDB := database.CreateTestMySQLDB(t)
+	defer mysqlDB.Close()
+	check(t, &sqlCustomerSSNRepository{mysqlDB.DB, log.NewNopLogger()})
 }

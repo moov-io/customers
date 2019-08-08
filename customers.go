@@ -3,5 +3,3 @@
 // license that can be found in the LICENSE file.
 
 package customers
-
-const Version = "v0.2.0-rc1"

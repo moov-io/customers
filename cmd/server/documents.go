@@ -205,15 +205,16 @@ type documentRepository interface {
 	writeCustomerDocument(customerId string, doc *client.Document) error
 }
 
-type sqliteDocumentRepository struct {
-	db *sql.DB
+type sqlDocumentRepository struct {
+	db     *sql.DB
+	logger log.Logger
 }
 
-func (r *sqliteDocumentRepository) close() error {
+func (r *sqlDocumentRepository) close() error {
 	return r.db.Close()
 }
 
-func (r *sqliteDocumentRepository) getCustomerDocuments(customerId string) ([]*client.Document, error) {
+func (r *sqlDocumentRepository) getCustomerDocuments(customerId string) ([]*client.Document, error) {
 	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ?`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -238,7 +239,7 @@ func (r *sqliteDocumentRepository) getCustomerDocuments(customerId string) ([]*c
 	return docs, nil
 }
 
-func (r *sqliteDocumentRepository) writeCustomerDocument(customerId string, doc *client.Document) error {
+func (r *sqlDocumentRepository) writeCustomerDocument(customerId string, doc *client.Document) error {
 	query := `insert into documents (document_id, customer_id, type, content_type, uploaded_at) values (?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

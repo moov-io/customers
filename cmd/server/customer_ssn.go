@@ -9,6 +9,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"fmt"
+	"github.com/go-kit/kit/log"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -68,34 +69,37 @@ type customerSSNRepository interface {
 	getCustomerSSN(customerId string) (*SSN, error)
 }
 
-type sqliteCustomerSSNRepository struct {
-	db *sql.DB
+type sqlCustomerSSNRepository struct {
+	db     *sql.DB
+	logger log.Logger
 }
 
-func (r *sqliteCustomerSSNRepository) close() error {
+func (r *sqlCustomerSSNRepository) close() error {
 	return r.db.Close()
 }
 
-func (r *sqliteCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {
-	query := `insert or replace into customer_ssn (customer_id, ssn, ssn_masked, created_at) values (?, ?, ?, ?);`
+//
+
+func (r *sqlCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {
+	query := `replace into customer_ssn (customer_id, ssn, ssn_masked, created_at) values (?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("sqliteCustomerSSNRepository: saveCustomerSSN prepare: %v", err)
+		return fmt.Errorf("sqlCustomerSSNRepository: saveCustomerSSN prepare: %v", err)
 	}
 	defer stmt.Close()
 
 	encoded := base64.StdEncoding.EncodeToString(ssn.encrypted)
 	if _, err := stmt.Exec(ssn.customerId, encoded, ssn.masked, time.Now()); err != nil {
-		return fmt.Errorf("sqliteCustomerSSNRepository: saveCustomerSSN: exec: %v", err)
+		return fmt.Errorf("sqlCustomerSSNRepository: saveCustomerSSN: exec: %v", err)
 	}
 	return nil
 }
 
-func (r *sqliteCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, error) {
+func (r *sqlCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, error) {
 	query := `select ssn, ssn_masked from customer_ssn where customer_id = ? limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return nil, fmt.Errorf("sqliteCustomerSSNRepository: getCustomerSSN prepare: %v", err)
+		return nil, fmt.Errorf("sqlCustomerSSNRepository: getCustomerSSN prepare: %v", err)
 	}
 	defer stmt.Close()
 
@@ -109,12 +113,12 @@ func (r *sqliteCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, e
 		if err == sql.ErrNoRows {
 			return nil, nil // not found
 		}
-		return nil, fmt.Errorf("sqliteCustomerSSNRepository: getCustomerSSN scan: %v", err)
+		return nil, fmt.Errorf("sqlCustomerSSNRepository: getCustomerSSN scan: %v", err)
 	}
 
 	decoded, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
-		return nil, fmt.Errorf("sqliteCustomerSSNRepository: getCustomerSSN decode: %v", err)
+		return nil, fmt.Errorf("sqlCustomerSSNRepository: getCustomerSSN decode: %v", err)
 	}
 	ssn.encrypted = decoded
 	return &ssn, nil
