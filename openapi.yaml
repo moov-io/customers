@@ -34,13 +34,13 @@ paths:
       summary: Create a new customer
       operationId: createCustomer
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -71,13 +71,13 @@ paths:
       summary: Retrieves a Customer object associated with the customer ID.
       operationId: getCustomer
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -85,7 +85,7 @@ paths:
             type: string
         - name: customer_id
           in: path
-          description: Customer Id
+          description: Customer ID
           required: true
           schema:
             type: string
@@ -105,13 +105,13 @@ paths:
       summary: Add an Address onto an existing Customer record
       operationId: addCustomerAddress
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -119,7 +119,7 @@ paths:
             type: string
         - name: customer_id
           in: path
-          description: Customer Id
+          description: Customer ID
           required: true
           schema:
             type: string
@@ -149,13 +149,13 @@ paths:
       summary: Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
       operationId: replaceCustomerMetadata
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -163,7 +163,7 @@ paths:
             type: string
         - name: customer_id
           in: path
-          description: Customer Id
+          description: Customer ID
           required: true
           schema:
             type: string
@@ -193,13 +193,13 @@ paths:
       summary: Update the status for a customer, which can only be updated by authenticated users with permissions.
       operationId: updateCustomerStatus
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -207,7 +207,7 @@ paths:
             type: string
         - name: customer_id
           in: path
-          description: Customer Id
+          description: Customer ID
           required: true
           schema:
             type: string
@@ -237,13 +237,13 @@ paths:
       summary: Upload a document for the given customer.
       operationId: uploadCustomerDocument
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -251,7 +251,7 @@ paths:
             type: string
         - name: customer_id
           in: path
-          description: Customer Id
+          description: Customer ID
           required: true
           schema:
             type: string
@@ -292,13 +292,13 @@ paths:
       summary: Get documents for a customer
       operationId: getCustomerDocuments
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -306,7 +306,7 @@ paths:
             type: string
         - name: customer_id
           in: path
-          description: Customer Id
+          description: Customer ID
           required: true
           schema:
             type: string
@@ -324,13 +324,13 @@ paths:
       summary: Retrieve the referenced document
       operationId: getCustomerDocumentContents
       parameters:
-        - name: X-Request-Id
+        - name: X-Request-ID
           in: header
           description: Optional Request ID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-Id
+        - name: X-User-ID
           in: header
           description: Moov User ID header, required in all requests
           example: e3cdf999
@@ -338,14 +338,14 @@ paths:
             type: string
         - name: customer_id
           in: path
-          description: Customer Id
+          description: Customer ID
           required: true
           schema:
             type: string
             example: e210a9d6
         - name: document_id
           in: path
-          description: Document Id
+          description: Document ID
           required: true
           schema:
             type: string
@@ -425,7 +425,7 @@ components:
           additionalProperties:
             type: string
           example:
-            paygateId: "23beb5fd"
+            paygateID: "23beb5fd"
       required:
         - firstName
         - lastName
@@ -497,7 +497,7 @@ components:
           additionalProperties:
             type: string
           example:
-            paygateId: "23beb5fd"
+            paygateID: "23beb5fd"
         createdAt:
           type: string
           format: date-time
@@ -519,7 +519,7 @@ components:
           additionalProperties:
             type: string
           example:
-            paygateId: "23beb5fd"
+            paygateID: "23beb5fd"
       required:
         - metadata
     UpdateCustomerStatus:

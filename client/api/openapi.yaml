@@ -34,7 +34,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -43,7 +43,7 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
@@ -79,7 +79,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -88,12 +88,12 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
         style: simple
-      - description: Customer Id
+      - description: Customer ID
         explode: false
         in: path
         name: customer_id
@@ -123,7 +123,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -132,12 +132,12 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
         style: simple
-      - description: Customer Id
+      - description: Customer ID
         explode: false
         in: path
         name: customer_id
@@ -177,7 +177,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -186,12 +186,12 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
         style: simple
-      - description: Customer Id
+      - description: Customer ID
         explode: false
         in: path
         name: customer_id
@@ -233,7 +233,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -242,12 +242,12 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
         style: simple
-      - description: Customer Id
+      - description: Customer ID
         explode: false
         in: path
         name: customer_id
@@ -288,7 +288,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -297,12 +297,12 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
         style: simple
-      - description: Customer Id
+      - description: Customer ID
         explode: false
         in: path
         name: customer_id
@@ -329,7 +329,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -338,12 +338,12 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
         style: simple
-      - description: Customer Id
+      - description: Customer ID
         explode: false
         in: path
         name: customer_id
@@ -397,7 +397,7 @@ paths:
         example: rs4f9915
         explode: false
         in: header
-        name: X-Request-Id
+        name: X-Request-ID
         required: false
         schema:
           type: string
@@ -406,12 +406,12 @@ paths:
         example: e3cdf999
         explode: false
         in: header
-        name: X-User-Id
+        name: X-User-ID
         required: false
         schema:
           type: string
         style: simple
-      - description: Customer Id
+      - description: Customer ID
         explode: false
         in: path
         name: customer_id
@@ -420,7 +420,7 @@ paths:
           example: e210a9d6
           type: string
         style: simple
-      - description: Document Id
+      - description: Document ID
         explode: false
         in: path
         name: document_id
@@ -474,7 +474,7 @@ components:
           state: state
           type: Primary
         metadata:
-          paygateId: 23beb5fd
+          paygateID: 23beb5fd
         nickName: Bob
         phones:
         - number: +1.818.555.1212
@@ -535,7 +535,7 @@ components:
           description: Map of unique keys associated to values to act as foreign key
             relationships or arbitrary data associated to a Customer.
           example:
-            paygateId: 23beb5fd
+            paygateID: 23beb5fd
           type: object
       required:
       - addresses
@@ -569,7 +569,7 @@ components:
           state: state
           type: Primary
         metadata:
-          paygateId: 23beb5fd
+          paygateID: 23beb5fd
         nickName: Bob
         phones:
         - valid: true
@@ -646,7 +646,7 @@ components:
           description: Map of unique keys associated to values to act as foreign key
             relationships or arbitrary data associated to a Customer.
           example:
-            paygateId: 23beb5fd
+            paygateID: 23beb5fd
           type: object
         createdAt:
           format: date-time
@@ -663,7 +663,7 @@ components:
     CustomerMetadata:
       example:
         metadata:
-          paygateId: 23beb5fd
+          paygateID: 23beb5fd
       properties:
         metadata:
           additionalProperties:
@@ -671,7 +671,7 @@ components:
           description: Map of unique keys associated to values to act as foreign key
             relationships or arbitrary data associated to a Customer.
           example:
-            paygateId: 23beb5fd
+            paygateID: 23beb5fd
           type: object
       required:
       - metadata
