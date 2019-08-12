@@ -34,11 +34,11 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 		SdnName:  "Jane Doe",
 		Match:    0.99,
 	}
-	customerId := base.ID()
-	if err := searcher.storeCustomerOFACSearch(&client.Customer{Id: customerId}, "requestId"); err != nil {
+	customerID := base.ID()
+	if err := searcher.storeCustomerOFACSearch(&client.Customer{ID: customerID}, "requestID"); err != nil {
 		t.Fatal(err)
 	}
-	res, err := repo.getLatestCustomerOFACSearch(customerId)
+	res, err := repo.getLatestCustomerOFACSearch(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -47,8 +47,8 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	}
 
 	// retry but with NickName set (test coverage)
-	customerId = base.ID()
-	if err := searcher.storeCustomerOFACSearch(&client.Customer{Id: customerId, NickName: "John Doe"}, "requestId"); err != nil {
+	customerID = base.ID()
+	if err := searcher.storeCustomerOFACSearch(&client.Customer{ID: customerID, NickName: "John Doe"}, "requestID"); err != nil {
 		t.Fatal(err)
 	}
 }

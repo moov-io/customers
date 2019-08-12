@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	errNoDocumentId = errors.New("no Document ID found")
+	errNoDocumentID = errors.New("no Document ID found")
 
 	maxDocumentSize int64 = 20 * 1024 * 1024 // 20MB
 )
@@ -37,10 +37,10 @@ func addDocumentRoutes(logger log.Logger, r *mux.Router, repo documentRepository
 	r.Methods("GET").Path("/customers/{customerId}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
 }
 
-func getDocumentId(w http.ResponseWriter, r *http.Request) string {
+func getDocumentID(w http.ResponseWriter, r *http.Request) string {
 	v, ok := mux.Vars(r)["documentId"]
 	if !ok || v == "" {
-		moovhttp.Problem(w, errNoDocumentId)
+		moovhttp.Problem(w, errNoDocumentID)
 		return ""
 	}
 	return v
@@ -50,12 +50,12 @@ func getCustomerDocuments(logger log.Logger, repo documentRepository) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
-		customerId := getCustomerId(w, r)
-		if customerId == "" {
+		customerID := getCustomerID(w, r)
+		if customerID == "" {
 			return
 		}
 
-		docs, err := repo.getCustomerDocuments(customerId)
+		docs, err := repo.getCustomerDocuments(customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -104,7 +104,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		contentType := http.DetectContentType(buf)
 		doc := &client.Document{
-			Id:          base.ID(),
+			ID:          base.ID(),
 			Type:        documentType,
 			ContentType: contentType,
 			UploadedAt:  time.Now(),
@@ -118,22 +118,22 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		defer bucket.Close()
 
-		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
-		if customerId == "" {
+		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestId(r)
+		if customerID == "" {
 			return
 		}
-		if err := repo.writeCustomerDocument(customerId, doc); err != nil {
+		if err := repo.writeCustomerDocument(customerID, doc); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
-		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.Id, contentType, customerId), "requestId", requestId)
+		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.ID, contentType, customerID), "requestID", requestID)
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
-		documentKey := makeDocumentKey(customerId, doc.Id)
-		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestId", requestId)
+		documentKey := makeDocumentKey(customerID, doc.ID)
+		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestID", requestID)
 
 		writer, err := bucket.NewWriter(ctx, documentKey, &blob.WriterOptions{
 			ContentDisposition: "inline",
@@ -162,11 +162,11 @@ func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFacto
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
-		customerId, documentId := getCustomerId(w, r), getDocumentId(w, r)
-		if customerId == "" || documentId == "" {
+		customerID, documentId := getCustomerID(w, r), getDocumentID(w, r)
+		if customerID == "" || documentId == "" {
 			return
 		}
-		requestId := moovhttp.GetRequestId(r)
+		requestID := moovhttp.GetRequestId(r)
 
 		bucket, err := bucketFactory()
 		if err != nil {
@@ -178,7 +178,7 @@ func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFacto
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()
 
-		documentKey := makeDocumentKey(customerId, documentId)
+		documentKey := makeDocumentKey(customerID, documentId)
 		signedURL, err := bucket.SignedURL(ctx, documentKey, &blob.SignedURLOptions{
 			Expiry: 15 * time.Minute,
 		})
@@ -191,18 +191,18 @@ func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFacto
 			return
 		}
 
-		logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestId", requestId)
+		logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestID", requestID)
 		http.Redirect(w, r, signedURL, http.StatusFound)
 	}
 }
 
-func makeDocumentKey(customerId, documentId string) string {
-	return fmt.Sprintf("customer-%s-document-%s", customerId, documentId)
+func makeDocumentKey(customerID, documentId string) string {
+	return fmt.Sprintf("customer-%s-document-%s", customerID, documentId)
 }
 
 type documentRepository interface {
-	getCustomerDocuments(customerId string) ([]*client.Document, error)
-	writeCustomerDocument(customerId string, doc *client.Document) error
+	getCustomerDocuments(customerID string) ([]*client.Document, error)
+	writeCustomerDocument(customerID string, doc *client.Document) error
 }
 
 type sqlDocumentRepository struct {
@@ -214,7 +214,7 @@ func (r *sqlDocumentRepository) close() error {
 	return r.db.Close()
 }
 
-func (r *sqlDocumentRepository) getCustomerDocuments(customerId string) ([]*client.Document, error) {
+func (r *sqlDocumentRepository) getCustomerDocuments(customerID string) ([]*client.Document, error) {
 	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ?`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -222,7 +222,7 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerId string) ([]*clie
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(customerId)
+	rows, err := stmt.Query(customerID)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: query %v", err)
 	}
@@ -231,7 +231,7 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerId string) ([]*clie
 	var docs []*client.Document
 	for rows.Next() {
 		var doc client.Document
-		if err := rows.Scan(&doc.Id, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
+		if err := rows.Scan(&doc.ID, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
 			return nil, fmt.Errorf("getCustomerDocuments: scan: %v", err)
 		}
 		docs = append(docs, &doc)
@@ -239,7 +239,7 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerId string) ([]*clie
 	return docs, nil
 }
 
-func (r *sqlDocumentRepository) writeCustomerDocument(customerId string, doc *client.Document) error {
+func (r *sqlDocumentRepository) writeCustomerDocument(customerID string, doc *client.Document) error {
 	query := `insert into documents (document_id, customer_id, type, content_type, uploaded_at) values (?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -247,7 +247,7 @@ func (r *sqlDocumentRepository) writeCustomerDocument(customerId string, doc *cl
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(doc.Id, customerId, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
+	if _, err := stmt.Exec(doc.ID, customerID, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
 		return fmt.Errorf("writeCustomerDocument: exec: %v", err)
 	}
 	return nil

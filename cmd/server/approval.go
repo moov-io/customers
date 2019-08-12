@@ -65,16 +65,16 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 	switch futureStatus {
 	case CustomerStatusKYC:
 		if existing.FirstName == "" || existing.LastName == "" {
-			return fmt.Errorf("customer=%s is missing fist/last name", existing.Id)
+			return fmt.Errorf("customer=%s is missing fist/last name", existing.ID)
 		}
 		if existing.BirthDate.IsZero() {
-			return fmt.Errorf("customer=%s is missing date of birth", existing.Id)
+			return fmt.Errorf("customer=%s is missing date of birth", existing.ID)
 		}
 		if !containsValidPrimaryAddress(existing.Addresses) {
-			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.Id)
+			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.ID)
 		}
 	case CustomerStatusOFAC:
-		searchResult, err := repo.getLatestCustomerOFACSearch(existing.Id)
+		searchResult, err := repo.getLatestCustomerOFACSearch(existing.ID)
 		if err != nil {
 			return fmt.Errorf("validCustomerStatusTransition: error getting OFAC search: %v", err)
 		}
@@ -82,19 +82,19 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 			if err := ofac.storeCustomerOFACSearch(existing, ""); err != nil {
 				return fmt.Errorf("validCustomerStatusTransition: problem with OFAC search: %v", err)
 			}
-			searchResult, err = repo.getLatestCustomerOFACSearch(existing.Id)
+			searchResult, err = repo.getLatestCustomerOFACSearch(existing.ID)
 			if err != nil || searchResult == nil {
 				return fmt.Errorf("validCustomerStatusTransition: inner lookup searchResult=%#v: %v", searchResult, err)
 			}
 		}
 		if searchResult.match > ofacMatchThreshold {
-			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.Id, searchResult.match, searchResult.entityId)
+			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.ID, searchResult.match, searchResult.entityId)
 		}
 		return nil
 	case CustomerStatusCIP: // TODO(adam): need to impl lookup
 		// What can we do to validate an SSN?
 		// https://www.ssa.gov/employer/randomization.html (not much)
-		return fmt.Errorf("customers=%s %s to CIP transition needs to lookup encrypted SSN", existing.Id, existing.Status)
+		return fmt.Errorf("customers=%s %s to CIP transition needs to lookup encrypted SSN", existing.ID, existing.Status)
 	}
 	return nil
 }
@@ -117,7 +117,7 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository, ofac *ofac
 			return
 		}
 
-		customerId, requestId := getCustomerId(w, r), moovhttp.GetRequestId(r)
+		customerId, requestId := getCustomerID(w, r), moovhttp.GetRequestId(r)
 		if customerId == "" {
 			return
 		}
@@ -184,7 +184,7 @@ func updateCustomerAddress(logger log.Logger, repo customerRepository) http.Hand
 			return
 		}
 
-		customerId, addressId := getCustomerId(w, r), getAddressId(w, r)
+		customerId, addressId := getCustomerID(w, r), getAddressId(w, r)
 		if customerId == "" || addressId == "" {
 			return
 		}

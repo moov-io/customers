@@ -34,24 +34,24 @@ type testDocumentRepository struct {
 	written *client.Document
 }
 
-func (r *testDocumentRepository) getCustomerDocuments(customerId string) ([]*client.Document, error) {
+func (r *testDocumentRepository) getCustomerDocuments(customerID string) ([]*client.Document, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
 	return r.documents, nil
 }
 
-func (r *testDocumentRepository) writeCustomerDocument(customerId string, doc *client.Document) error {
+func (r *testDocumentRepository) writeCustomerDocument(customerID string, doc *client.Document) error {
 	r.written = doc
 	return r.err
 }
 
-func TestDocuments__getDocumentId(t *testing.T) {
+func TestDocuments__getDocumentID(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
 	req.Header.Set("x-request-id", "test")
 
-	if id := getDocumentId(w, req); id != "" {
+	if id := getDocumentID(w, req); id != "" {
 		t.Errorf("unexpected id: %v", id)
 	}
 }
@@ -77,7 +77,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	repo.err = nil
 	repo.documents = []*client.Document{
 		{
-			Id:   base.ID(),
+			ID:   base.ID(),
 			Type: "DriversLicense",
 		},
 	}
@@ -160,7 +160,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&doc); err != nil {
 		t.Fatal(err)
 	}
-	if doc.Id == "" {
+	if doc.ID == "" {
 		t.Fatal("failed to read document")
 	}
 	if doc.ContentType != "image/jpeg" {
@@ -169,14 +169,14 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 
 	// Test the HTTP retrieval route
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest("GET", fmt.Sprintf("/customers/foo/documents/%s", doc.Id), nil)
+	req = httptest.NewRequest("GET", fmt.Sprintf("/customers/foo/documents/%s", doc.ID), nil)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusFound {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
-	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.Id)) {
+	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.ID)) {
 		t.Errorf("unexpected SignedURL: %s", loc)
 	}
 }
@@ -211,10 +211,10 @@ func TestDocuments__makeDocumentKey(t *testing.T) {
 }
 
 func TestDocumentRepository(t *testing.T) {
-	customerId := base.ID()
+	customerID := base.ID()
 
 	check := func(t *testing.T, repo *sqlDocumentRepository) {
-		docs, err := repo.getCustomerDocuments(customerId)
+		docs, err := repo.getCustomerDocuments(customerID)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -224,22 +224,22 @@ func TestDocumentRepository(t *testing.T) {
 
 		// Write a Document and read it back
 		doc := &client.Document{
-			Id:          base.ID(),
+			ID:          base.ID(),
 			Type:        "DriversLicense",
 			ContentType: "image/png",
 		}
-		if err := repo.writeCustomerDocument(customerId, doc); err != nil {
+		if err := repo.writeCustomerDocument(customerID, doc); err != nil {
 			t.Fatal(err)
 		}
-		docs, err = repo.getCustomerDocuments(customerId)
+		docs, err = repo.getCustomerDocuments(customerID)
 		if err != nil {
 			t.Fatal(err)
 		}
 		if len(docs) != 1 {
 			t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
 		}
-		if docs[0].Id != doc.Id {
-			t.Errorf("docs[0].Id=%s doc.Id=%s", docs[0].Id, doc.Id)
+		if docs[0].ID != doc.ID {
+			t.Errorf("docs[0].ID=%s doc.ID=%s", docs[0].ID, doc.ID)
 		}
 	}
 	// SQLite tests

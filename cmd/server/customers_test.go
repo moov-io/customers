@@ -33,7 +33,7 @@ type testCustomerRepository struct {
 	savedOFACSearchResult *ofacSearchResult
 }
 
-func (r *testCustomerRepository) getCustomer(customerId string) (*client.Customer, error) {
+func (r *testCustomerRepository) getCustomer(customerID string) (*client.Customer, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -45,29 +45,29 @@ func (r *testCustomerRepository) createCustomer(c *client.Customer) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomerStatus(customerId string, status CustomerStatus, comment string) error {
+func (r *testCustomerRepository) updateCustomerStatus(customerID string, status CustomerStatus, comment string) error {
 	r.updatedStatus = status
 	return r.err
 }
 
-func (r *testCustomerRepository) getCustomerMetadata(customerId string) (map[string]string, error) {
+func (r *testCustomerRepository) getCustomerMetadata(customerID string) (map[string]string, error) {
 	out := make(map[string]string)
 	return out, r.err
 }
 
-func (r *testCustomerRepository) replaceCustomerMetadata(customerId string, metadata map[string]string) error {
+func (r *testCustomerRepository) replaceCustomerMetadata(customerID string, metadata map[string]string) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) addCustomerAddress(customerId string, address address) error {
+func (r *testCustomerRepository) addCustomerAddress(customerID string, address address) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomerAddress(customerId, addressId string, _type string, validated bool) error {
+func (r *testCustomerRepository) updateCustomerAddress(customerID, addressID string, _type string, validated bool) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerId string) (*ofacSearchResult, error) {
+func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*ofacSearchResult, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -77,16 +77,16 @@ func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerId string) 
 	return r.ofacSearchResult, nil
 }
 
-func (r *testCustomerRepository) saveCustomerOFACSearch(customerId string, result ofacSearchResult) error {
+func (r *testCustomerRepository) saveCustomerOFACSearch(customerID string, result ofacSearchResult) error {
 	r.savedOFACSearchResult = &result
 	return r.err
 }
 
-func TestCustomers__getCustomerId(t *testing.T) {
+func TestCustomers__getCustomerID(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
 
-	if id := getCustomerId(w, req); id != "" {
+	if id := getCustomerID(w, req); id != "" {
 		t.Errorf("unexpected id: %v", id)
 	}
 }
@@ -159,7 +159,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.Id), nil)
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.ID), nil)
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -176,8 +176,8 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&customer); err != nil {
 		t.Fatal(err)
 	}
-	if customer.Id == "" {
-		t.Error("empty Customer.Id")
+	if customer.ID == "" {
+		t.Error("empty Customer.ID")
 	}
 }
 
@@ -233,7 +233,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 
 	// asCustomer
 	cust, _, _ := req.asCustomer(testCustomerSSNStorage)
-	if cust.Id == "" {
+	if cust.ID == "" {
 		t.Errorf("empty Customer: %#v", cust)
 	}
 	if len(cust.Phones) != 1 {
@@ -271,8 +271,8 @@ func TestCustomers__createCustomer(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&cust); err != nil {
 		t.Fatal(err)
 	}
-	if cust.Id == "" {
-		t.Error("empty Customer.Id")
+	if cust.ID == "" {
+		t.Error("empty Customer.ID")
 	}
 
 	// sad path
@@ -359,7 +359,7 @@ func TestCustomers__repository(t *testing.T) {
 	}
 
 	// read
-	cust, err = repo.getCustomer(cust.Id)
+	cust, err = repo.getCustomer(cust.ID)
 	if err != nil {
 		t.Error(err)
 	}
@@ -385,12 +385,12 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	}
 
 	// update status
-	if err := repo.updateCustomerStatus(cust.Id, CustomerStatusKYC, "test comment"); err != nil {
+	if err := repo.updateCustomerStatus(cust.ID, CustomerStatusKYC, "test comment"); err != nil {
 		t.Fatal(err)
 	}
 
 	// read the status back
-	customer, err := repo.getCustomer(cust.Id)
+	customer, err := repo.getCustomer(cust.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -415,7 +415,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	body := strings.NewReader(`{ "metadata": { "key": "bar"} }`)
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.Id), body)
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.ID), body)
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -476,7 +476,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.Id), &buf)
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.ID), &buf)
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -491,7 +491,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 
 	// invalid JSON
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.Id), strings.NewReader("{invalid-json"))
+	req = httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.ID), strings.NewReader("{invalid-json"))
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -527,9 +527,9 @@ func TestCustomerRepository__metadata(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	customerId := base.ID()
+	customerID := base.ID()
 
-	meta, err := repo.getCustomerMetadata(customerId)
+	meta, err := repo.getCustomerMetadata(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -538,10 +538,10 @@ func TestCustomerRepository__metadata(t *testing.T) {
 	}
 
 	// replace
-	if err := repo.replaceCustomerMetadata(customerId, map[string]string{"key": "bar"}); err != nil {
+	if err := repo.replaceCustomerMetadata(customerID, map[string]string{"key": "bar"}); err != nil {
 		t.Fatal(err)
 	}
-	meta, err = repo.getCustomerMetadata(customerId)
+	meta, err = repo.getCustomerMetadata(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -578,7 +578,7 @@ func TestCustomers__validateMetadata(t *testing.T) {
 func TestCustomers__addCustomerAddress(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			Id: base.ID(),
+			ID: base.ID(),
 		},
 		err: errors.New("bad error"),
 	}
@@ -629,7 +629,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	}
 
 	// add an Address
-	if err := repo.addCustomerAddress(cust.Id, address{
+	if err := repo.addCustomerAddress(cust.ID, address{
 		Address1:   "123 1st st",
 		City:       "fake city",
 		State:      "CA",
@@ -640,7 +640,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	}
 
 	// re-read
-	cust, err := repo.getCustomer(cust.Id)
+	cust, err := repo.getCustomer(cust.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -656,9 +656,9 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	customerId := base.ID()
+	customerID := base.ID()
 
-	res, err := repo.getLatestCustomerOFACSearch(customerId)
+	res, err := repo.getLatestCustomerOFACSearch(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -667,10 +667,10 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	}
 
 	// save a record and read it back
-	if err := repo.saveCustomerOFACSearch(customerId, ofacSearchResult{entityId: "14141"}); err != nil {
+	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{entityId: "14141"}); err != nil {
 		t.Fatal(err)
 	}
-	res, err = repo.getLatestCustomerOFACSearch(customerId)
+	res, err = repo.getLatestCustomerOFACSearch(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -679,10 +679,10 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	}
 
 	// save another and get it back
-	if err := repo.saveCustomerOFACSearch(customerId, ofacSearchResult{entityId: "777121"}); err != nil {
+	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{entityId: "777121"}); err != nil {
 		t.Fatal(err)
 	}
-	res, err = repo.getLatestCustomerOFACSearch(customerId)
+	res, err = repo.getLatestCustomerOFACSearch(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
