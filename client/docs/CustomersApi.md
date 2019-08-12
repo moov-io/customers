@@ -4,21 +4,21 @@ All URIs are relative to *http://localhost:8087*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customer_id}/address | Add an Address onto an existing Customer record
+[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add an Address onto an existing Customer record
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create a new customer
-[**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customer_id} | Retrieves a Customer object associated with the customer ID.
-[**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customer_id}/documents/{document_id} | Retrieve the referenced document
-[**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customer_id}/documents | Get documents for a customer
+[**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieves a Customer object associated with the customer ID.
+[**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Retrieve the referenced document
+[**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get documents for a customer
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping the Customers service to check if running
-[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customer_id}/metadata | Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
-[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customer_id}/status | Update the status for a customer, which can only be updated by authenticated users with permissions.
-[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customer_id}/documents | Upload a document for the given customer.
+[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update the status for a customer, which can only be updated by authenticated users with permissions.
+[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload a document for the given customer.
 
 
 
 ## AddCustomerAddress
 
-> Customer AddCustomerAddress(ctx, customerId, createAddress, optional)
+> Customer AddCustomerAddress(ctx, customerID, createAddress, optional)
 Add an Address onto an existing Customer record
 
 ### Required Parameters
@@ -27,7 +27,7 @@ Add an Address onto an existing Customer record
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerId** | **string**| Customer ID | 
+**customerID** | **string**| Customer ID | 
 **createAddress** | [**CreateAddress**](CreateAddress.md)|  | 
  **optional** | ***AddCustomerAddressOpts** | optional parameters | nil if no parameters
 
@@ -106,7 +106,7 @@ No authorization required
 
 ## GetCustomer
 
-> Customer GetCustomer(ctx, customerId, optional)
+> Customer GetCustomer(ctx, customerID, optional)
 Retrieves a Customer object associated with the customer ID.
 
 ### Required Parameters
@@ -115,7 +115,7 @@ Retrieves a Customer object associated with the customer ID.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerId** | **string**| Customer ID | 
+**customerID** | **string**| Customer ID | 
  **optional** | ***GetCustomerOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -149,7 +149,7 @@ No authorization required
 
 ## GetCustomerDocumentContents
 
-> *os.File GetCustomerDocumentContents(ctx, customerId, documentId, optional)
+> *os.File GetCustomerDocumentContents(ctx, customerID, documentID, optional)
 Retrieve the referenced document
 
 ### Required Parameters
@@ -158,8 +158,8 @@ Retrieve the referenced document
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerId** | **string**| Customer ID | 
-**documentId** | **string**| Document ID | 
+**customerID** | **string**| Customer ID | 
+**documentID** | **string**| Document ID | 
  **optional** | ***GetCustomerDocumentContentsOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -194,7 +194,7 @@ No authorization required
 
 ## GetCustomerDocuments
 
-> []Document GetCustomerDocuments(ctx, customerId, optional)
+> []Document GetCustomerDocuments(ctx, customerID, optional)
 Get documents for a customer
 
 ### Required Parameters
@@ -203,7 +203,7 @@ Get documents for a customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerId** | **string**| Customer ID | 
+**customerID** | **string**| Customer ID | 
  **optional** | ***GetCustomerDocumentsOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -264,7 +264,7 @@ No authorization required
 
 ## ReplaceCustomerMetadata
 
-> Customer ReplaceCustomerMetadata(ctx, customerId, customerMetadata, optional)
+> Customer ReplaceCustomerMetadata(ctx, customerID, customerMetadata, optional)
 Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 
 ### Required Parameters
@@ -273,7 +273,7 @@ Replace the metadata object for a customer. Metadata is a map of unique keys ass
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerId** | **string**| Customer ID | 
+**customerID** | **string**| Customer ID | 
 **customerMetadata** | [**CustomerMetadata**](CustomerMetadata.md)|  | 
  **optional** | ***ReplaceCustomerMetadataOpts** | optional parameters | nil if no parameters
 
@@ -309,7 +309,7 @@ No authorization required
 
 ## UpdateCustomerStatus
 
-> Customer UpdateCustomerStatus(ctx, customerId, updateCustomerStatus, optional)
+> Customer UpdateCustomerStatus(ctx, customerID, updateCustomerStatus, optional)
 Update the status for a customer, which can only be updated by authenticated users with permissions.
 
 ### Required Parameters
@@ -318,7 +318,7 @@ Update the status for a customer, which can only be updated by authenticated use
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerId** | **string**| Customer ID | 
+**customerID** | **string**| Customer ID | 
 **updateCustomerStatus** | [**UpdateCustomerStatus**](UpdateCustomerStatus.md)|  | 
  **optional** | ***UpdateCustomerStatusOpts** | optional parameters | nil if no parameters
 
@@ -354,7 +354,7 @@ No authorization required
 
 ## UploadCustomerDocument
 
-> Document UploadCustomerDocument(ctx, customerId, type_, file, optional)
+> Document UploadCustomerDocument(ctx, customerID, type_, file, optional)
 Upload a document for the given customer.
 
 ### Required Parameters
@@ -363,7 +363,7 @@ Upload a document for the given customer.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerId** | **string**| Customer ID | 
+**customerID** | **string**| Customer ID | 
 **type_** | **string**| Document type (see Document type for values) | 
 **file** | ***os.File*****os.File**| Document to be uploaded | 
  **optional** | ***UploadCustomerDocumentOpts** | optional parameters | nil if no parameters

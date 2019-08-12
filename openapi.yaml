@@ -65,7 +65,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /customers/{customer_id}:
+  /customers/{customerID}:
     get:
       tags: [Customers]
       summary: Retrieves a Customer object associated with the customer ID.
@@ -83,7 +83,7 @@ paths:
           example: e3cdf999
           schema:
             type: string
-        - name: customer_id
+        - name: customerID
           in: path
           description: Customer ID
           required: true
@@ -99,7 +99,7 @@ paths:
                 $ref: '#/components/schemas/Customer'
         '404':
           description: A resource with the specified ID was not found
-  /customers/{customer_id}/address:
+  /customers/{customerID}/address:
     post:
       tags: [Customers]
       summary: Add an Address onto an existing Customer record
@@ -117,7 +117,7 @@ paths:
           example: e3cdf999
           schema:
             type: string
-        - name: customer_id
+        - name: customerID
           in: path
           description: Customer ID
           required: true
@@ -143,7 +143,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /customers/{customer_id}/metadata:
+  /customers/{customerID}/metadata:
     put:
       tags: [Customers]
       summary: Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -161,7 +161,7 @@ paths:
           example: e3cdf999
           schema:
             type: string
-        - name: customer_id
+        - name: customerID
           in: path
           description: Customer ID
           required: true
@@ -187,7 +187,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /customers/{customer_id}/status:
+  /customers/{customerID}/status:
     put:
       tags: [Customers]
       summary: Update the status for a customer, which can only be updated by authenticated users with permissions.
@@ -205,7 +205,7 @@ paths:
           example: e3cdf999
           schema:
             type: string
-        - name: customer_id
+        - name: customerID
           in: path
           description: Customer ID
           required: true
@@ -231,7 +231,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /customers/{customer_id}/documents:
+  /customers/{customerID}/documents:
     post:
       tags: [Customers]
       summary: Upload a document for the given customer.
@@ -249,7 +249,7 @@ paths:
           example: e3cdf999
           schema:
             type: string
-        - name: customer_id
+        - name: customerID
           in: path
           description: Customer ID
           required: true
@@ -304,7 +304,7 @@ paths:
           example: e3cdf999
           schema:
             type: string
-        - name: customer_id
+        - name: customerID
           in: path
           description: Customer ID
           required: true
@@ -318,7 +318,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Documents'
-  /customers/{customer_id}/documents/{document_id}:
+  /customers/{customerID}/documents/{documentID}:
     get:
       tags: [Customers]
       summary: Retrieve the referenced document
@@ -336,14 +336,14 @@ paths:
           example: e3cdf999
           schema:
             type: string
-        - name: customer_id
+        - name: customerID
           in: path
           description: Customer ID
           required: true
           schema:
             type: string
             example: e210a9d6
-        - name: document_id
+        - name: documentID
           in: path
           description: Document ID
           required: true
@@ -438,7 +438,7 @@ components:
     Customer:
       type: object
       properties:
-        id:
+        ID:
           type: string
           description: The unique identifier for the customer who owns the account
           example: e210a9d6
@@ -609,7 +609,7 @@ components:
     Address:
       type: object
       properties:
-        id:
+        ID:
           type: string
           description: Unique identifier for this Address
           example: 851233a1
@@ -646,7 +646,7 @@ components:
     Document:
       type: object
       properties:
-        id:
+        ID:
           type: string
           description: The unique identifier for this document
           example: e210a9d6
