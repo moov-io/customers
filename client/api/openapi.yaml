@@ -538,14 +538,11 @@ components:
             paygateId: 23beb5fd
           type: object
       required:
-      - SSN
-      - addresses
       - addresses
       - birthDate
       - email
       - firstName
       - lastName
-      - phones
       type: object
     Customer:
       example:
