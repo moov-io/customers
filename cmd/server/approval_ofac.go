@@ -33,26 +33,26 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestId 
 
 	sdn, err := s.ofacClient.Search(ctx, formatCustomerName(cust), requestId)
 	if err != nil {
-		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.Id, err)
+		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.ID, err)
 	}
 	var nickSDN *ofac.Sdn
 	if cust.NickName != "" {
 		nickSDN, err = s.ofacClient.Search(ctx, cust.NickName, requestId)
 		if err != nil {
-			return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.Id, err)
+			return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.ID, err)
 		}
 	}
 	// Save the higher matching SDN (from name search or nick name)
 	switch {
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
-		err = s.repo.saveCustomerOFACSearch(cust.Id, ofacSearchResult{
+		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
 			entityId: nickSDN.EntityID,
 			sdnName:  nickSDN.SdnName,
 			sdnType:  nickSDN.SdnType,
 			match:    nickSDN.Match,
 		})
 	case sdn != nil:
-		err = s.repo.saveCustomerOFACSearch(cust.Id, ofacSearchResult{
+		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
 			entityId: sdn.EntityID,
 			sdnName:  sdn.SdnName,
 			sdnType:  sdn.SdnType,
@@ -60,7 +60,7 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestId 
 		})
 	}
 	if err != nil {
-		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: saveCustomerOFACSearch customer=%s: %v", cust.Id, err)
+		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: saveCustomerOFACSearch customer=%s: %v", cust.ID, err)
 	}
 	return nil
 }

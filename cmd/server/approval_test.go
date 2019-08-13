@@ -27,7 +27,7 @@ import (
 func TestCustomers__updateCustomerStatus(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			Id: base.ID(),
+			ID: base.ID(),
 		},
 	}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -59,7 +59,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	if err := json.NewDecoder(bytes.NewReader(respBody)).Decode(&customer); err != nil {
 		t.Fatal(err)
 	}
-	if customer.Id == "" {
+	if customer.ID == "" {
 		t.Errorf("missing customer JSON: %#v", customer)
 	}
 	if repo.updatedStatus != CustomerStatusReviewRequired {
@@ -138,34 +138,34 @@ func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
 
 func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	cust := &client.Customer{
-		Id:     base.ID(),
+		ID:     base.ID(),
 		Status: CustomerStatusNone,
 	}
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
 
-	if err := validCustomerStatusTransition(cust, CustomerStatusDeceased, repo, searcher, "requestId"); err != nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusDeceased, repo, searcher, "requestID"); err != nil {
 		t.Errorf("expected no error: %v", err)
 	}
 
 	// block Deceased and Rejected customers
 	cust.Status = CustomerStatusDeceased
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 	cust.Status = CustomerStatusRejected
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 
 	// normal KYC approval (rejected due to missing info)
 	cust.FirstName, cust.LastName = "Jane", "Doe"
 	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 	cust.BirthDate = time.Now()
-	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestId"); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 	cust.Addresses = append(cust.Addresses, client.Address{
@@ -175,14 +175,14 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 
 	// CIP transistions are WIP // TODO(adam):
 	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, CustomerStatusCIP, repo, searcher, "requestId"); err == nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusCIP, repo, searcher, "requestID"); err == nil {
 		t.Error("CIP transition is WIP")
 	}
 }
 
 func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 	cust := &client.Customer{
-		Id:     base.ID(),
+		ID:     base.ID(),
 		Status: CustomerStatusReviewRequired,
 	}
 	repo := &testCustomerRepository{}
@@ -203,7 +203,7 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 
 func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	cust := &client.Customer{
-		Id:     base.ID(),
+		ID:     base.ID(),
 		Status: CustomerStatusReviewRequired,
 	}
 	repo := &testCustomerRepository{}
@@ -213,13 +213,13 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 		sdnName: "Jane Doe",
 		match:   0.10,
 	}
-	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestID"); err != nil {
 		t.Errorf("unexpected error in OFAC transition: %v", err)
 	}
 
 	// OFAC transition with positive match
 	repo.ofacSearchResult.match = 0.99
-	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestID"); err != nil {
 		if !strings.Contains(err.Error(), "positive OFAC match") {
 			t.Errorf("unexpected error in OFAC transition: %v", err)
 		}
@@ -232,7 +232,7 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 			EntityID: "12124",
 		}
 	}
-	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestId"); err != nil {
+	if err := validCustomerStatusTransition(cust, CustomerStatusOFAC, repo, searcher, "requestID"); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 	if repo.savedOFACSearchResult.entityId != "12124" {
@@ -243,7 +243,7 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 func TestCustomers__updateCustomerAddress(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			Id: base.ID(),
+			ID: base.ID(),
 		},
 	}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -330,11 +330,11 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 	}
 
 	// update the Address
-	if err := repo.updateCustomerAddress(cust.Id, cust.Addresses[0].Id, "Primary", true); err != nil {
+	if err := repo.updateCustomerAddress(cust.ID, cust.Addresses[0].ID, "Primary", true); err != nil {
 		t.Error(err)
 	}
 
-	cust, err := repo.getCustomer(cust.Id)
+	cust, err := repo.getCustomer(cust.ID)
 	if err != nil {
 		t.Error(err)
 	}

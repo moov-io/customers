@@ -30,7 +30,7 @@ type CustomersApiService service
 /*
 CustomersApiService Add an Address onto an existing Customer record
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerId Customer ID
+ * @param customerID Customer ID
  * @param createAddress
  * @param optional nil or *AddCustomerAddressOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
@@ -43,7 +43,7 @@ type AddCustomerAddressOpts struct {
 	XUserID    optional.String
 }
 
-func (a *CustomersApiService) AddCustomerAddress(ctx context.Context, customerId string, createAddress CreateAddress, localVarOptionals *AddCustomerAddressOpts) (Customer, *http.Response, error) {
+func (a *CustomersApiService) AddCustomerAddress(ctx context.Context, customerID string, createAddress CreateAddress, localVarOptionals *AddCustomerAddressOpts) (Customer, *http.Response, error) {
 	var (
 		localVarHttpMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -54,8 +54,8 @@ func (a *CustomersApiService) AddCustomerAddress(ctx context.Context, customerId
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customer_id}/address"
-	localVarPath = strings.Replace(localVarPath, "{"+"customer_id"+"}", fmt.Sprintf("%v", customerId), -1)
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/address"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", fmt.Sprintf("%v", customerID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -258,7 +258,7 @@ func (a *CustomersApiService) CreateCustomer(ctx context.Context, createCustomer
 /*
 CustomersApiService Retrieves a Customer object associated with the customer ID.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerId Customer ID
+ * @param customerID Customer ID
  * @param optional nil or *GetCustomerOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
  * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
@@ -270,7 +270,7 @@ type GetCustomerOpts struct {
 	XUserID    optional.String
 }
 
-func (a *CustomersApiService) GetCustomer(ctx context.Context, customerId string, localVarOptionals *GetCustomerOpts) (Customer, *http.Response, error) {
+func (a *CustomersApiService) GetCustomer(ctx context.Context, customerID string, localVarOptionals *GetCustomerOpts) (Customer, *http.Response, error) {
 	var (
 		localVarHttpMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -281,8 +281,8 @@ func (a *CustomersApiService) GetCustomer(ctx context.Context, customerId string
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customer_id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customer_id"+"}", fmt.Sprintf("%v", customerId), -1)
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", fmt.Sprintf("%v", customerID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -360,8 +360,8 @@ func (a *CustomersApiService) GetCustomer(ctx context.Context, customerId string
 /*
 CustomersApiService Retrieve the referenced document
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerId Customer ID
- * @param documentId Document ID
+ * @param customerID Customer ID
+ * @param documentID Document ID
  * @param optional nil or *GetCustomerDocumentContentsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
  * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
@@ -373,7 +373,7 @@ type GetCustomerDocumentContentsOpts struct {
 	XUserID    optional.String
 }
 
-func (a *CustomersApiService) GetCustomerDocumentContents(ctx context.Context, customerId string, documentId string, localVarOptionals *GetCustomerDocumentContentsOpts) (*os.File, *http.Response, error) {
+func (a *CustomersApiService) GetCustomerDocumentContents(ctx context.Context, customerID string, documentID string, localVarOptionals *GetCustomerDocumentContentsOpts) (*os.File, *http.Response, error) {
 	var (
 		localVarHttpMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -384,9 +384,9 @@ func (a *CustomersApiService) GetCustomerDocumentContents(ctx context.Context, c
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customer_id}/documents/{document_id}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customer_id"+"}", fmt.Sprintf("%v", customerId), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"document_id"+"}", fmt.Sprintf("%v", documentId), -1)
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/documents/{documentID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", fmt.Sprintf("%v", customerID), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"documentID"+"}", fmt.Sprintf("%v", documentID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -464,7 +464,7 @@ func (a *CustomersApiService) GetCustomerDocumentContents(ctx context.Context, c
 /*
 CustomersApiService Get documents for a customer
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerId Customer ID
+ * @param customerID Customer ID
  * @param optional nil or *GetCustomerDocumentsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
  * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
@@ -476,7 +476,7 @@ type GetCustomerDocumentsOpts struct {
 	XUserID    optional.String
 }
 
-func (a *CustomersApiService) GetCustomerDocuments(ctx context.Context, customerId string, localVarOptionals *GetCustomerDocumentsOpts) ([]Document, *http.Response, error) {
+func (a *CustomersApiService) GetCustomerDocuments(ctx context.Context, customerID string, localVarOptionals *GetCustomerDocumentsOpts) ([]Document, *http.Response, error) {
 	var (
 		localVarHttpMethod   = http.MethodGet
 		localVarPostBody     interface{}
@@ -487,8 +487,8 @@ func (a *CustomersApiService) GetCustomerDocuments(ctx context.Context, customer
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customer_id}/documents"
-	localVarPath = strings.Replace(localVarPath, "{"+"customer_id"+"}", fmt.Sprintf("%v", customerId), -1)
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/documents"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", fmt.Sprintf("%v", customerID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -630,7 +630,7 @@ func (a *CustomersApiService) Ping(ctx context.Context) (*http.Response, error) 
 /*
 CustomersApiService Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerId Customer ID
+ * @param customerID Customer ID
  * @param customerMetadata
  * @param optional nil or *ReplaceCustomerMetadataOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
@@ -643,7 +643,7 @@ type ReplaceCustomerMetadataOpts struct {
 	XUserID    optional.String
 }
 
-func (a *CustomersApiService) ReplaceCustomerMetadata(ctx context.Context, customerId string, customerMetadata CustomerMetadata, localVarOptionals *ReplaceCustomerMetadataOpts) (Customer, *http.Response, error) {
+func (a *CustomersApiService) ReplaceCustomerMetadata(ctx context.Context, customerID string, customerMetadata CustomerMetadata, localVarOptionals *ReplaceCustomerMetadataOpts) (Customer, *http.Response, error) {
 	var (
 		localVarHttpMethod   = http.MethodPut
 		localVarPostBody     interface{}
@@ -654,8 +654,8 @@ func (a *CustomersApiService) ReplaceCustomerMetadata(ctx context.Context, custo
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customer_id}/metadata"
-	localVarPath = strings.Replace(localVarPath, "{"+"customer_id"+"}", fmt.Sprintf("%v", customerId), -1)
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/metadata"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", fmt.Sprintf("%v", customerID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -745,7 +745,7 @@ func (a *CustomersApiService) ReplaceCustomerMetadata(ctx context.Context, custo
 /*
 CustomersApiService Update the status for a customer, which can only be updated by authenticated users with permissions.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerId Customer ID
+ * @param customerID Customer ID
  * @param updateCustomerStatus
  * @param optional nil or *UpdateCustomerStatusOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
@@ -758,7 +758,7 @@ type UpdateCustomerStatusOpts struct {
 	XUserID    optional.String
 }
 
-func (a *CustomersApiService) UpdateCustomerStatus(ctx context.Context, customerId string, updateCustomerStatus UpdateCustomerStatus, localVarOptionals *UpdateCustomerStatusOpts) (Customer, *http.Response, error) {
+func (a *CustomersApiService) UpdateCustomerStatus(ctx context.Context, customerID string, updateCustomerStatus UpdateCustomerStatus, localVarOptionals *UpdateCustomerStatusOpts) (Customer, *http.Response, error) {
 	var (
 		localVarHttpMethod   = http.MethodPut
 		localVarPostBody     interface{}
@@ -769,8 +769,8 @@ func (a *CustomersApiService) UpdateCustomerStatus(ctx context.Context, customer
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customer_id}/status"
-	localVarPath = strings.Replace(localVarPath, "{"+"customer_id"+"}", fmt.Sprintf("%v", customerId), -1)
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/status"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", fmt.Sprintf("%v", customerID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -860,7 +860,7 @@ func (a *CustomersApiService) UpdateCustomerStatus(ctx context.Context, customer
 /*
 CustomersApiService Upload a document for the given customer.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerId Customer ID
+ * @param customerID Customer ID
  * @param type_ Document type (see Document type for values)
  * @param file Document to be uploaded
  * @param optional nil or *UploadCustomerDocumentOpts - Optional Parameters:
@@ -874,7 +874,7 @@ type UploadCustomerDocumentOpts struct {
 	XUserID    optional.String
 }
 
-func (a *CustomersApiService) UploadCustomerDocument(ctx context.Context, customerId string, type_ string, file *os.File, localVarOptionals *UploadCustomerDocumentOpts) (Document, *http.Response, error) {
+func (a *CustomersApiService) UploadCustomerDocument(ctx context.Context, customerID string, type_ string, file *os.File, localVarOptionals *UploadCustomerDocumentOpts) (Document, *http.Response, error) {
 	var (
 		localVarHttpMethod   = http.MethodPost
 		localVarPostBody     interface{}
@@ -885,8 +885,8 @@ func (a *CustomersApiService) UploadCustomerDocument(ctx context.Context, custom
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customer_id}/documents"
-	localVarPath = strings.Replace(localVarPath, "{"+"customer_id"+"}", fmt.Sprintf("%v", customerId), -1)
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/documents"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", fmt.Sprintf("%v", customerID), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}

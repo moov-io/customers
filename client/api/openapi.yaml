@@ -70,7 +70,7 @@ paths:
       summary: Create a new customer
       tags:
       - Customers
-  /customers/{customer_id}:
+  /customers/{customerID}:
     get:
       operationId: getCustomer
       parameters:
@@ -96,7 +96,7 @@ paths:
       - description: Customer ID
         explode: false
         in: path
-        name: customer_id
+        name: customerID
         required: true
         schema:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
@@ -114,7 +114,7 @@ paths:
       summary: Retrieves a Customer object associated with the customer ID.
       tags:
       - Customers
-  /customers/{customer_id}/address:
+  /customers/{customerID}/address:
     post:
       operationId: addCustomerAddress
       parameters:
@@ -140,7 +140,7 @@ paths:
       - description: Customer ID
         explode: false
         in: path
-        name: customer_id
+        name: customerID
         required: true
         schema:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
@@ -168,7 +168,7 @@ paths:
       summary: Add an Address onto an existing Customer record
       tags:
       - Customers
-  /customers/{customer_id}/metadata:
+  /customers/{customerID}/metadata:
     put:
       operationId: replaceCustomerMetadata
       parameters:
@@ -194,7 +194,7 @@ paths:
       - description: Customer ID
         explode: false
         in: path
-        name: customer_id
+        name: customerID
         required: true
         schema:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
@@ -224,7 +224,7 @@ paths:
         data associated to a Customer.
       tags:
       - Customers
-  /customers/{customer_id}/status:
+  /customers/{customerID}/status:
     put:
       operationId: updateCustomerStatus
       parameters:
@@ -250,7 +250,7 @@ paths:
       - description: Customer ID
         explode: false
         in: path
-        name: customer_id
+        name: customerID
         required: true
         schema:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
@@ -279,7 +279,7 @@ paths:
         users with permissions.
       tags:
       - Customers
-  /customers/{customer_id}/documents:
+  /customers/{customerID}/documents:
     get:
       operationId: getCustomerDocuments
       parameters:
@@ -305,7 +305,7 @@ paths:
       - description: Customer ID
         explode: false
         in: path
-        name: customer_id
+        name: customerID
         required: true
         schema:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
@@ -346,7 +346,7 @@ paths:
       - description: Customer ID
         explode: false
         in: path
-        name: customer_id
+        name: customerID
         required: true
         schema:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
@@ -388,7 +388,7 @@ paths:
       summary: Upload a document for the given customer.
       tags:
       - Customers
-  /customers/{customer_id}/documents/{document_id}:
+  /customers/{customerID}/documents/{documentID}:
     get:
       operationId: getCustomerDocumentContents
       parameters:
@@ -414,7 +414,7 @@ paths:
       - description: Customer ID
         explode: false
         in: path
-        name: customer_id
+        name: customerID
         required: true
         schema:
           example: e210a9d6
@@ -423,7 +423,7 @@ paths:
       - description: Document ID
         explode: false
         in: path
-        name: document_id
+        name: documentID
         required: true
         schema:
           example: 9577ea7e1081
@@ -555,7 +555,7 @@ components:
           address1: address1
           postalCode: postalCode
           active: true
-          id: 851233a1
+          ID: 851233a1
           state: state
           type: Primary
         - country: US
@@ -565,7 +565,7 @@ components:
           address1: address1
           postalCode: postalCode
           active: true
-          id: 851233a1
+          ID: 851233a1
           state: state
           type: Primary
         metadata:
@@ -583,12 +583,12 @@ components:
         firstName: Robert
         createdAt: 2000-01-23T04:56:07.000+00:00
         middleName: Flex
-        id: e210a9d6
+        ID: e210a9d6
         lastModified: 2000-01-23T04:56:07.000+00:00
         email: email
         status: Deceased
       properties:
-        id:
+        ID:
           description: The unique identifier for the customer who owns the account
           example: e210a9d6
           type: string
@@ -786,11 +786,11 @@ components:
         address1: address1
         postalCode: postalCode
         active: true
-        id: 851233a1
+        ID: 851233a1
         state: state
         type: Primary
       properties:
-        id:
+        ID:
           description: Unique identifier for this Address
           example: 851233a1
           type: string
@@ -828,14 +828,14 @@ components:
     Document:
       example:
         uploadedAt: 2000-01-23T04:56:07.000+00:00
-        id: e210a9d6
+        ID: e210a9d6
         type: DriversLicense
         parseErrors:
         - parseErrors
         - parseErrors
         contentType: application/pdf
       properties:
-        id:
+        ID:
           description: The unique identifier for this document
           example: e210a9d6
           type: string

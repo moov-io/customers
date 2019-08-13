@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | The unique identifier for this document | [optional] 
+**ID** | **string** | The unique identifier for this document | [optional] 
 **Type** | **string** |  | [optional] 
 **ContentType** | **string** |  | [optional] 
 **ParseErrors** | **[]string** | Optional array of errors encountered dring automated parsing. | [optional] 
