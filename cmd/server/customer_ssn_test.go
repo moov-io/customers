@@ -35,7 +35,7 @@ func (r *testCustomerSSNRepository) saveCustomerSSN(*SSN) error {
 	return r.err
 }
 
-func (r *testCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, error) {
+func (r *testCustomerSSNRepository) getCustomerSSN(customerID string) (*SSN, error) {
 	if r.ssn != nil {
 		return r.ssn, nil
 	}
@@ -43,9 +43,9 @@ func (r *testCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, err
 }
 
 func TestSSN(t *testing.T) {
-	customerId := base.ID()
-	ssn := &SSN{customerId: customerId, masked: "1###5"}
-	if v := ssn.String(); v != fmt.Sprintf("SSN: customerId=%s masked=1###5", customerId) {
+	customerID := base.ID()
+	ssn := &SSN{customerID: customerID, masked: "1###5"}
+	if v := ssn.String(); v != fmt.Sprintf("SSN: customerID=%s masked=1###5", customerID) {
 		t.Errorf("got %s", v)
 	}
 
@@ -55,7 +55,7 @@ func TestSSN(t *testing.T) {
 			return nil, errors.New("bad error")
 		},
 	}
-	if _, err := storage.encryptRaw(customerId, "1###5"); err == nil {
+	if _, err := storage.encryptRaw(customerID, "1###5"); err == nil {
 		t.Error("expected error")
 	} else {
 		if !strings.Contains(err.Error(), "ssnStorage: keeper init") {
@@ -77,19 +77,19 @@ func TestCustomerSSNStorage(t *testing.T) {
 	}
 
 	// encrypt SSN
-	customerId := base.ID()
-	ssn, err := storage.encryptRaw(customerId, "123456789")
+	customerID := base.ID()
+	ssn, err := storage.encryptRaw(customerID, "123456789")
 	if err != nil {
 		t.Error(err)
 	}
-	if ssn.customerId != customerId {
-		t.Errorf("ssn.customerId=%s", ssn.customerId)
+	if ssn.customerID != customerID {
+		t.Errorf("ssn.customerID=%s", ssn.customerID)
 	}
 	if ssn.masked != "1#######9" {
 		t.Errorf("ssn.masked=%s", ssn.masked)
 	}
 
-	keeper, err := storage.keeperFactory(fmt.Sprintf("customer-%s-ssn", customerId))
+	keeper, err := storage.keeperFactory(fmt.Sprintf("customer-%s-ssn", customerID))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,22 +103,22 @@ func TestCustomerSSNStorage(t *testing.T) {
 }
 
 func TestCustomerSSNRepository(t *testing.T) {
-	customerId := base.ID()
+	customerID := base.ID()
 	check := func(t *testing.T, customerSSNRepo *sqlCustomerSSNRepository) {
 
-		if ssn, err := customerSSNRepo.getCustomerSSN(customerId); ssn != nil || err != nil {
+		if ssn, err := customerSSNRepo.getCustomerSSN(customerID); ssn != nil || err != nil {
 			t.Fatalf("ssn=%v error=%v", ssn, err)
 		}
 
 		// write
 		bs := base64.StdEncoding.EncodeToString([]byte("123456789"))
-		ssn := &SSN{customerId: customerId, encrypted: []byte(bs), masked: "1#######9"}
+		ssn := &SSN{customerID: customerID, encrypted: []byte(bs), masked: "1#######9"}
 		if err := customerSSNRepo.saveCustomerSSN(ssn); err != nil {
 			t.Fatal(err)
 		}
 
 		// read again
-		ssn, err := customerSSNRepo.getCustomerSSN(customerId)
+		ssn, err := customerSSNRepo.getCustomerSSN(customerID)
 		if ssn == nil || err != nil {
 			t.Fatalf("ssn=%v error=%v", ssn, err)
 		}

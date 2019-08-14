@@ -25,7 +25,11 @@ func TestSQLite__basic(t *testing.T) {
 
 	conn, err := s.Connect()
 
-	defer conn.Close()
+	defer func(t *testing.T) {
+		if err := conn.Close(); err != nil {
+			t.Errorf("close: %v", err)
+		}
+	}(t)
 
 	if err := conn.Ping(); err == nil {
 		t.Fatal("expected error")
