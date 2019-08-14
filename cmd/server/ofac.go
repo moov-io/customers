@@ -20,7 +20,7 @@ import (
 type OFACClient interface {
 	Ping() error
 
-	Search(ctx context.Context, name string, requestId string) (*ofac.Sdn, error)
+	Search(ctx context.Context, name string, requestID string) (*ofac.Sdn, error)
 }
 
 type moovOFACClient struct {
@@ -47,11 +47,11 @@ func (c *moovOFACClient) Ping() error {
 }
 
 // Search returns the top OFAC match given the provided options across SDN names and AltNames
-func (c *moovOFACClient) Search(ctx context.Context, name string, requestId string) (*ofac.Sdn, error) {
+func (c *moovOFACClient) Search(ctx context.Context, name string, requestID string) (*ofac.Sdn, error) {
 	search, resp, err := c.underlying.OFACApi.Search(ctx, &ofac.SearchOpts{
 		Q:          optional.NewString(name),
 		Limit:      optional.NewInt32(1),
-		XRequestId: optional.NewString(requestId),
+		XRequestId: optional.NewString(requestID),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("ofac.Search: %v", err)
@@ -66,14 +66,14 @@ func (c *moovOFACClient) Search(ctx context.Context, name string, requestId stri
 
 		// AltName matched higher than SDN names, so return the SDN of the matched AltName
 		sdn, resp, err := c.underlying.OFACApi.GetSDN(ctx, alt.EntityID, &ofac.GetSDNOpts{
-			XRequestId: optional.NewString(requestId),
+			XRequestId: optional.NewString(requestID),
 		})
 		resp.Body.Close()
 		if err != nil {
 			return nil, fmt.Errorf("ofac.Search: found alt name: %v", err)
 		}
 		sdn.Match = alt.Match // copy match from original search (GetSDN doesn't do string matching)
-		c.logger.Log("ofac", fmt.Sprintf("AltName=%s,SDN=%s had higher match than SDN=%s", alt.AlternateID, alt.EntityID, search.SDNs[0].EntityID), "requestId", requestId)
+		c.logger.Log("ofac", fmt.Sprintf("AltName=%s,SDN=%s had higher match than SDN=%s", alt.AlternateID, alt.EntityID, search.SDNs[0].EntityID), "requestID", requestID)
 		return &sdn, nil
 	} else {
 		if len(search.SDNs) > 0 {

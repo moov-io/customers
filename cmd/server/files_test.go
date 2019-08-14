@@ -29,8 +29,8 @@ func TestFiles__proxyLocalFile(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	customerId, documentId := base.ID(), base.ID()
-	documentKey := makeDocumentKey(customerId, documentId)
+	customerID, documentID := base.ID(), base.ID()
+	documentKey := makeDocumentKey(customerID, documentID)
 
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()

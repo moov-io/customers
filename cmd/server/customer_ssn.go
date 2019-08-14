@@ -16,14 +16,14 @@ import (
 )
 
 type SSN struct {
-	customerId string
+	customerID string
 
 	encrypted []byte
 	masked    string
 }
 
 func (s *SSN) String() string {
-	return fmt.Sprintf("SSN: customerId=%s masked=%s", s.customerId, s.masked)
+	return fmt.Sprintf("SSN: customerID=%s masked=%s", s.customerID, s.masked)
 }
 
 type ssnStorage struct {
@@ -31,23 +31,23 @@ type ssnStorage struct {
 	repo          customerSSNRepository
 }
 
-func (s *ssnStorage) encryptRaw(customerId, raw string) (*SSN, error) {
+func (s *ssnStorage) encryptRaw(customerID, raw string) (*SSN, error) {
 	defer func() {
 		raw = ""
 	}()
-	if customerId == "" || raw == "" {
-		return nil, fmt.Errorf("missing customer=%s and/or SSN", customerId)
+	if customerID == "" || raw == "" {
+		return nil, fmt.Errorf("missing customer=%s and/or SSN", customerID)
 	}
-	keeper, err := s.keeperFactory(fmt.Sprintf("customer-%s-ssn", customerId))
+	keeper, err := s.keeperFactory(fmt.Sprintf("customer-%s-ssn", customerID))
 	if err != nil {
-		return nil, fmt.Errorf("ssnStorage: keeper init customer=%s: %v", customerId, err)
+		return nil, fmt.Errorf("ssnStorage: keeper init customer=%s: %v", customerID, err)
 	}
 	encrypted, err := keeper.Encrypt(context.Background(), []byte(raw))
 	if err != nil {
-		return nil, fmt.Errorf("ssnStorage: encrypt customer=%s: %v", customerId, err)
+		return nil, fmt.Errorf("ssnStorage: encrypt customer=%s: %v", customerID, err)
 	}
 	return &SSN{
-		customerId: customerId,
+		customerID: customerID,
 		encrypted:  encrypted,
 		masked:     maskSSN(raw),
 	}, nil
@@ -66,7 +66,7 @@ func maskSSN(s string) string {
 
 type customerSSNRepository interface {
 	saveCustomerSSN(*SSN) error
-	getCustomerSSN(customerId string) (*SSN, error)
+	getCustomerSSN(customerID string) (*SSN, error)
 }
 
 type sqlCustomerSSNRepository struct {
@@ -89,13 +89,13 @@ func (r *sqlCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {
 	defer stmt.Close()
 
 	encoded := base64.StdEncoding.EncodeToString(ssn.encrypted)
-	if _, err := stmt.Exec(ssn.customerId, encoded, ssn.masked, time.Now()); err != nil {
+	if _, err := stmt.Exec(ssn.customerID, encoded, ssn.masked, time.Now()); err != nil {
 		return fmt.Errorf("sqlCustomerSSNRepository: saveCustomerSSN: exec: %v", err)
 	}
 	return nil
 }
 
-func (r *sqlCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, error) {
+func (r *sqlCustomerSSNRepository) getCustomerSSN(customerID string) (*SSN, error) {
 	query := `select ssn, ssn_masked from customer_ssn where customer_id = ? limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -103,11 +103,11 @@ func (r *sqlCustomerSSNRepository) getCustomerSSN(customerId string) (*SSN, erro
 	}
 	defer stmt.Close()
 
-	row := stmt.QueryRow(customerId)
+	row := stmt.QueryRow(customerID)
 
 	var encoded string
 	ssn := SSN{
-		customerId: customerId,
+		customerID: customerID,
 	}
 	if err := row.Scan(&encoded, &ssn.masked); err != nil {
 		if err == sql.ErrNoRows {

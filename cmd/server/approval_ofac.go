@@ -27,17 +27,17 @@ type ofacSearcher struct {
 
 // storeCustomerOFACSearch performs OFAC searches against the Customer's name and nickname if populated.
 // The higher matching search result is stored in s.customerRepository for use later (in approvals)
-func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestId string) error {
+func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID string) error {
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
 
-	sdn, err := s.ofacClient.Search(ctx, formatCustomerName(cust), requestId)
+	sdn, err := s.ofacClient.Search(ctx, formatCustomerName(cust), requestID)
 	if err != nil {
 		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.ID, err)
 	}
 	var nickSDN *ofac.Sdn
 	if cust.NickName != "" {
-		nickSDN, err = s.ofacClient.Search(ctx, cust.NickName, requestId)
+		nickSDN, err = s.ofacClient.Search(ctx, cust.NickName, requestID)
 		if err != nil {
 			return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.ID, err)
 		}

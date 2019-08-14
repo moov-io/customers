@@ -39,8 +39,8 @@ var (
 // TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now.
 // What about a header like x-admin-id ??
 func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerRepository, ofac *ofacSearcher) {
-	svc.AddHandler("/customers/{customerId}/status", updateCustomerStatus(logger, repo, ofac))
-	svc.AddHandler("/customers/{customerId}/addresses/{addressId}", updateCustomerAddress(logger, repo))
+	svc.AddHandler("/customers/{customerID}/status", updateCustomerStatus(logger, repo, ofac))
+	svc.AddHandler("/customers/{customerID}/addresses/{addressId}", updateCustomerAddress(logger, repo))
 }
 
 type updateCustomerStatusRequest struct {
@@ -54,7 +54,7 @@ type updateCustomerStatusRequest struct {
 //  - KYC is only valid if the Customer has first, last, address, and date of birth
 //  - OFAC can only be after an OFAC search has been performed (and search info recorded)
 //  - CIP can only be if the SSN has been set
-func validCustomerStatusTransition(existing *client.Customer, futureStatus CustomerStatus, repo customerRepository, ofac *ofacSearcher, requestId string) error {
+func validCustomerStatusTransition(existing *client.Customer, futureStatus CustomerStatus, repo customerRepository, ofac *ofacSearcher, requestID string) error {
 	eql := func(s string, status CustomerStatus) bool {
 		return strings.EqualFold(s, string(status))
 	}
@@ -117,8 +117,8 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository, ofac *ofac
 			return
 		}
 
-		customerId, requestId := getCustomerID(w, r), moovhttp.GetRequestId(r)
-		if customerId == "" {
+		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		if customerID == "" {
 			return
 		}
 
@@ -128,23 +128,23 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository, ofac *ofac
 			return
 		}
 
-		cust, err := repo.getCustomer(customerId)
+		cust, err := repo.getCustomer(customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err := validCustomerStatusTransition(cust, req.Status, repo, ofac, requestId); err != nil {
+		if err := validCustomerStatusTransition(cust, req.Status, repo, ofac, requestID); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		// Update Customer's status in the database
-		if err := repo.updateCustomerStatus(customerId, req.Status, req.Comment); err != nil {
+		if err := repo.updateCustomerStatus(customerID, req.Status, req.Comment); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		respondWithCustomer(logger, w, customerId, requestId, repo)
+		respondWithCustomer(logger, w, customerID, requestID, repo)
 	}
 }
 
@@ -159,7 +159,7 @@ func getAddressId(w http.ResponseWriter, r *http.Request) string {
 
 // TODO(adam): Should Addresses have a 'Type: Previous'? I don't think we ever want to delete an address, but it can be marked as old.
 // If we keep address info around does it have GDPR implications?
-// PUT /customers/{customerId}/addresses/{addressId} only accept {"type": "Primary/Secondary", "validated": true/false}
+// PUT /customers/{customerID}/addresses/{addressId} only accept {"type": "Primary/Secondary", "validated": true/false}
 
 type updateCustomerAddressRequest struct {
 	Type      string `json:"type"`
@@ -184,8 +184,8 @@ func updateCustomerAddress(logger log.Logger, repo customerRepository) http.Hand
 			return
 		}
 
-		customerId, addressId := getCustomerID(w, r), getAddressId(w, r)
-		if customerId == "" || addressId == "" {
+		customerID, addressId := getCustomerID(w, r), getAddressId(w, r)
+		if customerID == "" || addressId == "" {
 			return
 		}
 
@@ -199,14 +199,14 @@ func updateCustomerAddress(logger log.Logger, repo customerRepository) http.Hand
 			return
 		}
 
-		requestId := moovhttp.GetRequestId(r)
-		logger.Log("approval", fmt.Sprintf("updating address=%s for customer=%s", addressId, customerId), "requestId", requestId)
+		requestID := moovhttp.GetRequestID(r)
+		logger.Log("approval", fmt.Sprintf("updating address=%s for customer=%s", addressId, customerID), "requestID", requestID)
 
-		if err := repo.updateCustomerAddress(customerId, addressId, req.Type, req.Validated); err != nil {
-			logger.Log("approval", fmt.Sprintf("error updating customer=%s address=%s: %v", customerId, addressId, err), "requestId", requestId)
+		if err := repo.updateCustomerAddress(customerID, addressId, req.Type, req.Validated); err != nil {
+			logger.Log("approval", fmt.Sprintf("error updating customer=%s address=%s: %v", customerID, addressId, err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
-		respondWithCustomer(logger, w, customerId, requestId, repo)
+		respondWithCustomer(logger, w, customerID, requestID, repo)
 	}
 }

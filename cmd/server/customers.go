@@ -64,14 +64,14 @@ func (cs *CustomerStatus) UnmarshalJSON(b []byte) error {
 }
 
 func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
-	r.Methods("GET").Path("/customers/{customerId}").HandlerFunc(getCustomer(logger, repo))
+	r.Methods("GET").Path("/customers/{customerID}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
-	r.Methods("PUT").Path("/customers/{customerId}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
-	r.Methods("POST").Path("/customers/{customerId}/address").HandlerFunc(addCustomerAddress(logger, repo))
+	r.Methods("PUT").Path("/customers/{customerID}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
+	r.Methods("POST").Path("/customers/{customerID}/address").HandlerFunc(addCustomerAddress(logger, repo))
 }
 
 func getCustomerID(w http.ResponseWriter, r *http.Request) string {
-	v, ok := mux.Vars(r)["customerId"]
+	v, ok := mux.Vars(r)["customerID"]
 	if !ok || v == "" {
 		moovhttp.Problem(w, errNoCustomerID)
 		return ""
@@ -100,7 +100,7 @@ func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestId(r)
+		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -233,7 +233,7 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 			moovhttp.Problem(w, err)
 			return
 		}
-		requestID := moovhttp.GetRequestId(r)
+		requestID := moovhttp.GetRequestID(r)
 
 		cust, ssn, err := req.asCustomer(customerSSNStorage)
 		if err != nil {
@@ -289,7 +289,7 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 			moovhttp.Problem(w, err)
 			return
 		}
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestId(r)
+		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -304,7 +304,7 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 
 func addCustomerAddress(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestId(r)
+		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}

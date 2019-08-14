@@ -222,8 +222,8 @@ github.com/mitchellh/reflectwalk v1.0.0/go.mod h1:mSTlrgnPZtwu0c4WaC2kGObEpuNDbx
 github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
 github.com/modern-go/reflect2 v1.0.1/go.mod h1:bx2lNnkwVCuqBIxFjflWJWanXIb3RllmbCylyMrvgv0=
 github.com/moov-io/base v0.9.1-0.20190430163914-76a8e2cca72d/go.mod h1:pPu/TAc9PkaaegbREVEeDHsGqyAlvji9vqTuARuAnd0=
-github.com/moov-io/base v0.9.1-0.20190509232802-5e13ea2b1490 h1:ukVnfYLs1XIyk8QKevYT43LQaVqKU9GPLOVvcSXnH1o=
-github.com/moov-io/base v0.9.1-0.20190509232802-5e13ea2b1490/go.mod h1:pPu/TAc9PkaaegbREVEeDHsGqyAlvji9vqTuARuAnd0=
+github.com/moov-io/base v0.10.0 h1:9A/N0E+oB5nqxTMWszN06Az1PRAkW9EgQ4UQ/94S1IU=
+github.com/moov-io/base v0.10.0/go.mod h1:pPu/TAc9PkaaegbREVEeDHsGqyAlvji9vqTuARuAnd0=
 github.com/moov-io/ofac v0.7.1-0.20190611152258-a1fb72e71c46 h1:UyImg75iJuNjXiLHDzcIbsMhni2Y0z7jz7jma7FzP3s=
 github.com/moov-io/ofac v0.7.1-0.20190611152258-a1fb72e71c46/go.mod h1:y2reNnW6KxYT1UylJ3bcwQ097ulJh7iow8VoeXzpmYw=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=

@@ -32,9 +32,9 @@ var (
 )
 
 func addDocumentRoutes(logger log.Logger, r *mux.Router, repo documentRepository, bucketFactory bucketFunc) {
-	r.Methods("GET").Path("/customers/{customerId}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
-	r.Methods("POST").Path("/customers/{customerId}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
-	r.Methods("GET").Path("/customers/{customerId}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
+	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
+	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
+	r.Methods("GET").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
 }
 
 func getDocumentID(w http.ResponseWriter, r *http.Request) string {
@@ -118,7 +118,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		defer bucket.Close()
 
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestId(r)
+		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -166,7 +166,7 @@ func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFacto
 		if customerID == "" || documentId == "" {
 			return
 		}
-		requestID := moovhttp.GetRequestId(r)
+		requestID := moovhttp.GetRequestID(r)
 
 		bucket, err := bucketFactory()
 		if err != nil {

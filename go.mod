@@ -19,7 +19,7 @@ require (
 	github.com/hashicorp/vault/api v1.0.1
 	github.com/lopezator/migrator v0.1.0
 	github.com/mattn/go-sqlite3 v1.10.0
-	github.com/moov-io/base v0.9.1-0.20190509232802-5e13ea2b1490
+	github.com/moov-io/base v0.10.0
 	github.com/moov-io/ofac v0.7.1-0.20190611152258-a1fb72e71c46
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opencontainers/image-spec v1.0.1 // indirect
