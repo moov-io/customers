@@ -31,11 +31,11 @@ var (
 
 func TestBucket__openBucket(t *testing.T) {
 	// test the invalid cases
-	bucket, err := openBucket(nil, "", "", nil)
+	bucket, err := openBucket(context.TODO(), "", "", nil)
 	if bucket != nil || err == nil {
 		t.Errorf("expected error: bucket=%v error=%v", bucket, err)
 	}
-	bucket, err = openBucket(nil, "", "other", nil)
+	bucket, err = openBucket(context.TODO(), "", "other", nil)
 	if bucket != nil || err == nil {
 		t.Errorf("expected error: bucket=%v error=%v", bucket, err)
 	}
@@ -64,14 +64,14 @@ func TestBucket__getBucket(t *testing.T) {
 }
 
 func TestBucketAWS(t *testing.T) {
-	bucket, err := openBucket(nil, "", "aws", nil)
+	bucket, err := openBucket(context.TODO(), "", "aws", nil)
 	if err == nil || bucket != nil {
 		t.Errorf("expected error bucket=%v", bucket)
 	}
 }
 
 func TestBucketGCP(t *testing.T) {
-	bucket, err := openBucket(nil, "", "gcp", nil)
+	bucket, err := openBucket(context.TODO(), "", "gcp", nil)
 	if err == nil || bucket != nil {
 		t.Errorf("expected error bucket=%v", bucket)
 	}

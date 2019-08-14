@@ -714,28 +714,6 @@ func mockCustomerRequest() customerRequest {
 	return c
 }
 
-func mockClientRequest() client.Customer {
-	cli := client.Customer{}
-	cli.FirstName = "John"
-	cli.LastName = "Doe"
-	cli.Email = "johndoe@example.net"
-
-	p := client.Phone{}
-	p.Number = "123-456-7892"
-	p.Type = "cell"
-	cli.Phones = append(cli.Phones, p)
-
-	a := client.Address{}
-	a.Address1 = "Any Street"
-	a.Address2 = ""
-	a.City = "Any City"
-	a.Country = "USA"
-	a.PostalCode = "19456"
-	a.State = "MA"
-	cli.Addresses = append(cli.Addresses, a)
-	return cli
-}
-
 // TestCustomers__MetaDataValidate validates customer meta data
 func TestCustomers__MetaDataValidate(t *testing.T) {
 	c := mockCustomerRequest()
