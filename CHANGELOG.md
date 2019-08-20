@@ -1,4 +1,8 @@
-## v0.2.0 (Unreleased)
+## v0.2.0 (Released 2019-08-20)
+
+BREAKING CHANGE
+
+In our OpenAPI we've renamed fields generated as `Id` to `ID`, which is more in-line with Go's style conventions.
 
 ADDITIONS
 
@@ -8,6 +12,8 @@ BUILD
 
 - docs: update docs.moov.io links after design refresh
 - build: push moov/customers:latest on 'make release-push'
+- build: upgrade openapi-generator to 4.1.0
+- cmd/server: upgrade github.com/moov-io/base to v0.10.0
 
 ## v0.1.1 (Released 2019-06-19)
 
