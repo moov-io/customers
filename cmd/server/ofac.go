@@ -51,7 +51,7 @@ func (c *moovOFACClient) Search(ctx context.Context, name string, requestID stri
 	search, resp, err := c.underlying.OFACApi.Search(ctx, &ofac.SearchOpts{
 		Q:          optional.NewString(name),
 		Limit:      optional.NewInt32(1),
-		XRequestId: optional.NewString(requestID),
+		XRequestID: optional.NewString(requestID),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("ofac.Search: %v", err)
@@ -66,7 +66,7 @@ func (c *moovOFACClient) Search(ctx context.Context, name string, requestID stri
 
 		// AltName matched higher than SDN names, so return the SDN of the matched AltName
 		sdn, resp, err := c.underlying.OFACApi.GetSDN(ctx, alt.EntityID, &ofac.GetSDNOpts{
-			XRequestId: optional.NewString(requestID),
+			XRequestID: optional.NewString(requestID),
 		})
 		resp.Body.Close()
 		if err != nil {
