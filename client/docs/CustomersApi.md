@@ -41,7 +41,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 
@@ -84,7 +84,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 
@@ -127,7 +127,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 
@@ -172,7 +172,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 
@@ -215,7 +215,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 
@@ -287,7 +287,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 
@@ -332,7 +332,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 
@@ -379,7 +379,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID header, required in all requests | 
+ **xUserID** | **optional.String**| Moov User ID | 
 
 ### Return type
 

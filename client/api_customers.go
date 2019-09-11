@@ -34,7 +34,7 @@ CustomersApiService Add an Address onto an existing Customer record
  * @param createAddress
  * @param optional nil or *AddCustomerAddressOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return Customer
 */
 
@@ -148,7 +148,7 @@ CustomersApiService Create a new customer
  * @param createCustomer
  * @param optional nil or *CreateCustomerOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return Customer
 */
 
@@ -261,7 +261,7 @@ CustomersApiService Retrieves a Customer object associated with the customer ID.
  * @param customerID Customer ID
  * @param optional nil or *GetCustomerOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return Customer
 */
 
@@ -364,7 +364,7 @@ CustomersApiService Retrieve the referenced document
  * @param documentID Document ID
  * @param optional nil or *GetCustomerDocumentContentsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return *os.File
 */
 
@@ -467,7 +467,7 @@ CustomersApiService Get documents for a customer
  * @param customerID Customer ID
  * @param optional nil or *GetCustomerDocumentsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return []Document
 */
 
@@ -634,7 +634,7 @@ CustomersApiService Replace the metadata object for a customer. Metadata is a ma
  * @param customerMetadata
  * @param optional nil or *ReplaceCustomerMetadataOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return Customer
 */
 
@@ -749,7 +749,7 @@ CustomersApiService Update the status for a customer, which can only be updated 
  * @param updateCustomerStatus
  * @param optional nil or *UpdateCustomerStatusOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return Customer
 */
 
@@ -865,7 +865,7 @@ CustomersApiService Upload a document for the given customer.
  * @param file Document to be uploaded
  * @param optional nil or *UploadCustomerDocumentOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Moov User ID header, required in all requests
+ * @param "XUserID" (optional.String) -  Moov User ID
 @return Document
 */
 

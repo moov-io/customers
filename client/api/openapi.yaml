@@ -39,7 +39,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header
@@ -84,7 +84,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header
@@ -128,7 +128,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header
@@ -182,7 +182,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header
@@ -238,7 +238,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header
@@ -293,7 +293,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header
@@ -334,7 +334,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header
@@ -402,7 +402,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID header, required in all requests
+      - description: Moov User ID
         example: e3cdf999
         explode: false
         in: header

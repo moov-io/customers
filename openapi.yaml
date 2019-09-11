@@ -42,7 +42,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
@@ -79,7 +79,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
@@ -113,7 +113,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
@@ -157,7 +157,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
@@ -201,7 +201,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
@@ -245,7 +245,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
@@ -300,7 +300,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
@@ -332,7 +332,7 @@ paths:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID header, required in all requests
+          description: Moov User ID
           example: e3cdf999
           schema:
             type: string
