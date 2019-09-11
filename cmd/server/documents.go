@@ -82,6 +82,7 @@ func readDocumentType(v string) (string, error) {
 func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
+		// TODO(adam): should we store x-user-id along with the Document?
 
 		documentType, err := readDocumentType(r.URL.Query().Get("type"))
 		if err != nil {
