@@ -18,7 +18,7 @@ require (
 	gocloud.dev v0.17.0
 	gocloud.dev/secrets/vault v0.15.0
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
-	gotest.tools v2.2.0+incompatible // indirect
+	gotest.tools v3.0.0 // indirect
 )
 
 replace go4.org v0.0.0-20190430205326-94abd6928b1d => go4.org v0.0.0-20190313082347-94abd6928b1d
