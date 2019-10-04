@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// Document struct for Document
 type Document struct {
 	// The unique identifier for this document
 	ID          string `json:"ID,omitempty"`

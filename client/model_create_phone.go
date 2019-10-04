@@ -9,6 +9,7 @@
 
 package openapi
 
+// CreatePhone struct for CreatePhone
 type CreatePhone struct {
 	// phone number
 	Number string `json:"number"`

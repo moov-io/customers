@@ -13,6 +13,7 @@ import (
 	"time"
 )
 
+// CreateCustomer struct for CreateCustomer
 type CreateCustomer struct {
 	// Given Name or First Name
 	FirstName string `json:"firstName"`

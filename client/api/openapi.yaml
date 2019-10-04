@@ -483,7 +483,7 @@ components:
           type: Home
         middleName: Flex
         suffix: suffix
-        birthDate: 2000-01-23T04:56:07.000+00:00
+        birthDate: 2016-08-29T09:12:33.001Z
         email: email
         SSN: 111-11-1111
       properties:
@@ -510,6 +510,7 @@ components:
           type: string
         birthDate:
           description: Legal date of birth
+          example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
         email:
@@ -579,12 +580,12 @@ components:
           number: +1.818.555.1212
           type: Home
         suffix: suffix
-        birthDate: 2000-01-23T04:56:07.000+00:00
+        birthDate: 2016-08-29T09:12:33.001Z
         firstName: Robert
-        createdAt: 2000-01-23T04:56:07.000+00:00
+        createdAt: 2016-08-29T09:12:33.001Z
         middleName: Flex
         ID: e210a9d6
-        lastModified: 2000-01-23T04:56:07.000+00:00
+        lastModified: 2016-08-29T09:12:33.001Z
         email: email
         status: Deceased
       properties:
@@ -615,6 +616,7 @@ components:
           type: string
         birthDate:
           description: Legal date of birth
+          example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
         status:
@@ -649,10 +651,12 @@ components:
             paygateID: 23beb5fd
           type: object
         createdAt:
+          example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
         lastModified:
           description: Last time the object was modified
+          example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
       type: object
@@ -827,7 +831,7 @@ components:
       type: object
     Document:
       example:
-        uploadedAt: 2000-01-23T04:56:07.000+00:00
+        uploadedAt: 2016-08-29T09:12:33.001Z
         ID: e210a9d6
         type: DriversLicense
         parseErrors:
@@ -855,6 +859,7 @@ components:
             type: string
           type: array
         uploadedAt:
+          example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
       type: object

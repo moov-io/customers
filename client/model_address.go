@@ -9,6 +9,7 @@
 
 package openapi
 
+// Address struct for Address
 type Address struct {
 	// Unique identifier for this Address
 	ID   string `json:"ID,omitempty"`
