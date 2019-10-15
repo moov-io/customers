@@ -829,6 +829,31 @@ components:
           description: Address is currently being used for customer
           type: boolean
       type: object
+    Disclaimer:
+      properties:
+        ID:
+          description: The unique identifier for this Disclaimer
+          example: 9342f3a7
+          type: string
+        text:
+          description: Text that user must accept
+          example: Set of conditions
+          type: string
+        documentID:
+          description: Optional ID which references a Document included in the disclaimer
+          example: 08a184e1
+          type: string
+        acceptedAt:
+          description: Timestamp if disclaimer has been accepted, a timestamp before
+            the year 2000 indicates no acceptance.
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+      type: object
+    Disclaimers:
+      items:
+        $ref: '#/components/schemas/Disclaimer'
+      type: array
     Document:
       example:
         uploadedAt: 2016-08-29T09:12:33.001Z

@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/moov-io/customers/internal/database"
 	"io"
 	"mime/multipart"
 	"net/http"
@@ -22,6 +21,7 @@ import (
 
 	"github.com/moov-io/base"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/internal/database"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -242,6 +242,7 @@ func TestDocumentRepository(t *testing.T) {
 			t.Errorf("docs[0].ID=%s doc.ID=%s", docs[0].ID, doc.ID)
 		}
 	}
+
 	// SQLite tests
 	sqliteDB := database.CreateTestSqliteDB(t)
 	defer sqliteDB.Close()
@@ -251,5 +252,4 @@ func TestDocumentRepository(t *testing.T) {
 	mysqlDB := database.CreateTestMySQLDB(t)
 	defer mysqlDB.Close()
 	check(t, &sqlDocumentRepository{mysqlDB.DB, log.NewNopLogger()})
-
 }

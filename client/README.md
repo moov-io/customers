@@ -52,6 +52,7 @@ Class | Method | HTTP request | Description
  - [CreatePhone](docs/CreatePhone.md)
  - [Customer](docs/Customer.md)
  - [CustomerMetadata](docs/CustomerMetadata.md)
+ - [Disclaimer](docs/Disclaimer.md)
  - [Document](docs/Document.md)
  - [Error](docs/Error.md)
  - [Phone](docs/Phone.md)

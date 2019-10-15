@@ -67,6 +67,14 @@ var (
 			"create_documents",
 			`create table if not exists documents(document_id varchar(40) primary key, customer_id varchar(40), type varchar(120), content_type integer, uploaded_at datetime);`,
 		),
+		execsql(
+			"create_disclaimers",
+			`create table if not exists disclaimers(disclaimer_id varchar(40) primary key, text text, document_id varchar(40), created_at datetime, deleted_at datetime);`,
+		),
+		execsql(
+			"create_disclaimer_acceptances",
+			`create table if not exists disclaimer_acceptances(disclaimer_id varchar(40), customer_id varchar(40), accepted_at datetime, unique(disclaimer_id, customer_id));`,
+		),
 	)
 )
 
