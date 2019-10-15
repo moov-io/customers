@@ -92,7 +92,8 @@ func (r *sqlDisclaimerRepository) close() error {
 
 func (r *sqlDisclaimerRepository) getCustomerDisclaimers(customerID string) ([]*client.Disclaimer, error) {
 	query := `select d.disclaimer_id, d.text, da.accepted_at from disclaimers as d
-left outer join disclaimer_acceptances as da on d.disclaimer_id = da.disclaimer_id;`
+left outer join disclaimer_acceptances as da on d.disclaimer_id = da.disclaimer_id
+where d.deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
