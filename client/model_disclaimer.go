@@ -19,6 +19,8 @@ type Disclaimer struct {
 	ID string `json:"ID,omitempty"`
 	// Text that user must accept
 	Text string `json:"text,omitempty"`
+	// Optional ID which references a Document included in the disclaimer
+	DocumentID string `json:"documentID,omitempty"`
 	// Timestamp if disclaimer has been accepted, a timestamp before the year 2000 indicates no acceptance.
 	AcceptedAt time.Time `json:"acceptedAt,omitempty"`
 }

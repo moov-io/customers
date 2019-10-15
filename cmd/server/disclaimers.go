@@ -91,7 +91,7 @@ func (r *sqlDisclaimerRepository) close() error {
 }
 
 func (r *sqlDisclaimerRepository) getCustomerDisclaimers(customerID string) ([]*client.Disclaimer, error) {
-	query := `select d.disclaimer_id, d.text, da.accepted_at from disclaimers as d
+	query := `select d.disclaimer_id, d.text, d.document_id, da.accepted_at from disclaimers as d
 left outer join disclaimer_acceptances as da on d.disclaimer_id = da.disclaimer_id
 where d.deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
@@ -108,16 +108,12 @@ where d.deleted_at is null;`
 
 	var out []*client.Disclaimer
 	for rows.Next() {
-		id, text := "", ""
+		disc := &client.Disclaimer{}
 		var acceptedAt *time.Time
-		if err := rows.Scan(&id, &text, &acceptedAt); err != nil {
+		if err := rows.Scan(&disc.ID, &disc.Text, &disc.DocumentID, &acceptedAt); err != nil {
 			return nil, err
 		}
-		disc := &client.Disclaimer{
-			ID:   id,
-			Text: text,
-		}
-		if acceptedAt != nil {
+		if acceptedAt != nil && !acceptedAt.IsZero() {
 			disc.AcceptedAt = *acceptedAt
 		}
 		out = append(out, disc)
@@ -163,8 +159,8 @@ func (r *sqlDisclaimerRepository) acceptDisclaimer(customerID, disclaimerID stri
 	return tx.Commit()
 }
 
-func (r *sqlDisclaimerRepository) insertDisclaimer(text string) (*client.Disclaimer, error) {
-	query := `insert into disclaimers (disclaimer_id, text, created_at) values (?, ?, ?);`
+func (r *sqlDisclaimerRepository) insertDisclaimer(text, documentID string) (*client.Disclaimer, error) {
+	query := `insert into disclaimers (disclaimer_id, text, document_id, created_at) values (?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -172,9 +168,10 @@ func (r *sqlDisclaimerRepository) insertDisclaimer(text string) (*client.Disclai
 	defer stmt.Close()
 
 	disc := &client.Disclaimer{
-		ID:   base.ID(),
-		Text: text,
+		ID:         base.ID(),
+		Text:       text,
+		DocumentID: documentID,
 	}
-	_, err = stmt.Exec(disc.ID, disc.Text, time.Now())
+	_, err = stmt.Exec(disc.ID, disc.Text, disc.DocumentID, time.Now())
 	return disc, err
 }

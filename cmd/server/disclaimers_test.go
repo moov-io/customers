@@ -140,7 +140,8 @@ func TestDisclaimersRepository(t *testing.T) {
 		}
 
 		// write a Disclaimer and verify
-		disc, err := repo.insertDisclaimer("terms and conditions")
+		documentID := ""
+		disc, err := repo.insertDisclaimer("terms and conditions", documentID)
 		if err != nil {
 			t.Fatal(err)
 		}
