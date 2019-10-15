@@ -156,6 +156,11 @@ func TestDisclaimersRepository(t *testing.T) {
 		if err := repo.acceptDisclaimer(customerID, disc.ID); err != nil {
 			t.Fatal(err)
 		}
+
+		// Verify a different disclaimer ID is rejected
+		if err := repo.acceptDisclaimer(customerID, base.ID()); err == nil {
+			t.Error("expected error")
+		}
 	}
 
 	// SQLite tests

@@ -8,6 +8,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -124,15 +125,41 @@ left outer join disclaimer_acceptances as da on d.disclaimer_id = da.disclaimer_
 }
 
 func (r *sqlDisclaimerRepository) acceptDisclaimer(customerID, disclaimerID string) error {
-	query := `insert into disclaimer_acceptances (disclaimer_id, customer_id, accepted_at) values (?, ?, ?);`
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	query := `select disclaimer_id from disclaimers where disclaimer_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	row := stmt.QueryRow(disclaimerID)
+	var discID string
+	if err := row.Scan(&discID); discID != disclaimerID || err != nil {
+		stmt.Close()
+		return fmt.Errorf("acceptDisclaimer: missing disclaimer: %v rollback=%v", err, tx.Rollback())
+	}
+	stmt.Close()
+
+	// write the acceptance row now
+	query = `insert into disclaimer_acceptances (disclaimer_id, customer_id, accepted_at) values (?, ?, ?);`
+	stmt, err = tx.Prepare(query)
+	if err != nil {
+		tx.Rollback()
 		return err
 	}
 	defer stmt.Close()
 
 	_, err = stmt.Exec(disclaimerID, customerID, time.Now())
-	return err
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit()
 }
 
 func (r *sqlDisclaimerRepository) insertDisclaimer(text string) (*client.Disclaimer, error) {

@@ -65,7 +65,7 @@ var (
 		),
 		execsql(
 			"create_disclaimers",
-			`create table if not exists disclaimers(disclaimer_id primary key, text, created_at datetime);`,
+			`create table if not exists disclaimers(disclaimer_id primary key, text, created_at datetime, deleted_at datetime);`,
 		),
 		execsql(
 			"create_disclaimer_acceptances",
