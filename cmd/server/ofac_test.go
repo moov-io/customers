@@ -65,7 +65,7 @@ func spawnOFAC(t *testing.T) *ofacDeployment {
 	}
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "moov/ofac",
-		Tag:        "v0.11.0-rc1",
+		Tag:        "v0.11.1",
 		Cmd:        []string{"-http.addr=:8080"},
 	})
 	if err != nil {
@@ -111,7 +111,7 @@ func TestOFAC__search(t *testing.T) {
 	}
 
 	// Search query that matches an AltName higher than SDN
-	sdn, err = deployment.client.Search(ctx, "Osama bin Muhammad bin Awad BIN LADIN", base.ID())
+	sdn, err = deployment.client.Search(ctx, "Osama BIN LADIN", base.ID())
 	if err != nil || sdn == nil {
 		t.Fatalf("sdn=%v err=%v", sdn, err)
 	}
