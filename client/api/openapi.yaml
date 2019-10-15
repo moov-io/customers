@@ -829,6 +829,21 @@ components:
           description: Address is currently being used for customer
           type: boolean
       type: object
+    Disclaimer:
+      properties:
+        ID:
+          description: The unique identifier for this Disclaimer
+          example: 9342f3a7
+          type: string
+        text:
+          description: Text that user must accept
+          example: Set of conditions
+          type: string
+      type: object
+    Disclaimers:
+      items:
+        $ref: '#/components/schemas/Disclaimer'
+      type: array
     Document:
       example:
         uploadedAt: 2016-08-29T09:12:33.001Z

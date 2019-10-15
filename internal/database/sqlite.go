@@ -63,6 +63,14 @@ var (
 			"create_documents",
 			`create table if not exists documents(document_id primary key, customer_id, type, content_type, uploaded_at datetime);`,
 		),
+		execsql(
+			"create_disclaimers",
+			`create table if not exists disclaimers(disclaimer_id primary key, text, created_at datetime);`,
+		),
+		execsql(
+			"create_disclaimer_acceptances",
+			`create table if not exists disclaimer_acceptances(disclaimer_id, customer_id, accepted_at datetime, unique(disclaimer_id, customer_id) on conflict ignore);`,
+		),
 	)
 )
 

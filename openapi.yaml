@@ -643,6 +643,21 @@ components:
         active:
           type: boolean
           description: Address is currently being used for customer
+    Disclaimer:
+      type: object
+      properties:
+        ID:
+          type: string
+          description: The unique identifier for this Disclaimer
+          example: 9342f3a7
+        text:
+          type: string
+          description: Text that user must accept
+          example: Set of conditions
+    Disclaimers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Disclaimer'
     Document:
       type: object
       properties:

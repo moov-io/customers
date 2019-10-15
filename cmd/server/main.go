@@ -9,8 +9,6 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
-	"github.com/moov-io/customers/internal/database"
-	"github.com/moov-io/customers/internal/version"
 	"net/http"
 	"os"
 	"os/signal"
@@ -21,6 +19,8 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
+	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/customers/internal/version"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -79,6 +79,8 @@ func main() {
 	defer customerRepo.close()
 	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
 	defer customerSSNRepo.close()
+	disclaimerRepo := &sqlDisclaimerRepository{db, logger}
+	defer disclaimerRepo.close()
 	documentRepo := &sqlDocumentRepository{db, logger}
 	defer documentRepo.close()
 
@@ -124,6 +126,7 @@ func main() {
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
+	addDisclaimerRoute(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
 
 	// Optionally serve /files/ as our fileblob routes
