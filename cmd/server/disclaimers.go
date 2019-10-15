@@ -90,7 +90,8 @@ func (r *sqlDisclaimerRepository) close() error {
 }
 
 func (r *sqlDisclaimerRepository) getCustomerDisclaimers(customerID string) ([]*client.Disclaimer, error) {
-	query := `select disclaimer_id, text from disclaimers;`
+	query := `select d.disclaimer_id, d.text, da.accepted_at from disclaimers as d
+left outer join disclaimer_acceptances as da on d.disclaimer_id = da.disclaimer_id;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -106,13 +107,18 @@ func (r *sqlDisclaimerRepository) getCustomerDisclaimers(customerID string) ([]*
 	var out []*client.Disclaimer
 	for rows.Next() {
 		id, text := "", ""
-		if err := rows.Scan(&id, &text); err != nil {
+		var acceptedAt *time.Time
+		if err := rows.Scan(&id, &text, &acceptedAt); err != nil {
 			return nil, err
 		}
-		out = append(out, &client.Disclaimer{
+		disc := &client.Disclaimer{
 			ID:   id,
 			Text: text,
-		})
+		}
+		if acceptedAt != nil {
+			disc.AcceptedAt = *acceptedAt
+		}
+		out = append(out, disc)
 	}
 	return out, rows.Err()
 }

@@ -9,10 +9,16 @@
 
 package openapi
 
+import (
+	"time"
+)
+
 // Disclaimer struct for Disclaimer
 type Disclaimer struct {
 	// The unique identifier for this Disclaimer
 	ID string `json:"ID,omitempty"`
 	// Text that user must accept
 	Text string `json:"text,omitempty"`
+	// Timestamp if disclaimer has been accepted, a timestamp before the year 2000 indicates no acceptance.
+	AcceptedAt time.Time `json:"acceptedAt,omitempty"`
 }

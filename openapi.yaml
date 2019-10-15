@@ -654,6 +654,11 @@ components:
           type: string
           description: Text that user must accept
           example: Set of conditions
+        acceptedAt:
+          type: string
+          description: Timestamp if disclaimer has been accepted, a timestamp before the year 2000 indicates no acceptance.
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
     Disclaimers:
       type: array
       items:
