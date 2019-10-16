@@ -29,7 +29,7 @@ var (
 				return float32(f)
 			}
 		}
-		return 0.90 // default, 90%
+		return 0.99 // default, 99%
 	}()
 
 	errNoAddressId = errors.New("no Address ID found")
