@@ -266,3 +266,58 @@ func TestDisclaimersAdmin__createErr(t *testing.T) {
 		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
 	}
 }
+
+func TestDisclaimersAdmin__createMethodErr(t *testing.T) {
+	disclaimRepo := &testDisclaimerRepository{}
+	docRepo := &testDocumentRepository{}
+
+	svc := admin.NewServer(":0")
+	defer svc.Shutdown()
+	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	go svc.Listen()
+
+	req, err := http.NewRequest("PUT", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	respBody, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
+	}
+}
+
+func TestDisclaimersAdmin__createJSONErr(t *testing.T) {
+	disclaimRepo := &testDisclaimerRepository{}
+	docRepo := &testDocumentRepository{}
+
+	svc := admin.NewServer(":0")
+	defer svc.Shutdown()
+	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	go svc.Listen()
+
+	body := strings.NewReader(`not-valid-json`)
+	req, err := http.NewRequest("POST", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	respBody, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
+	}
+}
