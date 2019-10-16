@@ -114,6 +114,7 @@ func main() {
 
 	// Register our admin routes
 	addApprovalRoutes(logger, adminServer, customerRepo, ofac)
+	addDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
 	customerSSNStorage := &ssnStorage{
@@ -126,7 +127,7 @@ func main() {
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
-	addDisclaimerRoute(logger, router, disclaimerRepo)
+	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
 
 	// Optionally serve /files/ as our fileblob routes

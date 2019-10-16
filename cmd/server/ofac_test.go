@@ -16,7 +16,7 @@ import (
 	ofac "github.com/moov-io/ofac/client"
 
 	"github.com/go-kit/kit/log"
-	"github.com/ory/dockertest"
+	"github.com/ory/dockertest/v3"
 )
 
 type testOFACClient struct {

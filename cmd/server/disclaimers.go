@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	client "github.com/moov-io/customers/client"
 
@@ -24,9 +25,13 @@ var (
 	errNoDisclaimerID = errors.New("no Disclaimer ID found")
 )
 
-func addDisclaimerRoute(logger log.Logger, r *mux.Router, repo disclaimerRepository) {
+func addDisclaimerRoutes(logger log.Logger, r *mux.Router, repo disclaimerRepository) {
 	r.Methods("GET").Path("/customers/{customerID}/disclaimers").HandlerFunc(getCustomerDisclaimers(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/disclaimers/{disclaimerID}").HandlerFunc(acceptDisclaimer(logger, repo))
+}
+
+func addDisclaimerAdminRoutes(logger log.Logger, svc *admin.Server, disclaimRepo disclaimerRepository, docRepo documentRepository) {
+	svc.AddHandler("/customers/{customerID}/disclaimers", createDisclaimer(logger, disclaimRepo, docRepo))
 }
 
 func getDisclaimerID(w http.ResponseWriter, r *http.Request) string {
@@ -76,9 +81,73 @@ func acceptDisclaimer(logger log.Logger, repo disclaimerRepository) http.Handler
 	}
 }
 
+type createDisclaimerRequest struct {
+	DocumentID string `json:"documentId,omitempty"`
+	Text       string `json:"text,omitempty"`
+}
+
+func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docRepo documentRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = wrapResponseWriter(logger, w, r)
+
+		if r.Method != "POST" {
+			moovhttp.Problem(w, fmt.Errorf("unsupported HTTP verb %s", r.Method))
+			return
+		}
+
+		customerID := getCustomerID(w, r)
+		if customerID == "" {
+			return
+		}
+
+		var req createDisclaimerRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		if err := documentExistsForCustomer(customerID, req, docRepo); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		if req.Text == "" {
+			moovhttp.Problem(w, errors.New("empty disclaimer text"))
+			return
+		}
+
+		disclaimer, err := disclaimRepo.insertDisclaimer(req.Text, req.DocumentID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(disclaimer)
+	}
+}
+
+func documentExistsForCustomer(customerID string, req createDisclaimerRequest, docRepo documentRepository) error {
+	if req.DocumentID != "" {
+		docs, err := docRepo.getCustomerDocuments(customerID)
+		if err != nil {
+			return err
+		}
+		for i := range docs {
+			if docs[i].ID == req.DocumentID {
+				return nil
+			}
+		}
+		return errors.New("document not found")
+	}
+	return nil
+}
+
 type disclaimerRepository interface {
 	getCustomerDisclaimers(customerID string) ([]*client.Disclaimer, error)
 	acceptDisclaimer(customerID, disclaimerID string) error
+	insertDisclaimer(text, documentID string) (*client.Disclaimer, error)
 }
 
 type sqlDisclaimerRepository struct {

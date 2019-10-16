@@ -5,14 +5,18 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/base/admin"
 	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/internal/database"
 
@@ -34,6 +38,21 @@ func (r *testDisclaimerRepository) getCustomerDisclaimers(customerID string) ([]
 
 func (r *testDisclaimerRepository) acceptDisclaimer(customerID, disclaimerID string) error {
 	return r.err
+}
+
+func (r *testDisclaimerRepository) insertDisclaimer(text, documentID string) (*client.Disclaimer, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
+	if len(r.disclaimers) == 0 {
+		r.disclaimers = append(r.disclaimers, &client.Disclaimer{
+			ID:         base.ID(),
+			Text:       text,
+			DocumentID: documentID,
+		})
+		return r.disclaimers[0], nil
+	}
+	return nil, nil
 }
 
 func TestDisclaimers__getDisclaimerID(t *testing.T) {
@@ -61,7 +80,7 @@ func TestDisclaimers__getCustomerDisclaimers(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addDisclaimerRoute(log.NewNopLogger(), router, repo)
+	addDisclaimerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -105,7 +124,7 @@ func TestDisclaimers__acceptDisclaimer(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addDisclaimerRoute(log.NewNopLogger(), router, repo)
+	addDisclaimerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -173,4 +192,132 @@ func TestDisclaimersRepository(t *testing.T) {
 	mysqlDB := database.CreateTestMySQLDB(t)
 	defer mysqlDB.Close()
 	check(t, &sqlDisclaimerRepository{mysqlDB.DB, log.NewNopLogger()})
+}
+
+func TestDisclaimersAdmin__create(t *testing.T) {
+	disclaimRepo := &testDisclaimerRepository{}
+
+	documentID := base.ID()
+	docRepo := &testDocumentRepository{
+		documents: []*client.Document{
+			{
+				ID: documentID,
+			},
+		},
+	}
+
+	svc := admin.NewServer(":0")
+	defer svc.Shutdown()
+	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	go svc.Listen()
+
+	body := strings.NewReader(fmt.Sprintf(`{"text": "terms and conditions", "documentId": "%s"}`, documentID))
+	req, err := http.NewRequest("POST", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	respBody, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
+	}
+
+	var disclaimer client.Disclaimer
+	if err := json.NewDecoder(bytes.NewReader(respBody)).Decode(&disclaimer); err != nil {
+		t.Fatal(err)
+	}
+
+	if disclaimer.Text != "terms and conditions" {
+		t.Errorf("disclaimer.Text=%s", disclaimer.Text)
+	}
+}
+
+func TestDisclaimersAdmin__createErr(t *testing.T) {
+	disclaimRepo := &testDisclaimerRepository{}
+	docRepo := &testDocumentRepository{}
+
+	svc := admin.NewServer(":0")
+	defer svc.Shutdown()
+	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	go svc.Listen()
+
+	body := strings.NewReader(`{"text": "", "documentId": ""}`)
+	req, err := http.NewRequest("POST", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	respBody, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
+	}
+}
+
+func TestDisclaimersAdmin__createMethodErr(t *testing.T) {
+	disclaimRepo := &testDisclaimerRepository{}
+	docRepo := &testDocumentRepository{}
+
+	svc := admin.NewServer(":0")
+	defer svc.Shutdown()
+	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	go svc.Listen()
+
+	req, err := http.NewRequest("PUT", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	respBody, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
+	}
+}
+
+func TestDisclaimersAdmin__createJSONErr(t *testing.T) {
+	disclaimRepo := &testDisclaimerRepository{}
+	docRepo := &testDocumentRepository{}
+
+	svc := admin.NewServer(":0")
+	defer svc.Shutdown()
+	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	go svc.Listen()
+
+	body := strings.NewReader(`not-valid-json`)
+	req, err := http.NewRequest("POST", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	respBody, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
+	}
 }
