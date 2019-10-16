@@ -223,6 +223,9 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 func createCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		requestID := moovhttp.GetRequestID(r)
 
 		var req customerRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -230,10 +233,10 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 			return
 		}
 		if err := req.validate(); err != nil {
+			logger.Log("customers", "error validating new customer", "error", err, "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
-		requestID := moovhttp.GetRequestID(r)
 
 		cust, ssn, err := req.asCustomer(customerSSNStorage)
 		if err != nil {
@@ -268,7 +271,6 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 
 		logger.Log("customers", fmt.Sprintf("created customer=%s", cust.ID), "requestID", requestID)
 
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(cust)
 	}
