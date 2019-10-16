@@ -82,7 +82,7 @@ func acceptDisclaimer(logger log.Logger, repo disclaimerRepository) http.Handler
 }
 
 type createDisclaimerRequest struct {
-	DocumentID string `json:"documentId"`
+	DocumentID string `json:"documentId,omitempty"`
 	Text       string `json:"text,omitempty"`
 }
 
@@ -106,18 +106,8 @@ func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docR
 			return
 		}
 
-		if req.DocumentID != "" {
-			docs, err := docRepo.getCustomerDocuments(customerID)
-			if err != nil {
-				moovhttp.Problem(w, err)
-				return
-			}
-			for i := range docs {
-				if docs[i].ID == req.DocumentID {
-					break
-				}
-			}
-			moovhttp.Problem(w, fmt.Errorf("document not found"))
+		if err := documentExistsForCustomer(customerID, req, docRepo); err != nil {
+			moovhttp.Problem(w, err)
 			return
 		}
 
@@ -136,6 +126,22 @@ func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docR
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(disclaimer)
 	}
+}
+
+func documentExistsForCustomer(customerID string, req createDisclaimerRequest, docRepo documentRepository) error {
+	if req.DocumentID != "" {
+		docs, err := docRepo.getCustomerDocuments(customerID)
+		if err != nil {
+			return err
+		}
+		for i := range docs {
+			if docs[i].ID == req.DocumentID {
+				return nil
+			}
+		}
+		return errors.New("document not found")
+	}
+	return nil
 }
 
 type disclaimerRepository interface {

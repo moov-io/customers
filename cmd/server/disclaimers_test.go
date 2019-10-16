@@ -196,14 +196,22 @@ func TestDisclaimersRepository(t *testing.T) {
 
 func TestDisclaimersAdmin__create(t *testing.T) {
 	disclaimRepo := &testDisclaimerRepository{}
-	docRepo := &testDocumentRepository{}
+
+	documentID := base.ID()
+	docRepo := &testDocumentRepository{
+		documents: []*client.Document{
+			{
+				ID: documentID,
+			},
+		},
+	}
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
 	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
 	go svc.Listen()
 
-	body := strings.NewReader(`{"text": "terms and conditions", "documentID": ""}`)
+	body := strings.NewReader(fmt.Sprintf(`{"text": "terms and conditions", "documentId": "%s"}`, documentID))
 	req, err := http.NewRequest("POST", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", body)
 	if err != nil {
 		t.Fatal(err)
@@ -228,5 +236,33 @@ func TestDisclaimersAdmin__create(t *testing.T) {
 
 	if disclaimer.Text != "terms and conditions" {
 		t.Errorf("disclaimer.Text=%s", disclaimer.Text)
+	}
+}
+
+func TestDisclaimersAdmin__createErr(t *testing.T) {
+	disclaimRepo := &testDisclaimerRepository{}
+	docRepo := &testDocumentRepository{}
+
+	svc := admin.NewServer(":0")
+	defer svc.Shutdown()
+	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	go svc.Listen()
+
+	body := strings.NewReader(`{"text": "", "documentId": ""}`)
+	req, err := http.NewRequest("POST", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	respBody, _ := ioutil.ReadAll(resp.Body)
+
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d: %v", resp.StatusCode, string(respBody))
 	}
 }
