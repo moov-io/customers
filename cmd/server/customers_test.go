@@ -9,12 +9,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/moov-io/customers/internal/database"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/customers/internal/database"
 
 	"github.com/moov-io/base"
 	client "github.com/moov-io/customers/client"
@@ -205,21 +206,28 @@ func TestCustomers__customerRequest(t *testing.T) {
 		t.Error("expected error")
 	}
 	req.FirstName = "jane"
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+
 	req.LastName = "doe"
-	if err := req.validate(); err == nil {
-		t.Error("expected error")
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
 	}
+
 	req.Email = "jane.doe@example.com"
-	if err := req.validate(); err == nil {
-		t.Error("expected error")
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
 	}
+
 	req.Phones = append(req.Phones, phone{
 		Number: "123.456.7890",
 		Type:   "Checking",
 	})
-	if err := req.validate(); err == nil {
-		t.Error("expected error")
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
 	}
+
 	req.Addresses = append(req.Addresses, address{
 		Address1:   "123 1st st",
 		City:       "fake city",
@@ -734,11 +742,9 @@ func TestCustomers__MetaDataValidate(t *testing.T) {
 	}
 }
 
-func TestCustomers__NoSSN(t *testing.T) {
+func TestCustomers__minimumFields(t *testing.T) {
 	w := httptest.NewRecorder()
-	phone := `{"number": "555.555.5555", "type": "mobile"}`
-	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
-	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "ssn": "", "phones": [%s], "addresses": [%s]}`, phone, address)
+	body := `{"firstName": "jane", "lastName": "doe"}`
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
@@ -753,12 +759,8 @@ func TestCustomers__NoSSN(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusBadRequest {
+	if w.Code != http.StatusOK {
 		t.Errorf("bogus status code: %d: %v", w.Code, w.Body.String())
-	}
-
-	if !strings.Contains(w.Body.String(), "SSN") {
-		t.Errorf("Expected SSN error received %s", w.Body.String())
 	}
 }
 

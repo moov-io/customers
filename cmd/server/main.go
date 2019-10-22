@@ -113,7 +113,7 @@ func main() {
 	}
 
 	// Register our admin routes
-	addApprovalRoutes(logger, adminServer, customerRepo, ofac)
+	addApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
 	addDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper

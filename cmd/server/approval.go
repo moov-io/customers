@@ -38,8 +38,8 @@ var (
 // addApprovalRoutes contains "back office" admin endpoints used to validate (or reject) a Customer
 // TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now.
 // What about a header like x-admin-id ??
-func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerRepository, ofac *ofacSearcher) {
-	svc.AddHandler("/customers/{customerID}/status", updateCustomerStatus(logger, repo, ofac))
+func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) {
+	svc.AddHandler("/customers/{customerID}/status", updateCustomerStatus(logger, repo, customerSSNRepo, ofac))
 	svc.AddHandler("/customers/{customerID}/addresses/{addressId}", updateCustomerAddress(logger, repo))
 }
 
@@ -54,7 +54,7 @@ type updateCustomerStatusRequest struct {
 //  - KYC is only valid if the Customer has first, last, address, and date of birth
 //  - OFAC can only be after an OFAC search has been performed (and search info recorded)
 //  - CIP can only be if the SSN has been set
-func validCustomerStatusTransition(existing *client.Customer, futureStatus CustomerStatus, repo customerRepository, ofac *ofacSearcher, requestID string) error {
+func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureStatus CustomerStatus, repo customerRepository, ofac *ofacSearcher, requestID string) error {
 	eql := func(s string, status CustomerStatus) bool {
 		return strings.EqualFold(s, string(status))
 	}
@@ -69,6 +69,9 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 		}
 		if existing.BirthDate.IsZero() {
 			return fmt.Errorf("customer=%s is missing date of birth", existing.ID)
+		}
+		if existing.Email == "" {
+			return fmt.Errorf("customer=%s is missing an email address", existing.ID)
 		}
 		if !containsValidPrimaryAddress(existing.Addresses) {
 			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.ID)
@@ -94,7 +97,10 @@ func validCustomerStatusTransition(existing *client.Customer, futureStatus Custo
 	case CustomerStatusCIP: // TODO(adam): need to impl lookup
 		// What can we do to validate an SSN?
 		// https://www.ssa.gov/employer/randomization.html (not much)
-		return fmt.Errorf("customers=%s %s to CIP transition needs to lookup encrypted SSN", existing.ID, existing.Status)
+		if ssn == nil || len(ssn.encrypted) == 0 {
+			return fmt.Errorf("customer=%s is missing SSN", existing.ID)
+		}
+		return fmt.Errorf("customer=%s %s to CIP transition needs to lookup encrypted SSN", existing.ID, existing.Status)
 	}
 	return nil
 }
@@ -108,7 +114,7 @@ func containsValidPrimaryAddress(addrs []client.Address) bool {
 	return false
 }
 
-func updateCustomerStatus(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
+func updateCustomerStatus(logger log.Logger, repo customerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 
@@ -133,7 +139,13 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository, ofac *ofac
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err := validCustomerStatusTransition(cust, req.Status, repo, ofac, requestID); err != nil {
+
+		ssn, err := customerSSNRepo.getCustomerSSN(customerID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		if err := validCustomerStatusTransition(cust, ssn, req.Status, repo, ofac, requestID); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}

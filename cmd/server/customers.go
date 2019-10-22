@@ -157,15 +157,6 @@ func (req customerRequest) validate() error {
 	if req.FirstName == "" || req.LastName == "" {
 		return errors.New("create customer: empty name field(s)")
 	}
-	if req.Email == "" {
-		return errors.New("create customer: empty email")
-	}
-	if len(req.Phones) == 0 {
-		return errors.New("create customer: phone array is required")
-	}
-	if len(req.Addresses) == 0 {
-		return errors.New("create customer: address array is required")
-	}
 	if err := validateMetadata(req.Metadata); err != nil {
 		return fmt.Errorf("create customer: %v", err)
 	}
@@ -216,8 +207,11 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			Active:     true,
 		})
 	}
-	ssn, err := storage.encryptRaw(customer.ID, req.SSN)
-	return customer, ssn, err
+	if req.SSN != "" {
+		ssn, err := storage.encryptRaw(customer.ID, req.SSN)
+		return customer, ssn, err
+	}
+	return customer, nil, nil
 }
 
 func createCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
@@ -244,10 +238,13 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err := customerSSNStorage.repo.saveCustomerSSN(ssn); err != nil {
-			logger.Log("customers", fmt.Sprintf("problem saving SSN for Customer=%s: %v", cust.ID, err), "requestID", requestID)
-			moovhttp.Problem(w, fmt.Errorf("saveCustomerSSN: %v", err))
-			return
+		if ssn != nil {
+			err := customerSSNStorage.repo.saveCustomerSSN(ssn)
+			if err != nil {
+				logger.Log("customers", fmt.Sprintf("problem saving SSN for Customer=%s: %v", cust.ID, err), "requestID", requestID)
+				moovhttp.Problem(w, fmt.Errorf("saveCustomerSSN: %v", err))
+				return
+			}
 		}
 		if err := repo.createCustomer(cust); err != nil {
 			if requestID != "" {
