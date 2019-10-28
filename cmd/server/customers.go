@@ -26,43 +26,6 @@ var (
 	errNoCustomerID = errors.New("no Customer ID found")
 )
 
-type CustomerStatus string
-
-const (
-	CustomerStatusDeceased       = "deceased"
-	CustomerStatusRejected       = "rejected"
-	CustomerStatusNone           = "none"
-	CustomerStatusReviewRequired = "reviewrequired"
-	CustomerStatusKYC            = "kyc"
-	CustomerStatusOFAC           = "ofac"
-	CustomerStatusCIP            = "cip"
-)
-
-func (cs CustomerStatus) validate() error {
-	switch cs {
-	case CustomerStatusDeceased, CustomerStatusRejected:
-		return nil
-	case CustomerStatusReviewRequired, CustomerStatusNone:
-		return nil
-	case CustomerStatusKYC, CustomerStatusOFAC, CustomerStatusCIP:
-		return nil
-	default:
-		return fmt.Errorf("CustomerStatus(%s) is invalid", cs)
-	}
-}
-
-func (cs *CustomerStatus) UnmarshalJSON(b []byte) error {
-	var s string
-	if err := json.Unmarshal(b, &s); err != nil {
-		return err
-	}
-	*cs = CustomerStatus(strings.TrimSpace(strings.ToLower(s)))
-	if err := cs.validate(); err != nil {
-		return err
-	}
-	return nil
-}
-
 func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
 	r.Methods("GET").Path("/customers/{customerID}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
@@ -186,7 +149,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		Suffix:     req.Suffix,
 		BirthDate:  req.BirthDate,
 		Email:      req.Email,
-		Status:     CustomerStatusNone,
+		Status:     CustomerStatusNone.String(),
 		Metadata:   req.Metadata,
 	}
 	for i := range req.Phones {
@@ -508,7 +471,7 @@ func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status C
 	if err != nil {
 		return fmt.Errorf("updateCustomerStatus: update customers prepare: %v", err)
 	}
-	if _, err := stmt.Exec(status, customerID); err != nil {
+	if _, err := stmt.Exec(status.String(), customerID); err != nil {
 		stmt.Close()
 		return fmt.Errorf("updateCustomerStatus: update customers exec: %v", err)
 	}
@@ -521,7 +484,7 @@ func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status C
 		return fmt.Errorf("updateCustomerStatus: insert status prepare: %v", err)
 	}
 	defer stmt.Close()
-	if _, err := stmt.Exec(customerID, status, comment, time.Now()); err != nil {
+	if _, err := stmt.Exec(customerID, status.String(), comment, time.Now()); err != nil {
 		return fmt.Errorf("updateCustomerStatus: insert status exec: %v", err)
 	}
 	return tx.Commit()

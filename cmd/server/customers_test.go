@@ -92,34 +92,6 @@ func TestCustomers__getCustomerID(t *testing.T) {
 	}
 }
 
-func TestCustomerStatus__json(t *testing.T) {
-	cs := CustomerStatus("invalid")
-	valid := map[string]CustomerStatus{
-		"deCEAsed":       CustomerStatusDeceased,
-		"Rejected":       CustomerStatusRejected,
-		"ReviewRequired": CustomerStatusReviewRequired,
-		"NONE":           CustomerStatusNone,
-		"KYC":            CustomerStatusKYC,
-		"ofaC":           CustomerStatusOFAC,
-		"cip":            CustomerStatusCIP,
-	}
-	for k, v := range valid {
-		in := []byte(fmt.Sprintf(`"%v"`, k))
-		if err := json.Unmarshal(in, &cs); err != nil {
-			t.Error(err.Error())
-		}
-		if cs != v {
-			t.Errorf("got cs=%#v, v=%#v", cs, v)
-		}
-	}
-
-	// make sure other values fail
-	in := []byte(fmt.Sprintf(`"%v"`, base.ID()))
-	if err := json.Unmarshal(in, &cs); err == nil {
-		t.Error("expected error")
-	}
-}
-
 func TestCustomers__formatCustomerName(t *testing.T) {
 	if out := formatCustomerName(nil); out != "" {
 		t.Errorf("got %q", out)
@@ -402,7 +374,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if customer.Status != CustomerStatusKYC {
+	if customer.Status != CustomerStatusKYC.String() {
 		t.Errorf("unexpected status: %s", customer.Status)
 	}
 }

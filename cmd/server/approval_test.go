@@ -27,7 +27,8 @@ import (
 func TestCustomers__updateCustomerStatus(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: base.ID(),
+			ID:     base.ID(),
+			Status: "none",
 		},
 	}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -141,7 +142,7 @@ func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
 func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	cust := &client.Customer{
 		ID:     base.ID(),
-		Status: CustomerStatusNone,
+		Status: CustomerStatusNone.String(),
 	}
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -153,18 +154,18 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	}
 
 	// block Deceased and Rejected customers
-	cust.Status = CustomerStatusDeceased
+	cust.Status = CustomerStatusDeceased.String()
 	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
-	cust.Status = CustomerStatusRejected
+	cust.Status = CustomerStatusRejected.String()
 	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 
 	// normal KYC approval (rejected due to missing info)
 	cust.FirstName, cust.LastName = "Jane", "Doe"
-	cust.Status = CustomerStatusReviewRequired
+	cust.Status = CustomerStatusReviewRequired.String()
 	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
@@ -178,7 +179,7 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	})
 
 	// CIP transistions are WIP // TODO(adam):
-	cust.Status = CustomerStatusReviewRequired
+	cust.Status = CustomerStatusReviewRequired.String()
 	if err := validCustomerStatusTransition(cust, nil, CustomerStatusCIP, repo, searcher, "requestID"); err != nil {
 		if !strings.Contains(err.Error(), "is missing SSN") {
 			t.Errorf("CIP: unexpected error: %v", err)
@@ -194,7 +195,7 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 	cust := &client.Customer{
 		ID:     base.ID(),
-		Status: CustomerStatusReviewRequired,
+		Status: CustomerStatusReviewRequired.String(),
 	}
 	repo := &testCustomerRepository{}
 	ofacClient := &testOFACClient{}
@@ -217,7 +218,7 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	cust := &client.Customer{
 		ID:     base.ID(),
-		Status: CustomerStatusReviewRequired,
+		Status: CustomerStatusReviewRequired.String(),
 	}
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)

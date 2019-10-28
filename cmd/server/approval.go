@@ -55,12 +55,9 @@ type updateCustomerStatusRequest struct {
 //  - OFAC can only be after an OFAC search has been performed (and search info recorded)
 //  - CIP can only be if the SSN has been set
 func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureStatus CustomerStatus, repo customerRepository, ofac *ofacSearcher, requestID string) error {
-	eql := func(s string, status CustomerStatus) bool {
-		return strings.EqualFold(s, string(status))
-	}
-	// Check Deceased and Rejected
-	if eql(existing.Status, CustomerStatusDeceased) || eql(existing.Status, CustomerStatusRejected) {
-		return fmt.Errorf("customer status '%s' cannot be changed", existing.Status)
+	// Reject certain Deceased and Rejected statuses
+	if cs, err := LiftStatus(existing.Status); err != nil || cs == nil || *cs <= CustomerStatusRejected {
+		return fmt.Errorf("customer status '%s' cannot be changed: %v", existing.Status, err)
 	}
 	switch futureStatus {
 	case CustomerStatusKYC:
