@@ -5,6 +5,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -135,7 +136,7 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository, customerSS
 		}
 
 		ssn, err := customerSSNRepo.getCustomerSSN(customerID)
-		if err != nil {
+		if err != nil && err != sql.ErrNoRows {
 			moovhttp.Problem(w, err)
 			return
 		}
