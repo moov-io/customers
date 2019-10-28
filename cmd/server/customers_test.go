@@ -18,6 +18,7 @@ import (
 	"github.com/moov-io/customers/internal/database"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
 
 	"github.com/go-kit/kit/log"
@@ -30,7 +31,7 @@ type testCustomerRepository struct {
 	ofacSearchResult *ofacSearchResult
 
 	createdCustomer       *client.Customer
-	updatedStatus         CustomerStatus
+	updatedStatus         customers.Status
 	savedOFACSearchResult *ofacSearchResult
 }
 
@@ -46,7 +47,7 @@ func (r *testCustomerRepository) createCustomer(c *client.Customer) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomerStatus(customerID string, status CustomerStatus, comment string) error {
+func (r *testCustomerRepository) updateCustomerStatus(customerID string, status customers.Status, comment string) error {
 	r.updatedStatus = status
 	return r.err
 }
@@ -89,34 +90,6 @@ func TestCustomers__getCustomerID(t *testing.T) {
 
 	if id := getCustomerID(w, req); id != "" {
 		t.Errorf("unexpected id: %v", id)
-	}
-}
-
-func TestCustomerStatus__json(t *testing.T) {
-	cs := CustomerStatus("invalid")
-	valid := map[string]CustomerStatus{
-		"deCEAsed":       CustomerStatusDeceased,
-		"Rejected":       CustomerStatusRejected,
-		"ReviewRequired": CustomerStatusReviewRequired,
-		"NONE":           CustomerStatusNone,
-		"KYC":            CustomerStatusKYC,
-		"ofaC":           CustomerStatusOFAC,
-		"cip":            CustomerStatusCIP,
-	}
-	for k, v := range valid {
-		in := []byte(fmt.Sprintf(`"%v"`, k))
-		if err := json.Unmarshal(in, &cs); err != nil {
-			t.Error(err.Error())
-		}
-		if cs != v {
-			t.Errorf("got cs=%#v, v=%#v", cs, v)
-		}
-	}
-
-	// make sure other values fail
-	in := []byte(fmt.Sprintf(`"%v"`, base.ID()))
-	if err := json.Unmarshal(in, &cs); err == nil {
-		t.Error("expected error")
 	}
 }
 
@@ -393,7 +366,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	}
 
 	// update status
-	if err := repo.updateCustomerStatus(cust.ID, CustomerStatusKYC, "test comment"); err != nil {
+	if err := repo.updateCustomerStatus(cust.ID, customers.KYC, "test comment"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -402,7 +375,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if customer.Status != CustomerStatusKYC {
+	if customer.Status != customers.KYC.String() {
 		t.Errorf("unexpected status: %s", customer.Status)
 	}
 }

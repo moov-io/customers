@@ -17,6 +17,7 @@ import (
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/base/admin"
+	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
 	ofac "github.com/moov-io/ofac/client"
 
@@ -27,7 +28,8 @@ import (
 func TestCustomers__updateCustomerStatus(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: base.ID(),
+			ID:     base.ID(),
+			Status: "none",
 		},
 	}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -63,7 +65,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	if customer.ID == "" {
 		t.Errorf("missing customer JSON: %#v", customer)
 	}
-	if repo.updatedStatus != CustomerStatusReviewRequired {
+	if repo.updatedStatus != customers.ReviewRequired {
 		t.Errorf("unexpected status: %s", repo.updatedStatus)
 	}
 }
@@ -141,35 +143,35 @@ func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
 func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	cust := &client.Customer{
 		ID:     base.ID(),
-		Status: CustomerStatusNone,
+		Status: customers.None.String(),
 	}
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
 
 	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
 
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusDeceased, repo, searcher, "requestID"); err != nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.Deceased, repo, searcher, "requestID"); err != nil {
 		t.Errorf("expected no error: %v", err)
 	}
 
 	// block Deceased and Rejected customers
-	cust.Status = CustomerStatusDeceased
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
+	cust.Status = customers.Deceased.String()
+	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
-	cust.Status = CustomerStatusRejected
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
+	cust.Status = customers.Rejected.String()
+	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 
 	// normal KYC approval (rejected due to missing info)
 	cust.FirstName, cust.LastName = "Jane", "Doe"
-	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
+	cust.Status = customers.ReviewRequired.String()
+	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 	cust.BirthDate = time.Now()
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusKYC, repo, searcher, "requestID"); err == nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
 	cust.Addresses = append(cust.Addresses, client.Address{
@@ -178,15 +180,15 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	})
 
 	// CIP transistions are WIP // TODO(adam):
-	cust.Status = CustomerStatusReviewRequired
-	if err := validCustomerStatusTransition(cust, nil, CustomerStatusCIP, repo, searcher, "requestID"); err != nil {
+	cust.Status = customers.ReviewRequired.String()
+	if err := validCustomerStatusTransition(cust, nil, customers.CIP, repo, searcher, "requestID"); err != nil {
 		if !strings.Contains(err.Error(), "is missing SSN") {
 			t.Errorf("CIP: unexpected error: %v", err)
 		}
 	} else {
 		t.Error("CIP transition is WIP")
 	}
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusCIP, repo, searcher, "requestID"); err == nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.CIP, repo, searcher, "requestID"); err == nil {
 		t.Error("CIP transition is WIP")
 	}
 }
@@ -194,7 +196,7 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 	cust := &client.Customer{
 		ID:     base.ID(),
-		Status: CustomerStatusReviewRequired,
+		Status: customers.ReviewRequired.String(),
 	}
 	repo := &testCustomerRepository{}
 	ofacClient := &testOFACClient{}
@@ -203,13 +205,13 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
 
 	repo.err = errors.New("bad error")
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusOFAC, repo, searcher, ""); err == nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, ""); err == nil {
 		t.Error("expected error, but got none")
 	}
 	repo.err = nil
 
 	ofacClient.err = errors.New("bad error")
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusOFAC, repo, searcher, ""); err == nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, ""); err == nil {
 		t.Error("expected error, but got none")
 	}
 }
@@ -217,7 +219,7 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	cust := &client.Customer{
 		ID:     base.ID(),
-		Status: CustomerStatusReviewRequired,
+		Status: customers.ReviewRequired.String(),
 	}
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -228,13 +230,13 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 		sdnName: "Jane Doe",
 		match:   0.10,
 	}
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusOFAC, repo, searcher, "requestID"); err != nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
 		t.Errorf("unexpected error in OFAC transition: %v", err)
 	}
 
 	// OFAC transition with positive match
 	repo.ofacSearchResult.match = 0.99
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusOFAC, repo, searcher, "requestID"); err != nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
 		if !strings.Contains(err.Error(), "positive OFAC match") {
 			t.Errorf("unexpected error in OFAC transition: %v", err)
 		}
@@ -247,7 +249,7 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 			EntityID: "12124",
 		}
 	}
-	if err := validCustomerStatusTransition(cust, ssn, CustomerStatusOFAC, repo, searcher, "requestID"); err != nil {
+	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 	if repo.savedOFACSearchResult.entityId != "12124" {
