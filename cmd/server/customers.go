@@ -16,6 +16,7 @@ import (
 
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
+	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
 
 	"github.com/go-kit/kit/log"
@@ -149,7 +150,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		Suffix:     req.Suffix,
 		BirthDate:  req.BirthDate,
 		Email:      req.Email,
-		Status:     CustomerStatusNone.String(),
+		Status:     customers.None.String(),
 		Metadata:   req.Metadata,
 	}
 	for i := range req.Phones {
@@ -291,7 +292,7 @@ func addCustomerAddress(logger log.Logger, repo customerRepository) http.Handler
 type customerRepository interface {
 	getCustomer(customerID string) (*client.Customer, error)
 	createCustomer(c *client.Customer) error
-	updateCustomerStatus(customerID string, status CustomerStatus, comment string) error
+	updateCustomerStatus(customerID string, status customers.Status, comment string) error
 
 	getCustomerMetadata(customerID string) (map[string]string, error)
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
@@ -459,7 +460,7 @@ func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.Addre
 	return adds, rows.Err()
 }
 
-func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status CustomerStatus, comment string) error {
+func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status customers.Status, comment string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("updateCustomerStatus: tx begin: %v", err)
