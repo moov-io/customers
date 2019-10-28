@@ -67,9 +67,6 @@ func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureSt
 		if existing.BirthDate.IsZero() {
 			return fmt.Errorf("customer=%s is missing date of birth", existing.ID)
 		}
-		if existing.Email == "" {
-			return fmt.Errorf("customer=%s is missing an email address", existing.ID)
-		}
 		if !containsValidPrimaryAddress(existing.Addresses) {
 			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.ID)
 		}
