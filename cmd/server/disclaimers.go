@@ -183,6 +183,9 @@ where d.deleted_at is null and d.disclaimer_id = ? limit 1;`
 	var d client.Disclaimer
 
 	if err := stmt.QueryRow(disclaimerID).Scan(&d.ID, &d.Text, &d.DocumentID, &acceptedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, err
 	}
 	if acceptedAt != nil && !acceptedAt.IsZero() {
