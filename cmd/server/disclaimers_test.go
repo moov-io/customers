@@ -29,6 +29,16 @@ type testDisclaimerRepository struct {
 	err         error
 }
 
+func (r *testDisclaimerRepository) getCustomerDisclaimer(customerID, documentID string) (*client.Disclaimer, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
+	if len(r.disclaimers) > 0 {
+		return r.disclaimers[0], nil
+	}
+	return nil, nil
+}
+
 func (r *testDisclaimerRepository) getCustomerDisclaimers(customerID string) ([]*client.Disclaimer, error) {
 	if r.err != nil {
 		return nil, r.err
