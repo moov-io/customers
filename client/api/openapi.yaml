@@ -279,6 +279,110 @@ paths:
         users with permissions.
       tags:
       - Customers
+  /customers/{customerID}/disclaimers:
+    get:
+      operationId: getCustomerDisclaimers
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disclaimers'
+          description: Active disclaimers for the customer
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer metadata was not updated, see error(s)
+      summary: Get active disclaimers for the given customer
+      tags:
+      - Customers
+    post:
+      operationId: acceptDisclaimer
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Document type (see Document type for values)
+        explode: true
+        in: query
+        name: type
+        required: true
+        schema:
+          example: DriversLicense
+          type: string
+        style: form
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disclaimer'
+          description: Disclaimer accepted for customer
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer disclaimer was not accepted, see error(s)
+      summary: Accept a disclaimer for the given customer
+      tags:
+      - Customers
   /customers/{customerID}/documents:
     get:
       operationId: getCustomerDocuments
@@ -830,6 +934,11 @@ components:
           type: boolean
       type: object
     Disclaimer:
+      example:
+        documentID: 08a184e1
+        ID: 9342f3a7
+        text: Set of conditions
+        acceptedAt: 2016-08-29T09:12:33.001Z
       properties:
         ID:
           description: The unique identifier for this Disclaimer

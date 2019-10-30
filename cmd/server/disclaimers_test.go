@@ -29,6 +29,16 @@ type testDisclaimerRepository struct {
 	err         error
 }
 
+func (r *testDisclaimerRepository) getCustomerDisclaimer(customerID, documentID string) (*client.Disclaimer, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
+	if len(r.disclaimers) > 0 {
+		return r.disclaimers[0], nil
+	}
+	return nil, nil
+}
+
 func (r *testDisclaimerRepository) getCustomerDisclaimers(customerID string) ([]*client.Disclaimer, error) {
 	if r.err != nil {
 		return nil, r.err
@@ -63,6 +73,32 @@ func TestDisclaimers__getDisclaimerID(t *testing.T) {
 	if id := getDisclaimerID(w, req); id != "" {
 		t.Errorf("unexpected ID: %s", id)
 	}
+}
+
+func TestDisclaimers__getCustomerDisclaimer(t *testing.T) {
+	check := func(t *testing.T, repo *sqlDisclaimerRepository) {
+		defer repo.close()
+
+		customerID, disclaimerID := base.ID(), base.ID()
+
+		disclaimer, err := repo.getCustomerDisclaimer(customerID, disclaimerID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if disclaimer != nil {
+			t.Errorf("expected no disclaimer")
+		}
+	}
+
+	// SQLite tests
+	sqliteDB := database.CreateTestSqliteDB(t)
+	defer sqliteDB.Close()
+	check(t, &sqlDisclaimerRepository{sqliteDB.DB, log.NewNopLogger()})
+
+	// MySQL tests
+	mysqlDB := database.CreateTestMySQLDB(t)
+	defer mysqlDB.Close()
+	check(t, &sqlDisclaimerRepository{mysqlDB.DB, log.NewNopLogger()})
 }
 
 func TestDisclaimers__getCustomerDisclaimers(t *testing.T) {

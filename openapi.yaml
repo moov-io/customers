@@ -231,6 +231,88 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /customers/{customerID}/disclaimers:
+    get:
+      tags: [Customers]
+      summary: Get active disclaimers for the given customer
+      operationId: getCustomerDisclaimers
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Moov User ID
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: Active disclaimers for the customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disclaimers'
+        '400':
+          description: Customer metadata was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags: [Customers]
+      summary: Accept a disclaimer for the given customer
+      operationId: acceptDisclaimer
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Moov User ID
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: type
+          in: query
+          description: Document type (see Document type for values)
+          required: true
+          schema:
+            type: string
+            example: DriversLicense
+      responses:
+        '200':
+          description: Disclaimer accepted for customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Disclaimer'
+        '400':
+          description: Customer disclaimer was not accepted, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /customers/{customerID}/documents:
     post:
       tags: [Customers]
