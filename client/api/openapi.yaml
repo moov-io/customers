@@ -327,6 +327,7 @@ paths:
       summary: Get active disclaimers for the given customer
       tags:
       - Customers
+  /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
       operationId: acceptDisclaimer
       parameters:

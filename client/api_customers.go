@@ -55,7 +55,7 @@ func (a *CustomersApiService) AcceptDisclaimer(ctx _context.Context, customerID 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/disclaimers"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/disclaimers/{disclaimerID}"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerID)), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"disclaimerID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", disclaimerID)), -1)
 

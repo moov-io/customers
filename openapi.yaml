@@ -269,6 +269,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
       tags: [Customers]
       summary: Accept a disclaimer for the given customer
