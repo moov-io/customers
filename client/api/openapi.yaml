@@ -358,15 +358,15 @@ paths:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
           type: string
         style: simple
-      - description: Document type (see Document type for values)
-        explode: true
-        in: query
-        name: type
+      - description: Disclaimer ID
+        explode: false
+        in: path
+        name: disclaimerID
         required: true
         schema:
-          example: DriversLicense
+          example: 9577ea7e1081
           type: string
-        style: form
+        style: simple
       responses:
         200:
           content:

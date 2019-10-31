@@ -38,13 +38,13 @@ type AcceptDisclaimerOpts struct {
 AcceptDisclaimer Accept a disclaimer for the given customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
- * @param type_ Document type (see Document type for values)
+ * @param disclaimerID Disclaimer ID
  * @param optional nil or *AcceptDisclaimerOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
  * @param "XUserID" (optional.String) -  Moov User ID
 @return Disclaimer
 */
-func (a *CustomersApiService) AcceptDisclaimer(ctx _context.Context, customerID string, type_ string, localVarOptionals *AcceptDisclaimerOpts) (Disclaimer, *_nethttp.Response, error) {
+func (a *CustomersApiService) AcceptDisclaimer(ctx _context.Context, customerID string, disclaimerID string, localVarOptionals *AcceptDisclaimerOpts) (Disclaimer, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -57,12 +57,12 @@ func (a *CustomersApiService) AcceptDisclaimer(ctx _context.Context, customerID 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/disclaimers"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerID)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"disclaimerID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", disclaimerID)), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
-	localVarQueryParams.Add("type", parameterToString(type_, ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

@@ -293,13 +293,13 @@ paths:
           schema:
             type: string
             example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-        - name: type
-          in: query
-          description: Document type (see Document type for values)
+        - name: disclaimerID
+          in: path
+          description: Disclaimer ID
           required: true
           schema:
             type: string
-            example: DriversLicense
+            example: 9577ea7e1081
       responses:
         '200':
           description: Disclaimer accepted for customer

@@ -20,7 +20,7 @@ Method | HTTP request | Description
 
 ## AcceptDisclaimer
 
-> Disclaimer AcceptDisclaimer(ctx, customerID, type_, optional)
+> Disclaimer AcceptDisclaimer(ctx, customerID, disclaimerID, optional)
 Accept a disclaimer for the given customer
 
 ### Required Parameters
@@ -30,7 +30,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| Customer ID | 
-**type_** | **string**| Document type (see Document type for values) | 
+**disclaimerID** | **string**| Disclaimer ID | 
  **optional** | ***AcceptDisclaimerOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
