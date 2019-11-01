@@ -21,6 +21,7 @@ Method | HTTP request | Description
 ## AcceptDisclaimer
 
 > Disclaimer AcceptDisclaimer(ctx, customerID, disclaimerID, optional)
+
 Accept a disclaimer for the given customer
 
 ### Required Parameters
@@ -66,6 +67,7 @@ No authorization required
 ## AddCustomerAddress
 
 > Customer AddCustomerAddress(ctx, customerID, createAddress, optional)
+
 Add an Address onto an existing Customer record
 
 ### Required Parameters
@@ -111,6 +113,7 @@ No authorization required
 ## CreateCustomer
 
 > Customer CreateCustomer(ctx, createCustomer, optional)
+
 Create a new customer
 
 ### Required Parameters
@@ -154,6 +157,7 @@ No authorization required
 ## GetCustomer
 
 > Customer GetCustomer(ctx, customerID, optional)
+
 Retrieves a Customer object associated with the customer ID.
 
 ### Required Parameters
@@ -197,6 +201,7 @@ No authorization required
 ## GetCustomerDisclaimers
 
 > []Disclaimer GetCustomerDisclaimers(ctx, customerID, optional)
+
 Get active disclaimers for the given customer
 
 ### Required Parameters
@@ -240,6 +245,7 @@ No authorization required
 ## GetCustomerDocumentContents
 
 > *os.File GetCustomerDocumentContents(ctx, customerID, documentID, optional)
+
 Retrieve the referenced document
 
 ### Required Parameters
@@ -285,6 +291,7 @@ No authorization required
 ## GetCustomerDocuments
 
 > []Document GetCustomerDocuments(ctx, customerID, optional)
+
 Get documents for a customer
 
 ### Required Parameters
@@ -328,6 +335,7 @@ No authorization required
 ## Ping
 
 > Ping(ctx, )
+
 Ping the Customers service to check if running
 
 ### Required Parameters
@@ -355,6 +363,7 @@ No authorization required
 ## ReplaceCustomerMetadata
 
 > Customer ReplaceCustomerMetadata(ctx, customerID, customerMetadata, optional)
+
 Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 
 ### Required Parameters
@@ -400,6 +409,7 @@ No authorization required
 ## UpdateCustomerStatus
 
 > Customer UpdateCustomerStatus(ctx, customerID, updateCustomerStatus, optional)
+
 Update the status for a customer, which can only be updated by authenticated users with permissions.
 
 ### Required Parameters
@@ -445,6 +455,7 @@ No authorization required
 ## UploadCustomerDocument
 
 > Document UploadCustomerDocument(ctx, customerID, type_, file, optional)
+
 Upload a document for the given customer.
 
 ### Required Parameters
