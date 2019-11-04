@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/mail"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -27,9 +28,9 @@ var (
 	errNoCustomerID = errors.New("no Customer ID found")
 )
 
-func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
+func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, mailRepo mailRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
 	r.Methods("GET").Path("/customers/{customerID}").HandlerFunc(getCustomer(logger, repo))
-	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
+	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, mailRepo, customerSSNStorage, ofac))
 	r.Methods("PUT").Path("/customers/{customerID}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/address").HandlerFunc(addCustomerAddress(logger, repo))
 }
@@ -178,7 +179,16 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 	return customer, nil, nil
 }
 
-func createCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
+// normalizeEmail attempts to parse an email address and return net/mail's result
+func normalizeEmail(raw string) (string, error) {
+	addr, err := mail.ParseAddress(raw)
+	if err != nil {
+		return "", fmt.Errorf("error parsing '%s': %v", raw, err)
+	}
+	return addr.Address, nil
+}
+
+func createCustomer(logger log.Logger, repo customerRepository, mailRepo mailRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = wrapResponseWriter(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -210,6 +220,13 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 				return
 			}
 		}
+		if addr, err := normalizeEmail(cust.Email); err != nil {
+			logger.Log("customers", fmt.Sprintf("problem parsing email: %v", err), "requestID", requestID)
+			moovhttp.Problem(w, fmt.Errorf("unable to parse email: %v", err))
+			return
+		} else {
+			cust.Email = addr
+		}
 		if err := repo.createCustomer(cust); err != nil {
 			if requestID != "" {
 				logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestID", requestID)
@@ -227,6 +244,20 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 		go func(logger log.Logger, cust *client.Customer, requestID string) {
 			if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
 				logger.Log("customers", fmt.Sprintf("error with OFAC search for customer=%s: %v", cust.ID, err), "requestID", requestID)
+			}
+		}(logger, cust, requestID)
+
+		// Queue up an email to send
+		go func(logger log.Logger, cust *client.Customer, requestID string) {
+			err := mailRepo.enqueueEmail(&email{ // TODO(adam): impl
+				id:         base.ID(),
+				customerID: cust.ID,
+				to:         cust.Email,
+				body:       "", // TODO(adam): impl
+				createdAt:  time.Now(),
+			})
+			if err != nil {
+				logger.Log("customers", fmt.Sprintf("error with email enqueue: %v", err), "requestID", requestID)
 			}
 		}(logger, cust, requestID)
 

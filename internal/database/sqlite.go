@@ -71,6 +71,14 @@ var (
 			"create_disclaimer_acceptances",
 			`create table if not exists disclaimer_acceptances(disclaimer_id, customer_id, accepted_at datetime, unique(disclaimer_id, customer_id) on conflict ignore);`,
 		),
+		execsql(
+			"create_outbound_emails",
+			`create table if not exists outbound_emails(email_id, customer_id, to_address, body, created_at datetime, sent_at datetime, deleted_at datetime);`,
+		),
+		execsql(
+			"create_email_activation_codes", // TODO(adam): do we need to HMAC and sign
+			`create table if not exists email_activation_codes(email_id, hash, created_at datetime, clicked_at datetime, deleted_at datetime);`,
+		),
 	)
 )
 

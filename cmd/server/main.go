@@ -122,11 +122,14 @@ func main() {
 		repo:          customerSSNRepo,
 	}
 
+	mailRepo := &sqlMailRepository{db: db, logger: logger}
+	defer mailRepo.close()
+
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
+	addCustomerRoutes(logger, router, customerRepo, mailRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
 
