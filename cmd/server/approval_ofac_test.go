@@ -5,6 +5,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -110,5 +111,38 @@ func TestOFACApproval__refresh(t *testing.T) {
 
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+}
+
+func TestOFACApproval__refreshErr(t *testing.T) {
+	logger := log.NewNopLogger()
+	router := mux.NewRouter()
+
+	customerID := base.ID()
+
+	repo := &testCustomerRepository{
+		customer: &client.Customer{
+			ID: customerID,
+		},
+		savedOFACSearchResult: &ofacSearchResult{
+			entityId: "142",
+			match:    0.88,
+		},
+	}
+	testOFACClient := &testOFACClient{err: errors.New("bad error")}
+	ofac := &ofacSearcher{
+		repo:       repo,
+		ofacClient: testOFACClient,
+	}
+
+	addOFACRoutes(logger, router, repo, ofac)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/refresh/ofac", customerID), nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d - %s", w.Code, w.Body.String())
 	}
 }
