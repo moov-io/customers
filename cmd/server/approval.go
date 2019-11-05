@@ -142,8 +142,6 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository, customerSS
 			return
 		}
 		if err := validCustomerStatusTransition(cust, ssn, req.Status, repo, ofac, requestID); err != nil {
-			// TODO(adam): should we reject the Customer here?
-
 			moovhttp.Problem(w, err)
 			return
 		}
