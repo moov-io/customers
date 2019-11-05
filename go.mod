@@ -9,7 +9,7 @@ require (
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gorilla/mux v1.7.3
 	github.com/hashicorp/vault/api v1.0.1
-	github.com/lopezator/migrator v0.1.0
+	github.com/lopezator/migrator v0.2.0
 	github.com/mattn/go-sqlite3 v1.10.0
 	github.com/moov-io/base v0.11.0-rc1
 	github.com/moov-io/ofac v0.11.1
