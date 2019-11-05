@@ -445,6 +445,44 @@ paths:
               schema:
                 type: string
                 format: binary
+  /customers/{customerID}/refresh/ofac:
+    put:
+      tags: [Customers]
+      summary: Refresh OFAC search for a given Customer
+      operationId: refreshOFACSearch
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Moov User ID
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6
+      responses:
+        '200':
+          description: OFAC search did not block customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: An error occurred when searching OFAC data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
