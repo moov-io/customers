@@ -7,6 +7,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -37,6 +38,10 @@ type ofacSearcher struct {
 func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID string) error {
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
+
+	if cust == nil {
+		return errors.New("nil Customer")
+	}
 
 	sdn, err := s.ofacClient.Search(ctx, formatCustomerName(cust), requestID)
 	if err != nil {
