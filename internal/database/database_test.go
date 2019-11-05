@@ -5,6 +5,7 @@
 package database
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/go-kit/kit/log"
@@ -17,29 +18,21 @@ func TestNewDataBase__MYSQL(t *testing.T) {
 	}
 }
 
-func TestNewDataBase__sqlite(t *testing.T) {
-	db, err := New(log.NewNopLogger(), "sqlite")
-	if err != nil {
-		t.Error("Error: expected access denied for use")
-	}
-	if db == nil {
-		t.Error("Error: expected a database connection")
-	}
-}
-
-func TestNewDataBase__sqliteDefault(t *testing.T) {
-	db, err := New(log.NewNopLogger(), "")
-	if err != nil {
-		t.Error("Error: expected access denied for use")
-	}
-	if db == nil {
-		t.Error("Error: expected a database connection")
-	}
-}
-
 func TestNewDataBase__invalid_type(t *testing.T) {
 	_, err := New(log.NewNopLogger(), "db2")
 	if err == nil {
 		t.Errorf("Error: expected unknown database type %s", "db2")
+	}
+}
+
+func TestUniqueViolation(t *testing.T) {
+	err := errors.New(`problem upserting depository="282f6ffcd9ba5b029afbf2b739ee826e22d9df3b", userId="f25f48968da47ef1adb5b6531a1c2197295678ce": Error 1062: Duplicate entry '282f6ffcd9ba5b029afbf2b739ee826e22d9df3b' for key 'PRIMARY'`)
+	if !UniqueViolation(err) {
+		t.Error("should have matched unique violation")
+	}
+
+	err = errors.New(`problem upserting depository="7d676c65eccd48090ff238a0d5e35eb6126c23f2", userId="80cfe1311d9eb7659d02cba9ee6cb04ed3739a85": UNIQUE constraint failed: depositories.depository_id`)
+	if !UniqueViolation(err) {
+		t.Error("should have matched unique violation")
 	}
 }

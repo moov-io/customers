@@ -34,7 +34,7 @@ var (
 
 	// ToDo: Consideration: For _type _status integer (1,2,3,4,5,6...) or string ("01", "1", "ABC")
 
-	mysqlMigrator = migrator.New(
+	mysqlMigrations = migrator.Migrations(
 		execsql(
 			"create_customers",
 			`create table if not exists customers(customer_id varchar(40), first_name varchar(40), middle_name varchar(40), last_name varchar(40), nick_name varchar(40), suffix varchar(3), birth_date datetime, status integer, email varchar(120), created_at datetime, last_modified datetime, deleted_at datetime, PRIMARY KEY (customer_id));`),
@@ -105,8 +105,12 @@ func (my *mysql) Connect() (*sql.DB, error) {
 	}
 
 	// Migrate our database
-	if err := mysqlMigrator.Migrate(db); err != nil {
+	if m, err := migrator.New(mysqlMigrations); err != nil {
 		return nil, err
+	} else {
+		if err := m.Migrate(db); err != nil {
+			return nil, err
+		}
 	}
 
 	// Setup metrics after the database is setup
@@ -173,14 +177,14 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 			"MYSQL_USER=moov",
 			"MYSQL_PASSWORD=secret",
 			"MYSQL_ROOT_PASSWORD=secret",
-			"MYSQL_DATABASE=customers",
+			"MYSQL_DATABASE=paygate",
 		},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 	err = pool.Retry(func() error {
-		db, err := sql.Open("mysql", fmt.Sprintf("moov:secret@tcp(localhost:%s)/customers", resource.GetPort("3306/tcp")))
+		db, err := sql.Open("mysql", fmt.Sprintf("moov:secret@tcp(localhost:%s)/paygate", resource.GetPort("3306/tcp")))
 		if err != nil {
 			return err
 		}
@@ -195,7 +199,7 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 	logger := log.NewNopLogger()
 	address := fmt.Sprintf("tcp(localhost:%s)", resource.GetPort("3306/tcp"))
 
-	db, err := mysqlConnection(logger, "moov", "secret", address, "customers").Connect()
+	db, err := mysqlConnection(logger, "moov", "secret", address, "paygate").Connect()
 	if err != nil {
 		t.Fatal(err)
 	}

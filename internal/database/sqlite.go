@@ -30,7 +30,7 @@ var (
 
 	sqliteVersionLogOnce sync.Once
 
-	sqliteMigrator = migrator.New(
+	sqliteMigrations = migrator.Migrations(
 		execsql(
 			"create_customers",
 			`create table if not exists customers(customer_id primary key, first_name, middle_name, last_name, nick_name, suffix, birth_date datetime, status, email, created_at datetime, last_modified datetime, deleted_at datetime);`,
@@ -74,16 +74,6 @@ var (
 	)
 )
 
-func getSqlitePath() string {
-	path := os.Getenv("SQLITE_DB_PATH")
-	if path == "" || strings.Contains(path, "..") {
-		// set default if empty or trying to escape
-		// don't filepath.ABS to avoid full-fs reads
-		path = "customers.db"
-	}
-	return path
-}
-
 type sqlite struct {
 	path string
 
@@ -104,7 +94,6 @@ func (s *sqlite) Connect() (*sql.DB, error) {
 		}
 	})
 
-	// Connect to our DB and perform a quick sanity check
 	db, err := sql.Open("sqlite3", s.path)
 	if err != nil {
 		return nil, err
@@ -114,13 +103,17 @@ func (s *sqlite) Connect() (*sql.DB, error) {
 	}
 
 	// Migrate our database
-	if err := sqliteMigrator.Migrate(db); err != nil {
+	if m, err := migrator.New(sqliteMigrations); err != nil {
 		return db, err
+	} else {
+		if err := m.Migrate(db); err != nil {
+			return db, err
+		}
 	}
 
 	// Spin up metrics only after everything works
 	go func() {
-		t := time.NewTicker(1 * time.Minute)
+		t := time.NewTicker(1 * time.Second)
 		for range t.C {
 			stats := db.Stats()
 			s.connections.With("state", "idle").Set(float64(stats.Idle))
@@ -138,6 +131,16 @@ func sqliteConnection(logger log.Logger, path string) *sqlite {
 		logger:      logger,
 		connections: sqliteConnections,
 	}
+}
+
+func getSqlitePath() string {
+	path := os.Getenv("SQLITE_DB_PATH")
+	if path == "" || strings.Contains(path, "..") {
+		// set default if empty or trying to escape
+		// don't filepath.ABS to avoid full-fs reads
+		path = "customers.db"
+	}
+	return path
 }
 
 // TestSQLiteDB is a wrapper around sql.DB for SQLite connections designed for tests to provide
