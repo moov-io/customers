@@ -64,6 +64,9 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	if res.EntityId != "1241421" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
+	if res.CreatedAt.IsZero() {
+		t.Errorf("res.CreatedAt=%v", res.CreatedAt)
+	}
 
 	// retry but with NickName set (test coverage)
 	customerID = base.ID()

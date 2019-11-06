@@ -22,10 +22,11 @@ import (
 )
 
 type ofacSearchResult struct {
-	EntityId string  `json:"entityId"`
-	SDNName  string  `json:"sdnName"`
-	SDNType  string  `json:"sdnType"`
-	Match    float32 `json:"match"`
+	EntityId  string    `json:"entityId"`
+	SDNName   string    `json:"sdnName"`
+	SDNType   string    `json:"sdnType"`
+	Match     float32   `json:"match"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 type ofacSearcher struct {
@@ -58,17 +59,19 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	switch {
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
 		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			EntityId: nickSDN.EntityID,
-			SDNName:  nickSDN.SdnName,
-			SDNType:  nickSDN.SdnType,
-			Match:    nickSDN.Match,
+			EntityId:  nickSDN.EntityID,
+			SDNName:   nickSDN.SdnName,
+			SDNType:   nickSDN.SdnType,
+			Match:     nickSDN.Match,
+			CreatedAt: time.Now(),
 		})
 	case sdn != nil:
 		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			EntityId: sdn.EntityID,
-			SDNName:  sdn.SdnName,
-			SDNType:  sdn.SdnType,
-			Match:    sdn.Match,
+			EntityId:  sdn.EntityID,
+			SDNName:   sdn.SdnName,
+			SDNType:   sdn.SdnType,
+			Match:     sdn.Match,
+			CreatedAt: time.Now(),
 		})
 	}
 	if err != nil {

@@ -9,6 +9,10 @@
 
 package openapi
 
+import (
+	"time"
+)
+
 // OfacSearch struct for OfacSearch
 type OfacSearch struct {
 	// SDN EntityID of the Entity
@@ -18,5 +22,6 @@ type OfacSearch struct {
 	// SDN entity type
 	SdnType string `json:"sdnType,omitempty"`
 	// Percentage of similarity between the Customer name and this OFAC entity
-	Match float32 `json:"match,omitempty"`
+	Match     float32   `json:"match,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 }
