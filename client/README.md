@@ -41,6 +41,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Retrieve the referenced document
 *CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get documents for a customer
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping the Customers service to check if running
+*CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh OFAC search for a given Customer
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update the status for a customer, which can only be updated by authenticated users with permissions.
 *CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload a document for the given customer.

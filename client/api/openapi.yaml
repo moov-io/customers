@@ -549,6 +549,54 @@ paths:
       summary: Retrieve the referenced document
       tags:
       - Customers
+  /customers/{customerID}/refresh/ofac:
+    put:
+      operationId: refreshOFACSearch
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: OFAC search did not block customer
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An error occurred when searching OFAC data
+      summary: Refresh OFAC search for a given Customer
+      tags:
+      - Customers
 components:
   schemas:
     Error:

@@ -129,6 +129,7 @@ func main() {
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
+	addOFACRoutes(logger, router, customerRepo, ofac)
 
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
