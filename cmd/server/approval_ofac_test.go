@@ -60,7 +60,7 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res.entityId != "1241421" {
+	if res.EntityId != "1241421" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
 
@@ -103,7 +103,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 
-	repo.savedOFACSearchResult.match = 0.90 // match isn't high enough to block
+	repo.savedOFACSearchResult.Match = 0.90 // match isn't high enough to block
 
 	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
