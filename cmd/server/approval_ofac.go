@@ -123,11 +123,13 @@ func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSea
 		logger.Log("ofac", fmt.Sprintf("running live OFAC search for customer=%s", customerID), "requestID", requestID, "userID", userID)
 
 		if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
+			logger.Log("ofac", fmt.Sprintf("error refreshing ofac search: %v", err))
 			moovhttp.Problem(w, err)
 			return
 		}
 		result, err := repo.getLatestCustomerOFACSearch(customerID)
 		if err != nil {
+			logger.Log("ofac", fmt.Sprintf("error getting latest ofac search: %v", err))
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -136,6 +138,7 @@ func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSea
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
 			if err := repo.updateCustomerStatus(cust.ID, customers.Rejected, "manual OFAC refresh"); err != nil {
+				logger.Log("ofac", fmt.Sprintf("error updating customer=%s error=%v", cust.ID, err))
 				moovhttp.Problem(w, err)
 				return
 			}
