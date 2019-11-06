@@ -648,26 +648,26 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	}
 
 	// save a record and read it back
-	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{entityId: "14141"}); err != nil {
+	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{EntityId: "14141"}); err != nil {
 		t.Fatal(err)
 	}
 	res, err = repo.getLatestCustomerOFACSearch(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res == nil || res.entityId != "14141" {
+	if res == nil || res.EntityId != "14141" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
 
 	// save another and get it back
-	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{entityId: "777121"}); err != nil {
+	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{EntityId: "777121"}); err != nil {
 		t.Fatal(err)
 	}
 	res, err = repo.getLatestCustomerOFACSearch(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res == nil || res.entityId != "777121" {
+	if res == nil || res.EntityId != "777121" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
 }

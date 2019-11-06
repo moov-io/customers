@@ -549,6 +549,54 @@ paths:
       summary: Retrieve the referenced document
       tags:
       - Customers
+  /customers/{customerID}/ofac:
+    get:
+      operationId: getLatestOFACSearch
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6
+          type: string
+        style: simple
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OFACSearch'
+          description: OFAC search did not block customer
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An error occurred when searching OFAC data
+      summary: Get the latest OFAC search for a customer
+      tags:
+      - Customers
   /customers/{customerID}/refresh/ofac:
     put:
       operationId: refreshOFACSearch
@@ -1050,3 +1098,28 @@ components:
       items:
         $ref: '#/components/schemas/Document'
       type: array
+    OFACSearch:
+      example:
+        sdnType: Individual
+        match: 0.91
+        entityId: "2141"
+        sdnName: John Smith
+      properties:
+        entityId:
+          description: SDN EntityID of the Entity
+          example: "2141"
+          type: string
+        sdnName:
+          description: Name of the SDN entity
+          example: John Smith
+          type: string
+        sdnType:
+          description: SDN entity type
+          example: Individual
+          type: string
+        match:
+          description: Percentage of similarity between the Customer name and this
+            OFAC entity
+          example: 0.91
+          type: number
+      type: object

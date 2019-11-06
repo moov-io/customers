@@ -60,7 +60,7 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res.entityId != "1241421" {
+	if res.EntityId != "1241421" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
 
@@ -68,6 +68,45 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	customerID = base.ID()
 	if err := searcher.storeCustomerOFACSearch(&client.Customer{ID: customerID, NickName: "John Doe"}, "requestID"); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestOFACApproval__getLatest(t *testing.T) {
+	logger := log.NewNopLogger()
+	router := mux.NewRouter()
+
+	customerID := base.ID()
+
+	repo := &testCustomerRepository{
+		customer: &client.Customer{
+			ID: customerID,
+		},
+		savedOFACSearchResult: &ofacSearchResult{
+			EntityId: "142",
+			Match:    1.0,
+		},
+	}
+
+	addOFACRoutes(logger, router, repo, nil)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/ofac", customerID), nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	// error case
+	repo.err = errors.New("bad error")
+
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 }
 
@@ -82,8 +121,8 @@ func TestOFACApproval__refresh(t *testing.T) {
 			ID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			entityId: "142",
-			match:    1.0,
+			EntityId: "142",
+			Match:    1.0,
 		},
 	}
 	testOFACClient := &testOFACClient{}
@@ -103,7 +142,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
 
-	repo.savedOFACSearchResult.match = 0.90 // match isn't high enough to block
+	repo.savedOFACSearchResult.Match = 0.90 // match isn't high enough to block
 
 	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -125,8 +164,8 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 			ID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			entityId: "142",
-			match:    0.88,
+			EntityId: "142",
+			Match:    0.88,
 		},
 	}
 	testOFACClient := &testOFACClient{err: errors.New("bad error")}
