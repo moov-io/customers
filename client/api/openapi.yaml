@@ -1101,6 +1101,7 @@ components:
     OFACSearch:
       example:
         sdnType: Individual
+        createdAt: 2016-08-29T09:12:33.001Z
         match: 0.91
         entityId: "2141"
         sdnName: John Smith
@@ -1122,4 +1123,8 @@ components:
             OFAC entity
           example: 0.91
           type: number
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
       type: object

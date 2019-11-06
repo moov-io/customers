@@ -876,3 +876,7 @@ components:
           type: number
           example: 0.91
           description: Percentage of similarity between the Customer name and this OFAC entity
+        createdAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'

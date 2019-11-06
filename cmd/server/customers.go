@@ -582,7 +582,7 @@ func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID stri
 }
 
 func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*ofacSearchResult, error) {
-	query := `select entity_id, sdn_name, sdn_type, match from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
+	query := `select entity_id, sdn_name, sdn_type, match, created_at from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("getLatestCustomerOFACSearch: prepare: %v", err)
@@ -591,7 +591,7 @@ func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID string) (
 
 	row := stmt.QueryRow(customerID)
 	var res ofacSearchResult
-	if err := row.Scan(&res.EntityId, &res.SDNName, &res.SDNType, &res.Match); err != nil {
+	if err := row.Scan(&res.EntityId, &res.SDNName, &res.SDNType, &res.Match, &res.CreatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // nothing found
 		}
@@ -608,7 +608,11 @@ func (r *sqlCustomerRepository) saveCustomerOFACSearch(customerID string, result
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(customerID, result.EntityId, result.SDNName, result.SDNType, result.Match, time.Now()); err != nil {
+	if result.CreatedAt.IsZero() {
+		result.CreatedAt = time.Now()
+	}
+
+	if _, err := stmt.Exec(customerID, result.EntityId, result.SDNName, result.SDNType, result.Match, result.CreatedAt); err != nil {
 		return fmt.Errorf("saveCustomerOFACSearch: exec: %v", err)
 	}
 	return nil
