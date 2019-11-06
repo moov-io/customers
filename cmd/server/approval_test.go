@@ -227,15 +227,15 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
 
 	repo.ofacSearchResult = &ofacSearchResult{
-		sdnName: "Jane Doe",
-		match:   0.10,
+		SDNName: "Jane Doe",
+		Match:   0.10,
 	}
 	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
 		t.Errorf("unexpected error in OFAC transition: %v", err)
 	}
 
 	// OFAC transition with positive match
-	repo.ofacSearchResult.match = 0.99
+	repo.ofacSearchResult.Match = 0.99
 	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
 		if !strings.Contains(err.Error(), "positive OFAC match") {
 			t.Errorf("unexpected error in OFAC transition: %v", err)

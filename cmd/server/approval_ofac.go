@@ -22,10 +22,10 @@ import (
 )
 
 type ofacSearchResult struct {
-	entityId string
-	sdnName  string
-	sdnType  string
-	match    float32
+	EntityId string  `json:"entityId"`
+	SDNName  string  `json:"sdnName"`
+	SDNType  string  `json:"sdnType"`
+	Match    float32 `json:"match"`
 }
 
 type ofacSearcher struct {
@@ -58,17 +58,17 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	switch {
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
 		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			entityId: nickSDN.EntityID,
-			sdnName:  nickSDN.SdnName,
-			sdnType:  nickSDN.SdnType,
-			match:    nickSDN.Match,
+			EntityId: nickSDN.EntityID,
+			SDNName:  nickSDN.SdnName,
+			SDNType:  nickSDN.SdnType,
+			Match:    nickSDN.Match,
 		})
 	case sdn != nil:
 		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			entityId: sdn.EntityID,
-			sdnName:  sdn.SdnName,
-			sdnType:  sdn.SdnType,
-			match:    sdn.Match,
+			EntityId: sdn.EntityID,
+			SDNName:  sdn.SdnName,
+			SDNType:  sdn.SdnType,
+			Match:    sdn.Match,
 		})
 	}
 	if err != nil {
@@ -78,7 +78,29 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 }
 
 func addOFACRoutes(logger log.Logger, r *mux.Router, repo customerRepository, ofac *ofacSearcher) {
+	r.Methods("GET").Path("/customers/{customerID}/ofac").HandlerFunc(getLatestCustomerOFACSearch(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/refresh/ofac").HandlerFunc(refreshOFACSearch(logger, repo, ofac))
+}
+
+func getLatestCustomerOFACSearch(logger log.Logger, repo customerRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = wrapResponseWriter(logger, w, r)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		customerID := getCustomerID(w, r)
+		if customerID == "" {
+			return
+		}
+
+		result, err := repo.getLatestCustomerOFACSearch(customerID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(result)
+	}
 }
 
 func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
@@ -109,8 +131,8 @@ func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSea
 			moovhttp.Problem(w, err)
 			return
 		}
-		if result.match > ofacMatchThreshold {
-			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.ID, result.entityId, result.match)
+		if result.Match > ofacMatchThreshold {
+			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.ID, result.EntityId, result.Match)
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
 			cust.Status = customers.Rejected.String()

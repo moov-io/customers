@@ -86,8 +86,8 @@ func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureSt
 				return fmt.Errorf("validCustomerStatusTransition: inner lookup searchResult=%#v: %v", searchResult, err)
 			}
 		}
-		if searchResult.match > ofacMatchThreshold {
-			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.ID, searchResult.match, searchResult.entityId)
+		if searchResult.Match > ofacMatchThreshold {
+			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.ID, searchResult.Match, searchResult.EntityId)
 		}
 		return nil
 	case customers.CIP: // TODO(adam): need to impl lookup

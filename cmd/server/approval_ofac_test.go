@@ -82,8 +82,8 @@ func TestOFACApproval__refresh(t *testing.T) {
 			ID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			entityId: "142",
-			match:    1.0,
+			EntityId: "142",
+			Match:    1.0,
 		},
 	}
 	testOFACClient := &testOFACClient{}
@@ -125,8 +125,8 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 			ID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			entityId: "142",
-			match:    0.88,
+			EntityId: "142",
+			Match:    0.88,
 		},
 	}
 	testOFACClient := &testOFACClient{err: errors.New("bad error")}
