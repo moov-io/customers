@@ -5,6 +5,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -138,8 +139,15 @@ func TestOFACApproval__refresh(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusBadRequest {
+	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+	var result ofacSearchResult
+	if err := json.NewDecoder(w.Body).Decode(&result); err != nil {
+		t.Fatal(err)
+	}
+	if result.EntityId != "142" {
+		t.Errorf("result=%#v", result)
 	}
 
 	repo.savedOFACSearchResult.Match = 0.90 // match isn't high enough to block
