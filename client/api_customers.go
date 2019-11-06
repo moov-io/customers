@@ -972,16 +972,16 @@ RefreshOFACSearch Refresh OFAC search for a given Customer
  * @param optional nil or *RefreshOFACSearchOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional Request ID allows application developer to trace requests through the systems logs
  * @param "XUserID" (optional.String) -  Moov User ID
-@return Customer
+@return OfacSearch
 */
-func (a *CustomersApiService) RefreshOFACSearch(ctx _context.Context, customerID string, localVarOptionals *RefreshOFACSearchOpts) (Customer, *_nethttp.Response, error) {
+func (a *CustomersApiService) RefreshOFACSearch(ctx _context.Context, customerID string, localVarOptionals *RefreshOFACSearchOpts) (OfacSearch, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPut
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  Customer
+		localVarReturnValue  OfacSearch
 	)
 
 	// create path and map variables
@@ -1037,7 +1037,7 @@ func (a *CustomersApiService) RefreshOFACSearch(ctx _context.Context, customerID
 			error: localVarHTTPResponse.Status,
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
-			var v Customer
+			var v OfacSearch
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

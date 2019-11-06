@@ -634,7 +634,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/OFACSearch'
           description: OFAC search did not block customer
         400:
           content:

@@ -515,7 +515,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Customer'
+                $ref: '#/components/schemas/OFACSearch'
         '400':
           description: An error occurred when searching OFAC data
           content:

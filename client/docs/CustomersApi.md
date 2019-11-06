@@ -408,7 +408,7 @@ No authorization required
 
 ## RefreshOFACSearch
 
-> Customer RefreshOFACSearch(ctx, customerID, optional)
+> OfacSearch RefreshOFACSearch(ctx, customerID, optional)
 
 Refresh OFAC search for a given Customer
 
@@ -434,7 +434,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**Customer**](Customer.md)
+[**OfacSearch**](OFACSearch.md)
 
 ### Authorization
 

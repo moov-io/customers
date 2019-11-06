@@ -135,17 +135,12 @@ func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSea
 			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.ID, result.EntityId, result.Match)
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
-			cust.Status = customers.Rejected.String()
 			if err := repo.updateCustomerStatus(cust.ID, customers.Rejected, "manual OFAC refresh"); err != nil {
 				moovhttp.Problem(w, err)
 				return
 			}
-
-			moovhttp.Problem(w, err)
-			return
 		}
-
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(cust)
+		json.NewEncoder(w).Encode(result)
 	}
 }
