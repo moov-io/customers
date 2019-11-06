@@ -445,6 +445,45 @@ paths:
               schema:
                 type: string
                 format: binary
+  /customers/{customerID}/ofac:
+    get:
+      tags: [Customers]
+      summary: Get the latest OFAC search for a customer
+      operationId: getLatestOFACSearch
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Moov User ID
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6
+      responses:
+        '200':
+          description: OFAC search did not block customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OFACSearch'
+        '400':
+          description: An error occurred when searching OFAC data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
   /customers/{customerID}/refresh/ofac:
     put:
       tags: [Customers]
@@ -818,3 +857,22 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/Document'
+    OFACSearch:
+      type: object
+      properties:
+        entityId:
+          type: string
+          description: SDN EntityID of the Entity
+          example: "2141"
+        sdnName:
+          type: string
+          description: Name of the SDN entity
+          example: John Smith
+        sdnType:
+          type: string
+          description: SDN entity type
+          example: Individual
+        match:
+          type: number
+          example: 0.91
+          description: Percentage of similarity between the Customer name and this OFAC entity
