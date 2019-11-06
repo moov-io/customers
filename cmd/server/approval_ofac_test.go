@@ -71,6 +71,45 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	}
 }
 
+func TestOFACApproval__getLatest(t *testing.T) {
+	logger := log.NewNopLogger()
+	router := mux.NewRouter()
+
+	customerID := base.ID()
+
+	repo := &testCustomerRepository{
+		customer: &client.Customer{
+			ID: customerID,
+		},
+		savedOFACSearchResult: &ofacSearchResult{
+			EntityId: "142",
+			Match:    1.0,
+		},
+	}
+
+	addOFACRoutes(logger, router, repo, nil)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/ofac", customerID), nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+
+	// error case
+	repo.err = errors.New("bad error")
+
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("bogus HTTP status: %d", w.Code)
+	}
+}
+
 func TestOFACApproval__refresh(t *testing.T) {
 	logger := log.NewNopLogger()
 	router := mux.NewRouter()
