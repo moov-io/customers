@@ -1,3 +1,21 @@
+## v0.3.0 (Unreleased)
+
+ADDITIONS
+
+- cmd/server: add routes to create and accept Disclaimers
+- cmd/server: add endpoint for manual OFAC refresh
+- cmd/server: add endpoint for getting the latest OFAC search result
+
+IMPROVEMENTS
+
+- ofac: bump minimum threshold to 99% matches
+- cmd/server: allow email, phones, and addresses to be optional on a Customer
+
+BUILD
+
+- build: download CI tools rather than install
+- build: upgrade openapi-generator to 4.2.0
+
 ## v0.2.0 (Released 2019-08-20)
 
 BREAKING CHANGE
