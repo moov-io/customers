@@ -1,4 +1,4 @@
-## v0.3.0 (Unreleased)
+## v0.3.0 (Released 2019-11-12)
 
 ADDITIONS
 
