@@ -2,6 +2,6 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package version
+package customers
 
-const Version = "v0.3.0-rc2"
+const Version = "v0.3.0"
