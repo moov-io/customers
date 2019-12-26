@@ -101,15 +101,15 @@ func main() {
 	cloudProvider := strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
 	signer := setupStorageBucket(logger, bucketName, cloudProvider)
 
-	// Create our OFAC searcher
-	ofacClient := newOFACClient(logger, os.Getenv("OFAC_ENDPOINT"))
-	if ofacClient == nil {
-		panic("No OFAC client created, see OFAC_ENDPOINT")
+	// Create our Watchman client
+	watchmanClient := newWatchmanClient(logger, os.Getenv("WATCHMAN_ENDPOINT"))
+	if watchmanClient == nil {
+		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
-	adminServer.AddLivenessCheck("ofac", ofacClient.Ping)
+	adminServer.AddLivenessCheck("watchman", watchmanClient.Ping)
 	ofac := &ofacSearcher{
-		repo:       customerRepo,
-		ofacClient: ofacClient,
+		repo:           customerRepo,
+		watchmanClient: watchmanClient,
 	}
 
 	// Register our admin routes

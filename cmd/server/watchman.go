@@ -1,0 +1,108 @@
+// Copyright 2019 The Moov Authors
+// Use of this source code is governed by an Apache License
+// license that can be found in the LICENSE file.
+
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+
+	"github.com/antihax/optional"
+	"github.com/moov-io/base/http/bind"
+	"github.com/moov-io/base/k8s"
+	watchman "github.com/moov-io/watchman/client"
+
+	"github.com/go-kit/kit/log"
+)
+
+type WatchmanClient interface {
+	Ping() error
+
+	Search(ctx context.Context, name string, requestID string) (*watchman.OfacSdn, error)
+}
+
+type moovWatchmanClient struct {
+	underlying *watchman.APIClient
+	logger     log.Logger
+}
+
+func (c *moovWatchmanClient) Ping() error {
+	// create a context just for this so ping requests don't require the setup of one
+	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
+	defer cancelFn()
+
+	resp, err := c.underlying.WatchmanApi.Ping(ctx)
+	if resp != nil && resp.Body != nil {
+		resp.Body.Close()
+	}
+	if resp == nil {
+		return fmt.Errorf("watchman.Ping: failed: %v", err)
+	}
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return fmt.Errorf("watchman.Ping: got status: %s", resp.Status)
+	}
+	return err
+}
+
+// Search returns the top Watchman match given the provided options across SDN names and AltNames
+func (c *moovWatchmanClient) Search(ctx context.Context, name string, requestID string) (*watchman.OfacSdn, error) {
+	search, resp, err := c.underlying.WatchmanApi.Search(ctx, &watchman.SearchOpts{
+		Q:          optional.NewString(name),
+		Limit:      optional.NewInt32(1),
+		XRequestID: optional.NewString(requestID),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("watchman.Search: %v", err)
+	}
+	resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return nil, fmt.Errorf("watchman.Search: customer=%q (status code: %d): %v", name, resp.StatusCode, err)
+	}
+	// We prefer to return the SDN, but if there's an AltName with a higher match return that instead.
+	if (len(search.SDNs) > 0 && len(search.AltNames) > 0) && ((search.AltNames[0].Match > 0.1) && (search.AltNames[0].Match > search.SDNs[0].Match)) {
+		alt := search.AltNames[0]
+
+		// AltName matched higher than SDN names, so return the SDN of the matched AltName
+		sdn, resp, err := c.underlying.WatchmanApi.GetSDN(ctx, alt.EntityID, &watchman.GetSDNOpts{
+			XRequestID: optional.NewString(requestID),
+		})
+		resp.Body.Close()
+		if err != nil {
+			return nil, fmt.Errorf("watchman.Search: found alt name: %v", err)
+		}
+		sdn.Match = alt.Match // copy match from original search (GetSDN doesn't do string matching)
+		c.logger.Log("watchman", fmt.Sprintf("AltName=%s,SDN=%s had higher match than SDN=%s", alt.AlternateID, alt.EntityID, search.SDNs[0].EntityID), "requestID", requestID)
+		return &sdn, nil
+	} else {
+		if len(search.SDNs) > 0 {
+			return &search.SDNs[0], nil // return the SDN which had a higher match than any AltNames
+		}
+	}
+	return nil, nil // no Watchman results found, so cust not blocked
+}
+
+// newWatchmanClient returns an WatchmanClient instance and will default to using the Watchman address in
+// moov's standard Kubernetes setup.
+//
+// endpoint is a DNS record responsible for routing us to an Watchman instance.
+// Example: http://watchman.apps.svc.cluster.local:8080
+func newWatchmanClient(logger log.Logger, endpoint string) WatchmanClient {
+	conf := watchman.NewConfiguration()
+	conf.BasePath = "http://localhost" + bind.HTTP("watchman")
+
+	if k8s.Inside() {
+		conf.BasePath = "http://watchman.apps.svc.cluster.local:8080"
+	}
+	if endpoint != "" {
+		conf.BasePath = endpoint // override from provided Watchman_ENDPOINT env variable
+	}
+
+	logger.Log("watchman", fmt.Sprintf("using %s for Watchman address", conf.BasePath))
+
+	return &moovWatchmanClient{
+		underlying: watchman.NewAPIClient(conf),
+		logger:     logger,
+	}
+}

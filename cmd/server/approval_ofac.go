@@ -15,7 +15,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
-	ofac "github.com/moov-io/ofac/client"
+	watchman "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -30,8 +30,8 @@ type ofacSearchResult struct {
 }
 
 type ofacSearcher struct {
-	repo       customerRepository
-	ofacClient OFACClient
+	repo           customerRepository
+	watchmanClient WatchmanClient
 }
 
 // storeCustomerOFACSearch performs OFAC searches against the Customer's name and nickname if populated.
@@ -44,13 +44,13 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 		return errors.New("nil Customer")
 	}
 
-	sdn, err := s.ofacClient.Search(ctx, formatCustomerName(cust), requestID)
+	sdn, err := s.watchmanClient.Search(ctx, formatCustomerName(cust), requestID)
 	if err != nil {
 		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.ID, err)
 	}
-	var nickSDN *ofac.Sdn
+	var nickSDN *watchman.OfacSdn
 	if cust.NickName != "" {
-		nickSDN, err = s.ofacClient.Search(ctx, cust.NickName, requestID)
+		nickSDN, err = s.watchmanClient.Search(ctx, cust.NickName, requestID)
 		if err != nil {
 			return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.ID, err)
 		}

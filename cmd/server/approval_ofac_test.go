@@ -16,24 +16,24 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base"
 	client "github.com/moov-io/customers/client"
-	ofac "github.com/moov-io/ofac/client"
+	watchman "github.com/moov-io/watchman/client"
 )
 
-func createTestOFACSearcher(repo customerRepository, ofacClient OFACClient) *ofacSearcher {
+func createTestOFACSearcher(repo customerRepository, watchmanClient WatchmanClient) *ofacSearcher {
 	if repo == nil {
 		repo = &testCustomerRepository{}
 	}
-	if ofacClient == nil {
-		ofacClient = &testOFACClient{}
+	if watchmanClient == nil {
+		watchmanClient = &testWatchmanClient{}
 	}
-	return &ofacSearcher{repo: repo, ofacClient: ofacClient}
+	return &ofacSearcher{repo: repo, watchmanClient: watchmanClient}
 }
 
 func TestOFACSearcher__nil(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	ofacClient := &testOFACClient{}
+	ofacClient := &testWatchmanClient{}
 	searcher := createTestOFACSearcher(repo, ofacClient)
 
 	if err := searcher.storeCustomerOFACSearch(nil, "requestID"); err == nil {
@@ -45,10 +45,10 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	ofacClient := &testOFACClient{}
+	ofacClient := &testWatchmanClient{}
 	searcher := createTestOFACSearcher(repo, ofacClient)
 
-	ofacClient.sdn = &ofac.Sdn{
+	ofacClient.sdn = &watchman.OfacSdn{
 		EntityID: "1241421",
 		SdnName:  "Jane Doe",
 		Match:    0.99,
@@ -129,10 +129,10 @@ func TestOFACApproval__refresh(t *testing.T) {
 			Match:    1.0,
 		},
 	}
-	testOFACClient := &testOFACClient{}
+	testWatchmanClient := &testWatchmanClient{}
 	ofac := &ofacSearcher{
-		repo:       repo,
-		ofacClient: testOFACClient,
+		repo:           repo,
+		watchmanClient: testWatchmanClient,
 	}
 
 	addOFACRoutes(logger, router, repo, ofac)
@@ -179,10 +179,10 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 			Match:    0.88,
 		},
 	}
-	testOFACClient := &testOFACClient{err: errors.New("bad error")}
+	testWatchmanClient := &testWatchmanClient{err: errors.New("bad error")}
 	ofac := &ofacSearcher{
-		repo:       repo,
-		ofacClient: testOFACClient,
+		repo:           repo,
+		watchmanClient: testWatchmanClient,
 	}
 
 	addOFACRoutes(logger, router, repo, ofac)

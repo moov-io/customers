@@ -19,7 +19,7 @@ import (
 	"github.com/moov-io/base/admin"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
-	ofac "github.com/moov-io/ofac/client"
+	watchman "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -199,8 +199,8 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 		Status: customers.ReviewRequired.String(),
 	}
 	repo := &testCustomerRepository{}
-	ofacClient := &testOFACClient{}
-	searcher := createTestOFACSearcher(repo, ofacClient)
+	client := &testWatchmanClient{}
+	searcher := createTestOFACSearcher(repo, client)
 
 	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
 
@@ -210,7 +210,7 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 	}
 	repo.err = nil
 
-	ofacClient.err = errors.New("bad error")
+	client.err = errors.New("bad error")
 	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, ""); err == nil {
 		t.Error("expected error, but got none")
 	}
@@ -244,8 +244,8 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 
 	// OFAC transition with no stored result
 	repo.ofacSearchResult = nil
-	if c, ok := searcher.ofacClient.(*testOFACClient); ok {
-		c.sdn = &ofac.Sdn{
+	if c, ok := searcher.watchmanClient.(*testWatchmanClient); ok {
+		c.sdn = &watchman.OfacSdn{
 			EntityID: "12124",
 		}
 	}
