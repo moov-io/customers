@@ -13,42 +13,42 @@ import (
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/base/docker"
-	ofac "github.com/moov-io/ofac/client"
+	watchman "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/ory/dockertest/v3"
 )
 
-type testOFACClient struct {
-	sdn *ofac.Sdn
+type testWatchmanClient struct {
+	sdn *watchman.OfacSdn
 
 	// error to be returned instead of field from above
 	err error
 }
 
-func (c *testOFACClient) Ping() error {
+func (c *testWatchmanClient) Ping() error {
 	return c.err
 }
 
-func (c *testOFACClient) Search(_ context.Context, name string, _ string) (*ofac.Sdn, error) {
+func (c *testWatchmanClient) Search(_ context.Context, name string, _ string) (*watchman.OfacSdn, error) {
 	if c.err != nil {
 		return nil, c.err
 	}
 	return c.sdn, nil
 }
 
-type ofacDeployment struct {
+type watchmanDeployment struct {
 	res    *dockertest.Resource
-	client OFACClient
+	client WatchmanClient
 }
 
-func (d *ofacDeployment) close(t *testing.T) {
+func (d *watchmanDeployment) close(t *testing.T) {
 	if err := d.res.Close(); err != nil {
 		t.Error(err)
 	}
 }
 
-func spawnOFAC(t *testing.T) *ofacDeployment {
+func spawnWatchman(t *testing.T) *watchmanDeployment {
 	// no t.Helper() call so we know where it failed
 
 	if testing.Short() {
@@ -58,48 +58,48 @@ func spawnOFAC(t *testing.T) *ofacDeployment {
 		t.Skip("Docker not enabled")
 	}
 
-	// Spawn OFAC docker image
+	// Spawn Watchman docker image
 	pool, err := dockertest.NewPool("")
 	if err != nil {
 		t.Fatal(err)
 	}
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
-		Repository: "moov/ofac",
-		Tag:        "v0.12.0",
+		Repository: "moov/watchman",
+		Tag:        "v0.13.0",
 		Cmd:        []string{"-http.addr=:8080"},
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	client := newOFACClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")))
+	client := newWatchmanClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")))
 	err = pool.Retry(func() error {
 		return client.Ping()
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	return &ofacDeployment{resource, client}
+	return &watchmanDeployment{resource, client}
 }
 
-func TestOFAC__client(t *testing.T) {
+func TestWatchman__client(t *testing.T) {
 	endpoint := ""
-	if client := newOFACClient(log.NewNopLogger(), endpoint); client == nil {
+	if client := newWatchmanClient(log.NewNopLogger(), endpoint); client == nil {
 		t.Fatal("expected non-nil client")
 	}
 
-	// Spawn an OFAC Docker image and ping against it
-	deployment := spawnOFAC(t)
+	// Spawn an Watchman Docker image and ping against it
+	deployment := spawnWatchman(t)
 	if err := deployment.client.Ping(); err != nil {
 		t.Fatal(err)
 	}
 	deployment.close(t) // close only if successful
 }
 
-func TestOFAC__search(t *testing.T) {
+func TestWatchman__search(t *testing.T) {
 	ctx := context.TODO()
 
-	deployment := spawnOFAC(t)
+	deployment := spawnWatchman(t)
 
 	// Search query that matches an SDN higher than an AltName
 	sdn, err := deployment.client.Search(ctx, "Nicolas Maduro", base.ID())
@@ -122,8 +122,8 @@ func TestOFAC__search(t *testing.T) {
 	deployment.close(t) // close only if successful
 }
 
-func TestOFAC_ping(t *testing.T) {
-	client := &testOFACClient{}
+func TestWatchman_ping(t *testing.T) {
+	client := &testWatchmanClient{}
 
 	// Ping tests
 	if err := client.Ping(); err != nil {
