@@ -1,4 +1,4 @@
-// Copyright 2019 The Moov Authors
+// Copyright 2020 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -9,10 +9,11 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"fmt"
-	"github.com/go-kit/kit/log"
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/go-kit/kit/log"
 )
 
 type SSN struct {
