@@ -1,4 +1,4 @@
-// Copyright 2019 The Moov Authors
+// Copyright 2020 The Moov Authors
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
@@ -9,9 +9,10 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"github.com/moov-io/customers/internal/database"
 	"strings"
 	"testing"
+
+	"github.com/moov-io/customers/internal/database"
 
 	"github.com/go-kit/kit/log"
 	"github.com/moov-io/base"
