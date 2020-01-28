@@ -1,3 +1,14 @@
+## v0.4.0 (Unreleased)
+
+IMPROVEMENTS
+
+- cmd/server: upgrade OFAC -> Watchman to v0.13.0
+
+BUILD
+
+- build: update Copyright headers for 2020
+- build: run sonatype-nexus-community/nancy in CI
+
 ## v0.3.0 (Released 2019-11-12)
 
 ADDITIONS
