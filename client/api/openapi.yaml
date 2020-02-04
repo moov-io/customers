@@ -65,7 +65,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: Customer was not created, see error(s)
       summary: Create a new customer
       tags:
@@ -163,7 +163,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
       summary: Add an Address onto an existing Customer record
       tags:
@@ -217,7 +217,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
       summary: Replace the metadata object for a customer. Metadata is a map of unique
         keys associated to values to act as foreign key relationships or arbitrary
@@ -273,7 +273,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
       summary: Update the status for a customer, which can only be updated by authenticated
         users with permissions.
@@ -322,7 +322,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
       summary: Get active disclaimers for the given customer
       tags:
@@ -379,7 +379,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: Customer disclaimer was not accepted, see error(s)
       summary: Accept a disclaimer for the given customer
       tags:
@@ -488,7 +488,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: Document was not uploaded, see error(s)
       summary: Upload a document for the given customer.
       tags:
@@ -592,7 +592,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: An error occurred when searching OFAC data
       summary: Get the latest OFAC search for a customer
       tags:
@@ -640,14 +640,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
           description: An error occurred when searching OFAC data
       summary: Refresh OFAC search for a given Customer
       tags:
       - Customers
 components:
   schemas:
-    CustomerError:
+    Error:
       properties:
         error:
           description: An error message describing the problem intended for humans.

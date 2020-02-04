@@ -1,4 +1,4 @@
-# CustomerError
+# Error
 
 ## Properties
 

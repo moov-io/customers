@@ -64,7 +64,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
   /customers/{customerID}:
     get:
       tags: [Customers]
@@ -142,7 +142,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
   /customers/{customerID}/metadata:
     put:
       tags: [Customers]
@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
   /customers/{customerID}/status:
     put:
       tags: [Customers]
@@ -230,7 +230,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]
@@ -268,7 +268,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
   /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
       tags: [Customers]
@@ -313,7 +313,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
   /customers/{customerID}/documents:
     post:
       tags: [Customers]
@@ -369,7 +369,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
     get:
       tags: [Customers]
       summary: Get documents for a customer
@@ -482,7 +482,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
 
   /customers/{customerID}/refresh/ofac:
     put:
@@ -521,11 +521,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerError'
+                $ref: '#/components/schemas/Error'
 
 components:
   schemas:
-    CustomerError:
+    Error:
       required:
         - error
       properties:
