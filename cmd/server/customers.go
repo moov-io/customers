@@ -160,7 +160,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		})
 	}
 	for i := range req.Addresses {
-		customer.Addresses = append(customer.Addresses, client.Address{
+		customer.Addresses = append(customer.Addresses, client.CustomerAddress{
 			ID:         base.ID(),
 			Address1:   req.Addresses[i].Address1,
 			Address2:   req.Addresses[i].Address2,
@@ -435,7 +435,7 @@ func (r *sqlCustomerRepository) readPhones(customerID string) ([]client.Phone, e
 	return phones, rows.Err()
 }
 
-func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.Address, error) {
+func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.CustomerAddress, error) {
 	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated, active from customers_addresses where customer_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -449,9 +449,9 @@ func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.Addre
 	}
 	defer rows.Close()
 
-	var adds []client.Address
+	var adds []client.CustomerAddress
 	for rows.Next() {
-		var a client.Address
+		var a client.CustomerAddress
 		if err := rows.Scan(&a.ID, &a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated, &a.Active); err != nil {
 			return nil, fmt.Errorf("readAddresses: scan customers_addresses: err=%v", err)
 		}

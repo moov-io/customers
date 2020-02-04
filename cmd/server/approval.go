@@ -101,7 +101,7 @@ func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureSt
 	return nil
 }
 
-func containsValidPrimaryAddress(addrs []client.Address) bool {
+func containsValidPrimaryAddress(addrs []client.CustomerAddress) bool {
 	for i := range addrs {
 		if strings.EqualFold(addrs[i].Type, "primary") && addrs[i].Validated {
 			return true

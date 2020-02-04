@@ -121,7 +121,7 @@ func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
 	if containsValidPrimaryAddress(nil) {
 		t.Error("no addresses, so can't be found")
 	}
-	addresses := []client.Address{
+	addresses := []client.CustomerAddress{
 		{
 			Type:      "Primary",
 			Validated: false,
@@ -174,7 +174,7 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
 		t.Error("expected error")
 	}
-	cust.Addresses = append(cust.Addresses, client.Address{
+	cust.Addresses = append(cust.Addresses, client.CustomerAddress{
 		Type:     "primary",
 		Address1: "123 1st st",
 	})
