@@ -9,8 +9,8 @@
 
 package openapi
 
-// Error struct for Error
-type Error struct {
+// CustomerError struct for CustomerError
+type CustomerError struct {
 	// An error message describing the problem intended for humans.
 	Error string `json:"error"`
 }

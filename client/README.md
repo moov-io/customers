@@ -50,15 +50,15 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
- - [Address](docs/Address.md)
- - [CreateAddress](docs/CreateAddress.md)
  - [CreateCustomer](docs/CreateCustomer.md)
+ - [CreateCustomerAddress](docs/CreateCustomerAddress.md)
  - [CreatePhone](docs/CreatePhone.md)
  - [Customer](docs/Customer.md)
+ - [CustomerAddress](docs/CustomerAddress.md)
+ - [CustomerError](docs/CustomerError.md)
  - [CustomerMetadata](docs/CustomerMetadata.md)
  - [Disclaimer](docs/Disclaimer.md)
  - [Document](docs/Document.md)
- - [Error](docs/Error.md)
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)

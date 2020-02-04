@@ -9,8 +9,8 @@
 
 package openapi
 
-// CreateAddress struct for CreateAddress
-type CreateAddress struct {
+// CreateCustomerAddress struct for CreateCustomerAddress
+type CreateCustomerAddress struct {
 	Type string `json:"type"`
 	// First line of the address
 	Address1 string `json:"address1"`

@@ -9,8 +9,8 @@
 
 package openapi
 
-// Address struct for Address
-type Address struct {
+// CustomerAddress struct for CustomerAddress
+type CustomerAddress struct {
 	// Unique identifier for this Address
 	ID   string `json:"ID,omitempty"`
 	Type string `json:"type,omitempty"`

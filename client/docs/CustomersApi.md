@@ -68,7 +68,7 @@ No authorization required
 
 ## AddCustomerAddress
 
-> Customer AddCustomerAddress(ctx, customerID, createAddress, optional)
+> Customer AddCustomerAddress(ctx, customerID, createCustomerAddress, optional)
 
 Add an Address onto an existing Customer record
 
@@ -79,7 +79,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| Customer ID | 
-**createAddress** | [**CreateAddress**](CreateAddress.md)|  | 
+**createCustomerAddress** | [**CreateCustomerAddress**](CreateCustomerAddress.md)|  | 
  **optional** | ***AddCustomerAddressOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters

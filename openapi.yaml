@@ -64,7 +64,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
   /customers/{customerID}:
     get:
       tags: [Customers]
@@ -129,7 +129,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateAddress'
+              $ref: '#/components/schemas/CreateCustomerAddress'
       responses:
         '200':
           description: A customer object
@@ -142,7 +142,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
   /customers/{customerID}/metadata:
     put:
       tags: [Customers]
@@ -186,7 +186,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
   /customers/{customerID}/status:
     put:
       tags: [Customers]
@@ -230,7 +230,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]
@@ -268,7 +268,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
   /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
       tags: [Customers]
@@ -313,7 +313,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
   /customers/{customerID}/documents:
     post:
       tags: [Customers]
@@ -369,7 +369,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
     get:
       tags: [Customers]
       summary: Get documents for a customer
@@ -482,7 +482,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
 
   /customers/{customerID}/refresh/ofac:
     put:
@@ -521,11 +521,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
+                $ref: '#/components/schemas/CustomerError'
 
 components:
   schemas:
-    Error:
+    CustomerError:
       required:
         - error
       properties:
@@ -578,7 +578,7 @@ components:
           type: array
           minimum: 1
           items:
-            $ref: '#/components/schemas/CreateAddress'
+            $ref: '#/components/schemas/CreateCustomerAddress'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -650,7 +650,7 @@ components:
         addresses:
           type: array
           items:
-            $ref: '#/components/schemas/Address'
+            $ref: '#/components/schemas/CustomerAddress'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -731,7 +731,7 @@ components:
             - Home
             - Mobile
             - Work
-    CreateAddress:
+    CreateCustomerAddress:
       type: object
       properties:
         type:
@@ -766,7 +766,7 @@ components:
         - state
         - postalCode
         - country
-    Address:
+    CustomerAddress:
       type: object
       properties:
         ID:
