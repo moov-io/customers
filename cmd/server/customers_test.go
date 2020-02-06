@@ -225,6 +225,20 @@ func TestCustomers__customerRequest(t *testing.T) {
 	}
 }
 
+func TestCustomers__addressValidate(t *testing.T) {
+	add := address{}
+
+	add.State = "IA"
+	if err := add.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	add.State = "ZZ"
+	if err := add.validate(); err == nil {
+		t.Error("expected error")
+	}
+}
+
 func TestCustomers__createCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
 	phone := `{"number": "555.555.5555", "type": "mobile"}`

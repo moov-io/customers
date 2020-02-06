@@ -18,6 +18,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/internal/usstates"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -113,8 +114,15 @@ type address struct {
 	Address2   string `json:"address2,omitempty"`
 	City       string `json:"city"`
 	State      string `json:"state"`
-	PostalCode string `json:"postalCode"`
+	PostalCode string `json:"postalCode"` // TODO(adam): validate against US postal codes
 	Country    string `json:"country"`
+}
+
+func (add address) validate() error {
+	if !usstates.Valid(add.State) {
+		return fmt.Errorf("create customer: invalid state=%s", add.State)
+	}
+	return nil
 }
 
 func (req customerRequest) validate() error {
@@ -123,6 +131,11 @@ func (req customerRequest) validate() error {
 	}
 	if err := validateMetadata(req.Metadata); err != nil {
 		return fmt.Errorf("create customer: %v", err)
+	}
+	for i := range req.Addresses {
+		if err := req.Addresses[i].validate(); err != nil {
+			return fmt.Errorf("address=%v validation failed: %v", req.Addresses[i], err)
+		}
 	}
 	return nil
 }
