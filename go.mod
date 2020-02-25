@@ -15,8 +15,8 @@ require (
 	github.com/moov-io/watchman v0.13.1
 	github.com/ory/dockertest/v3 v3.5.4
 	github.com/prometheus/client_golang v1.4.1
-	gocloud.dev v0.17.0
-	gocloud.dev/secrets/hashivault v0.17.0
+	gocloud.dev v0.19.0
+	gocloud.dev/secrets/hashivault v0.19.0
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 )
 

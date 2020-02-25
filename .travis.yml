@@ -57,7 +57,8 @@ script:
   - gocyclo -over 20 $GOFILES
   - golint -set_exit_status $GOFILES
   - staticcheck ./cmd/... ./internal/... .
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then go list -m all | ./bin/nancy; fi
+  # Vault Enterprise, needs gocloud.dev release
+  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then go list -m all | ./bin/nancy -exclude-vulnerability CVE-2020-7220,2b1dc3ea-0783-4eaa-a678-236cf05953db; fi
   - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y mingw; export PATH=/c/tools/mingw64/bin:"$PATH";fi
 after_success:
   - bash <(curl -s https://codecov.io/bash) -X fix
