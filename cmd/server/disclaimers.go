@@ -92,7 +92,7 @@ func acceptDisclaimer(logger log.Logger, repo disclaimerRepository) http.Handler
 
 type createDisclaimerRequest struct {
 	DocumentID string `json:"documentId,omitempty"`
-	Text       string `json:"text,omitempty"`
+	Text       string `json:"text"`
 }
 
 func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docRepo documentRepository) http.HandlerFunc {

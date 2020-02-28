@@ -2,7 +2,8 @@ openapi: 3.0.2
 info:
   contact:
     url: https://github.com/moov-io/customers
-  description: Customers ...
+  description: |
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Also, Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -20,7 +21,7 @@ paths:
     get:
       operationId: ping
       responses:
-        200:
+        "200":
           description: Service is running properly
       summary: Ping the Customers service to check if running
       tags:
@@ -55,13 +56,13 @@ paths:
               $ref: '#/components/schemas/CreateCustomer'
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
           description: Customer was successfully created
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -103,13 +104,13 @@ paths:
           type: string
         style: simple
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
           description: A customer objects for the supplied customer ID
-        404:
+        "404":
           description: A resource with the specified ID was not found
       summary: Retrieves a Customer object associated with the customer ID.
       tags:
@@ -153,13 +154,13 @@ paths:
               $ref: '#/components/schemas/CreateCustomerAddress'
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
           description: A customer object
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -207,13 +208,13 @@ paths:
               $ref: '#/components/schemas/CustomerMetadata'
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
           description: A customer object
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -263,13 +264,13 @@ paths:
               $ref: '#/components/schemas/UpdateCustomerStatus'
         required: true
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
           description: A customer object
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -312,13 +313,13 @@ paths:
           type: string
         style: simple
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Disclaimers'
           description: Active disclaimers for the customer
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -369,13 +370,13 @@ paths:
           type: string
         style: simple
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Disclaimer'
           description: Disclaimer accepted for customer
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -417,7 +418,7 @@ paths:
           type: string
         style: simple
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
@@ -478,13 +479,13 @@ paths:
               required:
               - file
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Document'
           description: Document uploaded successfully
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -535,7 +536,7 @@ paths:
           type: string
         style: simple
       responses:
-        200:
+        "200":
           content:
             application/pdf:
               schema:
@@ -582,13 +583,13 @@ paths:
           type: string
         style: simple
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OFACSearch'
           description: OFAC search did not block customer
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -630,13 +631,13 @@ paths:
           type: string
         style: simple
       responses:
-        200:
+        "200":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/OFACSearch'
           description: OFAC search did not block customer
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -647,14 +648,6 @@ paths:
       - Customers
 components:
   schemas:
-    Error:
-      properties:
-        error:
-          description: An error message describing the problem intended for humans.
-          example: Validation error(s) present.
-          type: string
-      required:
-      - error
     CreateCustomer:
       example:
         firstName: Robert
@@ -1128,3 +1121,11 @@ components:
           format: date-time
           type: string
       type: object
+    Error:
+      properties:
+        error:
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+          type: string
+      required:
+      - error

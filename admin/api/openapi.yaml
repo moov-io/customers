@@ -1,0 +1,188 @@
+openapi: 3.0.2
+info:
+  contact:
+    url: https://github.com/moov-io/customers
+  description: |
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Also, Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Customers Admin API
+  version: v1
+servers:
+- description: Local development
+  url: http://localhost:9097
+tags:
+- description: Customers endpoints which are only meant to be exposed for admin dashboards
+    and operations.
+  name: Admin
+paths:
+  /version:
+    get:
+      operationId: getVersion
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                example: v0.4.0
+                type: string
+          description: The current version running
+      summary: Show the current version
+      tags:
+      - Admin
+  /customers/{customerID}/disclaimers:
+    post:
+      operationId: createCustomerDisclaimer
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDisclaimer'
+        required: true
+      responses:
+        "200":
+          description: Created disclaimer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Create a disclaimer for a customer to approve
+      tags:
+      - Admin
+  /customers/{customerID}/status:
+    put:
+      operationId: updateCustomerStatus
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerStatus'
+        required: true
+      responses:
+        "200":
+          description: Updated Customer status
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Update a Customers status and initiate required checks
+      tags:
+      - Admin
+  /customers/{customerID}/addresses/{addressID}:
+    put:
+      operationId: updateCustomerAddress
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Address ID
+        explode: false
+        in: path
+        name: addressID
+        required: true
+        schema:
+          example: 1d62e297-9727-4084-a902-1031da932c9e
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerAddress'
+        required: true
+      responses:
+        "200":
+          description: Updated Customer address
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Update a Customers address
+      tags:
+      - Admin
+components:
+  schemas:
+    CreateUserDisclaimer:
+      example:
+        documentId: ad3cb5fe
+        text: Please read and accept the attached document
+      properties:
+        documentId:
+          description: Optional ID for document to display alongside
+          example: ad3cb5fe
+          type: string
+        text:
+          description: Free form text agreement or policy to display
+          example: Please read and accept the attached document
+          type: string
+      required:
+      - text
+    UpdateCustomerStatus:
+      example:
+        comment: User submitted address information
+        status: OFAC
+      properties:
+        comment:
+          description: Free form text for admin users
+          example: User submitted address information
+          type: string
+        status:
+          description: Status to attempt transistion towards
+          example: OFAC
+          type: string
+    UpdateCustomerAddress:
+      example:
+        validated: false
+        type: primary
+      properties:
+        type:
+          description: Attribute of address
+          enum:
+          - primary
+          - secondary
+          type: string
+        validated:
+          default: false
+          description: If this address has been confirmed with the Customer
+          type: boolean
+    Error:
+      properties:
+        error:
+          description: An error message describing the problem intended for humans.
+          example: Validation error(s) present.
+          type: string
+      required:
+      - error
