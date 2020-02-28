@@ -1,0 +1,161 @@
+openapi: "3.0.2"
+info:
+  description: |
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Also, Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+  version: v1
+  title: Customers Admin API
+  contact:
+    url: https://github.com/moov-io/customers
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+
+servers:
+  - url: http://localhost:9097
+    description: Local development
+
+tags:
+  - name: Admin
+    description: Customers endpoints which are only meant to be exposed for admin dashboards and operations.
+
+paths:
+  /version:
+    get:
+      tags: ["Admin"]
+      summary: Show the current version
+      operationId: getVersion
+      responses:
+        '200':
+          description: The current version running
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: v0.4.0
+  /customers/{customerID}/disclaimers:
+    post:
+      tags: ["Admin"]
+      summary: Create a disclaimer for a customer to approve
+      operationId: createCustomerDisclaimer
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDisclaimer'
+      responses:
+        '200':
+          description: Created disclaimer
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/status:
+    put:
+      tags: ["Admin"]
+      summary: Update a Customers status and initiate required checks
+      operationId: updateCustomerStatus
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerStatus'
+      responses:
+        '200':
+          description: Updated Customer status
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/addresses/{addressID}:
+    put:
+      tags: ["Admin"]
+      summary: Update a Customers address
+      operationId: updateCustomerAddress
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: addressID
+          in: path
+          description: Address ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerAddress'
+      responses:
+        '200':
+          description: Updated Customer address
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+components:
+  schemas:
+    CreateUserDisclaimer:
+      properties:
+        documentId:
+          type: string
+          description: Optional ID for document to display alongside
+          example: ad3cb5fe
+        text:
+          type: string
+          description: Free form text agreement or policy to display
+          example: Please read and accept the attached document
+      required:
+        - text
+    UpdateCustomerStatus:
+      properties:
+        comment:
+          type: string
+          description: Free form text for admin users
+          example: User submitted address information
+        status:
+          type: string
+          description: Status to attempt transistion towards
+          example: OFAC
+    UpdateCustomerAddress:
+      properties:
+        type:
+          type: string
+          description: Attribute of address
+          enum:
+            - primary
+            - secondary
+        validated:
+          type: boolean
+          default: false
+          description: If this address has been confirmed with the Customer
