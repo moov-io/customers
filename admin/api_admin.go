@@ -11,7 +11,6 @@ package admin
 
 import (
 	_context "context"
-	"fmt"
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
 	_neturl "net/url"
@@ -43,7 +42,7 @@ func (a *AdminApiService) CreateCustomerDisclaimer(ctx _context.Context, custome
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/disclaimers"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerID)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -121,7 +120,6 @@ func (a *AdminApiService) GetVersion(ctx _context.Context) (string, *_nethttp.Re
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/version"
-
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
@@ -206,8 +204,9 @@ func (a *AdminApiService) UpdateCustomerAddress(ctx _context.Context, customerID
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/addresses/{addressID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerID)), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"addressID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", addressID)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"addressID"+"}", _neturl.QueryEscape(parameterToString(addressID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -285,7 +284,7 @@ func (a *AdminApiService) UpdateCustomerStatus(ctx _context.Context, customerID 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/status"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(fmt.Sprintf("%v", customerID)), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}

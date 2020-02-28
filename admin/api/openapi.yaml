@@ -21,7 +21,7 @@ paths:
     get:
       operationId: getVersion
       responses:
-        200:
+        "200":
           content:
             text/plain:
               schema:
@@ -51,9 +51,9 @@ paths:
               $ref: '#/components/schemas/CreateUserDisclaimer'
         required: true
       responses:
-        200:
+        "200":
           description: Created disclaimer
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -82,9 +82,9 @@ paths:
               $ref: '#/components/schemas/UpdateCustomerStatus'
         required: true
       responses:
-        200:
+        "200":
           description: Updated Customer status
-        400:
+        "400":
           content:
             application/json:
               schema:
@@ -122,9 +122,9 @@ paths:
               $ref: '#/components/schemas/UpdateCustomerAddress'
         required: true
       responses:
-        200:
+        "200":
           description: Updated Customer address
-        400:
+        "400":
           content:
             application/json:
               schema:
