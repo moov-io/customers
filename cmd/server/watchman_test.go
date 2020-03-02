@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"testing"
 
@@ -119,6 +120,20 @@ func TestWatchman__search(t *testing.T) {
 		t.Errorf("SDN=%s %#v", sdn.EntityID, sdn)
 	}
 
+	// Lookup an SDN from an alt
+	if c, ok := deployment.client.(*moovWatchmanClient); ok {
+		search, err := c.ofacSearch(ctx, "Osama Bin Ladin", "individual", base.ID())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(search.SDNs) == 0 {
+			t.Fatalf("no Search results: %#v", search)
+		}
+		if sdn := search.SDNs[0]; sdn.EntityID != "6365" {
+			t.Errorf("SDN=%s %#v", sdn.EntityID, sdn)
+		}
+	}
+
 	deployment.close(t) // close only if successful
 }
 
@@ -138,5 +153,174 @@ func TestWatchman_ping(t *testing.T) {
 		if !strings.Contains(err.Error(), "ping error") {
 			t.Errorf("unknown error: %v", err)
 		}
+	}
+}
+
+func sdn(match float32) watchman.OfacSdn {
+	return watchman.OfacSdn{
+		EntityID: base.ID(),
+		Match:    match,
+	}
+}
+
+func alt(match float32) watchman.OfacAlt {
+	return watchman.OfacAlt{
+		EntityID: base.ID(),
+		Match:    match,
+	}
+}
+
+func TestWatchman__highestOfacSearchMatch(t *testing.T) {
+	search := highestOfacSearchMatch(nil)
+	if len(search.SDNs) != 0 || len(search.AltNames) != 0 {
+		t.Errorf("expected nil ofac Search, got %#v", search)
+	}
+
+	// SDN with no alts
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.80)},
+		},
+	)
+	if len(search.SDNs) != 1 || len(search.AltNames) != 0 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// Alt with no SDNs
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			AltNames: []watchman.OfacAlt{alt(0.70)},
+		},
+	)
+	if len(search.SDNs) != 0 || len(search.AltNames) != 1 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// Two SDN's, first is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.80)},
+		},
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.75)},
+		},
+	)
+	if len(search.SDNs) != 1 || math.Abs(float64(0.80-search.SDNs[0].Match)) > 0.01 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// Two SDN's, second is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.77)},
+		},
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.82)},
+		},
+	)
+	if len(search.SDNs) != 1 || math.Abs(float64(0.82-search.SDNs[0].Match)) > 0.01 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// Two Alts, first is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			AltNames: []watchman.OfacAlt{alt(0.90)},
+		},
+		&watchman.Search{
+			AltNames: []watchman.OfacAlt{alt(0.87)},
+		},
+	)
+	if len(search.AltNames) != 1 || math.Abs(float64(0.90-search.AltNames[0].Match)) > 0.01 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// Two Alts, second is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			AltNames: []watchman.OfacAlt{alt(0.87)},
+		},
+		&watchman.Search{
+			AltNames: []watchman.OfacAlt{alt(0.90)},
+		},
+	)
+	if len(search.AltNames) != 1 || math.Abs(float64(0.90-search.AltNames[0].Match)) > 0.01 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// SDN first, but other alt is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.80)},
+		},
+		&watchman.Search{
+			AltNames: []watchman.OfacAlt{alt(0.90)},
+		},
+	)
+	if len(search.SDNs) != 0 || len(search.AltNames) != 1 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// SDN first, but other alt is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.80)},
+		},
+		&watchman.Search{
+			SDNs:     []watchman.OfacSdn{sdn(0.70)},
+			AltNames: []watchman.OfacAlt{alt(0.90)},
+		},
+	)
+	if len(search.SDNs) != 1 || len(search.AltNames) != 1 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// SDN first, but other sdn is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.80)},
+		},
+		&watchman.Search{
+			SDNs:     []watchman.OfacSdn{sdn(0.99)},
+			AltNames: []watchman.OfacAlt{alt(0.90)},
+		},
+	)
+	if len(search.SDNs) != 1 || len(search.AltNames) != 1 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// SDN second and alt is higher
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs:     []watchman.OfacSdn{sdn(0.70)},
+			AltNames: []watchman.OfacAlt{alt(0.90)},
+		},
+		&watchman.Search{
+			SDNs: []watchman.OfacSdn{sdn(0.80)},
+		},
+	)
+	if len(search.SDNs) != 1 || len(search.AltNames) != 1 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+
+	// Check
+	search = highestOfacSearchMatch(
+		&watchman.Search{
+			SDNs:     []watchman.OfacSdn{sdn(0.70)},
+			AltNames: []watchman.OfacAlt{alt(0.72)},
+		},
+		&watchman.Search{
+			SDNs:     []watchman.OfacSdn{sdn(0.75)},
+			AltNames: []watchman.OfacAlt{alt(0.50)},
+		},
+	)
+	if len(search.SDNs) != 1 || len(search.AltNames) != 1 {
+		t.Fatalf("unexpected search: %#v", search)
+	}
+	if math.Abs(float64(0.75-search.SDNs[0].Match)) > 0.01 {
+		t.Errorf("unexpected search: %#v", search)
+	}
+	if math.Abs(float64(0.50-search.AltNames[0].Match)) > 0.01 {
+		t.Errorf("unexpected search: %#v", search)
 	}
 }
