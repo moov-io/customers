@@ -12,7 +12,7 @@ require (
 	github.com/lopezator/migrator v0.2.0
 	github.com/mattn/go-sqlite3 v1.13.0
 	github.com/moov-io/base v0.11.0
-	github.com/moov-io/watchman v0.13.1
+	github.com/moov-io/watchman v0.13.2
 	github.com/ory/dockertest/v3 v3.5.4
 	github.com/prometheus/client_golang v1.4.1
 	gocloud.dev v0.19.0

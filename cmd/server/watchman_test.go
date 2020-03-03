@@ -66,7 +66,7 @@ func spawnWatchman(t *testing.T) *watchmanDeployment {
 	}
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "moov/watchman",
-		Tag:        "v0.13.0",
+		Tag:        "v0.13.2",
 		Cmd:        []string{"-http.addr=:8080"},
 	})
 	if err != nil {
