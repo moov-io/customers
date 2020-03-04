@@ -98,7 +98,13 @@ func main() {
 
 	// Setup our cloud Storage object
 	bucketName := os.Getenv("BUCKET_NAME")
+	if bucketName == "" {
+		bucketName = "./storage"
+	}
 	cloudProvider := strings.ToLower(os.Getenv("CLOUD_PROVIDER"))
+	if cloudProvider == "" {
+		cloudProvider = "file"
+	}
 	signer := setupStorageBucket(logger, bucketName, cloudProvider)
 
 	// Create our Watchman client
@@ -193,11 +199,6 @@ func addPingRoute(r *mux.Router) {
 
 func setupStorageBucket(logger log.Logger, bucketName, cloudProvider string) *fileblob.URLSignerHMAC {
 	if cloudProvider == "file" || cloudProvider == "" {
-		if bucketName == "" {
-			bucketName = "./storage"
-			cloudProvider = "file"
-		}
-
 		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
 		if baseURL == "" {
 			baseURL = fmt.Sprintf("http://localhost%s/files", bind.HTTP("customers"))
