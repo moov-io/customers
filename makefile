@@ -50,6 +50,15 @@ docker:
 	docker build --pull -t moov/customers:$(VERSION) -f Dockerfile .
 	docker tag moov/customers:$(VERSION) moov/customers:latest
 
+clean-integration:
+	docker-compose kill
+	docker-compose rm -v -f
+
+test-integration: clean-integration
+	docker-compose up -d
+	sleep 10
+	curl -v http://localhost:9097/live
+
 release: docker AUTHORS
 	go vet ./...
 	go test -coverprofile=cover-$(VERSION).out ./...
