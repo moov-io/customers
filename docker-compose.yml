@@ -1,0 +1,16 @@
+version: '3'
+services:
+  customers:
+    image: moov/customers:v0.4.0-rc1
+    ports:
+      - "8087:8087"
+      - "9097:9097"
+    environment:
+      WATCHMAN_ENDPOINT: 'http://watchman:8084'
+    depends_on:
+      - watchman
+  watchman:
+    image: moov/watchman:v0.13.2
+    ports:
+      - "8084:8084"
+      - "9094:9094"
