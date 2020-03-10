@@ -86,6 +86,7 @@ func main() {
 
 	// Start Admin server (with Prometheus metrics)
 	adminServer := admin.NewServer(*adminAddr)
+	adminServer.AddVersionHandler(customers.Version) // Setup 'GET /version'
 	go func() {
 		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
