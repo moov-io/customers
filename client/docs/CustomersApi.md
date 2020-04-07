@@ -4,19 +4,19 @@ All URIs are relative to *http://localhost:8087*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept a disclaimer for the given customer
-[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add an Address onto an existing Customer record
-[**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create a new customer
-[**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieves a Customer object associated with the customer ID.
-[**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get active disclaimers for the given customer
-[**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Retrieve the referenced document
-[**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get documents for a customer
-[**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Get the latest OFAC search for a customer
-[**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping the Customers service to check if running
-[**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh OFAC search for a given Customer
-[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
-[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update the status for a customer, which can only be updated by authenticated users with permissions.
-[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload a document for the given customer.
+[**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
+[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add customer address
+[**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create customer
+[**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
+[**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
+[**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
+[**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
+[**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
+[**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
+[**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
+[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
+[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
+[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
 
 
 
@@ -24,7 +24,9 @@ Method | HTTP request | Description
 
 > Disclaimer AcceptDisclaimer(ctx, customerID, disclaimerID, optional)
 
-Accept a disclaimer for the given customer
+Accept customer disclaimer
+
+Accept a disclaimer for the given customer which could include a document also
 
 ### Required Parameters
 
@@ -69,6 +71,8 @@ No authorization required
 ## AddCustomerAddress
 
 > Customer AddCustomerAddress(ctx, customerID, createCustomerAddress, optional)
+
+Add customer address
 
 Add an Address onto an existing Customer record
 
@@ -116,7 +120,9 @@ No authorization required
 
 > Customer CreateCustomer(ctx, createCustomer, optional)
 
-Create a new customer
+Create customer
+
+Create a Customer object from the given details of a human or business
 
 ### Required Parameters
 
@@ -160,7 +166,9 @@ No authorization required
 
 > Customer GetCustomer(ctx, customerID, optional)
 
-Retrieves a Customer object associated with the customer ID.
+Retrieve customer
+
+Get the Customer object and metadata for the customer ID.
 
 ### Required Parameters
 
@@ -203,6 +211,8 @@ No authorization required
 ## GetCustomerDisclaimers
 
 > []Disclaimer GetCustomerDisclaimers(ctx, customerID, optional)
+
+Get customer disclaimers
 
 Get active disclaimers for the given customer
 
@@ -247,6 +257,8 @@ No authorization required
 ## GetCustomerDocumentContents
 
 > *os.File GetCustomerDocumentContents(ctx, customerID, documentID, optional)
+
+Get customer document
 
 Retrieve the referenced document
 
@@ -294,6 +306,8 @@ No authorization required
 
 > []Document GetCustomerDocuments(ctx, customerID, optional)
 
+Get customer documents
+
 Get documents for a customer
 
 ### Required Parameters
@@ -337,6 +351,8 @@ No authorization required
 ## GetLatestOFACSearch
 
 > OfacSearch GetLatestOFACSearch(ctx, customerID, optional)
+
+Get latest OFAC search
 
 Get the latest OFAC search for a customer
 
@@ -382,7 +398,9 @@ No authorization required
 
 > Ping(ctx, )
 
-Ping the Customers service to check if running
+Ping Customers
+
+Check the Customers service to check if running
 
 ### Required Parameters
 
@@ -409,6 +427,8 @@ No authorization required
 ## RefreshOFACSearch
 
 > OfacSearch RefreshOFACSearch(ctx, customerID, optional)
+
+Refresh customer OFAC search
 
 Refresh OFAC search for a given Customer
 
@@ -453,6 +473,8 @@ No authorization required
 ## ReplaceCustomerMetadata
 
 > Customer ReplaceCustomerMetadata(ctx, customerID, customerMetadata, optional)
+
+Update customer metadata
 
 Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 
@@ -500,6 +522,8 @@ No authorization required
 
 > Customer UpdateCustomerStatus(ctx, customerID, updateCustomerStatus, optional)
 
+Update customer status
+
 Update the status for a customer, which can only be updated by authenticated users with permissions.
 
 ### Required Parameters
@@ -546,7 +570,9 @@ No authorization required
 
 > Document UploadCustomerDocument(ctx, customerID, type_, file, optional)
 
-Upload a document for the given customer.
+Upload document
+
+Upload a document for the given customer
 
 ### Required Parameters
 

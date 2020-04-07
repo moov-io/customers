@@ -22,7 +22,8 @@ paths:
   /version:
     get:
       tags: ["Admin"]
-      summary: Show the current version
+      summary: Get Version
+      description: Show the current version of Customers
       operationId: getVersion
       responses:
         '200':
@@ -35,7 +36,8 @@ paths:
   /customers/{customerID}/disclaimers:
     post:
       tags: ["Admin"]
-      summary: Create a disclaimer for a customer to approve
+      summary: Create disclaimer
+      description: Create a disclaimer for the specified customerID to approve
       operationId: createCustomerDisclaimer
       parameters:
         - name: customerID
@@ -63,7 +65,8 @@ paths:
   /customers/{customerID}/status:
     put:
       tags: ["Admin"]
-      summary: Update a Customers status and initiate required checks
+      summary: Update Customer status
+      description: Updates a customer status and initiates the required checks for that new status
       operationId: updateCustomerStatus
       parameters:
         - name: customerID
@@ -91,7 +94,8 @@ paths:
   /customers/{customerID}/addresses/{addressID}:
     put:
       tags: ["Admin"]
-      summary: Update a Customers address
+      summary: Update customers address
+      description: Updates the specified customer address
       operationId: updateCustomerAddress
       parameters:
         - name: customerID
