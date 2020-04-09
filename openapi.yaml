@@ -23,7 +23,8 @@ paths:
     get:
       tags:
         - Customers
-      summary: Ping the Customers service to check if running
+      summary: Ping Customers
+      description: Check the Customers service to check if running
       operationId: ping
       responses:
         '200':
@@ -32,7 +33,8 @@ paths:
   /customers:
     post:
       tags: [Customers]
-      summary: Create a new customer
+      summary: Create customer
+      description: Create a Customer object from the given details of a human or business
       operationId: createCustomer
       parameters:
         - name: X-Request-ID
@@ -69,7 +71,8 @@ paths:
   /customers/{customerID}:
     get:
       tags: [Customers]
-      summary: Retrieves a Customer object associated with the customer ID.
+      summary: Retrieve customer
+      description: Get the Customer object and metadata for the customer ID.
       operationId: getCustomer
       parameters:
         - name: X-Request-ID
@@ -103,7 +106,8 @@ paths:
   /customers/{customerID}/address:
     post:
       tags: [Customers]
-      summary: Add an Address onto an existing Customer record
+      summary: Add customer address
+      description: Add an Address onto an existing Customer record
       operationId: addCustomerAddress
       parameters:
         - name: X-Request-ID
@@ -147,7 +151,8 @@ paths:
   /customers/{customerID}/metadata:
     put:
       tags: [Customers]
-      summary: Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
+      summary: Update customer metadata
+      description: Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
       operationId: replaceCustomerMetadata
       parameters:
         - name: X-Request-ID
@@ -191,7 +196,8 @@ paths:
   /customers/{customerID}/status:
     put:
       tags: [Customers]
-      summary: Update the status for a customer, which can only be updated by authenticated users with permissions.
+      summary: Update customer status
+      description: Update the status for a customer, which can only be updated by authenticated users with permissions.
       operationId: updateCustomerStatus
       parameters:
         - name: X-Request-ID
@@ -235,7 +241,8 @@ paths:
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]
-      summary: Get active disclaimers for the given customer
+      summary: Get customer disclaimers
+      description: Get active disclaimers for the given customer
       operationId: getCustomerDisclaimers
       parameters:
         - name: X-Request-ID
@@ -273,7 +280,8 @@ paths:
   /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
       tags: [Customers]
-      summary: Accept a disclaimer for the given customer
+      summary: Accept customer disclaimer
+      description: Accept a disclaimer for the given customer which could include a document also
       operationId: acceptDisclaimer
       parameters:
         - name: X-Request-ID
@@ -318,7 +326,8 @@ paths:
   /customers/{customerID}/documents:
     post:
       tags: [Customers]
-      summary: Upload a document for the given customer.
+      summary: Upload document
+      description: Upload a document for the given customer
       operationId: uploadCustomerDocument
       parameters:
         - name: X-Request-ID
@@ -373,7 +382,8 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
     get:
       tags: [Customers]
-      summary: Get documents for a customer
+      summary: Get customer documents
+      description: Get documents for a customer
       operationId: getCustomerDocuments
       parameters:
         - name: X-Request-ID
@@ -405,7 +415,8 @@ paths:
   /customers/{customerID}/documents/{documentID}:
     get:
       tags: [Customers]
-      summary: Retrieve the referenced document
+      summary: Get customer document
+      description: Retrieve the referenced document
       operationId: getCustomerDocumentContents
       parameters:
         - name: X-Request-ID
@@ -449,7 +460,8 @@ paths:
   /customers/{customerID}/ofac:
     get:
       tags: [Customers]
-      summary: Get the latest OFAC search for a customer
+      summary: Get latest OFAC search
+      description: Get the latest OFAC search for a customer
       operationId: getLatestOFACSearch
       parameters:
         - name: X-Request-ID
@@ -488,7 +500,8 @@ paths:
   /customers/{customerID}/refresh/ofac:
     put:
       tags: [Customers]
-      summary: Refresh OFAC search for a given Customer
+      summary: Refresh customer OFAC search
+      description: Refresh OFAC search for a given Customer
       operationId: refreshOFACSearch
       parameters:
         - name: X-Request-ID

@@ -34,10 +34,10 @@ All URIs are relative to *http://localhost:9097*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AdminApi* | [**CreateCustomerDisclaimer**](docs/AdminApi.md#createcustomerdisclaimer) | **Post** /customers/{customerID}/disclaimers | Create a disclaimer for a customer to approve
-*AdminApi* | [**GetVersion**](docs/AdminApi.md#getversion) | **Get** /version | Show the current version
-*AdminApi* | [**UpdateCustomerAddress**](docs/AdminApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update a Customers address
-*AdminApi* | [**UpdateCustomerStatus**](docs/AdminApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update a Customers status and initiate required checks
+*AdminApi* | [**CreateCustomerDisclaimer**](docs/AdminApi.md#createcustomerdisclaimer) | **Post** /customers/{customerID}/disclaimers | Create disclaimer
+*AdminApi* | [**GetVersion**](docs/AdminApi.md#getversion) | **Get** /version | Get Version
+*AdminApi* | [**UpdateCustomerAddress**](docs/AdminApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customers address
+*AdminApi* | [**UpdateCustomerStatus**](docs/AdminApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer status
 
 
 ## Documentation For Models

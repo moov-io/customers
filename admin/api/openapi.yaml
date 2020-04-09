@@ -19,6 +19,7 @@ tags:
 paths:
   /version:
     get:
+      description: Show the current version of Customers
       operationId: getVersion
       responses:
         "200":
@@ -28,11 +29,12 @@ paths:
                 example: v0.4.0
                 type: string
           description: The current version running
-      summary: Show the current version
+      summary: Get Version
       tags:
       - Admin
   /customers/{customerID}/disclaimers:
     post:
+      description: Create a disclaimer for the specified customerID to approve
       operationId: createCustomerDisclaimer
       parameters:
       - description: Customer ID
@@ -59,11 +61,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Create a disclaimer for a customer to approve
+      summary: Create disclaimer
       tags:
       - Admin
   /customers/{customerID}/status:
     put:
+      description: Updates a customer status and initiates the required checks for
+        that new status
       operationId: updateCustomerStatus
       parameters:
       - description: Customer ID
@@ -90,11 +94,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Update a Customers status and initiate required checks
+      summary: Update Customer status
       tags:
       - Admin
   /customers/{customerID}/addresses/{addressID}:
     put:
+      description: Updates the specified customer address
       operationId: updateCustomerAddress
       parameters:
       - description: Customer ID
@@ -130,7 +135,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Update a Customers address
+      summary: Update customers address
       tags:
       - Admin
 components:

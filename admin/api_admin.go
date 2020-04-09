@@ -26,7 +26,8 @@ var (
 type AdminApiService service
 
 /*
-CreateCustomerDisclaimer Create a disclaimer for a customer to approve
+CreateCustomerDisclaimer Create disclaimer
+Create a disclaimer for the specified customerID to approve
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
  * @param createUserDisclaimer
@@ -104,7 +105,8 @@ func (a *AdminApiService) CreateCustomerDisclaimer(ctx _context.Context, custome
 }
 
 /*
-GetVersion Show the current version
+GetVersion Get Version
+Show the current version of Customers
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 @return string
 */
@@ -187,7 +189,8 @@ func (a *AdminApiService) GetVersion(ctx _context.Context) (string, *_nethttp.Re
 }
 
 /*
-UpdateCustomerAddress Update a Customers address
+UpdateCustomerAddress Update customers address
+Updates the specified customer address
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
  * @param addressID Address ID
@@ -268,7 +271,8 @@ func (a *AdminApiService) UpdateCustomerAddress(ctx _context.Context, customerID
 }
 
 /*
-UpdateCustomerStatus Update a Customers status and initiate required checks
+UpdateCustomerStatus Update Customer status
+Updates a customer status and initiates the required checks for that new status
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
  * @param updateCustomerStatus

@@ -4,10 +4,10 @@ All URIs are relative to *http://localhost:9097*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**CreateCustomerDisclaimer**](AdminApi.md#CreateCustomerDisclaimer) | **Post** /customers/{customerID}/disclaimers | Create a disclaimer for a customer to approve
-[**GetVersion**](AdminApi.md#GetVersion) | **Get** /version | Show the current version
-[**UpdateCustomerAddress**](AdminApi.md#UpdateCustomerAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update a Customers address
-[**UpdateCustomerStatus**](AdminApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update a Customers status and initiate required checks
+[**CreateCustomerDisclaimer**](AdminApi.md#CreateCustomerDisclaimer) | **Post** /customers/{customerID}/disclaimers | Create disclaimer
+[**GetVersion**](AdminApi.md#GetVersion) | **Get** /version | Get Version
+[**UpdateCustomerAddress**](AdminApi.md#UpdateCustomerAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customers address
+[**UpdateCustomerStatus**](AdminApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update Customer status
 
 
 
@@ -15,7 +15,9 @@ Method | HTTP request | Description
 
 > CreateCustomerDisclaimer(ctx, customerID, createUserDisclaimer)
 
-Create a disclaimer for a customer to approve
+Create disclaimer
+
+Create a disclaimer for the specified customerID to approve
 
 ### Required Parameters
 
@@ -48,7 +50,9 @@ No authorization required
 
 > string GetVersion(ctx, )
 
-Show the current version
+Get Version
+
+Show the current version of Customers
 
 ### Required Parameters
 
@@ -76,7 +80,9 @@ No authorization required
 
 > UpdateCustomerAddress(ctx, customerID, addressID, updateCustomerAddress)
 
-Update a Customers address
+Update customers address
+
+Updates the specified customer address
 
 ### Required Parameters
 
@@ -110,7 +116,9 @@ No authorization required
 
 > UpdateCustomerStatus(ctx, customerID, updateCustomerStatus)
 
-Update a Customers status and initiate required checks
+Update Customer status
+
+Updates a customer status and initiates the required checks for that new status
 
 ### Required Parameters
 

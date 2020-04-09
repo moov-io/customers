@@ -19,15 +19,17 @@ tags:
 paths:
   /ping:
     get:
+      description: Check the Customers service to check if running
       operationId: ping
       responses:
         "200":
           description: Service is running properly
-      summary: Ping the Customers service to check if running
+      summary: Ping Customers
       tags:
       - Customers
   /customers:
     post:
+      description: Create a Customer object from the given details of a human or business
       operationId: createCustomer
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -68,11 +70,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer was not created, see error(s)
-      summary: Create a new customer
+      summary: Create customer
       tags:
       - Customers
   /customers/{customerID}:
     get:
+      description: Get the Customer object and metadata for the customer ID.
       operationId: getCustomer
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -112,11 +115,12 @@ paths:
           description: A customer objects for the supplied customer ID
         "404":
           description: A resource with the specified ID was not found
-      summary: Retrieves a Customer object associated with the customer ID.
+      summary: Retrieve customer
       tags:
       - Customers
   /customers/{customerID}/address:
     post:
+      description: Add an Address onto an existing Customer record
       operationId: addCustomerAddress
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -166,11 +170,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
-      summary: Add an Address onto an existing Customer record
+      summary: Add customer address
       tags:
       - Customers
   /customers/{customerID}/metadata:
     put:
+      description: Replace the metadata object for a customer. Metadata is a map of
+        unique keys associated to values to act as foreign key relationships or arbitrary
+        data associated to a Customer.
       operationId: replaceCustomerMetadata
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -220,13 +227,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
-      summary: Replace the metadata object for a customer. Metadata is a map of unique
-        keys associated to values to act as foreign key relationships or arbitrary
-        data associated to a Customer.
+      summary: Update customer metadata
       tags:
       - Customers
   /customers/{customerID}/status:
     put:
+      description: Update the status for a customer, which can only be updated by
+        authenticated users with permissions.
       operationId: updateCustomerStatus
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -276,12 +283,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
-      summary: Update the status for a customer, which can only be updated by authenticated
-        users with permissions.
+      summary: Update customer status
       tags:
       - Customers
   /customers/{customerID}/disclaimers:
     get:
+      description: Get active disclaimers for the given customer
       operationId: getCustomerDisclaimers
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -325,11 +332,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
-      summary: Get active disclaimers for the given customer
+      summary: Get customer disclaimers
       tags:
       - Customers
   /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
+      description: Accept a disclaimer for the given customer which could include
+        a document also
       operationId: acceptDisclaimer
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -382,11 +391,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer disclaimer was not accepted, see error(s)
-      summary: Accept a disclaimer for the given customer
+      summary: Accept customer disclaimer
       tags:
       - Customers
   /customers/{customerID}/documents:
     get:
+      description: Get documents for a customer
       operationId: getCustomerDocuments
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -424,10 +434,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Documents'
           description: Document uploaded successfully
-      summary: Get documents for a customer
+      summary: Get customer documents
       tags:
       - Customers
     post:
+      description: Upload a document for the given customer
       operationId: uploadCustomerDocument
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -491,11 +502,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Document was not uploaded, see error(s)
-      summary: Upload a document for the given customer.
+      summary: Upload document
       tags:
       - Customers
   /customers/{customerID}/documents/{documentID}:
     get:
+      description: Retrieve the referenced document
       operationId: getCustomerDocumentContents
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -547,11 +559,12 @@ paths:
                 format: binary
                 type: string
           description: Document contents (ready for a browser to download)
-      summary: Retrieve the referenced document
+      summary: Get customer document
       tags:
       - Customers
   /customers/{customerID}/ofac:
     get:
+      description: Get the latest OFAC search for a customer
       operationId: getLatestOFACSearch
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -595,11 +608,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: An error occurred when searching OFAC data
-      summary: Get the latest OFAC search for a customer
+      summary: Get latest OFAC search
       tags:
       - Customers
   /customers/{customerID}/refresh/ofac:
     put:
+      description: Refresh OFAC search for a given Customer
       operationId: refreshOFACSearch
       parameters:
       - description: Optional Request ID allows application developer to trace requests
@@ -643,7 +657,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: An error occurred when searching OFAC data
-      summary: Refresh OFAC search for a given Customer
+      summary: Refresh customer OFAC search
       tags:
       - Customers
 components:
