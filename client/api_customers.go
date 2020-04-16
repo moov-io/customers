@@ -631,7 +631,7 @@ func (a *CustomersApiService) GetCustomerDocumentContents(ctx _context.Context, 
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/pdf", "image/_*"}
+	localVarHTTPHeaderAccepts := []string{"application/pdf", "image/_*", "application/json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
@@ -667,6 +667,16 @@ func (a *CustomersApiService) GetCustomerDocumentContents(ctx _context.Context, 
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
 			var v *os.File
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Error
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()
@@ -769,6 +779,16 @@ func (a *CustomersApiService) GetCustomerDocuments(ctx _context.Context, custome
 		}
 		if localVarHTTPResponse.StatusCode == 200 {
 			var v []Document
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarReturnValue, localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+			return localVarReturnValue, localVarHTTPResponse, newErr
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Error
 			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
 			if err != nil {
 				newErr.error = err.Error()

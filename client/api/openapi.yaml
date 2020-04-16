@@ -169,7 +169,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          description: Customer metadata was not updated, see error(s)
+          description: Customer address was not updated, see error(s)
       summary: Add customer address
       tags:
       - Customers
@@ -282,7 +282,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          description: Customer metadata was not updated, see error(s)
+          description: Customer status was not updated, see error(s)
       summary: Update customer status
       tags:
       - Customers
@@ -331,7 +331,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          description: Customer metadata was not updated, see error(s)
+          description: Failed to get disclaimers, see error(s)
       summary: Get customer disclaimers
       tags:
       - Customers
@@ -434,6 +434,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Documents'
           description: Document uploaded successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get customer documents, see error(s)
       summary: Get customer documents
       tags:
       - Customers
@@ -559,6 +565,12 @@ paths:
                 format: binary
                 type: string
           description: Document contents (ready for a browser to download)
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get customer document, see error(s)
       summary: Get customer document
       tags:
       - Customers
@@ -607,7 +619,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          description: An error occurred when searching OFAC data
+          description: An error occurred when refreshing OFAC data, see error(s)
       summary: Get latest OFAC search
       tags:
       - Customers
@@ -656,7 +668,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          description: An error occurred when searching OFAC data
+          description: An error occurred when refreshing OFAC data, see error(s)
       summary: Refresh customer OFAC search
       tags:
       - Customers

@@ -127,6 +127,7 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+
 components:
   schemas:
     CreateUserDisclaimer:
