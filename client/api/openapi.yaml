@@ -286,6 +286,106 @@ paths:
       summary: Update customer status
       tags:
       - Customers
+  /customers/{customerID}/accounts:
+    get:
+      description: Retrieve all accounts for the given customer.
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accounts'
+          description: Active accounts for the customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      summary: Get Customer Accounts
+      tags:
+      - Customers
+    post:
+      description: Create an account for the given customer
+      parameters:
+      - description: Optional Request ID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Moov User ID
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccount'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: Account created for the customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      summary: Create Customer Account
+      tags:
+      - Customers
   /customers/{customerID}/disclaimers:
     get:
       description: Get active disclaimers for the given customer
@@ -1049,6 +1149,73 @@ components:
           description: Address is currently being used for customer
           type: boolean
       type: object
+    CreateAccount:
+      example:
+        routingNumber: "051504597"
+        accountNumber: "0001027028"
+        type: checking
+        holderType: individual
+      properties:
+        accountNumber:
+          description: The account number for the depository account
+          example: "0001027028"
+          type: string
+        routingNumber:
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+          type: string
+        type:
+          description: Defines the account as *checking* or *savings*
+          enum:
+          - Checking
+          - Savings
+          example: checking
+          type: string
+        holderType:
+          description: Defines the type of entity of the account holder as an *individual*
+            or *business*
+          enum:
+          - individual
+          - business
+          type: string
+    Accounts:
+      items:
+        $ref: '#/components/schemas/Account'
+      type: array
+    Account:
+      example:
+        routingNumber: "051504597"
+        id: e1b1544a
+        type: checking
+        maskedAccountNumber: "0001027028"
+        holderType: individual
+      properties:
+        id:
+          description: A unique identifier for this account
+          example: e1b1544a
+          type: string
+        maskedAccountNumber:
+          description: The masked account number for the depository account
+          example: "0001027028"
+          type: string
+        routingNumber:
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+          type: string
+        type:
+          description: Defines the account as *checking* or *savings*
+          enum:
+          - Checking
+          - Savings
+          example: checking
+          type: string
+        holderType:
+          description: Defines the type of entity of the account holder as an *individual*
+            or *business*
+          enum:
+          - individual
+          - business
+          type: string
     Disclaimer:
       example:
         documentID: 08a184e1

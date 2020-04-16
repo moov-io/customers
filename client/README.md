@@ -37,6 +37,8 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add customer address
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create customer
+*CustomersApi* | [**CustomersCustomerIDAccountsGet**](docs/CustomersApi.md#customerscustomeridaccountsget) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
+*CustomersApi* | [**CustomersCustomerIDAccountsPost**](docs/CustomersApi.md#customerscustomeridaccountspost) | **Post** /customers/{customerID}/accounts | Create Customer Account
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer
 *CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 *CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
@@ -51,6 +53,8 @@ Class | Method | HTTP request | Description
 
 ## Documentation For Models
 
+ - [Account](docs/Account.md)
+ - [CreateAccount](docs/CreateAccount.md)
  - [CreateCustomer](docs/CreateCustomer.md)
  - [CreateCustomerAddress](docs/CreateCustomerAddress.md)
  - [CreatePhone](docs/CreatePhone.md)

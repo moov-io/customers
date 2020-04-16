@@ -236,6 +236,86 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/accounts:
+    get:
+      tags: [Customers]
+      summary: Get Customer Accounts
+      description: Retrieve all accounts for the given customer.
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Moov User ID
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: Active accounts for the customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accounts'
+        '400':
+          description: Failed to get accounts, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+    post:
+      tags: [Customers]
+      summary: Create Customer Account
+      description: Create an account for the given customer
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Moov User ID
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccount'
+      responses:
+        '200':
+          description: Account created for the customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Failed to get accounts, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]
@@ -819,6 +899,60 @@ components:
         active:
           type: boolean
           description: Address is currently being used for customer
+    CreateAccount:
+      properties:
+        accountNumber:
+          type: string
+          description: The account number for the depository account
+          example: "0001027028"
+        routingNumber:
+          type: string
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+        type:
+          type: string
+          description: Defines the account as *checking* or *savings*
+          enum:
+            - Checking
+            - Savings
+          example: "checking"
+        holderType:
+          type: string
+          description: Defines the type of entity of the account holder as an *individual* or *business*
+          enum:
+            - individual
+            - business
+    Accounts:
+      type: array
+      items:
+        $ref: '#/components/schemas/Account'
+    Account:
+      properties:
+        id:
+          type: string
+          description: A unique identifier for this account
+          example: e1b1544a
+        maskedAccountNumber:
+          type: string
+          description: The masked account number for the depository account
+          example: "0001027028"
+        routingNumber:
+          type: string
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+        type:
+          type: string
+          description: Defines the account as *checking* or *savings*
+          enum:
+            - Checking
+            - Savings
+          example: "checking"
+        holderType:
+          type: string
+          description: Defines the type of entity of the account holder as an *individual* or *business*
+          enum:
+            - individual
+            - business
     Disclaimer:
       type: object
       properties:
