@@ -73,7 +73,7 @@ var (
 		),
 		execsql(
 			"create_accounts",
-			`create table if not exists accounts(account_id primary key, customer_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, type, holder_type, created_at datetime, deleted_at datetime);`,
+			`create table if not exists accounts(account_id primary key, customer_id, user_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, type, holder_type, created_at datetime, deleted_at datetime);`,
 		),
 	)
 )

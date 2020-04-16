@@ -56,8 +56,8 @@ func createCustomerAccount(logger log.Logger, repo Repository) http.HandlerFunc 
 			return
 		}
 
-		customerID := route.GetCustomerID(w, r)
-		account, err := repo.createCustomerAccount(customerID, &request)
+		customerID, userID := route.GetCustomerID(w, r), moovhttp.GetUserID(r)
+		account, err := repo.createCustomerAccount(customerID, userID, &request)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

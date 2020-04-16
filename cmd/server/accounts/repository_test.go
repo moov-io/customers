@@ -32,7 +32,7 @@ func setupTestAccountRepository(t *testing.T) *testAccountRepository {
 }
 
 func TestRepository(t *testing.T) {
-	customerID := base.ID()
+	customerID, userID := base.ID(), base.ID()
 	repo := setupTestAccountRepository(t)
 
 	// initial read, find no accounts
@@ -42,7 +42,7 @@ func TestRepository(t *testing.T) {
 	}
 
 	// create account
-	acct, err := repo.createCustomerAccount(customerID, &createAccountRequest{
+	acct, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          "Checking",

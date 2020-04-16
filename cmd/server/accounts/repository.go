@@ -17,7 +17,7 @@ import (
 
 type Repository interface {
 	getCustomerAccounts(customerID string) ([]*client.Account, error)
-	createCustomerAccount(customerID string, req *createAccountRequest) (*client.Account, error)
+	createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error)
 	deactivateCustomerAccount(accountID string) error
 }
 
@@ -60,7 +60,7 @@ where customer_id = ? and deleted_at is null;`
 	return out, nil
 }
 
-func (r *sqlAccountRepository) createCustomerAccount(customerID string, req *createAccountRequest) (*client.Account, error) {
+func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
 	account := &client.Account{
 		Id:                  base.ID(),
 		MaskedAccountNumber: req.AccountNumber,
@@ -68,14 +68,14 @@ func (r *sqlAccountRepository) createCustomerAccount(customerID string, req *cre
 		Type:                req.Type,
 		HolderType:          req.HolderType,
 	}
-	query := `insert into accounts (account_id, customer_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, type, holder_type, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query := `insert into accounts (account_id, customer_id, user_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, type, holder_type, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(account.Id, customerID, "", "", "", account.RoutingNumber, account.Type, account.HolderType, time.Now())
+	_, err = stmt.Exec(account.Id, customerID, userID, "", "", "", account.RoutingNumber, account.Type, account.HolderType, time.Now())
 	if err != nil {
 		return nil, fmt.Errorf("problem creating account=%s: %v", account.Id, err)
 	}
