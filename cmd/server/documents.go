@@ -19,6 +19,7 @@ import (
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -48,9 +49,9 @@ func getDocumentID(w http.ResponseWriter, r *http.Request) string {
 
 func getCustomerDocuments(logger log.Logger, repo documentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -81,7 +82,7 @@ func readDocumentType(v string) (string, error) {
 
 func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		// TODO(adam): should we store x-user-id along with the Document?
 
 		documentType, err := readDocumentType(r.URL.Query().Get("type"))
@@ -119,7 +120,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		defer bucket.Close()
 
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -161,9 +162,9 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 
 func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
-		customerID, documentId := getCustomerID(w, r), getDocumentID(w, r)
+		customerID, documentId := route.GetCustomerID(w, r), getDocumentID(w, r)
 		if customerID == "" || documentId == "" {
 			return
 		}

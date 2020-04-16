@@ -15,6 +15,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 	watchman "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
@@ -87,10 +88,10 @@ func addOFACRoutes(logger log.Logger, r *mux.Router, repo customerRepository, of
 
 func getLatestCustomerOFACSearch(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -108,11 +109,11 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo customerRepository) htt
 
 func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		requestID, userID := moovhttp.GetRequestID(r), moovhttp.GetUserID(r)
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}

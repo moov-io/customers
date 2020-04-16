@@ -84,15 +84,6 @@ func (r *testCustomerRepository) saveCustomerOFACSearch(customerID string, resul
 	return r.err
 }
 
-func TestCustomers__getCustomerID(t *testing.T) {
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/ping", nil)
-
-	if id := getCustomerID(w, req); id != "" {
-		t.Errorf("unexpected id: %v", id)
-	}
-}
-
 func TestCustomers__formatCustomerName(t *testing.T) {
 	if out := formatCustomerName(nil); out != "" {
 		t.Errorf("got %q", out)

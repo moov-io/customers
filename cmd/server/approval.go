@@ -18,6 +18,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -112,14 +113,14 @@ func containsValidPrimaryAddress(addrs []client.CustomerAddress) bool {
 
 func updateCustomerStatus(logger log.Logger, repo customerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
 		if r.Method != "PUT" {
 			moovhttp.Problem(w, fmt.Errorf("unsupported HTTP verb %s", r.Method))
 			return
 		}
 
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -185,14 +186,14 @@ func (req *updateCustomerAddressRequest) validate() error {
 
 func updateCustomerAddress(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
 		if r.Method != "PUT" {
 			moovhttp.Problem(w, fmt.Errorf("unsupported HTTP verb %s", r.Method))
 			return
 		}
 
-		customerID, addressId := getCustomerID(w, r), getAddressId(w, r)
+		customerID, addressId := route.GetCustomerID(w, r), getAddressId(w, r)
 		if customerID == "" || addressId == "" {
 			return
 		}

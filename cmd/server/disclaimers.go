@@ -16,6 +16,7 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -45,10 +46,10 @@ func getDisclaimerID(w http.ResponseWriter, r *http.Request) string {
 
 func getCustomerDisclaimers(logger log.Logger, repo disclaimerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -66,10 +67,10 @@ func getCustomerDisclaimers(logger log.Logger, repo disclaimerRepository) http.H
 
 func acceptDisclaimer(logger log.Logger, repo disclaimerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		customerID, disclaimerID := getCustomerID(w, r), getDisclaimerID(w, r)
+		customerID, disclaimerID := route.GetCustomerID(w, r), getDisclaimerID(w, r)
 		if customerID == "" || disclaimerID == "" {
 			return
 		}
@@ -97,7 +98,7 @@ type createDisclaimerRequest struct {
 
 func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docRepo documentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		if r.Method != "POST" {
@@ -105,7 +106,7 @@ func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docR
 			return
 		}
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}

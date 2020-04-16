@@ -18,14 +18,11 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/internal/usstates"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
-)
-
-var (
-	errNoCustomerID = errors.New("no Customer ID found")
 )
 
 func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
@@ -33,15 +30,6 @@ func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
 	r.Methods("PUT").Path("/customers/{customerID}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/address").HandlerFunc(addCustomerAddress(logger, repo))
-}
-
-func getCustomerID(w http.ResponseWriter, r *http.Request) string {
-	v, ok := mux.Vars(r)["customerID"]
-	if !ok || v == "" {
-		moovhttp.Problem(w, errNoCustomerID)
-		return ""
-	}
-	return v
 }
 
 // formatCustomerName returns a Customer's name joined as one string. It accounts for
@@ -63,9 +51,9 @@ func formatCustomerName(c *client.Customer) string {
 
 func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -193,7 +181,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 
 func createCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		requestID := moovhttp.GetRequestID(r)
@@ -265,7 +253,7 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 			moovhttp.Problem(w, err)
 			return
 		}
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -280,7 +268,7 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 
 func addCustomerAddress(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -339,12 +327,13 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
+
 	now := time.Now()
 	_, err = stmt.Exec(c.ID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.BirthDate, c.Status, c.Email, now, now)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
-	stmt.Close()
 
 	// Insert customer phone numbers
 	query = `insert or replace into customers_phones (customer_id, number, valid, type) values (?, ?, ?, ?);`
