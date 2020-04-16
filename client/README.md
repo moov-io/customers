@@ -37,6 +37,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add customer address
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create customer
+*CustomersApi* | [**CustomersCustomerIDAccountsDelete**](docs/CustomersApi.md#customerscustomeridaccountsdelete) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
 *CustomersApi* | [**CustomersCustomerIDAccountsGet**](docs/CustomersApi.md#customerscustomeridaccountsget) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
 *CustomersApi* | [**CustomersCustomerIDAccountsPost**](docs/CustomersApi.md#customerscustomeridaccountspost) | **Post** /customers/{customerID}/accounts | Create Customer Account
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer

@@ -20,6 +20,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/customers"
+	"github.com/moov-io/customers/cmd/server/accounts"
 	"github.com/moov-io/customers/internal/database"
 
 	"github.com/go-kit/kit/log"
@@ -75,6 +76,8 @@ func main() {
 		}
 	}()
 
+	accountsRepo := accounts.NewRepo(logger, db)
+	defer accountsRepo.Close()
 	customerRepo := &sqlCustomerRepository{db, logger}
 	defer customerRepo.close()
 	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
@@ -133,6 +136,7 @@ func main() {
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
+	accounts.RegisterRoutes(logger, router, accountsRepo)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))

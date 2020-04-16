@@ -7,6 +7,7 @@ Method | HTTP request | Description
 [**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 [**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add customer address
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create customer
+[**CustomersCustomerIDAccountsDelete**](CustomersApi.md#CustomersCustomerIDAccountsDelete) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
 [**CustomersCustomerIDAccountsGet**](CustomersApi.md#CustomersCustomerIDAccountsGet) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
 [**CustomersCustomerIDAccountsPost**](CustomersApi.md#CustomersCustomerIDAccountsPost) | **Post** /customers/{customerID}/accounts | Create Customer Account
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
@@ -157,6 +158,52 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## CustomersCustomerIDAccountsDelete
+
+> CustomersCustomerIDAccountsDelete(ctx, customerID, optional)
+
+Delete Customer Account
+
+Remove an account from the given Customer
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+ **optional** | ***CustomersCustomerIDAccountsDeleteOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a CustomersCustomerIDAccountsDeleteOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Moov User ID | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

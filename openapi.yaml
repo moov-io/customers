@@ -316,6 +316,39 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+    delete:
+      tags: [Customers]
+      summary: Delete Customer Account
+      description: Remove an account from the given Customer
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional Request ID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Moov User ID
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: Account removed form customer
+        '400':
+          description: Failed to get accounts, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]
