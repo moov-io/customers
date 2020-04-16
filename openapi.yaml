@@ -21,15 +21,13 @@ tags:
 paths:
   /ping:
     get:
-      tags:
-        - Customers
+      tags: [Customers]
       summary: Ping Customers
       description: Check the Customers service to check if running
       operationId: ping
       responses:
         '200':
           description: Service is running properly
-  # Customer endpoints
   /customers:
     post:
       tags: [Customers]
