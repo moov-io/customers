@@ -9,12 +9,11 @@
 
 package client
 
-// CreateAccount struct for CreateAccount
-type CreateAccount struct {
-	// The account number for the depository account
-	AccountNumber string `json:"accountNumber,omitempty"`
-	// The ABA routing transit number for the depository account.
-	RoutingNumber string      `json:"routingNumber,omitempty"`
-	Type          AccountType `json:"type,omitempty"`
-	HolderType    HolderType  `json:"holderType,omitempty"`
-}
+// AccountType Defines the account as *checking* or *savings*
+type AccountType string
+
+// List of AccountType
+const (
+	CHECKING AccountType = "Checking"
+	SAVINGS  AccountType = "Savings"
+)

@@ -148,7 +148,7 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
 
-	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
+	ssn := &SSN{customerID: cust.ID, encrypted: "secret"}
 
 	if err := validCustomerStatusTransition(cust, ssn, customers.Deceased, repo, searcher, "requestID"); err != nil {
 		t.Errorf("expected no error: %v", err)
@@ -202,7 +202,7 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 	client := &testWatchmanClient{}
 	searcher := createTestOFACSearcher(repo, client)
 
-	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
+	ssn := &SSN{customerID: cust.ID, encrypted: "secret"}
 
 	repo.err = errors.New("bad error")
 	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, ""); err == nil {
@@ -224,7 +224,7 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
 
-	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
+	ssn := &SSN{customerID: cust.ID, encrypted: "secret"}
 
 	repo.ofacSearchResult = &ofacSearchResult{
 		SDNName: "Jane Doe",
@@ -342,7 +342,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 				Country:    "US",
 			},
 		},
-	}).asCustomer(testCustomerSSNStorage)
+	}).asCustomer(testCustomerSSNStorage(t))
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}

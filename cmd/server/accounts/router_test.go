@@ -14,6 +14,7 @@ import (
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/internal/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -22,9 +23,10 @@ import (
 func TestRoutes(t *testing.T) {
 	customerID := base.ID()
 	repo := setupTestAccountRepository(t)
+	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, keeper)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -34,6 +36,9 @@ func TestRoutes(t *testing.T) {
 
 	// create an account
 	account := httpCreateAccount(t, handler, customerID)
+	if account.MaskedAccountNumber != "***49" {
+		t.Logf("masked account number: %q", account.MaskedAccountNumber)
+	}
 
 	// re-read, find account
 	accounts = httpReadAccounts(t, handler, customerID)
@@ -68,10 +73,10 @@ func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*c
 
 func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *client.Account {
 	params := &createAccountRequest{
-		AccountNumber: "123",
+		AccountNumber: "18749",
 		RoutingNumber: "987654320",
-		Type:          "Checking",
-		HolderType:    "individual",
+		Type:          client.SAVINGS,
+		HolderType:    client.INDIVIDUAL,
 	}
 
 	var buf bytes.Buffer

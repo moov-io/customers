@@ -22,6 +22,7 @@ import (
 	"github.com/moov-io/customers"
 	"github.com/moov-io/customers/cmd/server/accounts"
 	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/customers/internal/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -127,16 +128,22 @@ func main() {
 	addDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
+	ctx := context.Background()
+	keeper, err := secrets.OpenSecretKeeper(ctx, "customer-ssn", os.Getenv("CLOUD_PROVIDER"))
+	if err != nil {
+		panic(err)
+	}
+	stringKeeper := secrets.NewStringKeeper(keeper, 10*time.Second)
 	customerSSNStorage := &ssnStorage{
-		keeperFactory: getSecretKeeper,
-		repo:          customerSSNRepo,
+		keeper: stringKeeper,
+		repo:   customerSSNRepo,
 	}
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo)
+	accounts.RegisterRoutes(logger, router, accountsRepo, stringKeeper)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))

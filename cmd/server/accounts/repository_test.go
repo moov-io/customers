@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/internal/database"
 
 	"github.com/go-kit/kit/log"
@@ -45,8 +46,8 @@ func TestRepository(t *testing.T) {
 	acct, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Type:          "Checking",
-		HolderType:    "individual",
+		Type:          client.CHECKING,
+		HolderType:    client.INDIVIDUAL,
 	})
 	if err != nil {
 		t.Fatal(err)

@@ -16,9 +16,7 @@ type Account struct {
 	// The masked account number for the depository account
 	MaskedAccountNumber string `json:"maskedAccountNumber,omitempty"`
 	// The ABA routing transit number for the depository account.
-	RoutingNumber string `json:"routingNumber,omitempty"`
-	// Defines the account as *checking* or *savings*
-	Type string `json:"type,omitempty"`
-	// Defines the type of entity of the account holder as an *individual* or *business*
-	HolderType string `json:"holderType,omitempty"`
+	RoutingNumber string      `json:"routingNumber,omitempty"`
+	Type          AccountType `json:"type,omitempty"`
+	HolderType    HolderType  `json:"holderType,omitempty"`
 }

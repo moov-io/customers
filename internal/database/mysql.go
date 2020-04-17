@@ -77,7 +77,7 @@ var (
 		),
 		execsql(
 			"create_accounts",
-			`create table if not exists accounts(account_id varchar(40) primary key, customer_id varchar(40), user_id varchar(40), encrypted_account_number varchar(40), hashed_account_number varchar(40), masked_account_number varchar(10), routing_number varchar(10), type varchar(12), holder_type varchar(10), created_at datetime, deleted_at datetime);`,
+			`create table if not exists accounts(account_id varchar(40) primary key, customer_id varchar(40), user_id varchar(40), encrypted_account_number varchar(40), hashed_account_number varchar(40), masked_account_number varchar(15), routing_number varchar(10), type varchar(12), holder_type varchar(10), created_at datetime, deleted_at datetime);`,
 		),
 	)
 )

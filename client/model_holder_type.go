@@ -9,12 +9,11 @@
 
 package client
 
-// CreateAccount struct for CreateAccount
-type CreateAccount struct {
-	// The account number for the depository account
-	AccountNumber string `json:"accountNumber,omitempty"`
-	// The ABA routing transit number for the depository account.
-	RoutingNumber string      `json:"routingNumber,omitempty"`
-	Type          AccountType `json:"type,omitempty"`
-	HolderType    HolderType  `json:"holderType,omitempty"`
-}
+// HolderType Defines the type of entity of the account holder as an *individual* or *business*
+type HolderType string
+
+// List of HolderType
+const (
+	INDIVIDUAL HolderType = "individual"
+	BUSINESS   HolderType = "business"
+)

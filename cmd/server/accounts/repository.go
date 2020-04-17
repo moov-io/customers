@@ -68,14 +68,22 @@ func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, 
 		Type:                req.Type,
 		HolderType:          req.HolderType,
 	}
-	query := `insert into accounts (account_id, customer_id, user_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, type, holder_type, created_at) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query := `insert into accounts (
+  account_id, customer_id, user_id,
+  encrypted_account_number, hashed_account_number, masked_account_number,
+  routing_number, type, holder_type, created_at
+) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(account.Id, customerID, userID, "", "", "", account.RoutingNumber, account.Type, account.HolderType, time.Now())
+	_, err = stmt.Exec(
+		account.Id, customerID, userID,
+		req.encryptedAccountNumber, req.hashedAccountNumber, req.maskedAccountNumber,
+		account.RoutingNumber, account.Type, account.HolderType, time.Now(),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("problem creating account=%s: %v", account.Id, err)
 	}

@@ -5,22 +5,21 @@
 package main
 
 import (
-	"context"
 	"database/sql"
-	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
 	"unicode/utf8"
+
+	"github.com/moov-io/customers/internal/secrets"
 
 	"github.com/go-kit/kit/log"
 )
 
 type SSN struct {
 	customerID string
-
-	encrypted []byte
-	masked    string
+	encrypted  string
+	masked     string
 }
 
 func (s *SSN) String() string {
@@ -28,8 +27,8 @@ func (s *SSN) String() string {
 }
 
 type ssnStorage struct {
-	keeperFactory secretFunc
-	repo          customerSSNRepository
+	keeper *secrets.StringKeeper
+	repo   customerSSNRepository
 }
 
 func (s *ssnStorage) encryptRaw(customerID, raw string) (*SSN, error) {
@@ -39,11 +38,7 @@ func (s *ssnStorage) encryptRaw(customerID, raw string) (*SSN, error) {
 	if customerID == "" || raw == "" {
 		return nil, fmt.Errorf("missing customer=%s and/or SSN", customerID)
 	}
-	keeper, err := s.keeperFactory(fmt.Sprintf("customer-%s-ssn", customerID))
-	if err != nil {
-		return nil, fmt.Errorf("ssnStorage: keeper init customer=%s: %v", customerID, err)
-	}
-	encrypted, err := keeper.Encrypt(context.Background(), []byte(raw))
+	encrypted, err := s.keeper.EncryptString(raw)
 	if err != nil {
 		return nil, fmt.Errorf("ssnStorage: encrypt customer=%s: %v", customerID, err)
 	}
@@ -89,8 +84,7 @@ func (r *sqlCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {
 	}
 	defer stmt.Close()
 
-	encoded := base64.StdEncoding.EncodeToString(ssn.encrypted)
-	if _, err := stmt.Exec(ssn.customerID, encoded, ssn.masked, time.Now()); err != nil {
+	if _, err := stmt.Exec(ssn.customerID, ssn.encrypted, ssn.masked, time.Now()); err != nil {
 		return fmt.Errorf("sqlCustomerSSNRepository: saveCustomerSSN: exec: %v", err)
 	}
 	return nil
@@ -106,21 +100,12 @@ func (r *sqlCustomerSSNRepository) getCustomerSSN(customerID string) (*SSN, erro
 
 	row := stmt.QueryRow(customerID)
 
-	var encoded string
-	ssn := SSN{
-		customerID: customerID,
-	}
-	if err := row.Scan(&encoded, &ssn.masked); err != nil {
+	ssn := SSN{customerID: customerID}
+	if err := row.Scan(&ssn.encrypted, &ssn.masked); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // not found
 		}
 		return nil, fmt.Errorf("sqlCustomerSSNRepository: getCustomerSSN scan: %v", err)
 	}
-
-	decoded, err := base64.StdEncoding.DecodeString(encoded)
-	if err != nil {
-		return nil, fmt.Errorf("sqlCustomerSSNRepository: getCustomerSSN decode: %v", err)
-	}
-	ssn.encrypted = decoded
 	return &ssn, nil
 }

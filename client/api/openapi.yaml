@@ -1192,6 +1192,22 @@ components:
           description: Address is currently being used for customer
           type: boolean
       type: object
+    AccountType:
+      description: |
+        Defines the account as *checking* or *savings*
+      enum:
+      - Checking
+      - Savings
+      example: checking
+      type: string
+    HolderType:
+      description: |
+        Defines the type of entity of the account holder as an *individual* or *business*
+      enum:
+      - individual
+      - business
+      example: individual
+      type: string
     CreateAccount:
       example:
         routingNumber: "051504597"
@@ -1208,19 +1224,9 @@ components:
           example: "051504597"
           type: string
         type:
-          description: Defines the account as *checking* or *savings*
-          enum:
-          - Checking
-          - Savings
-          example: checking
-          type: string
+          $ref: '#/components/schemas/AccountType'
         holderType:
-          description: Defines the type of entity of the account holder as an *individual*
-            or *business*
-          enum:
-          - individual
-          - business
-          type: string
+          $ref: '#/components/schemas/HolderType'
     Accounts:
       items:
         $ref: '#/components/schemas/Account'
@@ -1246,19 +1252,9 @@ components:
           example: "051504597"
           type: string
         type:
-          description: Defines the account as *checking* or *savings*
-          enum:
-          - Checking
-          - Savings
-          example: checking
-          type: string
+          $ref: '#/components/schemas/AccountType'
         holderType:
-          description: Defines the type of entity of the account holder as an *individual*
-            or *business*
-          enum:
-          - individual
-          - business
-          type: string
+          $ref: '#/components/schemas/HolderType'
     Disclaimer:
       example:
         documentID: 08a184e1
