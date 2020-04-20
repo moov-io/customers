@@ -809,11 +809,9 @@ components:
           enum:
             - Deceased
             - Rejected
-            - None
-            - ReviewRequired
-            - KYC
-            - OFAC
-            - CIP
+            - Unknown
+            - ReceiveOnly
+            - Verified
         email:
           type: string
           maximum: 500
@@ -865,11 +863,9 @@ components:
           enum:
             - Deceased
             - Rejected
-            - None
-            - ReviewRequired
-            - KYC
-            - OFAC
-            - CIP
+            - Unknown
+            - ReceiveOnly
+            - Verified
       required:
         - status
     CreatePhone:
