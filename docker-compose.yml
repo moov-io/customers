@@ -10,7 +10,7 @@ services:
     depends_on:
       - watchman
   watchman:
-    image: moov/watchman:v0.13.2
+    image: moov/watchman:v0.14.0
     ports:
       - "8084:8084"
       - "9094:9094"
