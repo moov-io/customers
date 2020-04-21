@@ -12,7 +12,7 @@ package client
 // Account struct for Account
 type Account struct {
 	// A unique identifier for this account
-	ID string `json:"ID,omitempty"`
+	AccountID string `json:"accountID,omitempty"`
 	// The masked account number for the depository account
 	MaskedAccountNumber string `json:"maskedAccountNumber,omitempty"`
 	// The ABA routing transit number for the depository account.

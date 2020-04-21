@@ -65,16 +65,16 @@ func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureSt
 	switch futureStatus {
 	case customers.KYC:
 		if existing.FirstName == "" || existing.LastName == "" {
-			return fmt.Errorf("customer=%s is missing fist/last name", existing.ID)
+			return fmt.Errorf("customer=%s is missing fist/last name", existing.CustomerID)
 		}
 		if existing.BirthDate.IsZero() {
-			return fmt.Errorf("customer=%s is missing date of birth", existing.ID)
+			return fmt.Errorf("customer=%s is missing date of birth", existing.CustomerID)
 		}
 		if !containsValidPrimaryAddress(existing.Addresses) {
-			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.ID)
+			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.CustomerID)
 		}
 	case customers.OFAC:
-		searchResult, err := repo.getLatestCustomerOFACSearch(existing.ID)
+		searchResult, err := repo.getLatestCustomerOFACSearch(existing.CustomerID)
 		if err != nil {
 			return fmt.Errorf("validCustomerStatusTransition: error getting OFAC search: %v", err)
 		}
@@ -82,22 +82,22 @@ func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureSt
 			if err := ofac.storeCustomerOFACSearch(existing, ""); err != nil {
 				return fmt.Errorf("validCustomerStatusTransition: problem with OFAC search: %v", err)
 			}
-			searchResult, err = repo.getLatestCustomerOFACSearch(existing.ID)
+			searchResult, err = repo.getLatestCustomerOFACSearch(existing.CustomerID)
 			if err != nil || searchResult == nil {
 				return fmt.Errorf("validCustomerStatusTransition: inner lookup searchResult=%#v: %v", searchResult, err)
 			}
 		}
 		if searchResult.Match > ofacMatchThreshold {
-			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.ID, searchResult.Match, searchResult.EntityID)
+			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.CustomerID, searchResult.Match, searchResult.EntityID)
 		}
 		return nil
 	case customers.CIP: // TODO(adam): need to impl lookup
 		// What can we do to validate an SSN?
 		// https://www.ssa.gov/employer/randomization.html (not much)
 		if ssn == nil || len(ssn.encrypted) == 0 {
-			return fmt.Errorf("customer=%s is missing SSN", existing.ID)
+			return fmt.Errorf("customer=%s is missing SSN", existing.CustomerID)
 		}
-		return fmt.Errorf("customer=%s %s to CIP transition needs to lookup encrypted SSN", existing.ID, existing.Status)
+		return fmt.Errorf("customer=%s %s to CIP transition needs to lookup encrypted SSN", existing.CustomerID, existing.Status)
 	}
 	return nil
 }

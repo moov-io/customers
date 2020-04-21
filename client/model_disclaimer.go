@@ -16,7 +16,7 @@ import (
 // Disclaimer struct for Disclaimer
 type Disclaimer struct {
 	// The unique identifier for this Disclaimer
-	ID string `json:"ID,omitempty"`
+	DisclaimerID string `json:"disclaimerID,omitempty"`
 	// Text that user must accept
 	Text string `json:"text,omitempty"`
 	// Optional ID which references a Document included in the disclaimer

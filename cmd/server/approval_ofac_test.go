@@ -54,7 +54,7 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 		Match:    0.99,
 	}
 	customerID := base.ID()
-	if err := searcher.storeCustomerOFACSearch(&client.Customer{ID: customerID}, "requestID"); err != nil {
+	if err := searcher.storeCustomerOFACSearch(&client.Customer{CustomerID: customerID}, "requestID"); err != nil {
 		t.Fatal(err)
 	}
 	res, err := repo.getLatestCustomerOFACSearch(customerID)
@@ -70,7 +70,7 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 
 	// retry but with NickName set (test coverage)
 	customerID = base.ID()
-	if err := searcher.storeCustomerOFACSearch(&client.Customer{ID: customerID, NickName: "John Doe"}, "requestID"); err != nil {
+	if err := searcher.storeCustomerOFACSearch(&client.Customer{CustomerID: customerID, NickName: "John Doe"}, "requestID"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -83,7 +83,7 @@ func TestOFACApproval__getLatest(t *testing.T) {
 
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: customerID,
+			CustomerID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
 			EntityID: "142",
@@ -122,7 +122,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: customerID,
+			CustomerID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
 			EntityID: "142",
@@ -172,7 +172,7 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: customerID,
+			CustomerID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
 			EntityID: "142",

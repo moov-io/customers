@@ -143,7 +143,7 @@ func validateMetadata(meta map[string]string) error {
 
 func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *SSN, error) {
 	customer := &client.Customer{
-		ID:         base.ID(),
+		CustomerID: base.ID(),
 		FirstName:  req.FirstName,
 		MiddleName: req.MiddleName,
 		LastName:   req.LastName,
@@ -162,7 +162,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 	}
 	for i := range req.Addresses {
 		customer.Addresses = append(customer.Addresses, client.CustomerAddress{
-			ID:         base.ID(),
+			AddressID:  base.ID(),
 			Address1:   req.Addresses[i].Address1,
 			Address2:   req.Addresses[i].Address2,
 			City:       req.Addresses[i].City,
@@ -173,7 +173,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		})
 	}
 	if req.SSN != "" {
-		ssn, err := storage.encryptRaw(customer.ID, req.SSN)
+		ssn, err := storage.encryptRaw(customer.CustomerID, req.SSN)
 		return customer, ssn, err
 	}
 	return customer, nil, nil
@@ -199,14 +199,14 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 
 		cust, ssn, err := req.asCustomer(customerSSNStorage)
 		if err != nil {
-			logger.Log("customers", fmt.Sprintf("problem transforming request into Customer=%s: %v", cust.ID, err), "requestID", requestID)
+			logger.Log("customers", fmt.Sprintf("problem transforming request into Customer=%s: %v", cust.CustomerID, err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
 		if ssn != nil {
 			err := customerSSNStorage.repo.saveCustomerSSN(ssn)
 			if err != nil {
-				logger.Log("customers", fmt.Sprintf("problem saving SSN for Customer=%s: %v", cust.ID, err), "requestID", requestID)
+				logger.Log("customers", fmt.Sprintf("problem saving SSN for Customer=%s: %v", cust.CustomerID, err), "requestID", requestID)
 				moovhttp.Problem(w, fmt.Errorf("saveCustomerSSN: %v", err))
 				return
 			}
@@ -218,8 +218,8 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err := repo.replaceCustomerMetadata(cust.ID, cust.Metadata); err != nil {
-			logger.Log("customers", fmt.Sprintf("updating metadata for customer=%s failed: %v", cust.ID, err), "requestID", requestID)
+		if err := repo.replaceCustomerMetadata(cust.CustomerID, cust.Metadata); err != nil {
+			logger.Log("customers", fmt.Sprintf("updating metadata for customer=%s failed: %v", cust.CustomerID, err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -227,11 +227,11 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 		// Try an OFAC search with the Customer information
 		go func(logger log.Logger, cust *client.Customer, requestID string) {
 			if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
-				logger.Log("customers", fmt.Sprintf("error with OFAC search for customer=%s: %v", cust.ID, err), "requestID", requestID)
+				logger.Log("customers", fmt.Sprintf("error with OFAC search for customer=%s: %v", cust.CustomerID, err), "requestID", requestID)
 			}
 		}(logger, cust, requestID)
 
-		logger.Log("customers", fmt.Sprintf("created customer=%s", cust.ID), "requestID", requestID)
+		logger.Log("customers", fmt.Sprintf("created customer=%s", cust.CustomerID), "requestID", requestID)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(cust)
@@ -330,7 +330,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	defer stmt.Close()
 
 	now := time.Now()
-	_, err = stmt.Exec(c.ID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.BirthDate, c.Status, c.Email, now, now)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.BirthDate, c.Status, c.Email, now, now)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
@@ -342,7 +342,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 		return fmt.Errorf("createCustomer: insert into customers_phones err=%v | rollback=%v", err, tx.Rollback())
 	}
 	for i := range c.Phones {
-		_, err := stmt.Exec(c.ID, c.Phones[i].Number, c.Phones[i].Valid, c.Phones[i].Type)
+		_, err := stmt.Exec(c.CustomerID, c.Phones[i].Number, c.Phones[i].Valid, c.Phones[i].Type)
 		if err != nil {
 			stmt.Close()
 			return fmt.Errorf("createCustomer: customers_phones exec err=%v | rollback=%v", err, tx.Rollback())
@@ -357,7 +357,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 		return fmt.Errorf("createCustomer: insert into customers_addresses err=%v | rollback=%v", err, tx.Rollback())
 	}
 	for i := range c.Addresses {
-		_, err := stmt.Exec(c.Addresses[i].ID, c.ID, c.Addresses[i].Type, c.Addresses[i].Address1, c.Addresses[i].Address2, c.Addresses[i].City, c.Addresses[i].State, c.Addresses[i].PostalCode, c.Addresses[i].Country, c.Addresses[i].Validated, c.Addresses[i].Active)
+		_, err := stmt.Exec(c.Addresses[i].AddressID, c.CustomerID, c.Addresses[i].Type, c.Addresses[i].Address1, c.Addresses[i].Address2, c.Addresses[i].City, c.Addresses[i].State, c.Addresses[i].PostalCode, c.Addresses[i].Country, c.Addresses[i].Validated, c.Addresses[i].Active)
 		if err != nil {
 			stmt.Close()
 			return fmt.Errorf("createCustomer: customers_addresses exec err=%v | rollback=%v", err, tx.Rollback())
@@ -381,7 +381,7 @@ func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer
 	row := stmt.QueryRow(customerID)
 
 	var cust client.Customer
-	cust.ID = customerID
+	cust.CustomerID = customerID
 	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.BirthDate, &cust.Status, &cust.Email, &cust.CreatedAt, &cust.LastModified)
 	stmt.Close()
 	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
@@ -454,7 +454,7 @@ func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.Custo
 	var adds []client.CustomerAddress
 	for rows.Next() {
 		var a client.CustomerAddress
-		if err := rows.Scan(&a.ID, &a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated, &a.Active); err != nil {
+		if err := rows.Scan(&a.AddressID, &a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated, &a.Active); err != nil {
 			return nil, fmt.Errorf("readAddresses: scan customers_addresses: err=%v", err)
 		}
 		adds = append(adds, a)

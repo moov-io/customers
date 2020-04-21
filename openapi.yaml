@@ -780,7 +780,7 @@ components:
     Customer:
       type: object
       properties:
-        ID:
+        customerID:
           type: string
           description: The unique identifier for the customer who owns the account
           example: e210a9d6
@@ -943,7 +943,7 @@ components:
     CustomerAddress:
       type: object
       properties:
-        ID:
+        addressID:
           type: string
           description: Unique identifier for this Address
           example: 851233a1
@@ -1013,7 +1013,7 @@ components:
         $ref: '#/components/schemas/Account'
     Account:
       properties:
-        ID:
+        accountID:
           type: string
           description: A unique identifier for this account
           example: e1b1544a
@@ -1055,7 +1055,7 @@ components:
     Disclaimer:
       type: object
       properties:
-        ID:
+        disclaimerID:
           type: string
           description: The unique identifier for this Disclaimer
           example: 9342f3a7
@@ -1079,7 +1079,7 @@ components:
     Document:
       type: object
       properties:
-        ID:
+        documentID:
           type: string
           description: The unique identifier for this document
           example: e210a9d6

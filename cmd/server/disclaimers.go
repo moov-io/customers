@@ -145,7 +145,7 @@ func documentExistsForCustomer(customerID string, req createDisclaimerRequest, d
 			return err
 		}
 		for i := range docs {
-			if docs[i].ID == req.DocumentID {
+			if docs[i].DocumentID == req.DocumentID {
 				return nil
 			}
 		}
@@ -183,7 +183,7 @@ where d.deleted_at is null and d.disclaimer_id = ? limit 1;`
 	var acceptedAt *time.Time
 	var d client.Disclaimer
 
-	if err := stmt.QueryRow(disclaimerID).Scan(&d.ID, &d.Text, &d.DocumentID, &acceptedAt); err != nil {
+	if err := stmt.QueryRow(disclaimerID).Scan(&d.DisclaimerID, &d.Text, &d.DocumentID, &acceptedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -269,10 +269,10 @@ func (r *sqlDisclaimerRepository) insertDisclaimer(text, documentID string) (*cl
 	defer stmt.Close()
 
 	disc := &client.Disclaimer{
-		ID:         base.ID(),
-		Text:       text,
-		DocumentID: documentID,
+		DisclaimerID: base.ID(),
+		Text:         text,
+		DocumentID:   documentID,
 	}
-	_, err = stmt.Exec(disc.ID, disc.Text, disc.DocumentID, time.Now())
+	_, err = stmt.Exec(disc.DisclaimerID, disc.Text, disc.DocumentID, time.Now())
 	return disc, err
 }

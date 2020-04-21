@@ -124,7 +124,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.ID), nil)
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.CustomerID), nil)
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -141,7 +141,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&customer); err != nil {
 		t.Fatal(err)
 	}
-	if customer.ID == "" {
+	if customer.CustomerID == "" {
 		t.Error("empty Customer.ID")
 	}
 }
@@ -205,7 +205,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 
 	// asCustomer
 	cust, _, _ := req.asCustomer(testCustomerSSNStorage(t))
-	if cust.ID == "" {
+	if cust.CustomerID == "" {
 		t.Errorf("empty Customer: %#v", cust)
 	}
 	if len(cust.Phones) != 1 {
@@ -257,8 +257,8 @@ func TestCustomers__createCustomer(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&cust); err != nil {
 		t.Fatal(err)
 	}
-	if cust.ID == "" {
-		t.Error("empty Customer.ID")
+	if cust.CustomerID == "" {
+		t.Error("empty Customer.CustomerID")
 	}
 
 	// sad path
@@ -345,7 +345,7 @@ func TestCustomers__repository(t *testing.T) {
 	}
 
 	// read
-	cust, err = repo.getCustomer(cust.ID)
+	cust, err = repo.getCustomer(cust.CustomerID)
 	if err != nil {
 		t.Error(err)
 	}
@@ -371,12 +371,12 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	}
 
 	// update status
-	if err := repo.updateCustomerStatus(cust.ID, customers.KYC, "test comment"); err != nil {
+	if err := repo.updateCustomerStatus(cust.CustomerID, customers.KYC, "test comment"); err != nil {
 		t.Fatal(err)
 	}
 
 	// read the status back
-	customer, err := repo.getCustomer(cust.ID)
+	customer, err := repo.getCustomer(cust.CustomerID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -401,7 +401,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	body := strings.NewReader(`{ "metadata": { "key": "bar"} }`)
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.ID), body)
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), body)
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -462,7 +462,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 	}
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.ID), &buf)
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), &buf)
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -477,7 +477,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 
 	// invalid JSON
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.ID), strings.NewReader("{invalid-json"))
+	req = httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), strings.NewReader("{invalid-json"))
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
 
@@ -564,7 +564,7 @@ func TestCustomers__validateMetadata(t *testing.T) {
 func TestCustomers__addCustomerAddress(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: base.ID(),
+			CustomerID: base.ID(),
 		},
 		err: errors.New("bad error"),
 	}
@@ -615,7 +615,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	}
 
 	// add an Address
-	if err := repo.addCustomerAddress(cust.ID, address{
+	if err := repo.addCustomerAddress(cust.CustomerID, address{
 		Address1:   "123 1st st",
 		City:       "fake city",
 		State:      "CA",
@@ -626,7 +626,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	}
 
 	// re-read
-	cust, err := repo.getCustomer(cust.ID)
+	cust, err := repo.getCustomer(cust.CustomerID)
 	if err != nil {
 		t.Fatal(err)
 	}

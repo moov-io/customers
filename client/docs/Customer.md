@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**ID** | **string** | The unique identifier for the customer who owns the account | [optional] 
+**CustomerID** | **string** | The unique identifier for the customer who owns the account | [optional] 
 **FirstName** | **string** | Given Name or First Name | [optional] 
 **MiddleName** | **string** | Middle Name | [optional] 
 **LastName** | **string** | Surname or Last Name | [optional] 

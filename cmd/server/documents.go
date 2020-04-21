@@ -106,7 +106,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		contentType := http.DetectContentType(buf)
 		doc := &client.Document{
-			ID:          base.ID(),
+			DocumentID:  base.ID(),
 			Type:        documentType,
 			ContentType: contentType,
 			UploadedAt:  time.Now(),
@@ -128,13 +128,13 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			moovhttp.Problem(w, err)
 			return
 		}
-		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.ID, contentType, customerID), "requestID", requestID)
+		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.DocumentID, contentType, customerID), "requestID", requestID)
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
-		documentKey := makeDocumentKey(customerID, doc.ID)
+		documentKey := makeDocumentKey(customerID, doc.DocumentID)
 		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestID", requestID)
 
 		writer, err := bucket.NewWriter(ctx, documentKey, &blob.WriterOptions{
@@ -233,7 +233,7 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerID string) ([]*clie
 	var docs []*client.Document
 	for rows.Next() {
 		var doc client.Document
-		if err := rows.Scan(&doc.ID, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
+		if err := rows.Scan(&doc.DocumentID, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
 			return nil, fmt.Errorf("getCustomerDocuments: scan: %v", err)
 		}
 		docs = append(docs, &doc)
@@ -249,7 +249,7 @@ func (r *sqlDocumentRepository) writeCustomerDocument(customerID string, doc *cl
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(doc.ID, customerID, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
+	if _, err := stmt.Exec(doc.DocumentID, customerID, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
 		return fmt.Errorf("writeCustomerDocument: exec: %v", err)
 	}
 	return nil
