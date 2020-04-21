@@ -41,13 +41,13 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
@@ -74,31 +74,31 @@ paths:
     get:
       tags: [Customers]
       summary: Retrieve customer
-      description: Get the Customer object and metadata for the customer ID.
+      description: Get the Customer object and metadata for the customerID.
       operationId: getCustomer
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID that identifies this Customer
           required: true
           schema:
             type: string
             example: e210a9d6-d755-4455-9bd2-9577ea7e1081
       responses:
         '200':
-          description: A customer objects for the supplied customer ID
+          description: A customer objects for the supplied customerID
           content:
             application/json:
               schema:
@@ -114,19 +114,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to add the address onto
           required: true
           schema:
             type: string
@@ -159,19 +159,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to add the metadata onto
           required: true
           schema:
             type: string
@@ -204,19 +204,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to update the CustomerStatus
           required: true
           schema:
             type: string
@@ -248,19 +248,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get Accounts for
           required: true
           schema:
             type: string
@@ -285,19 +285,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to add an Account onto
           required: true
           schema:
             type: string
@@ -327,19 +327,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to remove an Account
           required: true
           schema:
             type: string
@@ -353,7 +353,7 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
-  /customers/{customerID}/accounts/validate:
+  /customers/{customerID}/accounts/{accountID}/validate:
     post:
       tags: [Customers]
       summary: Validate Account
@@ -364,23 +364,30 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer the accountID belongs to
           required: true
           schema:
             type: string
-            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+            example: 51dd8cdd
+        - name: accountID
+          in: path
+          description: accountID of the Account to validate
+          required: true
+          schema:
+            type: string
+            example: b74d7c51
       requestBody:
         content:
           application/json:
@@ -404,19 +411,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get disclaimers
           required: true
           schema:
             type: string
@@ -443,26 +450,26 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to accept a disclaimer
           required: true
           schema:
             type: string
             example: e210a9d6-d755-4455-9bd2-9577ea7e1081
         - name: disclaimerID
           in: path
-          description: Disclaimer ID
+          description: disclaimerID of the Disclaimer to accept
           required: true
           schema:
             type: string
@@ -489,19 +496,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to add a document
           required: true
           schema:
             type: string
@@ -545,19 +552,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get all Documents
           required: true
           schema:
             type: string
@@ -584,26 +591,26 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get a Document
           required: true
           schema:
             type: string
             example: e210a9d6
         - name: documentID
           in: path
-          description: Document ID
+          description: documentID to identify a Document
           required: true
           schema:
             type: string
@@ -635,19 +642,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get latest OFAC search
           required: true
           schema:
             type: string
@@ -675,19 +682,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to refresh OFAC search
           required: true
           schema:
             type: string
@@ -1006,7 +1013,7 @@ components:
         $ref: '#/components/schemas/Account'
     Account:
       properties:
-        id:
+        ID:
           type: string
           description: A unique identifier for this account
           example: e1b1544a
@@ -1102,7 +1109,7 @@ components:
     OFACSearch:
       type: object
       properties:
-        entityId:
+        entityID:
           type: string
           description: SDN EntityID of the Entity
           example: "2141"

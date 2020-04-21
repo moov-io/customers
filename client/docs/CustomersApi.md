@@ -20,6 +20,7 @@ Method | HTTP request | Description
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
+[**ValidateAccount**](CustomersApi.md#ValidateAccount) | **Post** /customers/{customerID}/accounts/{accountID}/validate | Validate Account
 
 
 
@@ -37,8 +38,8 @@ Accept a disclaimer for the given customer which could include a document also
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
-**disclaimerID** | **string**| Disclaimer ID | 
+**customerID** | **string**| customerID of the Customer to accept a disclaimer | 
+**disclaimerID** | **string**| disclaimerID of the Disclaimer to accept | 
  **optional** | ***AcceptDisclaimerOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -50,8 +51,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -85,7 +86,7 @@ Add an Address onto an existing Customer record
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to add the address onto | 
 **createCustomerAddress** | [**CreateCustomerAddress**](CreateCustomerAddress.md)|  | 
  **optional** | ***AddCustomerAddressOpts** | optional parameters | nil if no parameters
 
@@ -98,8 +99,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -144,8 +145,8 @@ Optional parameters are passed through a pointer to a CreateCustomerOpts struct
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -179,7 +180,7 @@ Remove an account from the given Customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to remove an Account | 
  **optional** | ***CustomersCustomerIDAccountsDeleteOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -190,8 +191,8 @@ Optional parameters are passed through a pointer to a CustomersCustomerIDAccount
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -225,7 +226,7 @@ Retrieve all accounts for the given customer.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to get Accounts for | 
  **optional** | ***CustomersCustomerIDAccountsGetOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -236,8 +237,8 @@ Optional parameters are passed through a pointer to a CustomersCustomerIDAccount
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -271,7 +272,7 @@ Create an account for the given customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to add an Account onto | 
  **optional** | ***CustomersCustomerIDAccountsPostOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -282,8 +283,8 @@ Optional parameters are passed through a pointer to a CustomersCustomerIDAccount
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
  **createAccount** | [**optional.Interface of CreateAccount**](CreateAccount.md)|  | 
 
 ### Return type
@@ -310,7 +311,7 @@ No authorization required
 
 Retrieve customer
 
-Get the Customer object and metadata for the customer ID.
+Get the Customer object and metadata for the customerID.
 
 ### Required Parameters
 
@@ -318,7 +319,7 @@ Get the Customer object and metadata for the customer ID.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID that identifies this Customer | 
  **optional** | ***GetCustomerOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -329,8 +330,8 @@ Optional parameters are passed through a pointer to a GetCustomerOpts struct
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -364,7 +365,7 @@ Get active disclaimers for the given customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to get disclaimers | 
  **optional** | ***GetCustomerDisclaimersOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -375,8 +376,8 @@ Optional parameters are passed through a pointer to a GetCustomerDisclaimersOpts
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -410,8 +411,8 @@ Retrieve the referenced document
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
-**documentID** | **string**| Document ID | 
+**customerID** | **string**| customerID of the Customer to get a Document | 
+**documentID** | **string**| documentID to identify a Document | 
  **optional** | ***GetCustomerDocumentContentsOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -423,8 +424,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -458,7 +459,7 @@ Get documents for a customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to get all Documents | 
  **optional** | ***GetCustomerDocumentsOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -469,8 +470,8 @@ Optional parameters are passed through a pointer to a GetCustomerDocumentsOpts s
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -504,7 +505,7 @@ Get the latest OFAC search for a customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to get latest OFAC search | 
  **optional** | ***GetLatestOFACSearchOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -515,8 +516,8 @@ Optional parameters are passed through a pointer to a GetLatestOFACSearchOpts st
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -580,7 +581,7 @@ Refresh OFAC search for a given Customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to refresh OFAC search | 
  **optional** | ***RefreshOFACSearchOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -591,8 +592,8 @@ Optional parameters are passed through a pointer to a RefreshOFACSearchOpts stru
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -626,7 +627,7 @@ Replace the metadata object for a customer. Metadata is a map of unique keys ass
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to add the metadata onto | 
 **customerMetadata** | [**CustomerMetadata**](CustomerMetadata.md)|  | 
  **optional** | ***ReplaceCustomerMetadataOpts** | optional parameters | nil if no parameters
 
@@ -639,8 +640,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -674,7 +675,7 @@ Update the status for a customer, which can only be updated by authenticated use
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to update the CustomerStatus | 
 **updateCustomerStatus** | [**UpdateCustomerStatus**](UpdateCustomerStatus.md)|  | 
  **optional** | ***UpdateCustomerStatusOpts** | optional parameters | nil if no parameters
 
@@ -687,8 +688,8 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -722,7 +723,7 @@ Upload a document for the given customer
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
+**customerID** | **string**| customerID of the Customer to add a document | 
 **type_** | **string**| Document type (see Document type for values) | 
 **file** | ***os.File*****os.File**| Document to be uploaded | 
  **optional** | ***UploadCustomerDocumentOpts** | optional parameters | nil if no parameters
@@ -737,8 +738,8 @@ Name | Type | Description  | Notes
 
 
 
- **xRequestID** | **optional.String**| Optional Request ID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Moov User ID | 
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
 
 ### Return type
 
@@ -751,6 +752,55 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: multipart/form-data
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## ValidateAccount
+
+> ValidateAccount(ctx, customerID, accountID, optional)
+
+Validate Account
+
+Initiate or validatae account with availble validation strategies. Currently the only available strategy is micro-deposits. 
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID of the Customer the accountID belongs to | 
+**accountID** | **string**| accountID of the Account to validate | 
+ **optional** | ***ValidateAccountOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a ValidateAccountOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+ **updateValidation** | [**optional.Interface of UpdateValidation**](UpdateValidation.md)|  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

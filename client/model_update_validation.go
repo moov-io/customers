@@ -9,10 +9,9 @@
 
 package client
 
-// UpdateCustomerStatus struct for UpdateCustomerStatus
-type UpdateCustomerStatus struct {
-	// Free form comment about the customer status update
-	Comment string `json:"comment,omitempty"`
-	// State of the customer
-	Status string `json:"status"`
+// UpdateValidation struct for UpdateValidation
+type UpdateValidation struct {
+	// Validation strategy to use. If micro-deposit send no amounts to initiate and supply amounts to validate the account.
+	Strategy      string   `json:"strategy,omitempty"`
+	MicroDeposits []string `json:"micro-deposits,omitempty"`
 }

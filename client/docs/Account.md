@@ -4,9 +4,10 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Id** | **string** | A unique identifier for this account | [optional] 
+**ID** | **string** | A unique identifier for this account | [optional] 
 **MaskedAccountNumber** | **string** | The masked account number for the depository account | [optional] 
 **RoutingNumber** | **string** | The ABA routing transit number for the depository account. | [optional] 
+**Status** | **string** | Enumeration if this account has been validated through micro-deposits or another available strategy. | [optional] 
 **Type** | [**AccountType**](AccountType.md) |  | [optional] 
 **HolderType** | [**HolderType**](HolderType.md) |  | [optional] 
 
