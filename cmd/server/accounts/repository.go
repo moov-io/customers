@@ -52,7 +52,7 @@ where customer_id = ? and deleted_at is null;`
 	var out []*client.Account
 	for rows.Next() {
 		var a client.Account
-		if err := rows.Scan(&a.Id, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Type, &a.HolderType); err != nil {
+		if err := rows.Scan(&a.ID, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Type, &a.HolderType); err != nil {
 			return nil, err
 		}
 		out = append(out, &a)
@@ -62,7 +62,7 @@ where customer_id = ? and deleted_at is null;`
 
 func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
 	account := &client.Account{
-		Id:                  base.ID(),
+		ID:                  base.ID(),
 		MaskedAccountNumber: req.AccountNumber,
 		RoutingNumber:       req.RoutingNumber,
 		Type:                req.Type,
@@ -80,12 +80,12 @@ func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, 
 	defer stmt.Close()
 
 	_, err = stmt.Exec(
-		account.Id, customerID, userID,
+		account.ID, customerID, userID,
 		req.encryptedAccountNumber, req.hashedAccountNumber, req.maskedAccountNumber,
 		account.RoutingNumber, account.Type, account.HolderType, time.Now(),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("problem creating account=%s: %v", account.Id, err)
+		return nil, fmt.Errorf("problem creating account=%s: %v", account.ID, err)
 	}
 	return account, nil
 }

@@ -59,7 +59,7 @@ type updateCustomerStatusRequest struct {
 //  - CIP can only be if the SSN has been set
 func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureStatus customers.Status, repo customerRepository, ofac *ofacSearcher, requestID string) error {
 	// Reject certain Deceased and Rejected statuses
-	if cs, err := customers.LiftStatus(existing.Status); err != nil || cs == nil || *cs <= customers.Rejected {
+	if cs, err := customers.LiftStatus(string(existing.Status)); err != nil || cs == nil || *cs <= customers.Rejected {
 		return fmt.Errorf("customer status '%s' cannot be changed: %v", existing.Status, err)
 	}
 	switch futureStatus {
@@ -88,7 +88,7 @@ func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureSt
 			}
 		}
 		if searchResult.Match > ofacMatchThreshold {
-			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.ID, searchResult.Match, searchResult.EntityId)
+			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.ID, searchResult.Match, searchResult.EntityID)
 		}
 		return nil
 	case customers.CIP: // TODO(adam): need to impl lookup

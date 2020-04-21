@@ -593,7 +593,7 @@ func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID string) (
 
 	row := stmt.QueryRow(customerID)
 	var res ofacSearchResult
-	if err := row.Scan(&res.EntityId, &res.SDNName, &res.SDNType, &res.Match, &res.CreatedAt); err != nil {
+	if err := row.Scan(&res.EntityID, &res.SDNName, &res.SDNType, &res.Match, &res.CreatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // nothing found
 		}
@@ -614,7 +614,7 @@ func (r *sqlCustomerRepository) saveCustomerOFACSearch(customerID string, result
 		result.CreatedAt = time.Now()
 	}
 
-	if _, err := stmt.Exec(customerID, result.EntityId, result.SDNName, result.SDNType, result.Match, result.CreatedAt); err != nil {
+	if _, err := stmt.Exec(customerID, result.EntityID, result.SDNName, result.SDNType, result.Match, result.CreatedAt); err != nil {
 		return fmt.Errorf("saveCustomerOFACSearch: exec: %v", err)
 	}
 	return nil

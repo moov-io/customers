@@ -42,12 +42,12 @@ func TestRoutes(t *testing.T) {
 
 	// re-read, find account
 	accounts = httpReadAccounts(t, handler, customerID)
-	if len(accounts) != 1 || accounts[0].Id != account.Id {
+	if len(accounts) != 1 || accounts[0].ID != account.ID {
 		t.Errorf("got accounts: %v", accounts)
 	}
 
 	// delete and expect no accounts
-	httpDeleteAccount(t, handler, customerID, account.Id)
+	httpDeleteAccount(t, handler, customerID, account.ID)
 	accounts = httpReadAccounts(t, handler, customerID)
 	if len(accounts) != 0 {
 		t.Errorf("got accounts: %v", accounts)

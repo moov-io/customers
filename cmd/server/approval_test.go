@@ -252,7 +252,7 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
-	if repo.savedOFACSearchResult.EntityId != "12124" {
+	if repo.savedOFACSearchResult.EntityID != "12124" {
 		t.Errorf("unexpected saved OFAC result: %#v", repo.savedOFACSearchResult)
 	}
 }

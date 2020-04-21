@@ -61,7 +61,7 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res.EntityId != "1241421" {
+	if res.EntityID != "1241421" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
 	if res.CreatedAt.IsZero() {
@@ -86,7 +86,7 @@ func TestOFACApproval__getLatest(t *testing.T) {
 			ID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			EntityId: "142",
+			EntityID: "142",
 			Match:    1.0,
 		},
 	}
@@ -125,7 +125,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 			ID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			EntityId: "142",
+			EntityID: "142",
 			Match:    1.0,
 		},
 	}
@@ -149,7 +149,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&result); err != nil {
 		t.Fatal(err)
 	}
-	if result.EntityId != "142" {
+	if result.EntityID != "142" {
 		t.Errorf("result=%#v", result)
 	}
 
@@ -175,7 +175,7 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 			ID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			EntityId: "142",
+			EntityID: "142",
 			Match:    0.88,
 		},
 	}

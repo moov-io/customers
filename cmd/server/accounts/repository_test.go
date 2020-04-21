@@ -58,12 +58,12 @@ func TestRepository(t *testing.T) {
 	if len(accounts) != 1 || err != nil {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}
-	if accounts[0].Id != acct.Id {
-		t.Errorf("accounts[0].Id=%s acct.Id=%s", accounts[0].Id, acct.Id)
+	if accounts[0].ID != acct.ID {
+		t.Errorf("accounts[0].ID=%s acct.ID=%s", accounts[0].ID, acct.ID)
 	}
 
 	// delete, expect no accounts
-	if err := repo.deactivateCustomerAccount(acct.Id); err != nil {
+	if err := repo.deactivateCustomerAccount(acct.ID); err != nil {
 		t.Fatal(err)
 	}
 	accounts, err = repo.getCustomerAccounts(customerID)

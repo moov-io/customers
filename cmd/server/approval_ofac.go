@@ -23,7 +23,7 @@ import (
 )
 
 type ofacSearchResult struct {
-	EntityId  string    `json:"entityId"`
+	EntityID  string    `json:"entityID"`
 	SDNName   string    `json:"sdnName"`
 	SDNType   string    `json:"sdnType"`
 	Match     float32   `json:"match"`
@@ -60,7 +60,7 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	switch {
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
 		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			EntityId:  nickSDN.EntityID,
+			EntityID:  nickSDN.EntityID,
 			SDNName:   nickSDN.SdnName,
 			SDNType:   nickSDN.SdnType,
 			Match:     nickSDN.Match,
@@ -68,7 +68,7 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 		})
 	case sdn != nil:
 		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			EntityId:  sdn.EntityID,
+			EntityID:  sdn.EntityID,
 			SDNName:   sdn.SdnName,
 			SDNType:   sdn.SdnType,
 			Match:     sdn.Match,
@@ -138,7 +138,7 @@ func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSea
 			return
 		}
 		if result.Match > ofacMatchThreshold {
-			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.ID, result.EntityId, result.Match)
+			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.ID, result.EntityID, result.Match)
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
 			if err := repo.updateCustomerStatus(cust.ID, customers.Rejected, "manual OFAC refresh"); err != nil {
