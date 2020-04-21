@@ -104,7 +104,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Customer'
         '404':
-          description: A resource with the specified ID was not found
+          description: No Customer with the specified customerID was found
   /customers/{customerID}/address:
     post:
       tags: [Customers]
@@ -739,6 +739,8 @@ components:
         suffix:
           type: string
           description: Customers name suffix. "Jr", "PH.D."
+        type:
+          $ref: '#/components/schemas/CustomerType'
         birthDate:
           type: string
           format: date-time
@@ -805,20 +807,15 @@ components:
         suffix:
           type: string
           description: Customers name suffix. "Jr", "PH.D."
+        type:
+          $ref: '#/components/schemas/CustomerType'
         birthDate:
           type: string
           format: date-time
           description: Legal date of birth
           example: '2016-08-29T09:12:33.001Z'
         status:
-          type: string
-          description: State of the customer
-          enum:
-            - Deceased
-            - Rejected
-            - Unknown
-            - ReceiveOnly
-            - Verified
+          $ref: '#/components/schemas/CustomerStatus'
         email:
           type: string
           maximum: 500
@@ -847,6 +844,21 @@ components:
           format: date-time
           description: Last time the object was modified
           example: '2016-08-29T09:12:33.001Z'
+    CustomerType:
+      type: string
+      description: Note if this Customer represents an individual or business
+      enum:
+        - Individual
+        - Business
+    CustomerStatus:
+      type: string
+      description: State of the customer
+      enum:
+        - Deceased
+        - Rejected
+        - Unknown
+        - ReceiveOnly
+        - Verified
     CustomerMetadata:
       properties:
         metadata:
@@ -865,14 +877,7 @@ components:
           description: Free form comment about the customer status update
           example: Customer was approved from KYC confirmation
         status:
-          type: string
-          description: State of the customer
-          enum:
-            - Deceased
-            - Rejected
-            - Unknown
-            - ReceiveOnly
-            - Verified
+          $ref: '#/components/schemas/CustomerStatus'
       required:
         - status
     CreatePhone:
@@ -985,14 +990,6 @@ components:
         - Checking
         - Savings
       example: checking
-    HolderType:
-      type: string
-      description: |
-        Defines the type of entity of the account holder as an *individual* or *business*
-      enum:
-        - individual
-        - business
-      example: individual
     CreateAccount:
       properties:
         accountNumber:
@@ -1005,8 +1002,6 @@ components:
           example: "051504597"
         type:
           $ref: '#/components/schemas/AccountType'
-        holderType:
-          $ref: '#/components/schemas/HolderType'
     Accounts:
       type: array
       items:
@@ -1034,8 +1029,6 @@ components:
           description: Enumeration if this account has been validated through micro-deposits or another available strategy.
         type:
           $ref: '#/components/schemas/AccountType'
-        holderType:
-          $ref: '#/components/schemas/HolderType'
     UpdateValidation:
       type: object
       properties:
@@ -1065,7 +1058,7 @@ components:
           example: Set of conditions
         documentID:
           type: string
-          description: Optional ID which references a Document included in the disclaimer
+          description: Optional documentID which references a Document included in the disclaimer
           example: 08a184e1
         acceptedAt:
           type: string
@@ -1081,7 +1074,7 @@ components:
       properties:
         documentID:
           type: string
-          description: The unique identifier for this document
+          description: A unique identifier for this document
           example: e210a9d6
         type:
           type: string
