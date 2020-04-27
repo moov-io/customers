@@ -54,14 +54,14 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 		Match:    0.99,
 	}
 	customerID := base.ID()
-	if err := searcher.storeCustomerOFACSearch(&client.Customer{ID: customerID}, "requestID"); err != nil {
+	if err := searcher.storeCustomerOFACSearch(&client.Customer{CustomerID: customerID}, "requestID"); err != nil {
 		t.Fatal(err)
 	}
 	res, err := repo.getLatestCustomerOFACSearch(customerID)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if res.EntityId != "1241421" {
+	if res.EntityID != "1241421" {
 		t.Errorf("ofacSearchResult: %#v", res)
 	}
 	if res.CreatedAt.IsZero() {
@@ -70,7 +70,7 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 
 	// retry but with NickName set (test coverage)
 	customerID = base.ID()
-	if err := searcher.storeCustomerOFACSearch(&client.Customer{ID: customerID, NickName: "John Doe"}, "requestID"); err != nil {
+	if err := searcher.storeCustomerOFACSearch(&client.Customer{CustomerID: customerID, NickName: "John Doe"}, "requestID"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -83,10 +83,10 @@ func TestOFACApproval__getLatest(t *testing.T) {
 
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: customerID,
+			CustomerID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			EntityId: "142",
+			EntityID: "142",
 			Match:    1.0,
 		},
 	}
@@ -122,10 +122,10 @@ func TestOFACApproval__refresh(t *testing.T) {
 
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: customerID,
+			CustomerID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			EntityId: "142",
+			EntityID: "142",
 			Match:    1.0,
 		},
 	}
@@ -149,7 +149,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&result); err != nil {
 		t.Fatal(err)
 	}
-	if result.EntityId != "142" {
+	if result.EntityID != "142" {
 		t.Errorf("result=%#v", result)
 	}
 
@@ -172,10 +172,10 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: customerID,
+			CustomerID: customerID,
 		},
 		savedOFACSearchResult: &ofacSearchResult{
-			EntityId: "142",
+			EntityID: "142",
 			Match:    0.88,
 		},
 	}

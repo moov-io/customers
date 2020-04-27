@@ -18,6 +18,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -58,22 +59,22 @@ type updateCustomerStatusRequest struct {
 //  - CIP can only be if the SSN has been set
 func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureStatus customers.Status, repo customerRepository, ofac *ofacSearcher, requestID string) error {
 	// Reject certain Deceased and Rejected statuses
-	if cs, err := customers.LiftStatus(existing.Status); err != nil || cs == nil || *cs <= customers.Rejected {
+	if cs, err := customers.LiftStatus(string(existing.Status)); err != nil || cs == nil || *cs <= customers.Rejected {
 		return fmt.Errorf("customer status '%s' cannot be changed: %v", existing.Status, err)
 	}
 	switch futureStatus {
 	case customers.KYC:
 		if existing.FirstName == "" || existing.LastName == "" {
-			return fmt.Errorf("customer=%s is missing fist/last name", existing.ID)
+			return fmt.Errorf("customer=%s is missing fist/last name", existing.CustomerID)
 		}
 		if existing.BirthDate.IsZero() {
-			return fmt.Errorf("customer=%s is missing date of birth", existing.ID)
+			return fmt.Errorf("customer=%s is missing date of birth", existing.CustomerID)
 		}
 		if !containsValidPrimaryAddress(existing.Addresses) {
-			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.ID)
+			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.CustomerID)
 		}
 	case customers.OFAC:
-		searchResult, err := repo.getLatestCustomerOFACSearch(existing.ID)
+		searchResult, err := repo.getLatestCustomerOFACSearch(existing.CustomerID)
 		if err != nil {
 			return fmt.Errorf("validCustomerStatusTransition: error getting OFAC search: %v", err)
 		}
@@ -81,22 +82,22 @@ func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureSt
 			if err := ofac.storeCustomerOFACSearch(existing, ""); err != nil {
 				return fmt.Errorf("validCustomerStatusTransition: problem with OFAC search: %v", err)
 			}
-			searchResult, err = repo.getLatestCustomerOFACSearch(existing.ID)
+			searchResult, err = repo.getLatestCustomerOFACSearch(existing.CustomerID)
 			if err != nil || searchResult == nil {
 				return fmt.Errorf("validCustomerStatusTransition: inner lookup searchResult=%#v: %v", searchResult, err)
 			}
 		}
 		if searchResult.Match > ofacMatchThreshold {
-			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.ID, searchResult.Match, searchResult.EntityId)
+			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.CustomerID, searchResult.Match, searchResult.EntityID)
 		}
 		return nil
 	case customers.CIP: // TODO(adam): need to impl lookup
 		// What can we do to validate an SSN?
 		// https://www.ssa.gov/employer/randomization.html (not much)
 		if ssn == nil || len(ssn.encrypted) == 0 {
-			return fmt.Errorf("customer=%s is missing SSN", existing.ID)
+			return fmt.Errorf("customer=%s is missing SSN", existing.CustomerID)
 		}
-		return fmt.Errorf("customer=%s %s to CIP transition needs to lookup encrypted SSN", existing.ID, existing.Status)
+		return fmt.Errorf("customer=%s %s to CIP transition needs to lookup encrypted SSN", existing.CustomerID, existing.Status)
 	}
 	return nil
 }
@@ -112,14 +113,14 @@ func containsValidPrimaryAddress(addrs []client.CustomerAddress) bool {
 
 func updateCustomerStatus(logger log.Logger, repo customerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
 		if r.Method != "PUT" {
 			moovhttp.Problem(w, fmt.Errorf("unsupported HTTP verb %s", r.Method))
 			return
 		}
 
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -185,14 +186,14 @@ func (req *updateCustomerAddressRequest) validate() error {
 
 func updateCustomerAddress(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
 		if r.Method != "PUT" {
 			moovhttp.Problem(w, fmt.Errorf("unsupported HTTP verb %s", r.Method))
 			return
 		}
 
-		customerID, addressId := getCustomerID(w, r), getAddressId(w, r)
+		customerID, addressId := route.GetCustomerID(w, r), getAddressId(w, r)
 		if customerID == "" || addressId == "" {
 			return
 		}

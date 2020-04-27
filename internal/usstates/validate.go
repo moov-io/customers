@@ -4,7 +4,9 @@
 
 package usstates
 
-import "strings"
+import (
+	"strings"
+)
 
 var (
 	// These abbreviations are mappings of the 50 United States of America, various

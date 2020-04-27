@@ -4,7 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**EntityId** | **string** | SDN EntityID of the Entity | [optional] 
+**EntityID** | **string** | SDN EntityID of the Entity | [optional] 
 **SdnName** | **string** | Name of the SDN entity | [optional] 
 **SdnType** | **string** | SDN entity type | [optional] 
 **Match** | **float32** | Percentage of similarity between the Customer name and this OFAC entity | [optional] 

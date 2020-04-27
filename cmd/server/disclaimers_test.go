@@ -56,9 +56,9 @@ func (r *testDisclaimerRepository) insertDisclaimer(text, documentID string) (*c
 	}
 	if len(r.disclaimers) == 0 {
 		r.disclaimers = append(r.disclaimers, &client.Disclaimer{
-			ID:         base.ID(),
-			Text:       text,
-			DocumentID: documentID,
+			DisclaimerID: base.ID(),
+			Text:         text,
+			DocumentID:   documentID,
 		})
 		return r.disclaimers[0], nil
 	}
@@ -105,8 +105,8 @@ func TestDisclaimers__getCustomerDisclaimers(t *testing.T) {
 	repo := &testDisclaimerRepository{
 		disclaimers: []*client.Disclaimer{
 			{
-				ID:   base.ID(),
-				Text: "terms and conditions",
+				DisclaimerID: base.ID(),
+				Text:         "terms and conditions",
 			},
 		},
 	}
@@ -149,8 +149,8 @@ func TestDisclaimers__acceptDisclaimer(t *testing.T) {
 	repo := &testDisclaimerRepository{
 		disclaimers: []*client.Disclaimer{
 			{
-				ID:   disclaimerID,
-				Text: "terms and conditions",
+				DisclaimerID: disclaimerID,
+				Text:         "terms and conditions",
 			},
 		},
 	}
@@ -209,7 +209,7 @@ func TestDisclaimersRepository(t *testing.T) {
 		}
 
 		// Accept the disclaimer
-		if err := repo.acceptDisclaimer(customerID, disc.ID); err != nil {
+		if err := repo.acceptDisclaimer(customerID, disc.DisclaimerID); err != nil {
 			t.Fatal(err)
 		}
 
@@ -237,7 +237,7 @@ func TestDisclaimersAdmin__create(t *testing.T) {
 	docRepo := &testDocumentRepository{
 		documents: []*client.Document{
 			{
-				ID: documentID,
+				DocumentID: documentID,
 			},
 		},
 	}

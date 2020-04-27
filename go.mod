@@ -11,6 +11,7 @@ require (
 	github.com/hashicorp/vault/api v1.0.2
 	github.com/lopezator/migrator v0.2.0
 	github.com/mattn/go-sqlite3 v1.13.0
+	github.com/moov-io/ach v1.3.1
 	github.com/moov-io/base v0.11.0
 	github.com/moov-io/watchman v0.13.2
 	github.com/ory/dockertest/v3 v3.5.4

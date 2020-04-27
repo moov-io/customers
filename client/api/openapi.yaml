@@ -3,7 +3,11 @@ info:
   contact:
     url: https://github.com/moov-io/customers
   description: |
-    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Also, Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+
+    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgement are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
+
+    ![](https://raw.githubusercontent.com/adamdecaf/customers/create-accounts/docs/images/customer.png)
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
@@ -32,7 +36,7 @@ paths:
       description: Create a Customer object from the given details of a human or business
       operationId: createCustomer
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -42,7 +46,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -75,10 +80,10 @@ paths:
       - Customers
   /customers/{customerID}:
     get:
-      description: Get the Customer object and metadata for the customer ID.
+      description: Get the Customer object and metadata for the customerID.
       operationId: getCustomer
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -88,7 +93,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -97,7 +103,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID that identifies this Customer
         explode: false
         in: path
         name: customerID
@@ -112,7 +118,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
-          description: A customer objects for the supplied customer ID
+          description: A customer objects for the supplied customerID
         "404":
           description: A resource with the specified ID was not found
       summary: Retrieve customer
@@ -123,7 +129,7 @@ paths:
       description: Add an Address onto an existing Customer record
       operationId: addCustomerAddress
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -133,7 +139,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -142,7 +149,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to add the address onto
         explode: false
         in: path
         name: customerID
@@ -180,7 +187,7 @@ paths:
         data associated to a Customer.
       operationId: replaceCustomerMetadata
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -190,7 +197,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -199,7 +207,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to add the metadata onto
         explode: false
         in: path
         name: customerID
@@ -236,7 +244,7 @@ paths:
         authenticated users with permissions.
       operationId: updateCustomerStatus
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -246,7 +254,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -255,7 +264,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to update the CustomerStatus
         explode: false
         in: path
         name: customerID
@@ -286,12 +295,11 @@ paths:
       summary: Update customer status
       tags:
       - Customers
-  /customers/{customerID}/disclaimers:
-    get:
-      description: Get active disclaimers for the given customer
-      operationId: getCustomerDisclaimers
+  /customers/{customerID}/accounts:
+    delete:
+      description: Remove an account from the given Customer
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -301,7 +309,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -310,7 +319,216 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to remove an Account
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Account removed form customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      summary: Delete Customer Account
+      tags:
+      - Customers
+    get:
+      description: Retrieve all accounts for the given customer.
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer to get Accounts for
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accounts'
+          description: Active accounts for the customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      summary: Get Customer Accounts
+      tags:
+      - Customers
+    post:
+      description: Create an account for the given customer
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer to add an Account onto
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccount'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: Account created for the customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      summary: Create Customer Account
+      tags:
+      - Customers
+  /customers/{customerID}/accounts/{accountID}/validate:
+    post:
+      description: |
+        Initiate or validatae account with availble validation strategies.
+        Currently the only available strategy is micro-deposits.
+      operationId: validateAccount
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer the accountID belongs to
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: 51dd8cdd
+          type: string
+        style: simple
+      - description: accountID of the Account to validate
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateValidation'
+      responses:
+        "200":
+          description: Account validated or validtion started
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to validate account, see error(s)
+      summary: Validate Account
+      tags:
+      - Customers
+  /customers/{customerID}/disclaimers:
+    get:
+      description: Get active disclaimers for the given customer
+      operationId: getCustomerDisclaimers
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer to get disclaimers
         explode: false
         in: path
         name: customerID
@@ -341,7 +559,7 @@ paths:
         a document also
       operationId: acceptDisclaimer
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -351,7 +569,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -360,7 +579,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to accept a disclaimer
         explode: false
         in: path
         name: customerID
@@ -369,7 +588,7 @@ paths:
           example: e210a9d6-d755-4455-9bd2-9577ea7e1081
           type: string
         style: simple
-      - description: Disclaimer ID
+      - description: disclaimerID of the Disclaimer to accept
         explode: false
         in: path
         name: disclaimerID
@@ -399,7 +618,7 @@ paths:
       description: Get documents for a customer
       operationId: getCustomerDocuments
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -409,7 +628,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -418,7 +638,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to get all Documents
         explode: false
         in: path
         name: customerID
@@ -447,7 +667,7 @@ paths:
       description: Upload a document for the given customer
       operationId: uploadCustomerDocument
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -457,7 +677,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -466,7 +687,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to add a document
         explode: false
         in: path
         name: customerID
@@ -516,7 +737,7 @@ paths:
       description: Retrieve the referenced document
       operationId: getCustomerDocumentContents
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -526,7 +747,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -535,7 +757,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to get a Document
         explode: false
         in: path
         name: customerID
@@ -544,7 +766,7 @@ paths:
           example: e210a9d6
           type: string
         style: simple
-      - description: Document ID
+      - description: documentID to identify a Document
         explode: false
         in: path
         name: documentID
@@ -579,7 +801,7 @@ paths:
       description: Get the latest OFAC search for a customer
       operationId: getLatestOFACSearch
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -589,7 +811,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -598,7 +821,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to get latest OFAC search
         explode: false
         in: path
         name: customerID
@@ -628,7 +851,7 @@ paths:
       description: Refresh OFAC search for a given Customer
       operationId: refreshOFACSearch
       parameters:
-      - description: Optional Request ID allows application developer to trace requests
+      - description: Optional requestID allows application developer to trace requests
           through the systems logs
         example: rs4f9915
         explode: false
@@ -638,7 +861,8 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Moov User ID
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
         example: e3cdf999
         explode: false
         in: header
@@ -647,7 +871,7 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Customer ID
+      - description: customerID of the Customer to refresh OFAC search
         explode: false
         in: path
         name: customerID
@@ -776,9 +1000,9 @@ components:
           address1: address1
           postalCode: postalCode
           active: true
-          ID: 851233a1
           state: state
           type: Primary
+          addressID: 851233a1
         - country: US
           validated: true
           address2: address2
@@ -786,9 +1010,9 @@ components:
           address1: address1
           postalCode: postalCode
           active: true
-          ID: 851233a1
           state: state
           type: Primary
+          addressID: 851233a1
         metadata:
           paygateID: 23beb5fd
         nickName: Bob
@@ -803,13 +1027,13 @@ components:
         birthDate: 2016-08-29T09:12:33.001Z
         firstName: Robert
         createdAt: 2016-08-29T09:12:33.001Z
+        customerID: e210a9d6
         middleName: Flex
-        ID: e210a9d6
         lastModified: 2016-08-29T09:12:33.001Z
         email: email
         status: Deceased
       properties:
-        ID:
+        customerID:
           description: The unique identifier for the customer who owns the account
           example: e210a9d6
           type: string
@@ -844,11 +1068,9 @@ components:
           enum:
           - Deceased
           - Rejected
-          - None
-          - ReviewRequired
-          - KYC
-          - OFAC
-          - CIP
+          - Unknown
+          - ReceiveOnly
+          - Verified
           type: string
         email:
           description: Primary email address of customer name@domain.com
@@ -880,10 +1102,6 @@ components:
           format: date-time
           type: string
       type: object
-    Customers:
-      items:
-        $ref: '#/components/schemas/Customer'
-      type: array
     CustomerMetadata:
       example:
         metadata:
@@ -913,11 +1131,9 @@ components:
           enum:
           - Deceased
           - Rejected
-          - None
-          - ReviewRequired
-          - KYC
-          - OFAC
-          - CIP
+          - Unknown
+          - ReceiveOnly
+          - Verified
           type: string
       required:
       - status
@@ -1010,11 +1226,11 @@ components:
         address1: address1
         postalCode: postalCode
         active: true
-        ID: 851233a1
         state: state
         type: Primary
+        addressID: 851233a1
       properties:
-        ID:
+        addressID:
           description: Unique identifier for this Address
           example: 851233a1
           type: string
@@ -1049,14 +1265,109 @@ components:
           description: Address is currently being used for customer
           type: boolean
       type: object
+    AccountType:
+      description: |
+        Defines the account as *checking* or *savings*
+      enum:
+      - Checking
+      - Savings
+      example: checking
+      type: string
+    HolderType:
+      description: |
+        Defines the type of entity of the account holder as an *individual* or *business*
+      enum:
+      - individual
+      - business
+      example: individual
+      type: string
+    CreateAccount:
+      example:
+        routingNumber: "051504597"
+        accountNumber: "0001027028"
+        type: checking
+        holderType: individual
+      properties:
+        accountNumber:
+          description: The account number for the depository account
+          example: "0001027028"
+          type: string
+        routingNumber:
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+          type: string
+        type:
+          $ref: '#/components/schemas/AccountType'
+        holderType:
+          $ref: '#/components/schemas/HolderType'
+    Accounts:
+      items:
+        $ref: '#/components/schemas/Account'
+      type: array
+    Account:
+      example:
+        accountID: e1b1544a
+        routingNumber: "051504597"
+        type: checking
+        maskedAccountNumber: "0001027028"
+        holderType: individual
+        status: validated
+      properties:
+        accountID:
+          description: A unique identifier for this account
+          example: e1b1544a
+          type: string
+        maskedAccountNumber:
+          description: The masked account number for the depository account
+          example: "0001027028"
+          type: string
+        routingNumber:
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+          type: string
+        status:
+          description: Enumeration if this account has been validated through micro-deposits
+            or another available strategy.
+          enum:
+          - unknown
+          - validated
+          example: validated
+          type: string
+        type:
+          $ref: '#/components/schemas/AccountType'
+        holderType:
+          $ref: '#/components/schemas/HolderType'
+    UpdateValidation:
+      example:
+        strategy: micro-deposits
+        micro-deposits:
+        - USD 0.01
+        - USD 0.13
+      properties:
+        strategy:
+          description: |
+            Validation strategy to use.
+            If micro-deposit send no amounts to initiate and supply amounts to validate the account.
+          enum:
+          - micro-deposits
+          example: micro-deposits
+          type: string
+        micro-deposits:
+          example:
+          - USD 0.01
+          - USD 0.13
+          items:
+            type: string
+          type: array
+      type: object
     Disclaimer:
       example:
+        disclaimerID: 9342f3a7
         documentID: 08a184e1
-        ID: 9342f3a7
         text: Set of conditions
         acceptedAt: 2016-08-29T09:12:33.001Z
       properties:
-        ID:
+        disclaimerID:
           description: The unique identifier for this Disclaimer
           example: 9342f3a7
           type: string
@@ -1082,14 +1393,14 @@ components:
     Document:
       example:
         uploadedAt: 2016-08-29T09:12:33.001Z
-        ID: e210a9d6
+        documentID: e210a9d6
         type: DriversLicense
         parseErrors:
         - parseErrors
         - parseErrors
         contentType: application/pdf
       properties:
-        ID:
+        documentID:
           description: The unique identifier for this document
           example: e210a9d6
           type: string
@@ -1122,10 +1433,10 @@ components:
         sdnType: Individual
         createdAt: 2016-08-29T09:12:33.001Z
         match: 0.91
-        entityId: "2141"
+        entityID: "2141"
         sdnName: John Smith
       properties:
-        entityId:
+        entityID:
           description: SDN EntityID of the Entity
           example: "2141"
           type: string

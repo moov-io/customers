@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package main
+package route
 
 import (
 	"fmt"
@@ -25,10 +25,10 @@ var (
 		Help: "Histogram representing the http response durations",
 	}, []string{"route"})
 
-	// inmemIdempotentRecorder = lru.New() // TODO(adam): integrate this with wrapResponseWriter (call moovhttp.EnsureHeaders)
+	// inmemIdempotentRecorder = lru.New() // TODO(adam): integrate this with Responder (call moovhttp.EnsureHeaders)
 )
 
-func wrapResponseWriter(logger log.Logger, w http.ResponseWriter, r *http.Request) http.ResponseWriter {
+func Responder(logger log.Logger, w http.ResponseWriter, r *http.Request) http.ResponseWriter {
 	route := fmt.Sprintf("%s-%s", strings.ToLower(r.Method), cleanMetricsPath(r.URL.Path))
 	return moovhttp.Wrap(logger, routeHistogram.With("route", route), w, r)
 }

@@ -28,8 +28,8 @@ import (
 func TestCustomers__updateCustomerStatus(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID:     base.ID(),
-			Status: "none",
+			CustomerID: base.ID(),
+			Status:     "none",
 		},
 	}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -62,7 +62,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	if err := json.NewDecoder(bytes.NewReader(respBody)).Decode(&customer); err != nil {
 		t.Fatal(err)
 	}
-	if customer.ID == "" {
+	if customer.CustomerID == "" {
 		t.Errorf("missing customer JSON: %#v", customer)
 	}
 	if repo.updatedStatus != customers.ReviewRequired {
@@ -142,13 +142,13 @@ func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
 
 func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 	cust := &client.Customer{
-		ID:     base.ID(),
-		Status: customers.None.String(),
+		CustomerID: base.ID(),
+		Status:     customers.None.String(),
 	}
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
 
-	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
+	ssn := &SSN{customerID: cust.CustomerID, encrypted: "secret"}
 
 	if err := validCustomerStatusTransition(cust, ssn, customers.Deceased, repo, searcher, "requestID"); err != nil {
 		t.Errorf("expected no error: %v", err)
@@ -195,14 +195,14 @@ func TestCustomers__validCustomerStatusTransition(t *testing.T) {
 
 func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 	cust := &client.Customer{
-		ID:     base.ID(),
-		Status: customers.ReviewRequired.String(),
+		CustomerID: base.ID(),
+		Status:     customers.ReviewRequired.String(),
 	}
 	repo := &testCustomerRepository{}
 	client := &testWatchmanClient{}
 	searcher := createTestOFACSearcher(repo, client)
 
-	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
+	ssn := &SSN{customerID: cust.CustomerID, encrypted: "secret"}
 
 	repo.err = errors.New("bad error")
 	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, ""); err == nil {
@@ -218,13 +218,13 @@ func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
 
 func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	cust := &client.Customer{
-		ID:     base.ID(),
-		Status: customers.ReviewRequired.String(),
+		CustomerID: base.ID(),
+		Status:     customers.ReviewRequired.String(),
 	}
 	repo := &testCustomerRepository{}
 	searcher := createTestOFACSearcher(repo, nil)
 
-	ssn := &SSN{customerID: cust.ID, encrypted: []byte("secret")}
+	ssn := &SSN{customerID: cust.CustomerID, encrypted: "secret"}
 
 	repo.ofacSearchResult = &ofacSearchResult{
 		SDNName: "Jane Doe",
@@ -252,7 +252,7 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
-	if repo.savedOFACSearchResult.EntityId != "12124" {
+	if repo.savedOFACSearchResult.EntityID != "12124" {
 		t.Errorf("unexpected saved OFAC result: %#v", repo.savedOFACSearchResult)
 	}
 }
@@ -260,7 +260,7 @@ func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
 func TestCustomers__updateCustomerAddress(t *testing.T) {
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
-			ID: base.ID(),
+			CustomerID: base.ID(),
 		},
 	}
 	searcher := createTestOFACSearcher(repo, nil)
@@ -342,17 +342,17 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 				Country:    "US",
 			},
 		},
-	}).asCustomer(testCustomerSSNStorage)
+	}).asCustomer(testCustomerSSNStorage(t))
 	if err := repo.createCustomer(cust); err != nil {
 		t.Fatal(err)
 	}
 
 	// update the Address
-	if err := repo.updateCustomerAddress(cust.ID, cust.Addresses[0].ID, "Primary", true); err != nil {
+	if err := repo.updateCustomerAddress(cust.CustomerID, cust.Addresses[0].AddressID, "Primary", true); err != nil {
 		t.Error(err)
 	}
 
-	cust, err := repo.getCustomer(cust.ID)
+	cust, err := repo.getCustomer(cust.CustomerID)
 	if err != nil {
 		t.Error(err)
 	}

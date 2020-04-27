@@ -19,6 +19,7 @@ import (
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -48,9 +49,9 @@ func getDocumentID(w http.ResponseWriter, r *http.Request) string {
 
 func getCustomerDocuments(logger log.Logger, repo documentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -81,7 +82,7 @@ func readDocumentType(v string) (string, error) {
 
 func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		// TODO(adam): should we store x-user-id along with the Document?
 
 		documentType, err := readDocumentType(r.URL.Query().Get("type"))
@@ -105,7 +106,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		contentType := http.DetectContentType(buf)
 		doc := &client.Document{
-			ID:          base.ID(),
+			DocumentID:  base.ID(),
 			Type:        documentType,
 			ContentType: contentType,
 			UploadedAt:  time.Now(),
@@ -119,7 +120,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 		}
 		defer bucket.Close()
 
-		customerID, requestID := getCustomerID(w, r), moovhttp.GetRequestID(r)
+		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
 		}
@@ -127,13 +128,13 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 			moovhttp.Problem(w, err)
 			return
 		}
-		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.ID, contentType, customerID), "requestID", requestID)
+		logger.Log("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.DocumentID, contentType, customerID), "requestID", requestID)
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
-		documentKey := makeDocumentKey(customerID, doc.ID)
+		documentKey := makeDocumentKey(customerID, doc.DocumentID)
 		logger.Log("documents", fmt.Sprintf("writing %s", documentKey), "requestID", requestID)
 
 		writer, err := bucket.NewWriter(ctx, documentKey, &blob.WriterOptions{
@@ -161,9 +162,9 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 
 func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
-		customerID, documentId := getCustomerID(w, r), getDocumentID(w, r)
+		customerID, documentId := route.GetCustomerID(w, r), getDocumentID(w, r)
 		if customerID == "" || documentId == "" {
 			return
 		}
@@ -232,7 +233,7 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerID string) ([]*clie
 	var docs []*client.Document
 	for rows.Next() {
 		var doc client.Document
-		if err := rows.Scan(&doc.ID, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
+		if err := rows.Scan(&doc.DocumentID, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
 			return nil, fmt.Errorf("getCustomerDocuments: scan: %v", err)
 		}
 		docs = append(docs, &doc)
@@ -248,7 +249,7 @@ func (r *sqlDocumentRepository) writeCustomerDocument(customerID string, doc *cl
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(doc.ID, customerID, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
+	if _, err := stmt.Exec(doc.DocumentID, customerID, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
 		return fmt.Errorf("writeCustomerDocument: exec: %v", err)
 	}
 	return nil

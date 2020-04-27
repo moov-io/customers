@@ -14,6 +14,7 @@ import (
 	"time"
 
 	moovhttp "github.com/moov-io/base/http"
+	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -33,7 +34,7 @@ func addFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSig
 
 func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 30*time.Second)
 		defer cancelFn()

@@ -5,25 +5,22 @@
 package main
 
 import (
-	"context"
 	"encoding/base64"
-	"errors"
-	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/customers/internal/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/moov-io/base"
-
-	"gocloud.dev/secrets"
 )
 
 var (
-	testCustomerSSNStorage = &ssnStorage{
-		keeperFactory: testSecretKeeper(testSecretKey),
-		repo:          &testCustomerSSNRepository{},
+	testCustomerSSNStorage = func(t *testing.T) *ssnStorage {
+		return &ssnStorage{
+			keeper: secrets.TestStringKeeper(t),
+			repo:   &testCustomerSSNRepository{},
+		}
 	}
 )
 
@@ -43,33 +40,9 @@ func (r *testCustomerSSNRepository) getCustomerSSN(customerID string) (*SSN, err
 	return nil, r.err
 }
 
-func TestSSN(t *testing.T) {
-	customerID := base.ID()
-	ssn := &SSN{customerID: customerID, masked: "1###5"}
-	if v := ssn.String(); v != fmt.Sprintf("SSN: customerID=%s masked=1###5", customerID) {
-		t.Errorf("got %s", v)
-	}
-
-	// ssn storage error case
-	storage := &ssnStorage{
-		keeperFactory: func(path string) (*secrets.Keeper, error) {
-			return nil, errors.New("bad error")
-		},
-	}
-	if _, err := storage.encryptRaw(customerID, "1###5"); err == nil {
-		t.Error("expected error")
-	} else {
-		if !strings.Contains(err.Error(), "ssnStorage: keeper init") {
-			t.Errorf("unexpected error: %v", err)
-		}
-	}
-}
-
 func TestCustomerSSNStorage(t *testing.T) {
-	storage := &ssnStorage{
-		keeperFactory: testSecretKeeper(testSecretKey),
-		repo:          &testCustomerSSNRepository{},
-	}
+	storage := testCustomerSSNStorage(t)
+
 	if _, err := storage.encryptRaw("", ""); err == nil {
 		t.Errorf("expected error")
 	}
@@ -90,16 +63,12 @@ func TestCustomerSSNStorage(t *testing.T) {
 		t.Errorf("ssn.masked=%s", ssn.masked)
 	}
 
-	keeper, err := storage.keeperFactory(fmt.Sprintf("customer-%s-ssn", customerID))
+	decrypted, err := storage.keeper.DecryptString(ssn.encrypted)
 	if err != nil {
 		t.Fatal(err)
 	}
-	decrypted, err := keeper.Decrypt(context.Background(), ssn.encrypted)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if v := string(decrypted); v != "123456789" {
-		t.Errorf("decrypted SSN=%s", v)
+	if decrypted != "123456789" {
+		t.Errorf("decrypted SSN=%s", decrypted)
 	}
 }
 
@@ -113,7 +82,7 @@ func TestCustomerSSNRepository(t *testing.T) {
 
 		// write
 		bs := base64.StdEncoding.EncodeToString([]byte("123456789"))
-		ssn := &SSN{customerID: customerID, encrypted: []byte(bs), masked: "1#######9"}
+		ssn := &SSN{customerID: customerID, encrypted: bs, masked: "1#######9"}
 		if err := customerSSNRepo.saveCustomerSSN(ssn); err != nil {
 			t.Fatal(err)
 		}

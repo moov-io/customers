@@ -77,8 +77,8 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	repo.err = nil
 	repo.documents = []*client.Document{
 		{
-			ID:   base.ID(),
-			Type: "DriversLicense",
+			DocumentID: base.ID(),
+			Type:       "DriversLicense",
 		},
 	}
 	w = httptest.NewRecorder()
@@ -160,7 +160,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&doc); err != nil {
 		t.Fatal(err)
 	}
-	if doc.ID == "" {
+	if doc.DocumentID == "" {
 		t.Fatal("failed to read document")
 	}
 	if doc.ContentType != "image/jpeg" {
@@ -169,14 +169,14 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 
 	// Test the HTTP retrieval route
 	w = httptest.NewRecorder()
-	req = httptest.NewRequest("GET", fmt.Sprintf("/customers/foo/documents/%s", doc.ID), nil)
+	req = httptest.NewRequest("GET", fmt.Sprintf("/customers/foo/documents/%s", doc.DocumentID), nil)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusFound {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
-	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.ID)) {
+	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.DocumentID)) {
 		t.Errorf("unexpected SignedURL: %s", loc)
 	}
 }
@@ -224,7 +224,7 @@ func TestDocumentRepository(t *testing.T) {
 
 		// Write a Document and read it back
 		doc := &client.Document{
-			ID:          base.ID(),
+			DocumentID:  base.ID(),
 			Type:        "DriversLicense",
 			ContentType: "image/png",
 		}
@@ -238,8 +238,8 @@ func TestDocumentRepository(t *testing.T) {
 		if len(docs) != 1 {
 			t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
 		}
-		if docs[0].ID != doc.ID {
-			t.Errorf("docs[0].ID=%s doc.ID=%s", docs[0].ID, doc.ID)
+		if docs[0].DocumentID != doc.DocumentID {
+			t.Errorf("docs[0].DocumentID=%s doc.DocumentID=%s", docs[0].DocumentID, doc.DocumentID)
 		}
 	}
 

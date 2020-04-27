@@ -16,6 +16,7 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -45,10 +46,10 @@ func getDisclaimerID(w http.ResponseWriter, r *http.Request) string {
 
 func getCustomerDisclaimers(logger log.Logger, repo disclaimerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -66,10 +67,10 @@ func getCustomerDisclaimers(logger log.Logger, repo disclaimerRepository) http.H
 
 func acceptDisclaimer(logger log.Logger, repo disclaimerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		customerID, disclaimerID := getCustomerID(w, r), getDisclaimerID(w, r)
+		customerID, disclaimerID := route.GetCustomerID(w, r), getDisclaimerID(w, r)
 		if customerID == "" || disclaimerID == "" {
 			return
 		}
@@ -97,7 +98,7 @@ type createDisclaimerRequest struct {
 
 func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docRepo documentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		if r.Method != "POST" {
@@ -105,7 +106,7 @@ func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docR
 			return
 		}
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -144,7 +145,7 @@ func documentExistsForCustomer(customerID string, req createDisclaimerRequest, d
 			return err
 		}
 		for i := range docs {
-			if docs[i].ID == req.DocumentID {
+			if docs[i].DocumentID == req.DocumentID {
 				return nil
 			}
 		}
@@ -182,7 +183,7 @@ where d.deleted_at is null and d.disclaimer_id = ? limit 1;`
 	var acceptedAt *time.Time
 	var d client.Disclaimer
 
-	if err := stmt.QueryRow(disclaimerID).Scan(&d.ID, &d.Text, &d.DocumentID, &acceptedAt); err != nil {
+	if err := stmt.QueryRow(disclaimerID).Scan(&d.DisclaimerID, &d.Text, &d.DocumentID, &acceptedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
@@ -268,10 +269,10 @@ func (r *sqlDisclaimerRepository) insertDisclaimer(text, documentID string) (*cl
 	defer stmt.Close()
 
 	disc := &client.Disclaimer{
-		ID:         base.ID(),
-		Text:       text,
-		DocumentID: documentID,
+		DisclaimerID: base.ID(),
+		Text:         text,
+		DocumentID:   documentID,
 	}
-	_, err = stmt.Exec(disc.ID, disc.Text, disc.DocumentID, time.Now())
+	_, err = stmt.Exec(disc.DisclaimerID, disc.Text, disc.DocumentID, time.Now())
 	return disc, err
 }

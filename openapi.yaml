@@ -1,7 +1,11 @@
 openapi: 3.0.2
 info:
   description: |
-    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Also, Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+
+    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgement are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
+
+    ![](https://raw.githubusercontent.com/adamdecaf/customers/create-accounts/docs/images/customer.png)
   version: v1
   title: Customers API
   contact:
@@ -37,13 +41,13 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
@@ -70,37 +74,37 @@ paths:
     get:
       tags: [Customers]
       summary: Retrieve customer
-      description: Get the Customer object and metadata for the customer ID.
+      description: Get the Customer object and metadata for the customerID.
       operationId: getCustomer
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID that identifies this Customer
           required: true
           schema:
             type: string
             example: e210a9d6-d755-4455-9bd2-9577ea7e1081
       responses:
         '200':
-          description: A customer objects for the supplied customer ID
+          description: A customer objects for the supplied customerID
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
         '404':
-          description: A resource with the specified ID was not found
+          description: No Customer with the specified customerID was found
   /customers/{customerID}/address:
     post:
       tags: [Customers]
@@ -110,19 +114,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to add the address onto
           required: true
           schema:
             type: string
@@ -155,19 +159,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to add the metadata onto
           required: true
           schema:
             type: string
@@ -200,19 +204,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to update the CustomerStatus
           required: true
           schema:
             type: string
@@ -236,6 +240,168 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/accounts:
+    get:
+      tags: [Customers]
+      summary: Get Customer Accounts
+      description: Retrieve all accounts for the given customer.
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer to get Accounts for
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: Active accounts for the customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Accounts'
+        '400':
+          description: Failed to get accounts, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+    post:
+      tags: [Customers]
+      summary: Create Customer Account
+      description: Create an account for the given customer
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer to add an Account onto
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccount'
+      responses:
+        '200':
+          description: Account created for the customer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '400':
+          description: Failed to get accounts, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+    delete:
+      tags: [Customers]
+      summary: Delete Customer Account
+      description: Remove an account from the given Customer
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer to remove an Account
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      responses:
+        '200':
+          description: Account removed form customer
+        '400':
+          description: Failed to get accounts, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/accounts/{accountID}/validate:
+    post:
+      tags: [Customers]
+      summary: Validate Account
+      description: |
+        Initiate or validatae account with availble validation strategies.
+        Currently the only available strategy is micro-deposits.
+      operationId: validateAccount
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer the accountID belongs to
+          required: true
+          schema:
+            type: string
+            example: 51dd8cdd
+        - name: accountID
+          in: path
+          description: accountID of the Account to validate
+          required: true
+          schema:
+            type: string
+            example: b74d7c51
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateValidation'
+      responses:
+        '200':
+          description: Account validated or validtion started
+        '400':
+          description: Failed to validate account, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]
@@ -245,19 +411,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get disclaimers
           required: true
           schema:
             type: string
@@ -284,26 +450,26 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to accept a disclaimer
           required: true
           schema:
             type: string
             example: e210a9d6-d755-4455-9bd2-9577ea7e1081
         - name: disclaimerID
           in: path
-          description: Disclaimer ID
+          description: disclaimerID of the Disclaimer to accept
           required: true
           schema:
             type: string
@@ -330,19 +496,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to add a document
           required: true
           schema:
             type: string
@@ -386,19 +552,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get all Documents
           required: true
           schema:
             type: string
@@ -425,26 +591,26 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get a Document
           required: true
           schema:
             type: string
             example: e210a9d6
         - name: documentID
           in: path
-          description: Document ID
+          description: documentID to identify a Document
           required: true
           schema:
             type: string
@@ -476,19 +642,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to get latest OFAC search
           required: true
           schema:
             type: string
@@ -516,19 +682,19 @@ paths:
       parameters:
         - name: X-Request-ID
           in: header
-          description: Optional Request ID allows application developer to trace requests through the systems logs
+          description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
           schema:
             type: string
         - name: X-User-ID
           in: header
-          description: Moov User ID
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
           example: e3cdf999
           schema:
             type: string
         - name: customerID
           in: path
-          description: Customer ID
+          description: customerID of the Customer to refresh OFAC search
           required: true
           schema:
             type: string
@@ -573,6 +739,8 @@ components:
         suffix:
           type: string
           description: Customers name suffix. "Jr", "PH.D."
+        type:
+          $ref: '#/components/schemas/CustomerType'
         birthDate:
           type: string
           format: date-time
@@ -614,7 +782,7 @@ components:
     Customer:
       type: object
       properties:
-        ID:
+        customerID:
           type: string
           description: The unique identifier for the customer who owns the account
           example: e210a9d6
@@ -639,22 +807,15 @@ components:
         suffix:
           type: string
           description: Customers name suffix. "Jr", "PH.D."
+        type:
+          $ref: '#/components/schemas/CustomerType'
         birthDate:
           type: string
           format: date-time
           description: Legal date of birth
           example: '2016-08-29T09:12:33.001Z'
         status:
-          type: string
-          description: State of the customer
-          enum:
-            - Deceased
-            - Rejected
-            - None
-            - ReviewRequired
-            - KYC
-            - OFAC
-            - CIP
+          $ref: '#/components/schemas/CustomerStatus'
         email:
           type: string
           maximum: 500
@@ -683,10 +844,21 @@ components:
           format: date-time
           description: Last time the object was modified
           example: '2016-08-29T09:12:33.001Z'
-    Customers:
-      type: array
-      items:
-        $ref: '#/components/schemas/Customer'
+    CustomerType:
+      type: string
+      description: Note if this Customer represents an individual or business
+      enum:
+        - Individual
+        - Business
+    CustomerStatus:
+      type: string
+      description: State of the customer
+      enum:
+        - Deceased
+        - Rejected
+        - Unknown
+        - ReceiveOnly
+        - Verified
     CustomerMetadata:
       properties:
         metadata:
@@ -705,16 +877,7 @@ components:
           description: Free form comment about the customer status update
           example: Customer was approved from KYC confirmation
         status:
-          type: string
-          description: State of the customer
-          enum:
-            - Deceased
-            - Rejected
-            - None
-            - ReviewRequired
-            - KYC
-            - OFAC
-            - CIP
+          $ref: '#/components/schemas/CustomerStatus'
       required:
         - status
     CreatePhone:
@@ -785,7 +948,7 @@ components:
     CustomerAddress:
       type: object
       properties:
-        ID:
+        addressID:
           type: string
           description: Unique identifier for this Address
           example: 851233a1
@@ -819,10 +982,73 @@ components:
         active:
           type: boolean
           description: Address is currently being used for customer
+    AccountType:
+      type: string
+      description: |
+        Defines the account as *checking* or *savings*
+      enum:
+        - Checking
+        - Savings
+      example: checking
+    CreateAccount:
+      properties:
+        accountNumber:
+          type: string
+          description: The account number for the depository account
+          example: "0001027028"
+        routingNumber:
+          type: string
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+        type:
+          $ref: '#/components/schemas/AccountType'
+    Accounts:
+      type: array
+      items:
+        $ref: '#/components/schemas/Account'
+    Account:
+      properties:
+        accountID:
+          type: string
+          description: A unique identifier for this account
+          example: e1b1544a
+        maskedAccountNumber:
+          type: string
+          description: The masked account number for the depository account
+          example: "0001027028"
+        routingNumber:
+          type: string
+          description: The ABA routing transit number for the depository account.
+          example: "051504597"
+        status:
+          type: string
+          enum:
+            - unknown
+            - validated
+          example: validated
+          description: Enumeration if this account has been validated through micro-deposits or another available strategy.
+        type:
+          $ref: '#/components/schemas/AccountType'
+    UpdateValidation:
+      type: object
+      properties:
+        strategy:
+          type: string
+          enum:
+            - "micro-deposits"
+          example: micro-deposits
+          description: |
+            Validation strategy to use.
+            If micro-deposit send no amounts to initiate and supply amounts to validate the account.
+        micro-deposits:
+          type: array
+          items:
+            type: string
+          example: ["USD 0.01", "USD 0.13"]
     Disclaimer:
       type: object
       properties:
-        ID:
+        disclaimerID:
           type: string
           description: The unique identifier for this Disclaimer
           example: 9342f3a7
@@ -832,7 +1058,7 @@ components:
           example: Set of conditions
         documentID:
           type: string
-          description: Optional ID which references a Document included in the disclaimer
+          description: Optional documentID which references a Document included in the disclaimer
           example: 08a184e1
         acceptedAt:
           type: string
@@ -846,9 +1072,9 @@ components:
     Document:
       type: object
       properties:
-        ID:
+        documentID:
           type: string
-          description: The unique identifier for this document
+          description: A unique identifier for this document
           example: e210a9d6
         type:
           type: string
@@ -876,7 +1102,7 @@ components:
     OFACSearch:
       type: object
       properties:
-        entityId:
+        entityID:
           type: string
           description: SDN EntityID of the Entity
           example: "2141"

@@ -15,6 +15,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/route"
 	watchman "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
@@ -22,7 +23,7 @@ import (
 )
 
 type ofacSearchResult struct {
-	EntityId  string    `json:"entityId"`
+	EntityID  string    `json:"entityID"`
 	SDNName   string    `json:"sdnName"`
 	SDNType   string    `json:"sdnType"`
 	Match     float32   `json:"match"`
@@ -46,28 +47,28 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 
 	sdn, err := s.watchmanClient.Search(ctx, formatCustomerName(cust), requestID)
 	if err != nil {
-		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.ID, err)
+		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.CustomerID, err)
 	}
 	var nickSDN *watchman.OfacSdn
 	if cust.NickName != "" {
 		nickSDN, err = s.watchmanClient.Search(ctx, cust.NickName, requestID)
 		if err != nil {
-			return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.ID, err)
+			return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.CustomerID, err)
 		}
 	}
 	// Save the higher matching SDN (from name search or nick name)
 	switch {
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
-		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			EntityId:  nickSDN.EntityID,
+		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, ofacSearchResult{
+			EntityID:  nickSDN.EntityID,
 			SDNName:   nickSDN.SdnName,
 			SDNType:   nickSDN.SdnType,
 			Match:     nickSDN.Match,
 			CreatedAt: time.Now(),
 		})
 	case sdn != nil:
-		err = s.repo.saveCustomerOFACSearch(cust.ID, ofacSearchResult{
-			EntityId:  sdn.EntityID,
+		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, ofacSearchResult{
+			EntityID:  sdn.EntityID,
 			SDNName:   sdn.SdnName,
 			SDNType:   sdn.SdnType,
 			Match:     sdn.Match,
@@ -75,7 +76,7 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 		})
 	}
 	if err != nil {
-		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: saveCustomerOFACSearch customer=%s: %v", cust.ID, err)
+		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: saveCustomerOFACSearch customer=%s: %v", cust.CustomerID, err)
 	}
 	return nil
 }
@@ -87,10 +88,10 @@ func addOFACRoutes(logger log.Logger, r *mux.Router, repo customerRepository, of
 
 func getLatestCustomerOFACSearch(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -108,11 +109,11 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo customerRepository) htt
 
 func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w = wrapResponseWriter(logger, w, r)
+		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
 		requestID, userID := moovhttp.GetRequestID(r), moovhttp.GetUserID(r)
-		customerID := getCustomerID(w, r)
+		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -137,11 +138,11 @@ func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSea
 			return
 		}
 		if result.Match > ofacMatchThreshold {
-			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.ID, result.EntityId, result.Match)
+			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
-			if err := repo.updateCustomerStatus(cust.ID, customers.Rejected, "manual OFAC refresh"); err != nil {
-				logger.Log("ofac", fmt.Sprintf("error updating customer=%s error=%v", cust.ID, err))
+			if err := repo.updateCustomerStatus(cust.CustomerID, customers.Rejected, "manual OFAC refresh"); err != nil {
+				logger.Log("ofac", fmt.Sprintf("error updating customer=%s error=%v", cust.CustomerID, err))
 				moovhttp.Problem(w, err)
 				return
 			}
