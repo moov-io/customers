@@ -24,7 +24,8 @@ type CreateCustomer struct {
 	// Name Customer is preferred to be called
 	NickName string `json:"nickName,omitempty"`
 	// Customers name suffix. \"Jr\", \"PH.D.\"
-	Suffix string `json:"suffix,omitempty"`
+	Suffix string       `json:"suffix,omitempty"`
+	Type   CustomerType `json:"type,omitempty"`
 	// Legal date of birth
 	BirthDate time.Time `json:"birthDate"`
 	// Primary email address of customer name@domain.com

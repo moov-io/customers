@@ -1,4 +1,4 @@
-# HolderType
+# CustomerType
 
 ## Properties
 

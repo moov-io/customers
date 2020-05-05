@@ -15,7 +15,7 @@ import (
 
 // Document struct for Document
 type Document struct {
-	// The unique identifier for this document
+	// A unique identifier for this document
 	DocumentID  string `json:"documentID,omitempty"`
 	Type        string `json:"type,omitempty"`
 	ContentType string `json:"contentType,omitempty"`

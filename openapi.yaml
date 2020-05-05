@@ -245,6 +245,7 @@ paths:
       tags: [Customers]
       summary: Get Customer Accounts
       description: Retrieve all accounts for the given customer.
+      operationId: getCustomerAccounts
       parameters:
         - name: X-Request-ID
           in: header
@@ -282,6 +283,7 @@ paths:
       tags: [Customers]
       summary: Create Customer Account
       description: Create an account for the given customer
+      operationId: createCustomerAccount
       parameters:
         - name: X-Request-ID
           in: header
@@ -324,6 +326,7 @@ paths:
       tags: [Customers]
       summary: Delete Customer Account
       description: Remove an account from the given Customer
+      operationId: deleteCustomerAccount
       parameters:
         - name: X-Request-ID
           in: header

@@ -16,5 +16,4 @@ type CreateAccount struct {
 	// The ABA routing transit number for the depository account.
 	RoutingNumber string      `json:"routingNumber,omitempty"`
 	Type          AccountType `json:"type,omitempty"`
-	HolderType    HolderType  `json:"holderType,omitempty"`
 }

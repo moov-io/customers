@@ -120,7 +120,7 @@ paths:
                 $ref: '#/components/schemas/Customer'
           description: A customer objects for the supplied customerID
         "404":
-          description: A resource with the specified ID was not found
+          description: No Customer with the specified customerID was found
       summary: Retrieve customer
       tags:
       - Customers
@@ -298,6 +298,7 @@ paths:
   /customers/{customerID}/accounts:
     delete:
       description: Remove an account from the given Customer
+      operationId: deleteCustomerAccount
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -342,6 +343,7 @@ paths:
       - Customers
     get:
       description: Retrieve all accounts for the given customer.
+      operationId: getCustomerAccounts
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -390,6 +392,7 @@ paths:
       - Customers
     post:
       description: Create an account for the given customer
+      operationId: createCustomerAccount
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -952,6 +955,8 @@ components:
         suffix:
           description: Customers name suffix. "Jr", "PH.D."
           type: string
+        type:
+          $ref: '#/components/schemas/CustomerType'
         birthDate:
           description: Legal date of birth
           example: 2016-08-29T09:12:33.001Z
@@ -1031,7 +1036,6 @@ components:
         middleName: Flex
         lastModified: 2016-08-29T09:12:33.001Z
         email: email
-        status: Deceased
       properties:
         customerID:
           description: The unique identifier for the customer who owns the account
@@ -1058,20 +1062,15 @@ components:
         suffix:
           description: Customers name suffix. "Jr", "PH.D."
           type: string
+        type:
+          $ref: '#/components/schemas/CustomerType'
         birthDate:
           description: Legal date of birth
           example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
         status:
-          description: State of the customer
-          enum:
-          - Deceased
-          - Rejected
-          - Unknown
-          - ReceiveOnly
-          - Verified
-          type: string
+          $ref: '#/components/schemas/CustomerStatus'
         email:
           description: Primary email address of customer name@domain.com
           maximum: 500
@@ -1102,6 +1101,21 @@ components:
           format: date-time
           type: string
       type: object
+    CustomerType:
+      description: Note if this Customer represents an individual or business
+      enum:
+      - Individual
+      - Business
+      type: string
+    CustomerStatus:
+      description: State of the customer
+      enum:
+      - Deceased
+      - Rejected
+      - Unknown
+      - ReceiveOnly
+      - Verified
+      type: string
     CustomerMetadata:
       example:
         metadata:
@@ -1120,21 +1134,13 @@ components:
     UpdateCustomerStatus:
       example:
         comment: Customer was approved from KYC confirmation
-        status: Deceased
       properties:
         comment:
           description: Free form comment about the customer status update
           example: Customer was approved from KYC confirmation
           type: string
         status:
-          description: State of the customer
-          enum:
-          - Deceased
-          - Rejected
-          - Unknown
-          - ReceiveOnly
-          - Verified
-          type: string
+          $ref: '#/components/schemas/CustomerStatus'
       required:
       - status
     CreatePhone:
@@ -1273,20 +1279,11 @@ components:
       - Savings
       example: checking
       type: string
-    HolderType:
-      description: |
-        Defines the type of entity of the account holder as an *individual* or *business*
-      enum:
-      - individual
-      - business
-      example: individual
-      type: string
     CreateAccount:
       example:
         routingNumber: "051504597"
         accountNumber: "0001027028"
         type: checking
-        holderType: individual
       properties:
         accountNumber:
           description: The account number for the depository account
@@ -1298,8 +1295,6 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/AccountType'
-        holderType:
-          $ref: '#/components/schemas/HolderType'
     Accounts:
       items:
         $ref: '#/components/schemas/Account'
@@ -1310,7 +1305,6 @@ components:
         routingNumber: "051504597"
         type: checking
         maskedAccountNumber: "0001027028"
-        holderType: individual
         status: validated
       properties:
         accountID:
@@ -1335,8 +1329,6 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/AccountType'
-        holderType:
-          $ref: '#/components/schemas/HolderType'
     UpdateValidation:
       example:
         strategy: micro-deposits
@@ -1376,7 +1368,8 @@ components:
           example: Set of conditions
           type: string
         documentID:
-          description: Optional ID which references a Document included in the disclaimer
+          description: Optional documentID which references a Document included in
+            the disclaimer
           example: 08a184e1
           type: string
         acceptedAt:
@@ -1401,7 +1394,7 @@ components:
         contentType: application/pdf
       properties:
         documentID:
-          description: The unique identifier for this document
+          description: A unique identifier for this document
           example: e210a9d6
           type: string
         type:

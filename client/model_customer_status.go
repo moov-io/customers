@@ -9,11 +9,14 @@
 
 package client
 
-// HolderType Defines the type of entity of the account holder as an *individual* or *business*
-type HolderType string
+// CustomerStatus State of the customer
+type CustomerStatus string
 
-// List of HolderType
+// List of CustomerStatus
 const (
-	INDIVIDUAL HolderType = "individual"
-	BUSINESS   HolderType = "business"
+	DECEASED     CustomerStatus = "Deceased"
+	REJECTED     CustomerStatus = "Rejected"
+	UNKNOWN      CustomerStatus = "Unknown"
+	RECEIVE_ONLY CustomerStatus = "ReceiveOnly"
+	VERIFIED     CustomerStatus = "Verified"
 )

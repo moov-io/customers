@@ -18,7 +18,6 @@ type Account struct {
 	// The ABA routing transit number for the depository account.
 	RoutingNumber string `json:"routingNumber,omitempty"`
 	// Enumeration if this account has been validated through micro-deposits or another available strategy.
-	Status     string      `json:"status,omitempty"`
-	Type       AccountType `json:"type,omitempty"`
-	HolderType HolderType  `json:"holderType,omitempty"`
+	Status string      `json:"status,omitempty"`
+	Type   AccountType `json:"type,omitempty"`
 }

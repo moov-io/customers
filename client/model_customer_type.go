@@ -9,18 +9,11 @@
 
 package client
 
-import (
-	"time"
-)
+// CustomerType Note if this Customer represents an individual or business
+type CustomerType string
 
-// Disclaimer struct for Disclaimer
-type Disclaimer struct {
-	// The unique identifier for this Disclaimer
-	DisclaimerID string `json:"disclaimerID,omitempty"`
-	// Text that user must accept
-	Text string `json:"text,omitempty"`
-	// Optional documentID which references a Document included in the disclaimer
-	DocumentID string `json:"documentID,omitempty"`
-	// Timestamp if disclaimer has been accepted, a timestamp before the year 2000 indicates no acceptance.
-	AcceptedAt time.Time `json:"acceptedAt,omitempty"`
-}
+// List of CustomerType
+const (
+	INDIVIDUAL CustomerType = "Individual"
+	BUSINESS   CustomerType = "Business"
+)

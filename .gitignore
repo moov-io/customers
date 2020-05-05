@@ -13,6 +13,9 @@
 
 /bin/
 *.db
+/coverage.txt
+misspell*
+staticcheck*
 
 openapi-generator-cli-*.jar
 /storage/
@@ -22,3 +25,5 @@ openapi-generator-cli-*.jar
 # code coverage
 coverage.html
 cover.out
+
+/lint-project.sh

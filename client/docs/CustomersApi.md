@@ -7,10 +7,10 @@ Method | HTTP request | Description
 [**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 [**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add customer address
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create customer
-[**CustomersCustomerIDAccountsDelete**](CustomersApi.md#CustomersCustomerIDAccountsDelete) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
-[**CustomersCustomerIDAccountsGet**](CustomersApi.md#CustomersCustomerIDAccountsGet) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
-[**CustomersCustomerIDAccountsPost**](CustomersApi.md#CustomersCustomerIDAccountsPost) | **Post** /customers/{customerID}/accounts | Create Customer Account
+[**CreateCustomerAccount**](CustomersApi.md#CreateCustomerAccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
+[**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
+[**GetCustomerAccounts**](CustomersApi.md#GetCustomerAccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
 [**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 [**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
@@ -166,101 +166,9 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## CustomersCustomerIDAccountsDelete
+## CreateCustomerAccount
 
-> CustomersCustomerIDAccountsDelete(ctx, customerID, optional)
-
-Delete Customer Account
-
-Remove an account from the given Customer
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| customerID of the Customer to remove an Account | 
- **optional** | ***CustomersCustomerIDAccountsDeleteOpts** | optional parameters | nil if no parameters
-
-### Optional Parameters
-
-Optional parameters are passed through a pointer to a CustomersCustomerIDAccountsDeleteOpts struct
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## CustomersCustomerIDAccountsGet
-
-> []Account CustomersCustomerIDAccountsGet(ctx, customerID, optional)
-
-Get Customer Accounts
-
-Retrieve all accounts for the given customer.
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| customerID of the Customer to get Accounts for | 
- **optional** | ***CustomersCustomerIDAccountsGetOpts** | optional parameters | nil if no parameters
-
-### Optional Parameters
-
-Optional parameters are passed through a pointer to a CustomersCustomerIDAccountsGetOpts struct
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
- **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
-
-### Return type
-
-[**[]Account**](Account.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## CustomersCustomerIDAccountsPost
-
-> Account CustomersCustomerIDAccountsPost(ctx, customerID, optional)
+> Account CreateCustomerAccount(ctx, customerID, optional)
 
 Create Customer Account
 
@@ -273,11 +181,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| customerID of the Customer to add an Account onto | 
- **optional** | ***CustomersCustomerIDAccountsPostOpts** | optional parameters | nil if no parameters
+ **optional** | ***CreateCustomerAccountOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
 
-Optional parameters are passed through a pointer to a CustomersCustomerIDAccountsPostOpts struct
+Optional parameters are passed through a pointer to a CreateCustomerAccountOpts struct
 
 
 Name | Type | Description  | Notes
@@ -298,6 +206,52 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## DeleteCustomerAccount
+
+> DeleteCustomerAccount(ctx, customerID, optional)
+
+Delete Customer Account
+
+Remove an account from the given Customer
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID of the Customer to remove an Account | 
+ **optional** | ***DeleteCustomerAccountOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a DeleteCustomerAccountOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
@@ -336,6 +290,52 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Customer**](Customer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetCustomerAccounts
+
+> []Account GetCustomerAccounts(ctx, customerID, optional)
+
+Get Customer Accounts
+
+Retrieve all accounts for the given customer.
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID of the Customer to get Accounts for | 
+ **optional** | ***GetCustomerAccountsOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a GetCustomerAccountsOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+
+### Return type
+
+[**[]Account**](Account.md)
 
 ### Authorization
 

@@ -41,10 +41,10 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add customer address
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create customer
-*CustomersApi* | [**CustomersCustomerIDAccountsDelete**](docs/CustomersApi.md#customerscustomeridaccountsdelete) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
-*CustomersApi* | [**CustomersCustomerIDAccountsGet**](docs/CustomersApi.md#customerscustomeridaccountsget) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
-*CustomersApi* | [**CustomersCustomerIDAccountsPost**](docs/CustomersApi.md#customerscustomeridaccountspost) | **Post** /customers/{customerID}/accounts | Create Customer Account
+*CustomersApi* | [**CreateCustomerAccount**](docs/CustomersApi.md#createcustomeraccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
+*CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer
+*CustomersApi* | [**GetCustomerAccounts**](docs/CustomersApi.md#getcustomeraccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
 *CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 *CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 *CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get customer documents
@@ -68,10 +68,11 @@ Class | Method | HTTP request | Description
  - [Customer](docs/Customer.md)
  - [CustomerAddress](docs/CustomerAddress.md)
  - [CustomerMetadata](docs/CustomerMetadata.md)
+ - [CustomerStatus](docs/CustomerStatus.md)
+ - [CustomerType](docs/CustomerType.md)
  - [Disclaimer](docs/Disclaimer.md)
  - [Document](docs/Document.md)
  - [Error](docs/Error.md)
- - [HolderType](docs/HolderType.md)
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)

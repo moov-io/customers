@@ -12,7 +12,6 @@ package client
 // UpdateCustomerStatus struct for UpdateCustomerStatus
 type UpdateCustomerStatus struct {
 	// Free form comment about the customer status update
-	Comment string `json:"comment,omitempty"`
-	// State of the customer
-	Status string `json:"status"`
+	Comment string         `json:"comment,omitempty"`
+	Status  CustomerStatus `json:"status"`
 }
