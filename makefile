@@ -8,9 +8,11 @@ build: check build-server
 build-server:
 	CGO_ENABLED=1 go build -o ./bin/server github.com/moov-io/customers/cmd/server
 
+.PHONY: check
 check:
-	go fmt ./...
-	@mkdir -p ./bin/
+	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
+	@chmod +x ./lint-project.sh
+	GOCYCLO_LIMIT=27 time ./lint-project.sh
 
 .PHONY: admin
 admin:
