@@ -6,6 +6,7 @@ package accounts
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/fed"
+	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
@@ -56,6 +58,34 @@ func TestRoutes(t *testing.T) {
 	accounts = httpReadAccounts(t, handler, customerID)
 	if len(accounts) != 0 {
 		t.Errorf("got accounts: %v", accounts)
+	}
+}
+
+func TestRoutes__DecryptAccountNumber(t *testing.T) {
+	customerID := base.ID()
+	repo := setupTestAccountRepository(t)
+	keeper := secrets.TestStringKeeper(t)
+
+	handler := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper)
+
+	client := testclient.New(t, handler)
+
+	// create an account
+	account := httpCreateAccount(t, handler, customerID)
+	if account == nil {
+		t.Error("missing account")
+	}
+
+	transit, resp, err := client.CustomersApi.DecryptAccountNumber(context.TODO(), customerID, account.AccountID, nil)
+	if resp.Body != nil {
+		resp.Body.Close()
+	}
+	if err != nil {
+		t.Error(err)
+	}
+	if transit.AccountNumber == "" {
+		t.Error("missing transit AccountNumber")
 	}
 }
 
