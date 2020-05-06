@@ -23,7 +23,7 @@ import (
 	"github.com/moov-io/customers/cmd/server/accounts"
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/internal/database"
-	"github.com/moov-io/customers/internal/secrets"
+	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"

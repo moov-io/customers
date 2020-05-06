@@ -11,7 +11,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/moov-io/customers/internal/secrets"
+	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
 )

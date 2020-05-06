@@ -15,7 +15,7 @@ import (
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/internal/secrets"
+	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"

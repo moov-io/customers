@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/customers/internal/database"
-	"github.com/moov-io/customers/internal/secrets"
+	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/moov-io/base"
