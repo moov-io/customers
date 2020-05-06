@@ -14,6 +14,7 @@ import (
 	"github.com/moov-io/ach"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/internal/secrets"
 	"github.com/moov-io/customers/internal/secrets/hash"
@@ -23,9 +24,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, keeper *secrets.StringKeeper) {
+func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, keeper *secrets.StringKeeper) {
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, repo))
-	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, repo, keeper))
+	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, repo, fedClient, keeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, repo))
 }
 
@@ -47,10 +48,10 @@ func getCustomerAccounts(logger log.Logger, repo Repository) http.HandlerFunc {
 }
 
 type createAccountRequest struct {
-	AccountNumber string             `json:"accountNumber"`
-	RoutingNumber string             `json:"routingNumber"`
-	Type          client.AccountType `json:"type"`
-	HolderType    client.HolderType  `json:"holderType"`
+	AccountNumber string               `json:"accountNumber"`
+	RoutingNumber string               `json:"routingNumber"`
+	Type          client.AccountType   `json:"type"`
+	Status        client.AccountStatus `json:"status"`
 
 	// fields we compute from the inbound AccountNumber
 	encryptedAccountNumber string
@@ -73,11 +74,8 @@ func (req *createAccountRequest) validate() error {
 		return fmt.Errorf("invalid account type: %s", req.Type)
 	}
 
-	ht := func(t1, t2 client.HolderType) bool {
-		return strings.EqualFold(string(t1), string(t2))
-	}
-	if !ht(req.HolderType, client.INDIVIDUAL) && !ht(req.HolderType, client.BUSINESS) {
-		return fmt.Errorf("invalid holder type: %s", req.HolderType)
+	if !strings.EqualFold(string(req.Status), string(client.VALIDATED)) {
+		return fmt.Errorf("invalid account status: %s", req.Status)
 	}
 	return nil
 }
@@ -97,7 +95,7 @@ func (req *createAccountRequest) disfigure(keeper *secrets.StringKeeper) error {
 	return nil
 }
 
-func createCustomerAccount(logger log.Logger, repo Repository, keeper *secrets.StringKeeper) http.HandlerFunc {
+func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Client, keeper *secrets.StringKeeper) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -113,6 +111,12 @@ func createCustomerAccount(logger log.Logger, repo Repository, keeper *secrets.S
 		}
 		if err := request.disfigure(keeper); err != nil {
 			logger.Log("accounts", fmt.Sprintf("problem disfiguring account: %v", err), "requestID", moovhttp.GetRequestID(r))
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		if err := fedClient.LookupRoutingNumber(request.RoutingNumber); err != nil {
+			logger.Log("accounts", fmt.Sprintf("problem looking up routing number=%q: %v", request.RoutingNumber, err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)
 			return
 		}

@@ -18,7 +18,6 @@ import (
 	"github.com/moov-io/customers/internal/database"
 
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
 
 	"github.com/go-kit/kit/log"
@@ -31,7 +30,7 @@ type testCustomerRepository struct {
 	ofacSearchResult *ofacSearchResult
 
 	createdCustomer       *client.Customer
-	updatedStatus         customers.Status
+	updatedStatus         client.CustomerStatus
 	savedOFACSearchResult *ofacSearchResult
 }
 
@@ -47,7 +46,7 @@ func (r *testCustomerRepository) createCustomer(c *client.Customer) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomerStatus(customerID string, status customers.Status, comment string) error {
+func (r *testCustomerRepository) updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error {
 	r.updatedStatus = status
 	return r.err
 }
@@ -371,7 +370,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	}
 
 	// update status
-	if err := repo.updateCustomerStatus(cust.CustomerID, customers.KYC, "test comment"); err != nil {
+	if err := repo.updateCustomerStatus(cust.CustomerID, client.VERIFIED, "test comment"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -380,7 +379,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if customer.Status != customers.KYC.String() {
+	if customer.Status != client.VERIFIED {
 		t.Errorf("unexpected status: %s", customer.Status)
 	}
 }

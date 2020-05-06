@@ -13,7 +13,6 @@ import (
 	"time"
 
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/route"
 	watchman "github.com/moov-io/watchman/client"
@@ -141,7 +140,7 @@ func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSea
 			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
-			if err := repo.updateCustomerStatus(cust.CustomerID, customers.Rejected, "manual OFAC refresh"); err != nil {
+			if err := repo.updateCustomerStatus(cust.CustomerID, client.REJECTED, "manual OFAC refresh"); err != nil {
 				logger.Log("ofac", fmt.Sprintf("error updating customer=%s error=%v", cust.CustomerID, err))
 				moovhttp.Problem(w, err)
 				return

@@ -17,11 +17,32 @@ servers:
 tags:
   - name: Admin
     description: Customers endpoints which are only meant to be exposed for admin dashboards and operations.
+  - name: Customers
+    description: Endpoints for searching, creating, and verifying individuals according to US government criteria for money movement within the country.
 
 paths:
+  /live:
+    get:
+      tags: [Admin]
+      summary: Get Liveness Probes
+      description: Get the status of each depdendency
+      operationId: getLivenessProbes
+      responses:
+        '200':
+          description: The status of dependencies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivenessProbes'
+        '400':
+          description: An error occurred when checking dependencies
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LivenessProbes'
   /version:
     get:
-      tags: ["Admin"]
+      tags: [Admin]
       summary: Get Version
       description: Show the current version of Customers
       operationId: getVersion
@@ -35,7 +56,7 @@ paths:
                 example: v0.4.0
   /customers/{customerID}/disclaimers:
     post:
-      tags: ["Admin"]
+      tags: [Customers]
       summary: Create disclaimer
       description: Create a disclaimer for the specified customerID to approve
       operationId: createCustomerDisclaimer
@@ -64,7 +85,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/status:
     put:
-      tags: ["Admin"]
+      tags: [Customers]
       summary: Update Customer status
       description: Updates a customer status and initiates the required checks for that new status
       operationId: updateCustomerStatus
@@ -93,7 +114,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/addresses/{addressID}:
     put:
-      tags: ["Admin"]
+      tags: [Customers]
       summary: Update customers address
       description: Updates the specified customer address
       operationId: updateCustomerAddress
@@ -130,6 +151,12 @@ paths:
 
 components:
   schemas:
+    LivenessProbes:
+      properties:
+        watchman:
+          type: string
+          description: Either an error from checking Customers or good as a string.
+          example: good
     CreateUserDisclaimer:
       properties:
         documentId:
@@ -150,7 +177,7 @@ components:
           example: User submitted address information
         status:
           type: string
-          description: Status to attempt transistion towards
+          description: Status to attempt transition towards
           example: OFAC
     UpdateCustomerAddress:
       properties:

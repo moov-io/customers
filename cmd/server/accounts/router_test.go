@@ -14,10 +14,15 @@ import (
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/internal/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+)
+
+var (
+	testFedClient = &fed.MockClient{}
 )
 
 func TestRoutes(t *testing.T) {
@@ -26,7 +31,7 @@ func TestRoutes(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -75,8 +80,8 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 	params := &createAccountRequest{
 		AccountNumber: "18749",
 		RoutingNumber: "987654320",
+		Status:        client.VALIDATED,
 		Type:          client.SAVINGS,
-		HolderType:    client.INDIVIDUAL,
 	}
 
 	var buf bytes.Buffer

@@ -7,19 +7,15 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/base/admin"
-	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
-	watchman "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -40,7 +36,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	addApprovalRoutes(log.NewNopLogger(), svc, repo, ssnRepo, searcher)
 	go svc.Listen()
 
-	body := strings.NewReader(`{"status": "ReviewRequired", "comment": "test comment"}`)
+	body := strings.NewReader(`{"status": "ReceiveOnly", "comment": "test comment"}`)
 	req, err := http.NewRequest("PUT", "http://localhost:10001/customers/foo/status", body)
 	if err != nil {
 		t.Fatal(err)
@@ -65,7 +61,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	if customer.CustomerID == "" {
 		t.Errorf("missing customer JSON: %#v", customer)
 	}
-	if repo.updatedStatus != customers.ReviewRequired {
+	if repo.updatedStatus != client.RECEIVE_ONLY {
 		t.Errorf("unexpected status: %s", repo.updatedStatus)
 	}
 }
@@ -137,123 +133,6 @@ func TestCustomers__containsValidPrimaryAddress(t *testing.T) {
 	addresses[0].Type = "Secondary"
 	if containsValidPrimaryAddress(addresses) {
 		t.Error("Address is Secondary")
-	}
-}
-
-func TestCustomers__validCustomerStatusTransition(t *testing.T) {
-	cust := &client.Customer{
-		CustomerID: base.ID(),
-		Status:     customers.None.String(),
-	}
-	repo := &testCustomerRepository{}
-	searcher := createTestOFACSearcher(repo, nil)
-
-	ssn := &SSN{customerID: cust.CustomerID, encrypted: "secret"}
-
-	if err := validCustomerStatusTransition(cust, ssn, customers.Deceased, repo, searcher, "requestID"); err != nil {
-		t.Errorf("expected no error: %v", err)
-	}
-
-	// block Deceased and Rejected customers
-	cust.Status = customers.Deceased.String()
-	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
-		t.Error("expected error")
-	}
-	cust.Status = customers.Rejected.String()
-	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
-		t.Error("expected error")
-	}
-
-	// normal KYC approval (rejected due to missing info)
-	cust.FirstName, cust.LastName = "Jane", "Doe"
-	cust.Status = customers.ReviewRequired.String()
-	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
-		t.Error("expected error")
-	}
-	cust.BirthDate = time.Now()
-	if err := validCustomerStatusTransition(cust, ssn, customers.KYC, repo, searcher, "requestID"); err == nil {
-		t.Error("expected error")
-	}
-	cust.Addresses = append(cust.Addresses, client.CustomerAddress{
-		Type:     "primary",
-		Address1: "123 1st st",
-	})
-
-	// CIP transistions are WIP // TODO(adam):
-	cust.Status = customers.ReviewRequired.String()
-	if err := validCustomerStatusTransition(cust, nil, customers.CIP, repo, searcher, "requestID"); err != nil {
-		if !strings.Contains(err.Error(), "is missing SSN") {
-			t.Errorf("CIP: unexpected error: %v", err)
-		}
-	} else {
-		t.Error("CIP transition is WIP")
-	}
-	if err := validCustomerStatusTransition(cust, ssn, customers.CIP, repo, searcher, "requestID"); err == nil {
-		t.Error("CIP transition is WIP")
-	}
-}
-
-func TestCustomers__validCustomerStatusTransitionError(t *testing.T) {
-	cust := &client.Customer{
-		CustomerID: base.ID(),
-		Status:     customers.ReviewRequired.String(),
-	}
-	repo := &testCustomerRepository{}
-	client := &testWatchmanClient{}
-	searcher := createTestOFACSearcher(repo, client)
-
-	ssn := &SSN{customerID: cust.CustomerID, encrypted: "secret"}
-
-	repo.err = errors.New("bad error")
-	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, ""); err == nil {
-		t.Error("expected error, but got none")
-	}
-	repo.err = nil
-
-	client.err = errors.New("bad error")
-	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, ""); err == nil {
-		t.Error("expected error, but got none")
-	}
-}
-
-func TestCustomers__validCustomerStatusTransitionOFAC(t *testing.T) {
-	cust := &client.Customer{
-		CustomerID: base.ID(),
-		Status:     customers.ReviewRequired.String(),
-	}
-	repo := &testCustomerRepository{}
-	searcher := createTestOFACSearcher(repo, nil)
-
-	ssn := &SSN{customerID: cust.CustomerID, encrypted: "secret"}
-
-	repo.ofacSearchResult = &ofacSearchResult{
-		SDNName: "Jane Doe",
-		Match:   0.10,
-	}
-	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
-		t.Errorf("unexpected error in OFAC transition: %v", err)
-	}
-
-	// OFAC transition with positive match
-	repo.ofacSearchResult.Match = 0.99
-	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
-		if !strings.Contains(err.Error(), "positive OFAC match") {
-			t.Errorf("unexpected error in OFAC transition: %v", err)
-		}
-	}
-
-	// OFAC transition with no stored result
-	repo.ofacSearchResult = nil
-	if c, ok := searcher.watchmanClient.(*testWatchmanClient); ok {
-		c.sdn = &watchman.OfacSdn{
-			EntityID: "12124",
-		}
-	}
-	if err := validCustomerStatusTransition(cust, ssn, customers.OFAC, repo, searcher, "requestID"); err != nil {
-		t.Errorf("unexpected error: %v", err)
-	}
-	if repo.savedOFACSearchResult.EntityID != "12124" {
-		t.Errorf("unexpected saved OFAC result: %#v", repo.savedOFACSearchResult)
 	}
 }
 

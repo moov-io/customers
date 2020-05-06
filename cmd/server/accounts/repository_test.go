@@ -46,8 +46,8 @@ func TestRepository(t *testing.T) {
 	acct, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
+		Status:        client.VALIDATED,
 		Type:          client.CHECKING,
-		HolderType:    client.INDIVIDUAL,
 	})
 	if err != nil {
 		t.Fatal(err)

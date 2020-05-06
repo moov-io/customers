@@ -9,14 +9,11 @@
 
 package client
 
-// Account struct for Account
-type Account struct {
-	// A unique identifier for this account
-	AccountID string `json:"accountID,omitempty"`
-	// The masked account number for the depository account
-	MaskedAccountNumber string `json:"maskedAccountNumber,omitempty"`
-	// The ABA routing transit number for the depository account.
-	RoutingNumber string        `json:"routingNumber,omitempty"`
-	Status        AccountStatus `json:"status,omitempty"`
-	Type          AccountType   `json:"type,omitempty"`
-}
+// AccountStatus Enumeration if this account has been validated through micro-deposits or another available strategy.
+type AccountStatus string
+
+// List of AccountStatus
+const (
+	NONE      AccountStatus = "none"
+	VALIDATED AccountStatus = "validated"
+)

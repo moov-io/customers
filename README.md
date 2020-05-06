@@ -47,6 +47,14 @@ The following environmental variables can be set to configure behavior in Accoun
 | `OFAC_MATCH_THRESHOLD` | Percent match against OFAC data that's required for paygate to block a transaction. | `99%` |
 | `DATABASE_TYPE` | Which database option to use (Options: `sqlite`, `mysql`) | Default: `sqlite` |
 
+### Fed
+
+The Moov [Fed](https://github.com/moov-io/fed) service is used for routing number lookup and verification.
+
+| Environmental Variable | Description | Default |
+|-----|-----|-----|
+| `FED_ENDPOINT` | HTTP address for Moov Fed interaction to lookup ABA routing numbers. | `http://fed.apps.svc.cluster.local:8080` |
+
 #### Storage
 
 Based on `DATABASE_TYPE` the following environment variables will be read to configure connections for a specific database.

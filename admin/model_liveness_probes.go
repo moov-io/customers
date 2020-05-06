@@ -9,10 +9,8 @@
 
 package admin
 
-// UpdateCustomerStatus struct for UpdateCustomerStatus
-type UpdateCustomerStatus struct {
-	// Free form text for admin users
-	Comment string `json:"comment,omitempty"`
-	// Status to attempt transition towards
-	Status string `json:"status,omitempty"`
+// LivenessProbes struct for LivenessProbes
+type LivenessProbes struct {
+	// Either an error from checking Customers or good as a string.
+	Watchman string `json:"watchman,omitempty"`
 }

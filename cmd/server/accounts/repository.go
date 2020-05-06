@@ -35,8 +35,7 @@ func (r *sqlAccountRepository) Close() error {
 }
 
 func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client.Account, error) {
-	query := `select account_id, masked_account_number, routing_number, type, holder_type from accounts
-where customer_id = ? and deleted_at is null;`
+	query := `select account_id, masked_account_number, routing_number, status, type from accounts where customer_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -52,7 +51,7 @@ where customer_id = ? and deleted_at is null;`
 	var out []*client.Account
 	for rows.Next() {
 		var a client.Account
-		if err := rows.Scan(&a.AccountID, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Type, &a.HolderType); err != nil {
+		if err := rows.Scan(&a.AccountID, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
 			return nil, err
 		}
 		out = append(out, &a)
@@ -65,13 +64,13 @@ func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, 
 		AccountID:           base.ID(),
 		MaskedAccountNumber: req.AccountNumber,
 		RoutingNumber:       req.RoutingNumber,
+		Status:              req.Status,
 		Type:                req.Type,
-		HolderType:          req.HolderType,
 	}
 	query := `insert into accounts (
   account_id, customer_id, user_id,
   encrypted_account_number, hashed_account_number, masked_account_number,
-  routing_number, type, holder_type, created_at
+  routing_number, status, type, created_at
 ) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -82,7 +81,7 @@ func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, 
 	_, err = stmt.Exec(
 		account.AccountID, customerID, userID,
 		req.encryptedAccountNumber, req.hashedAccountNumber, req.maskedAccountNumber,
-		account.RoutingNumber, account.Type, account.HolderType, time.Now(),
+		account.RoutingNumber, account.Status, account.Type, time.Now(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("problem creating account=%s: %v", account.AccountID, err)

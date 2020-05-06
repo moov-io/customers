@@ -45,7 +45,7 @@ var (
 		),
 		execsql(
 			"create_customers_addresses",
-			`create table if not exists customers_addresses(address_id varchar(40) primary key, customer_id varchar(40), type SMALLINT, address1 varchar(120), address2 varchar(120), city varchar(50), state varchar(2), postal_code varchar(9), country varchar(3), validated BOOLEAN, active BOOLEAN, unique (customer_id, address1));`,
+			`create table if not exists customers_addresses(address_id varchar(40) primary key, customer_id varchar(40), type SMALLINT, address1 varchar(120), address2 varchar(120), city varchar(50), state varchar(2), postal_code varchar(9), country varchar(3), validated BOOLEAN, unique (customer_id, address1));`,
 		),
 		execsql(
 			"create_customer_metadata",
@@ -77,7 +77,7 @@ var (
 		),
 		execsql(
 			"create_accounts",
-			`create table if not exists accounts(account_id varchar(40) primary key, customer_id varchar(40), user_id varchar(40), encrypted_account_number varchar(40), hashed_account_number varchar(40), masked_account_number varchar(15), routing_number varchar(10), type varchar(12), holder_type varchar(10), created_at datetime, deleted_at datetime);`,
+			`create table if not exists accounts(account_id varchar(40) primary key, customer_id varchar(40), user_id varchar(40), encrypted_account_number varchar(40), hashed_account_number varchar(40), masked_account_number varchar(15), routing_number varchar(10), status varchar(12), type varchar(12), created_at datetime, deleted_at datetime);`,
 		),
 	)
 )

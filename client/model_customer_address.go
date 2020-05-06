@@ -25,6 +25,4 @@ type CustomerAddress struct {
 	Country    string `json:"country,omitempty"`
 	// Address has been validated for customer
 	Validated bool `json:"validated,omitempty"`
-	// Address is currently being used for customer
-	Active bool `json:"active,omitempty"`
 }

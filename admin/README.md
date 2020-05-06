@@ -34,16 +34,18 @@ All URIs are relative to *http://localhost:9097*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AdminApi* | [**CreateCustomerDisclaimer**](docs/AdminApi.md#createcustomerdisclaimer) | **Post** /customers/{customerID}/disclaimers | Create disclaimer
+*AdminApi* | [**GetLivenessProbes**](docs/AdminApi.md#getlivenessprobes) | **Get** /live | Get Liveness Probes
 *AdminApi* | [**GetVersion**](docs/AdminApi.md#getversion) | **Get** /version | Get Version
-*AdminApi* | [**UpdateCustomerAddress**](docs/AdminApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customers address
-*AdminApi* | [**UpdateCustomerStatus**](docs/AdminApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer status
+*CustomersApi* | [**CreateCustomerDisclaimer**](docs/CustomersApi.md#createcustomerdisclaimer) | **Post** /customers/{customerID}/disclaimers | Create disclaimer
+*CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customers address
+*CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer status
 
 
 ## Documentation For Models
 
  - [CreateUserDisclaimer](docs/CreateUserDisclaimer.md)
  - [Error](docs/Error.md)
+ - [LivenessProbes](docs/LivenessProbes.md)
  - [UpdateCustomerAddress](docs/UpdateCustomerAddress.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
 

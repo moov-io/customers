@@ -1004,7 +1004,6 @@ components:
           city: city
           address1: address1
           postalCode: postalCode
-          active: true
           state: state
           type: Primary
           addressID: 851233a1
@@ -1014,7 +1013,6 @@ components:
           city: city
           address1: address1
           postalCode: postalCode
-          active: true
           state: state
           type: Primary
           addressID: 851233a1
@@ -1231,7 +1229,6 @@ components:
         city: city
         address1: address1
         postalCode: postalCode
-        active: true
         state: state
         type: Primary
         addressID: 851233a1
@@ -1267,10 +1264,15 @@ components:
         validated:
           description: Address has been validated for customer
           type: boolean
-        active:
-          description: Address is currently being used for customer
-          type: boolean
       type: object
+    AccountStatus:
+      description: Enumeration if this account has been validated through micro-deposits
+        or another available strategy.
+      enum:
+      - none
+      - validated
+      example: microdeposits
+      type: string
     AccountType:
       description: |
         Defines the account as *checking* or *savings*
@@ -1305,7 +1307,7 @@ components:
         routingNumber: "051504597"
         type: checking
         maskedAccountNumber: "0001027028"
-        status: validated
+        status: microdeposits
       properties:
         accountID:
           description: A unique identifier for this account
@@ -1320,13 +1322,7 @@ components:
           example: "051504597"
           type: string
         status:
-          description: Enumeration if this account has been validated through micro-deposits
-            or another available strategy.
-          enum:
-          - unknown
-          - validated
-          example: validated
-          type: string
+          $ref: '#/components/schemas/AccountStatus'
         type:
           $ref: '#/components/schemas/AccountType'
     UpdateValidation:

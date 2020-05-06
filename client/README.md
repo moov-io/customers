@@ -60,6 +60,7 @@ Class | Method | HTTP request | Description
 ## Documentation For Models
 
  - [Account](docs/Account.md)
+ - [AccountStatus](docs/AccountStatus.md)
  - [AccountType](docs/AccountType.md)
  - [CreateAccount](docs/CreateAccount.md)
  - [CreateCustomer](docs/CreateCustomer.md)

@@ -21,6 +21,7 @@ import (
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/customers"
 	"github.com/moov-io/customers/cmd/server/accounts"
+	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/internal/secrets"
 
@@ -139,11 +140,14 @@ func main() {
 		repo:   customerSSNRepo,
 	}
 
+	fedClient := fed.NewClient(logger, os.Getenv("FED_ENDPOINT"))
+	adminServer.AddLivenessCheck("fed", fedClient.Ping)
+
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, stringKeeper)
+	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, stringKeeper)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))

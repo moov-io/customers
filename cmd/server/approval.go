@@ -5,7 +5,6 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -16,7 +15,6 @@ import (
 
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/route"
 
@@ -47,59 +45,8 @@ func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerReposi
 }
 
 type updateCustomerStatusRequest struct {
-	Comment string           `json:"comment,omitempty"`
-	Status  customers.Status `json:"status"`
-}
-
-// validCustomerStatusTransition determines if a future CustomerStatus is valid for a given
-// Customer. There are several rules which apply to a CustomerStatus, such as:
-//  - Deceased, Rejected statuses can never be changed
-//  - KYC is only valid if the Customer has first, last, address, and date of birth
-//  - OFAC can only be after an OFAC search has been performed (and search info recorded)
-//  - CIP can only be if the SSN has been set
-func validCustomerStatusTransition(existing *client.Customer, ssn *SSN, futureStatus customers.Status, repo customerRepository, ofac *ofacSearcher, requestID string) error {
-	// Reject certain Deceased and Rejected statuses
-	if cs, err := customers.LiftStatus(string(existing.Status)); err != nil || cs == nil || *cs <= customers.Rejected {
-		return fmt.Errorf("customer status '%s' cannot be changed: %v", existing.Status, err)
-	}
-	switch futureStatus {
-	case customers.KYC:
-		if existing.FirstName == "" || existing.LastName == "" {
-			return fmt.Errorf("customer=%s is missing fist/last name", existing.CustomerID)
-		}
-		if existing.BirthDate.IsZero() {
-			return fmt.Errorf("customer=%s is missing date of birth", existing.CustomerID)
-		}
-		if !containsValidPrimaryAddress(existing.Addresses) {
-			return fmt.Errorf("customer=%s is missing a valid primary Address", existing.CustomerID)
-		}
-	case customers.OFAC:
-		searchResult, err := repo.getLatestCustomerOFACSearch(existing.CustomerID)
-		if err != nil {
-			return fmt.Errorf("validCustomerStatusTransition: error getting OFAC search: %v", err)
-		}
-		if searchResult == nil {
-			if err := ofac.storeCustomerOFACSearch(existing, ""); err != nil {
-				return fmt.Errorf("validCustomerStatusTransition: problem with OFAC search: %v", err)
-			}
-			searchResult, err = repo.getLatestCustomerOFACSearch(existing.CustomerID)
-			if err != nil || searchResult == nil {
-				return fmt.Errorf("validCustomerStatusTransition: inner lookup searchResult=%#v: %v", searchResult, err)
-			}
-		}
-		if searchResult.Match > ofacMatchThreshold {
-			return fmt.Errorf("validCustomerStatusTransition: customer=%s has positive OFAC match (%.2f) with SDN=%s", existing.CustomerID, searchResult.Match, searchResult.EntityID)
-		}
-		return nil
-	case customers.CIP: // TODO(adam): need to impl lookup
-		// What can we do to validate an SSN?
-		// https://www.ssa.gov/employer/randomization.html (not much)
-		if ssn == nil || len(ssn.encrypted) == 0 {
-			return fmt.Errorf("customer=%s is missing SSN", existing.CustomerID)
-		}
-		return fmt.Errorf("customer=%s %s to CIP transition needs to lookup encrypted SSN", existing.CustomerID, existing.Status)
-	}
-	return nil
+	Comment string                `json:"comment,omitempty"`
+	Status  client.CustomerStatus `json:"status"`
 }
 
 func containsValidPrimaryAddress(addrs []client.CustomerAddress) bool {
@@ -136,14 +83,8 @@ func updateCustomerStatus(logger log.Logger, repo customerRepository, customerSS
 			moovhttp.Problem(w, err)
 			return
 		}
-
-		ssn, err := customerSSNRepo.getCustomerSSN(customerID)
-		if err != nil && err != sql.ErrNoRows {
-			moovhttp.Problem(w, err)
-			return
-		}
-		if err := validCustomerStatusTransition(cust, ssn, req.Status, repo, ofac, requestID); err != nil {
-			moovhttp.Problem(w, err)
+		if cust == nil {
+			moovhttp.Problem(w, fmt.Errorf("customerID=%s not found", customerID))
 			return
 		}
 

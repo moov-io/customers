@@ -41,7 +41,7 @@ var (
 		),
 		execsql(
 			"create_customers_addresses",
-			`create table if not exists customers_addresses(address_id primary key, customer_id, type, address1, address2, city, state, postal_code, country, validated, active, unique (customer_id, address1) on conflict abort);`,
+			`create table if not exists customers_addresses(address_id primary key, customer_id, type, address1, address2, city, state, postal_code, country, validated, unique (customer_id, address1) on conflict abort);`,
 		),
 		execsql(
 			"create_customer_metadata",
@@ -73,7 +73,7 @@ var (
 		),
 		execsql(
 			"create_accounts",
-			`create table if not exists accounts(account_id primary key, customer_id, user_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, type, holder_type, created_at datetime, deleted_at datetime);`,
+			`create table if not exists accounts(account_id primary key, customer_id, user_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, status, type, created_at datetime, deleted_at datetime);`,
 		),
 	)
 )

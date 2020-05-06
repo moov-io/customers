@@ -16,7 +16,6 @@ import (
 
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers"
 	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/internal/usstates"
@@ -151,7 +150,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		Suffix:     req.Suffix,
 		BirthDate:  req.BirthDate,
 		Email:      req.Email,
-		Status:     customers.None.String(),
+		Status:     client.UNKNOWN,
 		Metadata:   req.Metadata,
 	}
 	for i := range req.Phones {
@@ -169,7 +168,6 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			State:      req.Addresses[i].State,
 			PostalCode: req.Addresses[i].PostalCode,
 			Country:    req.Addresses[i].Country,
-			Active:     true,
 		})
 	}
 	if req.SSN != "" {
@@ -293,7 +291,7 @@ func addCustomerAddress(logger log.Logger, repo customerRepository) http.Handler
 type customerRepository interface {
 	getCustomer(customerID string) (*client.Customer, error)
 	createCustomer(c *client.Customer) error
-	updateCustomerStatus(customerID string, status customers.Status, comment string) error
+	updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error
 
 	getCustomerMetadata(customerID string) (map[string]string, error)
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
@@ -351,13 +349,13 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt.Close()
 
 	// Insert customer addresses
-	query = `insert or replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query = `insert or replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers_addresses err=%v | rollback=%v", err, tx.Rollback())
 	}
 	for i := range c.Addresses {
-		_, err := stmt.Exec(c.Addresses[i].AddressID, c.CustomerID, c.Addresses[i].Type, c.Addresses[i].Address1, c.Addresses[i].Address2, c.Addresses[i].City, c.Addresses[i].State, c.Addresses[i].PostalCode, c.Addresses[i].Country, c.Addresses[i].Validated, c.Addresses[i].Active)
+		_, err := stmt.Exec(c.Addresses[i].AddressID, c.CustomerID, c.Addresses[i].Type, c.Addresses[i].Address1, c.Addresses[i].Address2, c.Addresses[i].City, c.Addresses[i].State, c.Addresses[i].PostalCode, c.Addresses[i].Country, c.Addresses[i].Validated)
 		if err != nil {
 			stmt.Close()
 			return fmt.Errorf("createCustomer: customers_addresses exec err=%v | rollback=%v", err, tx.Rollback())
@@ -438,7 +436,7 @@ func (r *sqlCustomerRepository) readPhones(customerID string) ([]client.Phone, e
 }
 
 func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.CustomerAddress, error) {
-	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated, active from customers_addresses where customer_id = ?;`
+	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated from customers_addresses where customer_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("readAddresses: prepare customers_addresses: err=%v", err)
@@ -454,7 +452,7 @@ func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.Custo
 	var adds []client.CustomerAddress
 	for rows.Next() {
 		var a client.CustomerAddress
-		if err := rows.Scan(&a.AddressID, &a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated, &a.Active); err != nil {
+		if err := rows.Scan(&a.AddressID, &a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated); err != nil {
 			return nil, fmt.Errorf("readAddresses: scan customers_addresses: err=%v", err)
 		}
 		adds = append(adds, a)
@@ -462,7 +460,7 @@ func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.Custo
 	return adds, rows.Err()
 }
 
-func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status customers.Status, comment string) error {
+func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return fmt.Errorf("updateCustomerStatus: tx begin: %v", err)
@@ -474,7 +472,7 @@ func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status c
 	if err != nil {
 		return fmt.Errorf("updateCustomerStatus: update customers prepare: %v", err)
 	}
-	if _, err := stmt.Exec(status.String(), customerID); err != nil {
+	if _, err := stmt.Exec(status, customerID); err != nil {
 		stmt.Close()
 		return fmt.Errorf("updateCustomerStatus: update customers exec: %v", err)
 	}
@@ -487,7 +485,7 @@ func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status c
 		return fmt.Errorf("updateCustomerStatus: insert status prepare: %v", err)
 	}
 	defer stmt.Close()
-	if _, err := stmt.Exec(customerID, status.String(), comment, time.Now()); err != nil {
+	if _, err := stmt.Exec(customerID, status, comment, time.Now()); err != nil {
 		return fmt.Errorf("updateCustomerStatus: insert status exec: %v", err)
 	}
 	return tx.Commit()
@@ -556,14 +554,14 @@ func (r *sqlCustomerRepository) replaceCustomerMetadata(customerID string, metad
 }
 
 func (r *sqlCustomerRepository) addCustomerAddress(customerID string, req address) error {
-	query := `insert into customers_addresses (address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated, active) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query := `insert into customers_addresses (address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("addCustomerAddress: prepare: %v", err)
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(base.ID(), customerID, "Secondary", req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false, true); err != nil {
+	if _, err := stmt.Exec(base.ID(), customerID, "Secondary", req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false); err != nil {
 		return fmt.Errorf("addCustomerAddress: exec: %v", err)
 	}
 	return nil

@@ -982,9 +982,13 @@ components:
         validated:
           type: boolean
           description: Address has been validated for customer
-        active:
-          type: boolean
-          description: Address is currently being used for customer
+    AccountStatus:
+      type: string
+      description: Enumeration if this account has been validated through micro-deposits or another available strategy.
+      enum:
+        - none
+        - validated
+      example: microdeposits
     AccountType:
       type: string
       description: |
@@ -1024,12 +1028,7 @@ components:
           description: The ABA routing transit number for the depository account.
           example: "051504597"
         status:
-          type: string
-          enum:
-            - unknown
-            - validated
-          example: validated
-          description: Enumeration if this account has been validated through micro-deposits or another available strategy.
+          $ref: '#/components/schemas/AccountStatus'
         type:
           $ref: '#/components/schemas/AccountType'
     UpdateValidation:
