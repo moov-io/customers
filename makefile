@@ -46,7 +46,7 @@ clean:
 
 dist: clean admin client build
 ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -o bin/customers-windows-amd64.exe github.com/moov-io/customers/cmd/server
+	CGO_ENABLED=1 GOOS=windows go build -o bin/customers.exe github.com/moov-io/customers/cmd/server
 else
 	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/customers-$(PLATFORM)-amd64 github.com/moov-io/customers/cmd/server
 endif
