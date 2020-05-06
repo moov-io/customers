@@ -42,7 +42,7 @@ func TestRoutes(t *testing.T) {
 	// create an account
 	account := httpCreateAccount(t, handler, customerID)
 	if account.MaskedAccountNumber != "***49" {
-		t.Logf("masked account number: %q", account.MaskedAccountNumber)
+		t.Errorf("masked account number: %q", account.MaskedAccountNumber)
 	}
 
 	// re-read, find account

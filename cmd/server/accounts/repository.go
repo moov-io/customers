@@ -64,7 +64,7 @@ func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client
 func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
 	account := &client.Account{
 		AccountID:           base.ID(),
-		MaskedAccountNumber: req.AccountNumber,
+		MaskedAccountNumber: req.maskedAccountNumber,
 		RoutingNumber:       req.RoutingNumber,
 		Status:              req.Status,
 		Type:                req.Type,
