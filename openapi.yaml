@@ -356,6 +356,53 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/accounts/{accountID}/decrypt:
+    post:
+      tags: [Customers]
+      summary: Decrypt Account Number
+      description: |
+        Return the account number encrypted with a shared secret for application requests. This encryption key is different from the key used for persistence.
+      operationId: decryptAccountNumber
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer the accountID belongs to
+          required: true
+          schema:
+            type: string
+            example: 51dd8cdd
+        - name: accountID
+          in: path
+          description: accountID of the Account to validate
+          required: true
+          schema:
+            type: string
+            example: b74d7c51
+      responses:
+        '200':
+          description: Decrypted account number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecryptedAccountNumber'
+        '400':
+          description: Failed to validate account, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/validate:
     post:
       tags: [Customers]
@@ -997,15 +1044,21 @@ components:
         - Checking
         - Savings
       example: checking
+    DecryptedAccountNumber:
+      properties:
+        decryptedAccountNumber:
+          type: string
+          description: The decrypted account number for the bank account
+          example: "71861294"
     CreateAccount:
       properties:
         accountNumber:
           type: string
-          description: The account number for the depository account
+          description: The account number for the bank account
           example: "0001027028"
         routingNumber:
           type: string
-          description: The ABA routing transit number for the depository account.
+          description: The ABA routing transit number for the bank account.
           example: "051504597"
         type:
           $ref: '#/components/schemas/AccountType'
@@ -1021,11 +1074,11 @@ components:
           example: e1b1544a
         maskedAccountNumber:
           type: string
-          description: The masked account number for the depository account
+          description: The masked account number for the bank account
           example: "0001027028"
         routingNumber:
           type: string
-          description: The ABA routing transit number for the depository account.
+          description: The ABA routing transit number for the bank account.
           example: "051504597"
         status:
           $ref: '#/components/schemas/AccountStatus'
