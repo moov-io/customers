@@ -11,6 +11,6 @@ package client
 
 // TransitAccountNumber struct for TransitAccountNumber
 type TransitAccountNumber struct {
-	// The encrypted account number for the bank account for transit across services.
+	// The base64 encoded encrypted account number for the bank account for transit across services.
 	AccountNumber string `json:"accountNumber,omitempty"`
 }

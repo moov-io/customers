@@ -1343,12 +1343,12 @@ components:
       type: string
     TransitAccountNumber:
       example:
-        accountNumber: "71861294"
+        accountNumber: MKtcJkzlxUlGcW7Nf5xm5cg==
       properties:
         accountNumber:
-          description: The encrypted account number for the bank account for transit
-            across services.
-          example: "71861294"
+          description: The base64 encoded encrypted account number for the bank account
+            for transit across services.
+          example: MKtcJkzlxUlGcW7Nf5xm5cg==
           type: string
     CreateAccount:
       example:

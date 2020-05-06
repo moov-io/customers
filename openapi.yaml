@@ -1048,8 +1048,8 @@ components:
       properties:
         accountNumber:
           type: string
-          description: The encrypted account number for the bank account for transit across services.
-          example: "71861294"
+          description: The base64 encoded encrypted account number for the bank account for transit across services.
+          example: MKtcJkzlxUlGcW7Nf5xm5cg==
     CreateAccount:
       properties:
         accountNumber:
