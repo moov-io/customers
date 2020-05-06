@@ -19,12 +19,14 @@ matrix:
     cache:
       directories:
       - "/Users/travis/Library/Caches/go-build"
-  # - os: windows
-  #   go: 1.14.x
+  - os: windows
+    go: 1.14.x
 before_install:
   # Setup directory for binaries
   - mkdir ./bin
   - export PATH=$PATH:$PWD/bin
+  # Install 'make' on Windows
+  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y make; fi
 before_script:
   - GOFILES=$(find . -type f -name '*.go' | grep -v vendor | grep -v admin | grep -v client)
   - go mod graph
@@ -47,6 +49,7 @@ deploy:
   file_glob: true
   file:
     - bin/customers-*
+    - bin/customers.exe
   on:
     repo: moov-io/customers
     tags: true
