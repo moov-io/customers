@@ -141,7 +141,7 @@ func main() {
 	}
 
 	// read transit keeper
-	transitKeeper, err := secrets.OpenSecretKeeper(ctx, "transit", "local")
+	transitKeeper, err := secrets.OpenLocal(os.Getenv("TRANSIT_LOCAL_BASE64_KEY"))
 	if err != nil {
 		panic(err)
 	}
