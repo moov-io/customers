@@ -396,7 +396,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DecryptedAccountNumber'
+                $ref: '#/components/schemas/TransitAccountNumber'
         '400':
           description: Failed to validate account, see error(s)
           content:
@@ -1044,11 +1044,11 @@ components:
         - Checking
         - Savings
       example: checking
-    DecryptedAccountNumber:
+    TransitAccountNumber:
       properties:
-        decryptedAccountNumber:
+        accountNumber:
           type: string
-          description: The decrypted account number for the bank account
+          description: The encrypted account number for the bank account for transit across services.
           example: "71861294"
     CreateAccount:
       properties:

@@ -444,6 +444,66 @@ paths:
       summary: Create Customer Account
       tags:
       - Customers
+  /customers/{customerID}/accounts/{accountID}/decrypt:
+    post:
+      description: |
+        Return the account number encrypted with a shared secret for application requests. This encryption key is different from the key used for persistence.
+      operationId: decryptAccountNumber
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer the accountID belongs to
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: 51dd8cdd
+          type: string
+        style: simple
+      - description: accountID of the Account to validate
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransitAccountNumber'
+          description: Decrypted account number
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to validate account, see error(s)
+      summary: Decrypt Account Number
+      tags:
+      - Customers
   /customers/{customerID}/accounts/{accountID}/validate:
     post:
       description: |
@@ -1281,6 +1341,15 @@ components:
       - Savings
       example: checking
       type: string
+    TransitAccountNumber:
+      example:
+        accountNumber: "71861294"
+      properties:
+        accountNumber:
+          description: The encrypted account number for the bank account for transit
+            across services.
+          example: "71861294"
+          type: string
     CreateAccount:
       example:
         routingNumber: "051504597"
@@ -1288,11 +1357,11 @@ components:
         type: checking
       properties:
         accountNumber:
-          description: The account number for the depository account
+          description: The account number for the bank account
           example: "0001027028"
           type: string
         routingNumber:
-          description: The ABA routing transit number for the depository account.
+          description: The ABA routing transit number for the bank account.
           example: "051504597"
           type: string
         type:
@@ -1314,11 +1383,11 @@ components:
           example: e1b1544a
           type: string
         maskedAccountNumber:
-          description: The masked account number for the depository account
+          description: The masked account number for the bank account
           example: "0001027028"
           type: string
         routingNumber:
-          description: The ABA routing transit number for the depository account.
+          description: The ABA routing transit number for the bank account.
           example: "051504597"
           type: string
         status:

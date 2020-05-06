@@ -71,3 +71,29 @@ func TestRepository(t *testing.T) {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}
 }
+
+func TestRepository__getEncryptedAccountNumber(t *testing.T) {
+	customerID, userID := base.ID(), base.ID()
+	repo := setupTestAccountRepository(t)
+
+	// create account
+	acct, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+		AccountNumber:          "123",
+		encryptedAccountNumber: "foo",
+		RoutingNumber:          "987654320",
+		Status:                 client.VALIDATED,
+		Type:                   client.CHECKING,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// read encrypted account number
+	encrypted, err := repo.getEncryptedAccountNumber(customerID, acct.AccountID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if encrypted == "" {
+		t.Error("missing encrypted account number")
+	}
+}

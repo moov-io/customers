@@ -42,6 +42,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add customer address
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create customer
 *CustomersApi* | [**CreateCustomerAccount**](docs/CustomersApi.md#createcustomeraccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
+*CustomersApi* | [**DecryptAccountNumber**](docs/CustomersApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 *CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer
 *CustomersApi* | [**GetCustomerAccounts**](docs/CustomersApi.md#getcustomeraccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
@@ -76,6 +77,7 @@ Class | Method | HTTP request | Description
  - [Error](docs/Error.md)
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
+ - [TransitAccountNumber](docs/TransitAccountNumber.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
  - [UpdateValidation](docs/UpdateValidation.md)
 

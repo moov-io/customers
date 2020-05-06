@@ -31,7 +31,7 @@ func TestRoutes(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
