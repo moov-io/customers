@@ -47,7 +47,7 @@ The following environmental variables can be set to configure behavior in Accoun
 | `OFAC_MATCH_THRESHOLD` | Percent match against OFAC data that's required for paygate to block a transaction. | `99%` |
 | `DATABASE_TYPE` | Which database option to use (Options: `sqlite`, `mysql`) | Default: `sqlite` |
 
-### Fed
+#### Fed
 
 The Moov [Fed](https://github.com/moov-io/fed) service is used for routing number lookup and verification.
 
@@ -109,7 +109,7 @@ For more information see the [Go Cloud Development Kit docs for fileblob](https:
 
 ##### Local storage
 
-- `SECRETS_LOCAL_BASE64_KEY`: A base64 encoded key used to encrypt and decrypt secrets in memory. This value needs to look like `base64key://value` where `value` is a 32 byte random key.
+- `SECRETS_LOCAL_BASE64_KEY`: A base64 encoded key used to encrypt and decrypt secrets which are stored in the database. This value needs to look like `base64key://value` where `value` is a 32 byte random key.
 
 ##### Google Cloud Storage
 
