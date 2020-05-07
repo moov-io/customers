@@ -74,11 +74,11 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	// create an account
 	account := httpCreateAccount(t, handler, customerID)
 	if account == nil {
-		t.Error("missing account")
+		t.Fatal("missing account")
 	}
 
 	transit, resp, err := client.CustomersApi.DecryptAccountNumber(context.TODO(), customerID, account.AccountID, nil)
-	if resp.Body != nil {
+	if resp != nil && resp.Body != nil {
 		resp.Body.Close()
 	}
 	if err != nil {
