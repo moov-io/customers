@@ -23,7 +23,7 @@ import (
 	"github.com/moov-io/customers/cmd/server/accounts"
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/internal/database"
-	"github.com/moov-io/customers/internal/secrets"
+	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -140,6 +140,13 @@ func main() {
 		repo:   customerSSNRepo,
 	}
 
+	// read transit keeper
+	transitKeeper, err := secrets.OpenLocal(os.Getenv("TRANSIT_LOCAL_BASE64_KEY"))
+	if err != nil {
+		panic(err)
+	}
+	transitStringKeeper := secrets.NewStringKeeper(transitKeeper, 10*time.Second)
+
 	fedClient := fed.NewClient(logger, os.Getenv("FED_ENDPOINT"))
 	adminServer.AddLivenessCheck("fed", fedClient.Ping)
 
@@ -147,7 +154,7 @@ func main() {
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, stringKeeper)
+	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, stringKeeper, transitStringKeeper)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))

@@ -8,6 +8,7 @@ Method | HTTP request | Description
 [**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add customer address
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create customer
 [**CreateCustomerAccount**](CustomersApi.md#CreateCustomerAccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
+[**DecryptAccountNumber**](CustomersApi.md#DecryptAccountNumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 [**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
 [**GetCustomerAccounts**](CustomersApi.md#GetCustomerAccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
@@ -206,6 +207,54 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## DecryptAccountNumber
+
+> TransitAccountNumber DecryptAccountNumber(ctx, customerID, accountID, optional)
+
+Decrypt Account Number
+
+Return the account number encrypted with a shared secret for application requests. This encryption key is different from the key used for persistence. 
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID of the Customer the accountID belongs to | 
+**accountID** | **string**| accountID of the Account to validate | 
+ **optional** | ***DecryptAccountNumberOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a DecryptAccountNumberOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+
+### Return type
+
+[**TransitAccountNumber**](TransitAccountNumber.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

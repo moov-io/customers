@@ -55,6 +55,12 @@ The Moov [Fed](https://github.com/moov-io/fed) service is used for routing numbe
 |-----|-----|-----|
 | `FED_ENDPOINT` | HTTP address for Moov Fed interaction to lookup ABA routing numbers. | `http://fed.apps.svc.cluster.local:8080` |
 
+#### Account Numbers
+
+Customers has an endpoint which encrypts an account number for transit to another service. This encryption is currently done with a symmetric key to the other service.
+
+- `TRANSIT_LOCAL_BASE64_KEY`: A base64 encoded key used to encrypt account numbers for transit. This value needs to look like `base64key://value` where `value` is a 32 byte random key.
+
 #### Storage
 
 Based on `DATABASE_TYPE` the following environment variables will be read to configure connections for a specific database.

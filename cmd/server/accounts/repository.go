@@ -19,6 +19,8 @@ type Repository interface {
 	getCustomerAccounts(customerID string) ([]*client.Account, error)
 	createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error)
 	deactivateCustomerAccount(accountID string) error
+
+	getEncryptedAccountNumber(customerID, accountID string) (string, error)
 }
 
 func NewRepo(logger log.Logger, db *sql.DB) *sqlAccountRepository {
@@ -62,9 +64,9 @@ func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client
 func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
 	account := &client.Account{
 		AccountID:           base.ID(),
-		MaskedAccountNumber: req.AccountNumber,
+		MaskedAccountNumber: req.maskedAccountNumber,
 		RoutingNumber:       req.RoutingNumber,
-		Status:              req.Status,
+		Status:              client.NONE,
 		Type:                req.Type,
 	}
 	query := `insert into accounts (
@@ -102,4 +104,22 @@ func (r *sqlAccountRepository) deactivateCustomerAccount(accountID string) error
 		return nil
 	}
 	return err
+}
+
+func (r *sqlAccountRepository) getEncryptedAccountNumber(customerID, accountID string) (string, error) {
+	query := `select encrypted_account_number from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return "", err
+	}
+	defer stmt.Close()
+
+	var encrypted string
+	if err := stmt.QueryRow(customerID, accountID).Scan(&encrypted); err != nil {
+		if err == sql.ErrNoRows {
+			return "", nil
+		}
+		return "", err
+	}
+	return encrypted, nil
 }

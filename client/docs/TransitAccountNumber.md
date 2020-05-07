@@ -1,12 +1,10 @@
-# CreateAccount
+# TransitAccountNumber
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**AccountNumber** | **string** | The account number for the bank account | [optional] 
-**RoutingNumber** | **string** | The ABA routing transit number for the bank account. | [optional] 
-**Type** | [**AccountType**](AccountType.md) |  | [optional] 
+**AccountNumber** | **string** | The base64 encoded encrypted account number for the bank account for transit across services. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

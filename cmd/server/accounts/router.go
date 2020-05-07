@@ -16,17 +16,18 @@ import (
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/cmd/server/route"
-	"github.com/moov-io/customers/internal/secrets"
-	"github.com/moov-io/customers/internal/secrets/hash"
-	"github.com/moov-io/customers/internal/secrets/mask"
+	"github.com/moov-io/customers/pkg/secrets"
+	"github.com/moov-io/customers/pkg/secrets/hash"
+	"github.com/moov-io/customers/pkg/secrets/mask"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, keeper *secrets.StringKeeper) {
+func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper) {
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, repo, fedClient, keeper))
+	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, repo, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, repo))
 }
 
@@ -48,10 +49,9 @@ func getCustomerAccounts(logger log.Logger, repo Repository) http.HandlerFunc {
 }
 
 type createAccountRequest struct {
-	AccountNumber string               `json:"accountNumber"`
-	RoutingNumber string               `json:"routingNumber"`
-	Type          client.AccountType   `json:"type"`
-	Status        client.AccountStatus `json:"status"`
+	AccountNumber string             `json:"accountNumber"`
+	RoutingNumber string             `json:"routingNumber"`
+	Type          client.AccountType `json:"type"`
 
 	// fields we compute from the inbound AccountNumber
 	encryptedAccountNumber string
@@ -74,9 +74,6 @@ func (req *createAccountRequest) validate() error {
 		return fmt.Errorf("invalid account type: %s", req.Type)
 	}
 
-	if !strings.EqualFold(string(req.Status), string(client.VALIDATED)) {
-		return fmt.Errorf("invalid account status: %s", req.Status)
-	}
 	return nil
 }
 
@@ -142,6 +139,42 @@ func getAccountID(w http.ResponseWriter, r *http.Request) string {
 		return ""
 	}
 	return v
+}
+
+func decryptAccountNumber(logger log.Logger, repo Repository, keeper *secrets.StringKeeper, transitKeeper *secrets.StringKeeper) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+
+		customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
+		if customerID == "" || accountID == "" {
+			return
+		}
+
+		// grab encrypted value
+		encrypted, err := repo.getEncryptedAccountNumber(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		// decrypt from database
+		decrypted, err := keeper.DecryptString(encrypted)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		// encrypt for transit response
+		encrypted, err = transitKeeper.EncryptString(decrypted)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(client.TransitAccountNumber{
+			AccountNumber: encrypted,
+		})
+	}
 }
 
 func removeCustomerAccount(logger log.Logger, repo Repository) http.HandlerFunc {

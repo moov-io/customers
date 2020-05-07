@@ -9,11 +9,8 @@
 
 package client
 
-// CreateAccount struct for CreateAccount
-type CreateAccount struct {
-	// The account number for the bank account
+// TransitAccountNumber struct for TransitAccountNumber
+type TransitAccountNumber struct {
+	// The base64 encoded encrypted account number for the bank account for transit across services.
 	AccountNumber string `json:"accountNumber,omitempty"`
-	// The ABA routing transit number for the bank account.
-	RoutingNumber string      `json:"routingNumber,omitempty"`
-	Type          AccountType `json:"type,omitempty"`
 }

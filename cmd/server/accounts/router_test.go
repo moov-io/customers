@@ -6,6 +6,7 @@ package accounts
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -15,7 +16,8 @@ import (
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/internal/secrets"
+	"github.com/moov-io/customers/internal/testclient"
+	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -31,7 +33,7 @@ func TestRoutes(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -42,7 +44,7 @@ func TestRoutes(t *testing.T) {
 	// create an account
 	account := httpCreateAccount(t, handler, customerID)
 	if account.MaskedAccountNumber != "***49" {
-		t.Logf("masked account number: %q", account.MaskedAccountNumber)
+		t.Errorf("masked account number: %q", account.MaskedAccountNumber)
 	}
 
 	// re-read, find account
@@ -56,6 +58,42 @@ func TestRoutes(t *testing.T) {
 	accounts = httpReadAccounts(t, handler, customerID)
 	if len(accounts) != 0 {
 		t.Errorf("got accounts: %v", accounts)
+	}
+}
+
+func TestRoutes__DecryptAccountNumber(t *testing.T) {
+	customerID := base.ID()
+	repo := setupTestAccountRepository(t)
+	keeper := secrets.TestStringKeeper(t)
+
+	handler := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper)
+
+	client := testclient.New(t, handler)
+
+	// create an account
+	account := httpCreateAccount(t, handler, customerID)
+	if account == nil {
+		t.Fatal("missing account")
+	}
+
+	transit, resp, err := client.CustomersApi.DecryptAccountNumber(context.TODO(), customerID, account.AccountID, nil)
+	if resp != nil && resp.Body != nil {
+		resp.Body.Close()
+	}
+	if err != nil {
+		t.Error(err)
+	}
+	if transit.AccountNumber == "" {
+		t.Error("missing transit AccountNumber")
+	}
+
+	decrypted, err := keeper.DecryptString(transit.AccountNumber)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decrypted != "18749" {
+		t.Errorf("decrypted=%q", decrypted)
 	}
 }
 
@@ -80,7 +118,6 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 	params := &createAccountRequest{
 		AccountNumber: "18749",
 		RoutingNumber: "987654320",
-		Status:        client.VALIDATED,
 		Type:          client.SAVINGS,
 	}
 
