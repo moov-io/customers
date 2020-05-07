@@ -41,8 +41,8 @@ client:
 
 .PHONY: clean
 clean:
-	@rm -rf ./bin/
-	@rm -f openapi-generator-cli-*.jar
+	@rm -rf ./bin/ cover.out coverage.txt openapi-generator-cli-*.jar
+	@rm -rf misspell* staticcheck*
 
 dist: clean admin client build
 ifeq ($(OS),Windows_NT)
