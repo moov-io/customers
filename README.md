@@ -59,7 +59,7 @@ The Moov [Fed](https://github.com/moov-io/fed) service is used for routing numbe
 
 Customers has an endpoint which encrypts an account number for transit to another service. This encryption is currently done with a symmetric key to the other service.
 
-- `TRANSIT_LOCAL_BASE64_KEY`: A base64 encoded key used to encrypt account numbers for transit. This value needs to look like `base64key://value` where `value` is a 32 byte random key.
+- `TRANSIT_LOCAL_BASE64_KEY`: A URI used to encrypt account numbers for transit. This value needs to look like `base64key://value` where `value` is a base64 encoded 32 byte random key.
 
 #### Storage
 
@@ -115,7 +115,7 @@ For more information see the [Go Cloud Development Kit docs for fileblob](https:
 
 ##### Local storage
 
-- `SECRETS_LOCAL_BASE64_KEY`: A base64 encoded key used to encrypt and decrypt secrets which are stored in the database. This value needs to look like `base64key://value` where `value` is a 32 byte random key.
+- `SECRETS_LOCAL_BASE64_KEY`: A URI used to encrypt account numbers for storage in the database. This value needs to look like `base64key://value` where `value` is a base64 encoded 32 byte random key.
 
 ##### Google Cloud Storage
 
