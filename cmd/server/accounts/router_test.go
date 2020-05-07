@@ -87,6 +87,14 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	if transit.AccountNumber == "" {
 		t.Error("missing transit AccountNumber")
 	}
+
+	decrypted, err := keeper.DecryptString(transit.AccountNumber)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decrypted != "18749" {
+		t.Errorf("decrypted=%q", decrypted)
+	}
 }
 
 func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*client.Account {
