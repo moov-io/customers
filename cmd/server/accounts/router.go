@@ -49,10 +49,9 @@ func getCustomerAccounts(logger log.Logger, repo Repository) http.HandlerFunc {
 }
 
 type createAccountRequest struct {
-	AccountNumber string               `json:"accountNumber"`
-	RoutingNumber string               `json:"routingNumber"`
-	Type          client.AccountType   `json:"type"`
-	Status        client.AccountStatus `json:"status"`
+	AccountNumber string             `json:"accountNumber"`
+	RoutingNumber string             `json:"routingNumber"`
+	Type          client.AccountType `json:"type"`
 
 	// fields we compute from the inbound AccountNumber
 	encryptedAccountNumber string
@@ -75,9 +74,6 @@ func (req *createAccountRequest) validate() error {
 		return fmt.Errorf("invalid account type: %s", req.Type)
 	}
 
-	if !strings.EqualFold(string(req.Status), string(client.VALIDATED)) {
-		return fmt.Errorf("invalid account status: %s", req.Status)
-	}
 	return nil
 }
 

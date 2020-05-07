@@ -47,7 +47,6 @@ func TestRepository(t *testing.T) {
 	acct, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Status:        client.VALIDATED,
 		Type:          client.CHECKING,
 	})
 	if err != nil {
@@ -83,7 +82,6 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 	req := &createAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Status:        client.VALIDATED,
 		Type:          client.CHECKING,
 	}
 	if err := req.disfigure(keeper); err != nil {

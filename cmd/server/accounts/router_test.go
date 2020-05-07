@@ -110,7 +110,6 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 	params := &createAccountRequest{
 		AccountNumber: "18749",
 		RoutingNumber: "987654320",
-		Status:        client.VALIDATED,
 		Type:          client.SAVINGS,
 	}
 
