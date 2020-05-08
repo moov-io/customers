@@ -1,13 +1,32 @@
 ## v0.4.0 (Unreleased)
 
+ADDITIONS
+
+- customers: validate state abbreviations
+- accounts: add endpoints (from PayGate) with encrypted account numbers
+- accounts: include endpoint for transit encryption of an account number
+
 IMPROVEMENTS
 
-- cmd/server: upgrade OFAC -> Watchman to v0.13.0
+- api: use shared models from other OpenAPI specifications
+- api,client: use short api summaries
+- cmd/server: upgrade Watchman to v0.14.0 (was called OFAC)
+- cmd/server: lookup individual and entiy SDNs from Watchman
+- cmd/server: add version handler to admin HTTP server
+- pkg/secrets: move to /pkg/ for external usage
+
+BUG FIXES
+
+- pkg/secrets: read "base64key://" keys in local keeper
 
 BUILD
 
 - build: update Copyright headers for 2020
 - build: run sonatype-nexus-community/nancy in CI
+- build: test docker-compose setup in CI
+- build: run infra Go lint script
+- build: run CI in Windows
+- disclaimers: remove `omitempty` from text field on admin create body
 
 ## v0.3.0 (Released 2019-11-12)
 
