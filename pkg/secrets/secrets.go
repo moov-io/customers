@@ -119,11 +119,19 @@ func OpenSecretKeeper(ctx context.Context, path, cloudProvider string) (*secrets
 func OpenLocal(base64Key string) (*secrets.Keeper, error) {
 	var key [32]byte
 	if base64Key != "" {
-		k, err := localsecrets.Base64Key(base64Key)
-		if err != nil {
-			return nil, fmt.Errorf("problem reading SECRETS_LOCAL_BASE64_KEY: %v", err)
+		if strings.HasPrefix(base64Key, localsecrets.Scheme) {
+			keeper, err := secrets.OpenKeeper(context.Background(), base64Key)
+			if err != nil {
+				return nil, fmt.Errorf("problem reading base64 url key: %v", err)
+			}
+			return keeper, nil
+		} else {
+			k, err := localsecrets.Base64Key(base64Key)
+			if err != nil {
+				return nil, fmt.Errorf("problem reading base64key: %v", err)
+			}
+			key = k
 		}
-		key = k
 	} else {
 		k, err := localsecrets.Base64Key(base64.StdEncoding.EncodeToString(bytes.Repeat([]byte("1"), 32)))
 		if err != nil {
