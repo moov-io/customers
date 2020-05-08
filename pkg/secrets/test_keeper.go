@@ -7,6 +7,7 @@ package secrets
 import (
 	"bytes"
 	"encoding/base64"
+	"fmt"
 	"testing"
 	"time"
 
@@ -17,6 +18,7 @@ type secretFunc func(path string) (*secrets.Keeper, error)
 
 var (
 	testSecretKey    = base64.StdEncoding.EncodeToString(bytes.Repeat([]byte("1"), 32))
+	testSecretKeyURL = fmt.Sprintf("base64key://%s", testSecretKey)
 	testSecretKeeper = func(base64Key string) secretFunc {
 		return func(path string) (*secrets.Keeper, error) {
 			return OpenLocal(base64Key)

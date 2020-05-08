@@ -35,7 +35,7 @@ func TestSecrets__OpenLocal(t *testing.T) {
 	if _, err := OpenLocal("invalid key"); err == nil {
 		t.Error("expected error")
 	} else {
-		if !strings.Contains(err.Error(), "SECRETS_LOCAL_BASE64_KEY") {
+		if !strings.Contains(err.Error(), "illegal base64 data") {
 			t.Errorf("unexpected error: %v", err)
 		}
 	}
@@ -54,6 +54,30 @@ func TestSecrets__OpenLocal(t *testing.T) {
 	}
 	if v := string(out); v != "hello, world" {
 		t.Errorf("got %q", v)
+	}
+}
+
+func TestSecrets__OpenLocalURL(t *testing.T) {
+	if _, err := testSecretKeeper("base64key://invalid-key")("string-keeper"); err == nil {
+		t.Error("expected error")
+	}
+
+	keeper, err := testSecretKeeper(testSecretKeyURL)("string-keeper")
+	if err != nil {
+		t.Error(err)
+	}
+	str := NewStringKeeper(keeper, 1*time.Second)
+
+	encrypted, err := str.EncryptString("123")
+	if err != nil {
+		t.Fatal(err)
+	}
+	decrypted, err := str.DecryptString(encrypted)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if decrypted != "123" {
+		t.Errorf("decrypted=%s", decrypted)
 	}
 }
 
