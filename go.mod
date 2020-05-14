@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/mux v1.7.4
 	github.com/hashicorp/vault/api v1.0.4
 	github.com/lopezator/migrator v0.3.0
-	github.com/mattn/go-sqlite3 v1.13.0
+	github.com/mattn/go-sqlite3/v2/v2 v2.0.5
 	github.com/moov-io/ach v1.3.1
 	github.com/moov-io/base v0.11.0
 	github.com/moov-io/fed v0.5.0
