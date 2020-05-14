@@ -127,6 +127,7 @@ func main() {
 	// Register our admin routes
 	addApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
 	addDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
+	accounts.RegisterAdminRoutes(logger, adminServer, accountsRepo)
 
 	// Setup Customer SSN storage wrapper
 	ctx := context.Background()

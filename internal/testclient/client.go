@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	moovadmin "github.com/moov-io/base/admin"
+	"github.com/moov-io/customers/admin"
 	"github.com/moov-io/customers/client"
 
 	"github.com/gorilla/mux"
@@ -21,4 +23,15 @@ func New(t *testing.T, handler *mux.Router) *client.APIClient {
 	conf.BasePath = server.URL
 
 	return client.NewAPIClient(conf)
+}
+
+func Admin(t *testing.T) (*moovadmin.Server, *admin.APIClient) {
+	svc := moovadmin.NewServer(":0")
+	go svc.Listen()
+	t.Cleanup(func() { svc.Shutdown() })
+
+	conf := admin.NewConfiguration()
+	conf.BasePath = "http://" + svc.BindAddr()
+
+	return svc, admin.NewAPIClient(conf)
 }
