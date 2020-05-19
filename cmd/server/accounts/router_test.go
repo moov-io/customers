@@ -27,7 +27,7 @@ var (
 	testFedClient = &fed.MockClient{}
 )
 
-func TestRoutes(t *testing.T) {
+func TestAccountRoutes(t *testing.T) {
 	customerID := base.ID()
 	repo := setupTestAccountRepository(t)
 	keeper := secrets.TestStringKeeper(t)
@@ -43,7 +43,7 @@ func TestRoutes(t *testing.T) {
 
 	// create an account
 	account := httpCreateAccount(t, handler, customerID)
-	if account.MaskedAccountNumber != "***49" {
+	if account.MaskedAccountNumber != "*8749" {
 		t.Errorf("masked account number: %q", account.MaskedAccountNumber)
 	}
 

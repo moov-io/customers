@@ -9,19 +9,19 @@ import (
 )
 
 func TestAccountNumber(t *testing.T) {
-	if v := AccountNumber(""); v != "**" {
+	if v := AccountNumber(""); v != "****" {
 		t.Errorf("got %q", v)
 	}
-	if v := AccountNumber("12"); v != "**" {
+	if v := AccountNumber("12"); v != "****" {
 		t.Errorf("got %q", v)
 	}
-	if v := AccountNumber("123"); v != "*23" {
+	if v := AccountNumber("1234"); v != "****" {
 		t.Errorf("got %q", v)
 	}
-	if v := AccountNumber("1234"); v != "**34" {
+	if v := AccountNumber("12345"); v != "*2345" {
 		t.Errorf("got %q", v)
 	}
-	if v := AccountNumber("123456789"); v != "*******89" {
+	if v := AccountNumber("123456789"); v != "*****6789" {
 		t.Errorf("got %q", v)
 	}
 }

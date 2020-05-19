@@ -11,8 +11,8 @@ import (
 
 func AccountNumber(s string) string {
 	length := utf8.RuneCountInString(s)
-	if length < 3 {
-		return "**" // too short, we can't mask anything
+	if length < 5 {
+		return "****" // too short, we can't keep anything
 	}
-	return strings.Repeat("*", length-2) + s[length-2:]
+	return strings.Repeat("*", length-4) + s[length-4:]
 }
