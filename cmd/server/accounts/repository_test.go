@@ -127,4 +127,13 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 	if err := repo.updateAccountStatus(acct.AccountID, admin.VALIDATED); err != nil {
 		t.Fatal(err)
 	}
+
+	// check status after update
+	acct, err = repo.getCustomerAccount(customerID, acct.AccountID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if acct.Status != client.VALIDATED {
+		t.Errorf("unexpected status: %s", acct.Status)
+	}
 }

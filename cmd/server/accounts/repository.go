@@ -117,7 +117,7 @@ func (r *sqlAccountRepository) updateAccountStatus(accountID string, status admi
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(accountID, status)
+	_, err = stmt.Exec(status, accountID)
 	return err
 }
 
