@@ -15,6 +15,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/fed"
+	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/secrets/hash"
@@ -24,11 +25,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper) {
+func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, paygateClient paygate.Client, keeper, transitKeeper *secrets.StringKeeper) {
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, repo, fedClient, keeper))
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, repo, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, repo))
+	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(validateAccount(logger, repo, paygateClient))
 }
 
 func getCustomerAccounts(logger log.Logger, repo Repository) http.HandlerFunc {

@@ -22,6 +22,7 @@ import (
 	"github.com/moov-io/customers"
 	"github.com/moov-io/customers/cmd/server/accounts"
 	"github.com/moov-io/customers/cmd/server/fed"
+	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/secrets"
 
@@ -151,11 +152,14 @@ func main() {
 	fedClient := fed.NewClient(logger, os.Getenv("FED_ENDPOINT"))
 	adminServer.AddLivenessCheck("fed", fedClient.Ping)
 
+	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"))
+	adminServer.AddLivenessCheck("paygate", paygateClient.Ping)
+
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, stringKeeper, transitStringKeeper)
+	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, paygateClient, stringKeeper, transitStringKeeper)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))

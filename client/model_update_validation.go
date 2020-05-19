@@ -11,7 +11,8 @@ package client
 
 // UpdateValidation struct for UpdateValidation
 type UpdateValidation struct {
-	// Validation strategy to use. If micro-deposit send no amounts to initiate and supply amounts to validate the account.
-	Strategy      string   `json:"strategy,omitempty"`
+	// Validation strategy to use for the account.  micro-deposits:   Initiate two small credits to the account along with a later balancing debit. Only provide amounts to attempt validation.
+	Strategy string `json:"strategy"`
+	// Amounts used to validate the account is owned by the customer.
 	MicroDeposits []string `json:"micro-deposits,omitempty"`
 }

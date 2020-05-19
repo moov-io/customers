@@ -15,6 +15,16 @@ type mockRepository struct {
 	Err           error
 }
 
+func (r *mockRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
+	if r.Err != nil {
+		return nil, r.Err
+	}
+	if len(r.Accounts) > 0 {
+		return r.Accounts[0], nil
+	}
+	return nil, nil
+}
+
 func (r *mockRepository) getCustomerAccounts(customerID string) ([]*client.Account, error) {
 	if r.Err != nil {
 		return nil, r.Err
