@@ -53,7 +53,7 @@ func spawnPayGate(t *testing.T) *deployment {
 	}
 	t.Cleanup(func() { os.RemoveAll(dir) })
 
-	paygateTag := "latest"
+	paygateTag := "v0.8.0-dev"
 	writePayGateConfig(t, dir, paygateTag)
 
 	// Spawn Watchman docker image
@@ -84,7 +84,7 @@ func spawnPayGate(t *testing.T) *deployment {
 // writePayGateConfig pulls down the example config from PayGate's repository for the given
 // docker tag we're running. This is easier than trying to stay updated with that project.
 func writePayGateConfig(t *testing.T, dir string, tag string) {
-	if strings.EqualFold(tag, "latest") {
+	if strings.EqualFold(tag, "latest") || strings.HasSuffix(tag, "-dev") {
 		tag = "master"
 	}
 	url := fmt.Sprintf("https://raw.githubusercontent.com/moov-io/paygate/%s/examples/config.yaml", tag)
