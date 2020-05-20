@@ -5,6 +5,8 @@ ADDITIONS
 - customers: validate state abbreviations
 - accounts: add endpoints (from PayGate) with encrypted account numbers
 - accounts: include endpoint for transit encryption of an account number
+- accounts: add endpoint for updating status
+- accounts: validate micro-deposits with paygate HTTP calls
 
 IMPROVEMENTS
 
@@ -14,6 +16,7 @@ IMPROVEMENTS
 - cmd/server: lookup individual and entiy SDNs from Watchman
 - cmd/server: add version handler to admin HTTP server
 - pkg/secrets: move to /pkg/ for external usage
+- secrets/mask: leave last 4 digits
 
 BUG FIXES
 
@@ -26,6 +29,7 @@ BUILD
 - build: test docker-compose setup in CI
 - build: run infra Go lint script
 - build: run CI in Windows
+- chore(deps): update module aws/aws-sdk-go to v1.31.0
 - disclaimers: remove `omitempty` from text field on admin create body
 
 ## v0.3.0 (Released 2019-11-12)
