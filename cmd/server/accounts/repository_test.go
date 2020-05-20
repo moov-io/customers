@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers/admin"
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/secrets"
@@ -99,5 +100,40 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 	}
 	if encrypted == "" {
 		t.Error("missing encrypted account number")
+	}
+}
+
+func TestRepository__updateAccountStatus(t *testing.T) {
+	customerID, userID := base.ID(), base.ID()
+	repo := setupTestAccountRepository(t)
+
+	keeper := secrets.TestStringKeeper(t)
+
+	// create account
+	req := &createAccountRequest{
+		AccountNumber: "123",
+		RoutingNumber: "987654320",
+		Type:          client.CHECKING,
+	}
+	if err := req.disfigure(keeper); err != nil {
+		t.Fatal(err)
+	}
+	acct, err := repo.createCustomerAccount(customerID, userID, req)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// update status
+	if err := repo.updateAccountStatus(acct.AccountID, admin.VALIDATED); err != nil {
+		t.Fatal(err)
+	}
+
+	// check status after update
+	acct, err = repo.getCustomerAccount(customerID, acct.AccountID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if acct.Status != client.VALIDATED {
+		t.Errorf("unexpected status: %s", acct.Status)
 	}
 }

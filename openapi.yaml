@@ -1093,13 +1093,18 @@ components:
             - "micro-deposits"
           example: micro-deposits
           description: |
-            Validation strategy to use.
-            If micro-deposit send no amounts to initiate and supply amounts to validate the account.
+            Validation strategy to use for the account.
+
+            micro-deposits:
+              Initiate two small credits to the account along with a later balancing debit. Only provide amounts to attempt validation.
         micro-deposits:
           type: array
           items:
             type: string
+          description: Amounts used to validate the account is owned by the customer.
           example: ["USD 0.01", "USD 0.13"]
+      required:
+        - strategy
     Disclaimer:
       type: object
       properties:

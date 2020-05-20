@@ -10,15 +10,20 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers/admin"
 	"github.com/moov-io/customers/client"
 
 	"github.com/go-kit/kit/log"
 )
 
 type Repository interface {
+	getCustomerAccount(customerID, accountID string) (*client.Account, error)
 	getCustomerAccounts(customerID string) ([]*client.Account, error)
+
 	createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error)
 	deactivateCustomerAccount(accountID string) error
+
+	updateAccountStatus(accountID string, status admin.AccountStatus) error
 
 	getEncryptedAccountNumber(customerID, accountID string) (string, error)
 }
@@ -36,8 +41,24 @@ func (r *sqlAccountRepository) Close() error {
 	return r.db.Close()
 }
 
+func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
+	query := `select account_id, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	var a client.Account
+	row := stmt.QueryRow(customerID, accountID)
+	if err := row.Scan(&a.AccountID, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
+		return nil, err
+	}
+	return &a, nil
+}
+
 func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client.Account, error) {
-	query := `select account_id, masked_account_number, routing_number, status, type from accounts where customer_id = ? and deleted_at is null;`
+	query := `select account_id from accounts where customer_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -52,11 +73,15 @@ func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client
 
 	var out []*client.Account
 	for rows.Next() {
-		var a client.Account
-		if err := rows.Scan(&a.AccountID, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
+		var accountID string
+		if err := rows.Scan(&accountID); err != nil {
 			return nil, err
 		}
-		out = append(out, &a)
+		acct, err := r.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			return nil, fmt.Errorf("problem reading accountID=%s error=%v", accountID, err)
+		}
+		out = append(out, acct)
 	}
 	return out, nil
 }
@@ -103,6 +128,18 @@ func (r *sqlAccountRepository) deactivateCustomerAccount(accountID string) error
 	if err == sql.ErrNoRows {
 		return nil
 	}
+	return err
+}
+
+func (r *sqlAccountRepository) updateAccountStatus(accountID string, status admin.AccountStatus) error {
+	query := `update accounts set status = ? where account_id = ? and deleted_at is null;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(status, accountID)
 	return err
 }
 

@@ -16,6 +16,7 @@ import (
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/fed"
+	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/secrets"
 
@@ -24,7 +25,8 @@ import (
 )
 
 var (
-	testFedClient = &fed.MockClient{}
+	testFedClient     = &fed.MockClient{}
+	testPayGateClient = &paygate.MockClient{}
 )
 
 func TestAccountRoutes(t *testing.T) {
@@ -33,7 +35,7 @@ func TestAccountRoutes(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -67,7 +69,7 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
 
 	client := testclient.New(t, handler)
 
