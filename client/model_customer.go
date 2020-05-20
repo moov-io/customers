@@ -16,28 +16,28 @@ import (
 // Customer struct for Customer
 type Customer struct {
 	// The unique identifier for the customer who owns the account
-	CustomerID string `json:"customerID,omitempty"`
+	CustomerID string `json:"customerID"`
 	// Given Name or First Name
-	FirstName string `json:"firstName,omitempty"`
+	FirstName string `json:"firstName"`
 	// Middle Name
 	MiddleName string `json:"middleName,omitempty"`
 	// Surname or Last Name
-	LastName string `json:"lastName,omitempty"`
+	LastName string `json:"lastName"`
 	// Name Customer is preferred to be called
 	NickName string `json:"nickName,omitempty"`
 	// Customers name suffix. \"Jr\", \"PH.D.\"
 	Suffix string       `json:"suffix,omitempty"`
-	Type   CustomerType `json:"type,omitempty"`
+	Type   CustomerType `json:"type"`
 	// Legal date of birth
 	BirthDate time.Time      `json:"birthDate,omitempty"`
-	Status    CustomerStatus `json:"status,omitempty"`
+	Status    CustomerStatus `json:"status"`
 	// Primary email address of customer name@domain.com
-	Email     string            `json:"email,omitempty"`
+	Email     string            `json:"email"`
 	Phones    []Phone           `json:"phones,omitempty"`
 	Addresses []CustomerAddress `json:"addresses,omitempty"`
 	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 	Metadata  map[string]string `json:"metadata,omitempty"`
-	CreatedAt time.Time         `json:"createdAt,omitempty"`
+	CreatedAt time.Time         `json:"createdAt"`
 	// Last time the object was modified
-	LastModified time.Time `json:"lastModified,omitempty"`
+	LastModified time.Time `json:"lastModified"`
 }

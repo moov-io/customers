@@ -894,6 +894,15 @@ components:
           format: date-time
           description: Last time the object was modified
           example: '2016-08-29T09:12:33.001Z'
+      required:
+        - customerID
+        - firstName
+        - lastName
+        - type
+        - status
+        - email
+        - createdAt
+        - lastModified
     CustomerType:
       type: string
       description: Note if this Customer represents an individual or business
@@ -960,6 +969,10 @@ components:
             - Home
             - Mobile
             - Work
+      required:
+        - number
+        - valid
+        - type
     CreateCustomerAddress:
       type: object
       properties:
@@ -990,7 +1003,6 @@ components:
       required:
         - type
         - address1
-        - address2
         - city
         - state
         - postalCode
@@ -1029,6 +1041,14 @@ components:
         validated:
           type: boolean
           description: Address has been validated for customer
+      required:
+        - addressID
+        - type
+        - address1
+        - city
+        - state
+        - postalCode
+        - country
     AccountStatus:
       type: string
       description: Enumeration if this account has been validated through micro-deposits or another available strategy.
@@ -1062,6 +1082,10 @@ components:
           example: "051504597"
         type:
           $ref: '#/components/schemas/AccountType'
+      required:
+        - accountNumber
+        - routingNumber
+        - type
     Accounts:
       type: array
       items:
@@ -1084,6 +1108,12 @@ components:
           $ref: '#/components/schemas/AccountStatus'
         type:
           $ref: '#/components/schemas/AccountType'
+      required:
+        - accountID
+        - maskedAccountNumber
+        - routingNumber
+        - status
+        - type
     UpdateValidation:
       type: object
       properties:
@@ -1125,6 +1155,9 @@ components:
           description: Timestamp if disclaimer has been accepted, a timestamp before the year 2000 indicates no acceptance.
           format: date-time
           example: '2016-08-29T09:12:33.001Z'
+      required:
+        - disclaimerID
+        - text
     Disclaimers:
       type: array
       items:
@@ -1155,6 +1188,11 @@ components:
           type: string
           format: date-time
           example: '2016-08-29T09:12:33.001Z'
+      required:
+        - documentID
+        - type
+        - contentType
+        - uploadedAt
     Documents:
       type: array
       items:
@@ -1182,3 +1220,9 @@ components:
           type: string
           format: date-time
           example: '2016-08-29T09:12:33.001Z'
+      required:
+        - entityID
+        - sdnName
+        - sdnType
+        - match
+        - createdAt

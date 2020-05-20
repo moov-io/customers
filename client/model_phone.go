@@ -12,8 +12,8 @@ package client
 // Phone struct for Phone
 type Phone struct {
 	// phone number
-	Number string `json:"number,omitempty"`
+	Number string `json:"number"`
 	// phone number has been validated to connect with customer
-	Valid bool   `json:"valid,omitempty"`
-	Type  string `json:"type,omitempty"`
+	Valid bool   `json:"valid"`
+	Type  string `json:"type"`
 }

@@ -16,9 +16,9 @@ import (
 // Disclaimer struct for Disclaimer
 type Disclaimer struct {
 	// The unique identifier for this Disclaimer
-	DisclaimerID string `json:"disclaimerID,omitempty"`
+	DisclaimerID string `json:"disclaimerID"`
 	// Text that user must accept
-	Text string `json:"text,omitempty"`
+	Text string `json:"text"`
 	// Optional documentID which references a Document included in the disclaimer
 	DocumentID string `json:"documentID,omitempty"`
 	// Timestamp if disclaimer has been accepted, a timestamp before the year 2000 indicates no acceptance.

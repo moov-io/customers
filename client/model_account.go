@@ -12,11 +12,11 @@ package client
 // Account struct for Account
 type Account struct {
 	// A unique identifier for this account
-	AccountID string `json:"accountID,omitempty"`
+	AccountID string `json:"accountID"`
 	// The masked account number for the bank account
-	MaskedAccountNumber string `json:"maskedAccountNumber,omitempty"`
+	MaskedAccountNumber string `json:"maskedAccountNumber"`
 	// The ABA routing transit number for the bank account.
-	RoutingNumber string        `json:"routingNumber,omitempty"`
-	Status        AccountStatus `json:"status,omitempty"`
-	Type          AccountType   `json:"type,omitempty"`
+	RoutingNumber string        `json:"routingNumber"`
+	Status        AccountStatus `json:"status"`
+	Type          AccountType   `json:"type"`
 }

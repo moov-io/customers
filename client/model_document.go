@@ -16,10 +16,10 @@ import (
 // Document struct for Document
 type Document struct {
 	// A unique identifier for this document
-	DocumentID  string `json:"documentID,omitempty"`
-	Type        string `json:"type,omitempty"`
-	ContentType string `json:"contentType,omitempty"`
+	DocumentID  string `json:"documentID"`
+	Type        string `json:"type"`
+	ContentType string `json:"contentType"`
 	// Optional array of errors encountered dring automated parsing.
 	ParseErrors []string  `json:"parseErrors,omitempty"`
-	UploadedAt  time.Time `json:"uploadedAt,omitempty"`
+	UploadedAt  time.Time `json:"uploadedAt"`
 }

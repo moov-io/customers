@@ -1158,6 +1158,15 @@ components:
           example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
+      required:
+      - createdAt
+      - customerID
+      - email
+      - firstName
+      - lastModified
+      - lastName
+      - status
+      - type
       type: object
     CustomerType:
       description: Note if this Customer represents an individual or business
@@ -1238,6 +1247,10 @@ components:
           - Mobile
           - Work
           type: string
+      required:
+      - number
+      - type
+      - valid
     CreateCustomerAddress:
       example:
         country: US
@@ -1274,7 +1287,6 @@ components:
           type: string
       required:
       - address1
-      - address2
       - city
       - country
       - postalCode
@@ -1324,6 +1336,14 @@ components:
         validated:
           description: Address has been validated for customer
           type: boolean
+      required:
+      - address1
+      - addressID
+      - city
+      - country
+      - postalCode
+      - state
+      - type
       type: object
     AccountStatus:
       description: Enumeration if this account has been validated through micro-deposits
@@ -1366,6 +1386,10 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/AccountType'
+      required:
+      - accountNumber
+      - routingNumber
+      - type
     Accounts:
       items:
         $ref: '#/components/schemas/Account'
@@ -1394,6 +1418,12 @@ components:
           $ref: '#/components/schemas/AccountStatus'
         type:
           $ref: '#/components/schemas/AccountType'
+      required:
+      - accountID
+      - maskedAccountNumber
+      - routingNumber
+      - status
+      - type
     UpdateValidation:
       example:
         strategy: micro-deposits
@@ -1448,6 +1478,9 @@ components:
           example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
+      required:
+      - disclaimerID
+      - text
       type: object
     Disclaimers:
       items:
@@ -1486,6 +1519,11 @@ components:
           example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
+      required:
+      - contentType
+      - documentID
+      - type
+      - uploadedAt
       type: object
     Documents:
       items:
@@ -1520,6 +1558,12 @@ components:
           example: 2016-08-29T09:12:33.001Z
           format: date-time
           type: string
+      required:
+      - createdAt
+      - entityID
+      - match
+      - sdnName
+      - sdnType
       type: object
     Error:
       properties:

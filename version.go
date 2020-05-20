@@ -4,4 +4,5 @@
 
 package customers
 
-const Version = "v0.4.0-rc4"
+// Version number
+const Version = "v0.4.0-dev"

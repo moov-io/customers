@@ -15,7 +15,7 @@ type CreateCustomerAddress struct {
 	// First line of the address
 	Address1 string `json:"address1"`
 	// Second line of the address
-	Address2 string `json:"address2"`
+	Address2 string `json:"address2,omitempty"`
 	City     string `json:"city"`
 	// two charcer code of US state
 	State      string `json:"state"`

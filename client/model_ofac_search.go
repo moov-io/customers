@@ -16,12 +16,12 @@ import (
 // OfacSearch struct for OfacSearch
 type OfacSearch struct {
 	// SDN EntityID of the Entity
-	EntityID string `json:"entityID,omitempty"`
+	EntityID string `json:"entityID"`
 	// Name of the SDN entity
-	SdnName string `json:"sdnName,omitempty"`
+	SdnName string `json:"sdnName"`
 	// SDN entity type
-	SdnType string `json:"sdnType,omitempty"`
+	SdnType string `json:"sdnType"`
 	// Percentage of similarity between the Customer name and this OFAC entity
-	Match     float32   `json:"match,omitempty"`
-	CreatedAt time.Time `json:"createdAt,omitempty"`
+	Match     float32   `json:"match"`
+	CreatedAt time.Time `json:"createdAt"`
 }
