@@ -32,22 +32,20 @@ type moovClient struct {
 }
 
 func (c *moovClient) Ping() error {
-	return nil
+	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
+	defer cancelFn()
 
-	// ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
-	// defer cancelFn()
-
-	// resp, err := c.underlying.Monitor.Ping(ctx)
-	// if resp != nil && resp.Body != nil {
-	// 	resp.Body.Close()
-	// }
-	// if resp == nil {
-	// 	return fmt.Errorf("PayGate ping failed: %v", err)
-	// }
-	// if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-	// 	return fmt.Errorf("PayGate ping got status: %s", resp.Status)
-	// }
-	// return err
+	resp, err := c.underlying.MonitorApi.Ping(ctx)
+	if resp != nil && resp.Body != nil {
+		resp.Body.Close()
+	}
+	if resp == nil {
+		return fmt.Errorf("PayGate ping failed: %v", err)
+	}
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return fmt.Errorf("PayGate ping got status: %s", resp.Status)
+	}
+	return err
 }
 
 func sqlNoRows(err error) error {
@@ -63,7 +61,10 @@ func sqlNoRows(err error) error {
 }
 
 func (c *moovClient) GetMicroDeposits(accountID, userID string) (*client.MicroDeposits, error) {
-	micro, resp, err := c.underlying.ValidationApi.GetAccountMicroDeposits(context.Background(), accountID, userID)
+	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
+	defer cancelFn()
+
+	micro, resp, err := c.underlying.ValidationApi.GetAccountMicroDeposits(ctx, accountID, userID)
 	if resp != nil && resp.Body != nil {
 		resp.Body.Close()
 	}
@@ -81,7 +82,10 @@ func (c *moovClient) GetMicroDeposits(accountID, userID string) (*client.MicroDe
 }
 
 func (c *moovClient) InitiateMicroDeposits(userID string, destination client.Destination) error {
-	micro, resp, err := c.underlying.ValidationApi.InitiateMicroDeposits(context.Background(), userID, client.CreateMicroDeposits{
+	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
+	defer cancelFn()
+
+	micro, resp, err := c.underlying.ValidationApi.InitiateMicroDeposits(ctx, userID, client.CreateMicroDeposits{
 		Destination: destination,
 	})
 	if resp != nil && resp.Body != nil {
