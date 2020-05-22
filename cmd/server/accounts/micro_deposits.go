@@ -44,7 +44,7 @@ func handleMicroDepositValidation(repo Repository, paygateClient paygate.Client,
 		return repo.updateAccountStatus(accountID, admin.VALIDATED)
 	}
 
-	return nil
+	return fmt.Errorf("microDepositID=%s is in status: %s", micro.MicroDepositID, micro.Status)
 }
 
 func validateAmounts(micro *client.MicroDeposits, requestAmounts []string) error {

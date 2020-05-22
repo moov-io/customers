@@ -33,11 +33,37 @@ func TestAccounts__handleMicroDepositValidation(t *testing.T) {
 	// validate amounts
 	requestAmounts = []string{"USD 0.04", "USD 0.09"}
 	paygateClient.Micro = &client.MicroDeposits{
-		Amounts: requestAmounts,
-		Status:  client.PROCESSED,
+		MicroDepositID: base.ID(),
+		Amounts:        requestAmounts,
+		Status:         client.PROCESSED,
 	}
 	err = handleMicroDepositValidation(repo, paygateClient, accountID, customerID, userID, requestAmounts)
 	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAccounts__RejectPendingMicroDeposits(t *testing.T) {
+	repo := &mockRepository{}
+
+	accountID, customerID := base.ID(), base.ID()
+	userID := base.ID()
+
+	requestAmounts := []string{"USD 0.04", "USD 0.09"}
+	paygateClient := &paygate.MockClient{
+		Micro: &client.MicroDeposits{
+			MicroDepositID: base.ID(),
+			Amounts:        requestAmounts,
+			Status:         client.PENDING,
+		},
+	}
+
+	// initiate micro-deposits
+	err := handleMicroDepositValidation(repo, paygateClient, accountID, customerID, userID, requestAmounts)
+	if err == nil {
+		t.Fatal("expected error")
+	}
+	if !strings.Contains(err.Error(), "is in status: pending") {
 		t.Fatal(err)
 	}
 }
