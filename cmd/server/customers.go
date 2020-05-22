@@ -78,17 +78,18 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID st
 // TODO(adam): What GDPR implications does this information have? IIRC if any EU citizen uses
 // this software we have to fully comply.
 type customerRequest struct {
-	FirstName  string            `json:"firstName"`
-	MiddleName string            `json:"middleName"`
-	LastName   string            `json:"lastName"`
-	NickName   string            `json:"nickName"`
-	Suffix     string            `json:"suffix"`
-	BirthDate  time.Time         `json:"birthDate"`
-	Email      string            `json:"email"`
-	SSN        string            `json:"SSN"`
-	Phones     []phone           `json:"phones"`
-	Addresses  []address         `json:"addresses"`
-	Metadata   map[string]string `json:"metadata"`
+	FirstName  string              `json:"firstName"`
+	MiddleName string              `json:"middleName"`
+	LastName   string              `json:"lastName"`
+	NickName   string              `json:"nickName"`
+	Suffix     string              `json:"suffix"`
+	Type       client.CustomerType `json:"type"`
+	BirthDate  time.Time           `json:"birthDate"`
+	Email      string              `json:"email"`
+	SSN        string              `json:"SSN"`
+	Phones     []phone             `json:"phones"`
+	Addresses  []address           `json:"addresses"`
+	Metadata   map[string]string   `json:"metadata"`
 }
 
 type phone struct {
@@ -148,6 +149,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		LastName:   req.LastName,
 		NickName:   req.NickName,
 		Suffix:     req.Suffix,
+		Type:       req.Type,
 		BirthDate:  req.BirthDate,
 		Email:      req.Email,
 		Status:     client.UNKNOWN,
