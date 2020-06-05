@@ -722,7 +722,6 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
-
   /customers/{customerID}/refresh/ofac:
     put:
       tags: [Customers]

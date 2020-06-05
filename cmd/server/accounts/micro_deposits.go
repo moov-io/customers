@@ -22,7 +22,7 @@ func handleMicroDepositValidation(repo Repository, paygateClient paygate.Client,
 	}
 
 	// If no micro-deposit was found then initiate them.
-	if micro == nil {
+	if micro == nil || micro.MicroDepositID == "" {
 		err = paygateClient.InitiateMicroDeposits(userID, client.Destination{
 			CustomerID: customerID,
 			AccountID:  accountID,
