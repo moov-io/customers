@@ -2,7 +2,6 @@ FROM golang:1.14-buster as builder
 WORKDIR /go/src/github.com/moov-io/customers
 RUN apt-get update && apt-get install -y make gcc g++ time
 COPY . .
-RUN go mod download
 RUN make build
 
 FROM debian:10
