@@ -1,6 +1,6 @@
 ## Customers
 
-**Purpose** | **[RUNNING](../README.md#running-locally)** | **[Configuration](./config.md)**
+**Purpose** | **[Running](../README.md#running-locally)** | **[Configuration](./config.md)**
 
 ### Purpose
 
