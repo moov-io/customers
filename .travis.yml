@@ -1,47 +1,16 @@
 language: go
 dist: xenial
 sudo: true
-services:
-  - docker
+services: [docker]
+
 matrix:
-  allow_failures:
-  - go: master
   include:
   - os: linux
     go: 1.14.x
-    cache:
-      directories:
-      - "/home/travis/.cache/go-build"
-  - os: linux
-    go: master
-  - os: osx
-    go: 1.14.x
-    cache:
-      directories:
-      - "/Users/travis/Library/Caches/go-build"
-  - os: windows
-    go: 1.14.x
-before_install:
-  # Setup directory for binaries
-  - mkdir ./bin
-  - export PATH=$PATH:$PWD/bin
-  # Install 'make' on Windows
-  - if [[ "$TRAVIS_OS_NAME" == "windows" ]]; then choco install -y make; fi
-before_script:
-  - GOFILES=$(find . -type f -name '*.go' | grep -v vendor | grep -v admin | grep -v client)
-  - go mod graph
-script:
-  - make check
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then make docker && make test-integration; fi
-after_script:
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then docker-compose logs; fi
-  - if [[ "$TRAVIS_OS_NAME" != "windows" ]]; then make clean-integration; fi
-after_success:
-  - bash <(curl -s https://codecov.io/bash) -X fix
-  - make
-  - make admin && make client
+
 before_deploy:
   - make dist
+
 deploy:
   provider: releases
   api_key:
@@ -55,9 +24,11 @@ deploy:
     tags: true
     go: 1.14.x
   skip_cleanup: true
+
 after_deploy:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - make release-push
+
 notifications:
   slack:
     secure: R8172Z70q4SIOQkSRUqC4Q2tSc+Ip+oWx3uyagYnx4cHeIR/uO1sPJlLZH13OVdqsDyoMywlLX31WC94EUPXvAwx+EPTOhGAs49TaY9pmOYlEe4MeWyJilHQMZl7I7geU9shRdW43kyR78+claY1n6FAIWdtzIskcwlOglc2TF+/2hOm5cZJpPmwhsF/8GDBCdUHNGj8uHkx1E4AfraCLOLVvB+1M8gbex8pYWHxOSpbiWbuDMhhJkBiQzlLcWcV0WpepwsukY+3HXsvj1+A2b1zleI6CL0ikKo4qPdNWhJD+iYDUk0bMOHihFEfcqmeGbehCwoWkJDNcAZG3TO4e57HniQE1L0usAqIWq+tK4gt3fWVPU7XqLHFhpN3VHbMxMmry8UQhy8hxN+M38Tgue2tVE3qbyZ1Nlg81IKFMJg/m01NR53NlVzXwWAzE5QR4NccTDkLkau/PER3QDsUSHBbiz69Ie9qCxiRStD4anQ4ZoQrR0d522WGGh6doIj6kKxE88V8SszBNNYebqGxN2yqZb2wpBVmr1zYFEX3bvK1nlSA2vk24MapMSozKKoq94TSx4Sw2Ya0To0z18MS4KXP8uylLckGejZ/2Fw6Pt9T0PUkcEIWmOrdeAwqIf1CVyfa7IVhiXA7QV2dp+qLijCl306ZJUG0uIiaNf452c8=
