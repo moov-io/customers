@@ -2,7 +2,7 @@ moov-io/customers
 ===
 
 [![GoDoc](https://godoc.org/github.com/moov-io/customers?status.svg)](https://godoc.org/github.com/moov-io/customers)
-[![Build Status](https://travis-ci.com/moov-io/customers.svg?branch=master)](https://travis-ci.com/moov-io/customers)
+[![Build Status](https://github.com/moov-io/customers/workflows/Go/badge.svg)](https://github.com/moov-io/customers/actions)
 [![Coverage Status](https://codecov.io/gh/moov-io/customers/branch/master/graph/badge.svg)](https://codecov.io/gh/moov-io/customers)
 [![Go Report Card](https://goreportcard.com/badge/github.com/moov-io/customers)](https://goreportcard.com/report/github.com/moov-io/customers)
 [![Apache 2 licensed](https://img.shields.io/badge/license-Apache2-blue.svg)](https://raw.githubusercontent.com/moov-io/customers/master/LICENSE)
