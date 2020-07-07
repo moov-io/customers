@@ -15,7 +15,7 @@ require (
 	github.com/moov-io/ach v1.4.0
 	github.com/moov-io/base v0.11.0
 	github.com/moov-io/fed v0.5.0
-	github.com/moov-io/paygate v0.8.0-rc6.0.20200630165917-f207c648aa97
+	github.com/moov-io/paygate v0.8.0
 	github.com/moov-io/watchman v0.14.0
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/prometheus/client_golang v1.6.0

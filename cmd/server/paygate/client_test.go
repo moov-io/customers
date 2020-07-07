@@ -88,6 +88,7 @@ func writePayGateConfig(t *testing.T, dir string, tag string) {
 		tag = "master"
 	}
 	url := fmt.Sprintf("https://raw.githubusercontent.com/moov-io/paygate/%s/examples/config.yaml", tag)
+	t.Logf("reading paygate config from: %v", url)
 	resp, err := http.DefaultClient.Get(url)
 	if err != nil {
 		t.Fatal(err)
