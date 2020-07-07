@@ -15,7 +15,7 @@ ifeq ($(OS),Windows_NT)
 else
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
-	GOCYCLO_LIMIT=27 time ./lint-project.sh
+	GOCYCLO_LIMIT=27 ./lint-project.sh
 endif
 
 .PHONY: admin
@@ -49,8 +49,7 @@ endif
 
 .PHONY: clean
 clean:
-	@rm -rf ./bin/ cover.out coverage.txt openapi-generator-cli-*.jar
-	@rm -rf misspell* staticcheck*
+	@rm -rf ./bin/ cover.out coverage.txt openapi-generator-cli-*.jar misspell* staticcheck* lint-project.sh
 
 dist: clean admin client build
 ifeq ($(OS),Windows_NT)
@@ -59,10 +58,13 @@ else
 	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/customers-$(PLATFORM)-amd64 github.com/moov-io/customers/cmd/server
 endif
 
-docker:
-# Main Customers server Docker image
+docker: clean
+# Docker image
 	docker build --pull -t moov/customers:$(VERSION) -f Dockerfile .
 	docker tag moov/customers:$(VERSION) moov/customers:latest
+# OpenShift Docker image
+	docker build --pull -t quay.io/moov/customers:$(VERSION) -f Dockerfile-openshift --build-arg VERSION=$(VERSION) .
+	docker tag quay.io/moov/customers:$(VERSION) quay.io/moov/customers:latest
 
 clean-integration:
 	docker-compose kill

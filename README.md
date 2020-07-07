@@ -35,7 +35,7 @@ Once the systems start you can access Customers via `http://localhost:8087` and 
 
 ### Deployment
 
-You can download [our docker image `moov/customers`](https://hub.docker.com/r/moov/customers/) from Docker Hub or use this repository. No configuration is required to serve on `:8087` and metrics at `:9097/metrics` in Prometheus format.
+You can download [our docker image `moov/customers`](https://hub.docker.com/r/moov/customers/) from Docker Hub or use this repository. No configuration is required to serve on `:8087` and metrics at `:9097/metrics` in Prometheus format. We also have docker images for [OpenShift](https://quay.io/repository/moov/customers?tab=tags).
 
 ### Configuration
 
