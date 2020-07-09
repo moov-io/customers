@@ -84,6 +84,10 @@ release-push:
 	docker push moov/customers:$(VERSION)
 	docker push moov/customers:latest
 
+quay-push:
+	docker push quay.io/moov/customers:$(VERSION)
+	docker push quay.io/moov/customers:latest
+
 .PHONY: cover-test cover-web
 cover-test:
 	go test -coverprofile=cover.out ./...
