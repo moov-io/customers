@@ -1,7 +1,8 @@
-## v0.4.0 (Unreleased)
+## v0.4.0 (Released 2020-07-09)
 
 ADDITIONS
 
+- build: add OpenShift docker image
 - customers: validate state abbreviations
 - accounts: add endpoints (from PayGate) with encrypted account numbers
 - accounts: include endpoint for transit encryption of an account number
@@ -10,6 +11,7 @@ ADDITIONS
 
 IMPROVEMENTS
 
+- accounts: micro-deposits weren't found if there's no MicroDepositID
 - api: use shared models from other OpenAPI specifications
 - api,client: use short api summaries
 - cmd/server: upgrade Watchman to v0.14.0 (was called OFAC)
@@ -24,6 +26,8 @@ BUG FIXES
 
 BUILD
 
+- build: upgrade github.com/moov-io/paygate to v0.8.0
+- build: switch to github Actions instead of TravisCI
 - build: update Copyright headers for 2020
 - build: run sonatype-nexus-community/nancy in CI
 - build: test docker-compose setup in CI
