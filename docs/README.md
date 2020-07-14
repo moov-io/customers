@@ -33,11 +33,11 @@ Moov Customers has several models which are used throughout the HTTP endpoints. 
 
 ### Customer
 
-`Customer` represents an individual or business (Sole-Proprietorships or Corporation). The data required for each will change with version v0.5.0 of Customers.
+`Customer` represents an individual or business (Sole-Proprietorships or Corporation). The data required for each will change with version v0.5.0 of Customers. See the [API documentation](https://moov-io.github.io/customers/#post-/customers) for creating a Customer.
 
 ### Account
 
-`Account` represents a demand-deposit account at a financial institution. The account number is encrypted.
+`Account` represents a demand-deposit account at a financial institution. The account number is encrypted. See the [API documentation](https://moov-io.github.io/customers/#post-/customers/{customerID}/accounts) for creating an Account.
 
 ## Getting Help
 
