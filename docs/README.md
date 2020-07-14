@@ -27,6 +27,18 @@ The Customers project focuses on solving authentic identification of humans who 
 1. [High Availability](./ha.md)
 -->
 
+## Models
+
+Moov Customers has several models which are used throughout the HTTP endpoints. These are generated from the OpenAPI specification in the `github.com/moov-io/customers/pkg/client` Go package.
+
+### Customer
+
+`Customer` represents an individual or business (Sole-Proprietorships or Corporation). The data required for each will change with version v0.5.0 of Customers.
+
+### Account
+
+`Account` represents a demand-deposit account at a financial institution. The account number is encrypted.
+
 ## Getting Help
 
  channel | info
