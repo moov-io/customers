@@ -11,6 +11,6 @@ package client
 
 // TransitAccountNumber struct for TransitAccountNumber
 type TransitAccountNumber struct {
-	// The base64 encoded encrypted account number for the bank account for transit across services.
+	// The base64 encoded encrypted account number for the bank account for transit across services. The symmetric key used is configured from TRANSIT_LOCAL_BASE64_KEY and callers of endpoints that respond with encrypted values need this same key to decrypt.
 	AccountNumber string `json:"accountNumber,omitempty"`
 }
