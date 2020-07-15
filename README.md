@@ -61,7 +61,8 @@ The Moov [Fed](https://github.com/moov-io/fed) service is used for routing numbe
 
 Customers has an endpoint which encrypts an account number for transit to another service. This encryption is currently done with a symmetric key to the other service.
 
-- `TRANSIT_LOCAL_BASE64_KEY`: A URI used to encrypt account numbers for transit. This value needs to look like `base64key://value` where `value` is a base64 encoded 32 byte random key.
+- `TRANSIT_LOCAL_BASE64_KEY`: A URI used to temporarily encrypt account numbers for transit over the network. This value needs to look like `base64key://value` where `value` is a base64 encoded 32 byte random key. Callers of endpoints that respond with encrypted values need this same key to decrypt.
+  - Generate this key by running `./cmd/genkey/` and copying the `base64key://...` value
 
 #### Storage
 
