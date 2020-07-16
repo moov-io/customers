@@ -145,6 +145,29 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	}
 }
 
+func TestCustomerRepository__createCustomer(t *testing.T) {
+	check := func(t *testing.T, repo *sqlCustomerRepository) {
+		cust, _, _ := (customerRequest{
+			FirstName: "Jane",
+			LastName:  "Doe",
+			Email:     "jane@example.com",
+		}).asCustomer(testCustomerSSNStorage(t))
+		if err := repo.createCustomer(cust); err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// SQLite tests
+	sqliteDB := database.CreateTestSqliteDB(t)
+	defer sqliteDB.Close()
+	check(t, &sqlCustomerRepository{sqliteDB.DB, log.NewNopLogger()})
+
+	// MySQL tests
+	mysqlDB := database.CreateTestMySQLDB(t)
+	defer mysqlDB.Close()
+	check(t, &sqlCustomerRepository{mysqlDB.DB, log.NewNopLogger()})
+}
+
 func TestCustomers__GetCustomersError(t *testing.T) {
 	repo := &testCustomerRepository{err: errors.New("bad error")}
 
