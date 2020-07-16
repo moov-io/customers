@@ -336,7 +336,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	// Insert customer phone numbers
-	query = `insert or replace into customers_phones (customer_id, number, valid, type) values (?, ?, ?, ?);`
+	query = `replace into customers_phones (customer_id, number, valid, type) values (?, ?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers_phones err=%v | rollback=%v", err, tx.Rollback())
@@ -351,7 +351,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt.Close()
 
 	// Insert customer addresses
-	query = `insert or replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query = `replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers_addresses err=%v | rollback=%v", err, tx.Rollback())
