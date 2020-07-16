@@ -1,3 +1,14 @@
+## v0.4.1 (Released 2020-07-16)
+
+IMPROVEMENTS
+
+- cmd/keygen: add script for generating high-quality gocloud.dev key URIs
+- docs: clarify TRANSIT_LOCAL_BASE64_KEY is used for temporary encryption
+
+BUG FIXES
+
+- cmd/server: fix create customer query for mysql
+
 ## v0.4.0 (Released 2020-07-09)
 
 ADDITIONS
