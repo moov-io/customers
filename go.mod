@@ -4,7 +4,7 @@ go 1.12
 
 require (
 	github.com/antihax/optional v1.0.0
-	github.com/aws/aws-sdk-go v1.33.6
+	github.com/aws/aws-sdk-go v1.33.7
 	github.com/go-kit/kit v0.10.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gorilla/mux v1.7.4
