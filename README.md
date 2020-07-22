@@ -119,6 +119,7 @@ For more information see the [Go Cloud Development Kit docs for fileblob](https:
 ##### Local storage
 
 - `SECRETS_LOCAL_BASE64_KEY`: A URI used to encrypt account numbers for storage in the database. This value needs to look like `base64key://value` where `value` is a base64 encoded 32 byte random key.
+   - Generate this key by running `./cmd/genkey/` and copying the `base64key://...` value
 
 ##### Google Cloud Storage
 
