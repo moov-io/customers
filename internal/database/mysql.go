@@ -83,6 +83,10 @@ var (
 			"alter_customers_status",
 			`alter table customers modify status varchar(20);`,
 		),
+		execsql(
+			"expand_accounts_encrypted_account_number",
+			`alter table accounts modify encrypted_account_number varchar(100);`,
+		),
 	)
 )
 
