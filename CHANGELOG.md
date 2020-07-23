@@ -1,3 +1,18 @@
+## v0.4.2 (Unreleased)
+
+IMPROVEMENTS
+
+- docs: reference ./cmd/genkey/ for SECRETS_LOCAL_BASE64_KEY
+
+BUG FIXEs
+
+- database/mysql: change customers.status to string
+- database/mysql: expand encrypted_account_number
+
+BUILD
+
+- Update module aws/aws-sdk-go to v1.33.7
+
 ## v0.4.1 (Released 2020-07-16)
 
 IMPROVEMENTS
