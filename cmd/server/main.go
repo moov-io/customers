@@ -24,6 +24,7 @@ import (
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/customers/internal/util"
 	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
@@ -115,7 +116,7 @@ func main() {
 	signer := setupStorageBucket(logger, bucketName, cloudProvider)
 
 	// Create our Watchman client
-	watchmanClient := newWatchmanClient(logger, os.Getenv("WATCHMAN_ENDPOINT"))
+	watchmanClient := newWatchmanClient(logger, util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT")))
 	if watchmanClient == nil {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
