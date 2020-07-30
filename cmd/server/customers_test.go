@@ -734,10 +734,8 @@ func TestCustomers__MetaDataValidate(t *testing.T) {
 	c.Metadata = m
 
 	if err := c.validate(); err != nil {
-		if err != nil {
-			if !strings.Contains(err.Error(), ": metadata") {
-				t.Fatal("Expected metadata error")
-			}
+		if !strings.Contains(err.Error(), ": metadata") {
+			t.Fatal("Expected metadata error")
 		}
 	}
 }
