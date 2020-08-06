@@ -99,6 +99,28 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	}
 }
 
+func TestRoutes__EmptyAccounts(t *testing.T) {
+	customerID := base.ID()
+	repo := setupTestAccountRepository(t)
+	keeper := secrets.TestStringKeeper(t)
+
+	handler := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus status code: %d", w.Code)
+	}
+
+	if body := w.Body.String(); body != "[]\n" {
+		t.Errorf("unexpected response body: %q", body)
+	}
+}
+
 func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*client.Account {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)

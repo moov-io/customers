@@ -71,7 +71,7 @@ func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client
 	}
 	defer rows.Close()
 
-	var out []*client.Account
+	out := make([]*client.Account, 0) // allocate array so JSON marshal's [] instead of null
 	for rows.Next() {
 		var accountID string
 		if err := rows.Scan(&accountID); err != nil {
