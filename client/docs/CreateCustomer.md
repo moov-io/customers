@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **Type** | [**CustomerType**](CustomerType.md) |  | [optional] 
-**BirthDate** | [**time.Time**](time.Time.md) | Legal date of birth | 
+**BirthDate** | Pointer to [**time.Time**](time.Time.md) | Legal date of birth | 
 **Email** | **string** | Primary email address of customer name@domain.com | 
 **SSN** | **string** | Customer Social Security Number (SSN) | 
 **Phones** | [**[]CreatePhone**](CreatePhone.md) |  | [optional] 

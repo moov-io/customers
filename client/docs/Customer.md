@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **Type** | [**CustomerType**](CustomerType.md) |  | 
-**BirthDate** | [**time.Time**](time.Time.md) | Legal date of birth | [optional] 
+**BirthDate** | Pointer to [**time.Time**](time.Time.md) | Legal date of birth | 
 **Status** | [**CustomerStatus**](CustomerStatus.md) |  | 
 **Email** | **string** | Primary email address of customer name@domain.com | 
 **Phones** | [**[]Phone**](Phone.md) |  | [optional] 

@@ -29,7 +29,7 @@ type Customer struct {
 	Suffix string       `json:"suffix,omitempty"`
 	Type   CustomerType `json:"type"`
 	// Legal date of birth
-	BirthDate time.Time      `json:"birthDate,omitempty"`
+	BirthDate *time.Time     `json:"birthDate"`
 	Status    CustomerStatus `json:"status"`
 	// Primary email address of customer name@domain.com
 	Email     string            `json:"email"`
