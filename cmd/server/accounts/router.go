@@ -26,14 +26,14 @@ import (
 )
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, paygateClient paygate.Client, keeper, transitKeeper *secrets.StringKeeper) {
-	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, repo))
+	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, repo, fedClient))
 	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, repo, fedClient, keeper))
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, repo, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(validateAccount(logger, repo, paygateClient))
 }
 
-func getCustomerAccounts(logger log.Logger, repo Repository) http.HandlerFunc {
+func getCustomerAccounts(logger log.Logger, repo Repository, fedClient fed.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -43,11 +43,21 @@ func getCustomerAccounts(logger log.Logger, repo Repository) http.HandlerFunc {
 			moovhttp.Problem(w, err)
 			return
 		}
+		accounts = decorateInstitutionDetails(accounts, fedClient)
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(accounts)
 	}
+}
+
+func decorateInstitutionDetails(accounts []*client.Account, client fed.Client) []*client.Account {
+	for i := range accounts {
+		if details, _ := client.LookupInstitution(accounts[i].RoutingNumber); details != nil {
+			accounts[i].Institution = *details
+		}
+	}
+	return accounts
 }
 
 type createAccountRequest struct {
@@ -114,7 +124,7 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 			return
 		}
 
-		if err := fedClient.LookupRoutingNumber(request.RoutingNumber); err != nil {
+		if _, err := fedClient.LookupInstitution(request.RoutingNumber); err != nil {
 			logger.Log("accounts", fmt.Sprintf("problem looking up routing number=%q: %v", request.RoutingNumber, err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)
 			return

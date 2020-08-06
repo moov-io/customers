@@ -27,7 +27,7 @@ func TestFED(t *testing.T) {
 	}
 	svc.Close()
 
-	// test LookupRoutingNumber
+	// test LookupInstitution
 	svc = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/fed/ach/search" {
 			w.WriteHeader(http.StatusBadRequest)
@@ -38,8 +38,12 @@ func TestFED(t *testing.T) {
 	}))
 
 	client = NewClient(log.NewNopLogger(), svc.URL)
-	if err := client.LookupRoutingNumber("121042882"); err != nil {
+	if details, err := client.LookupInstitution("121042882"); err != nil {
 		t.Fatal(err)
+	} else {
+		if details.RoutingNumber != "121042882" {
+			t.Errorf("unexpected ACH details: %#v", details)
+		}
 	}
 	svc.Close()
 }

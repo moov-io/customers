@@ -4,14 +4,22 @@
 
 package fed
 
+import (
+	"github.com/moov-io/customers/client"
+)
+
 type MockClient struct {
-	Err error
+	Err     error
+	Details *client.InstitutionDetails
 }
 
 func (c *MockClient) Ping() error {
 	return c.Err
 }
 
-func (c *MockClient) LookupRoutingNumber(routingNumber string) error {
-	return c.Err
+func (c *MockClient) LookupInstitution(routingNumber string) (*client.InstitutionDetails, error) {
+	if c.Err != nil {
+		return nil, c.Err
+	}
+	return c.Details, nil
 }
