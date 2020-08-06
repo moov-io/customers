@@ -51,6 +51,16 @@ func (r *testCustomerRepository) updateCustomerStatus(customerID string, status 
 	return r.err
 }
 
+func (r *testCustomerRepository) searchCustomers(params searchParams) ([]*client.Customer, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
+	if r.customer != nil {
+		return []*client.Customer{r.customer}, nil
+	}
+	return nil, nil
+}
+
 func (r *testCustomerRepository) getCustomerMetadata(customerID string) (map[string]string, error) {
 	out := make(map[string]string)
 	return out, r.err
