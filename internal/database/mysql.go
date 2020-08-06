@@ -87,6 +87,10 @@ var (
 			"expand_accounts_encrypted_account_number",
 			`alter table accounts modify encrypted_account_number varchar(100);`,
 		),
+		execsql(
+			"add_customer_type",
+			`alter table customers add column type varchar(25); update customers set type = 'individual' where type is null;`,
+		),
 	)
 )
 

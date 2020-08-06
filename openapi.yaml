@@ -913,8 +913,8 @@ components:
       type: string
       description: Note if this Customer represents an individual or business
       enum:
-        - Individual
-        - Business
+        - individual
+        - business
     CustomerStatus:
       type: string
       description: State of the customer
