@@ -84,7 +84,7 @@ type customerRequest struct {
 	NickName   string              `json:"nickName"`
 	Suffix     string              `json:"suffix"`
 	Type       client.CustomerType `json:"type"`
-	BirthDate  time.Time           `json:"birthDate"`
+	BirthDate  *time.Time          `json:"birthDate"`
 	Email      string              `json:"email"`
 	SSN        string              `json:"SSN"`
 	Phones     []phone             `json:"phones"`

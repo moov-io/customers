@@ -1021,6 +1021,7 @@ components:
           description: Legal date of birth
           example: 2016-08-29T09:12:33.001Z
           format: date-time
+          nullable: true
           type: string
         email:
           description: Primary email address of customer name@domain.com
@@ -1127,6 +1128,7 @@ components:
           description: Legal date of birth
           example: 2016-08-29T09:12:33.001Z
           format: date-time
+          nullable: true
           type: string
         status:
           $ref: '#/components/schemas/CustomerStatus'
@@ -1160,6 +1162,7 @@ components:
           format: date-time
           type: string
       required:
+      - birthDate
       - createdAt
       - customerID
       - email

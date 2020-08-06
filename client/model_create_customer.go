@@ -27,7 +27,7 @@ type CreateCustomer struct {
 	Suffix string       `json:"suffix,omitempty"`
 	Type   CustomerType `json:"type,omitempty"`
 	// Legal date of birth
-	BirthDate time.Time `json:"birthDate"`
+	BirthDate *time.Time `json:"birthDate"`
 	// Primary email address of customer name@domain.com
 	Email string `json:"email"`
 	// Customer Social Security Number (SSN)
