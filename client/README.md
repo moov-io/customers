@@ -75,6 +75,8 @@ Class | Method | HTTP request | Description
  - [Disclaimer](docs/Disclaimer.md)
  - [Document](docs/Document.md)
  - [Error](docs/Error.md)
+ - [InstitutionAddress](docs/InstitutionAddress.md)
+ - [InstitutionDetails](docs/InstitutionDetails.md)
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
  - [TransitAccountNumber](docs/TransitAccountNumber.md)

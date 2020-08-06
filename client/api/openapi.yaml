@@ -1399,6 +1399,16 @@ components:
       example:
         accountID: e1b1544a
         routingNumber: "051504597"
+        institution:
+          routingNumber: "123456780"
+          phoneNumber: "5551112222"
+          address:
+            zip: "43724"
+            address2: address2
+            city: CALDWELL
+            address1: 430 NORTH ST
+            state: OH
+          name: First Bank
         type: checking
         maskedAccountNumber: "0001027028"
         status: microdeposits
@@ -1419,12 +1429,67 @@ components:
           $ref: '#/components/schemas/AccountStatus'
         type:
           $ref: '#/components/schemas/AccountType'
+        institution:
+          $ref: '#/components/schemas/InstitutionDetails'
       required:
       - accountID
       - maskedAccountNumber
       - routingNumber
       - status
       - type
+    InstitutionDetails:
+      example:
+        routingNumber: "123456780"
+        phoneNumber: "5551112222"
+        address:
+          zip: "43724"
+          address2: address2
+          city: CALDWELL
+          address1: 430 NORTH ST
+          state: OH
+        name: First Bank
+      properties:
+        name:
+          example: First Bank
+          type: string
+        routingNumber:
+          example: "123456780"
+          type: string
+        phoneNumber:
+          example: "5551112222"
+          type: string
+        address:
+          $ref: '#/components/schemas/InstitutionAddress'
+      required:
+      - name
+      - routingNumber
+    InstitutionAddress:
+      example:
+        zip: "43724"
+        address2: address2
+        city: CALDWELL
+        address1: 430 NORTH ST
+        state: OH
+      properties:
+        address1:
+          example: 430 NORTH ST
+          type: string
+        address2:
+          type: string
+        city:
+          example: CALDWELL
+          type: string
+        state:
+          example: OH
+          type: string
+        zip:
+          example: "43724"
+          type: string
+      required:
+      - address1
+      - city
+      - state
+      - zip
     UpdateValidation:
       example:
         strategy: micro-deposits
