@@ -119,6 +119,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Customer'
           description: A customer objects for the supplied customerID
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Problem getting customer, see error(s)
         "404":
           description: No Customer with the specified customerID was found
       summary: Retrieve customer
