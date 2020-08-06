@@ -121,6 +121,9 @@ func (req customerRequest) validate() error {
 	if req.FirstName == "" || req.LastName == "" {
 		return errors.New("create customer: empty name field(s)")
 	}
+	if err := validateCustomerType(req.Type); err != nil {
+		return fmt.Errorf("create customer: %v", err)
+	}
 	if err := validateMetadata(req.Metadata); err != nil {
 		return fmt.Errorf("create customer: %v", err)
 	}
@@ -130,6 +133,17 @@ func (req customerRequest) validate() error {
 		}
 	}
 	return nil
+}
+
+func validateCustomerType(t client.CustomerType) error {
+	norm := func(t client.CustomerType) string {
+		return strings.ToLower(string(t))
+	}
+	switch norm(t) {
+	case norm(client.INDIVIDUAL), norm(client.BUSINESS):
+		return nil
+	}
+	return fmt.Errorf("unknown type: %s", t)
 }
 
 func validateMetadata(meta map[string]string) error {
