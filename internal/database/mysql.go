@@ -89,7 +89,11 @@ var (
 		),
 		execsql(
 			"add_customer_type",
-			`alter table customers add column type varchar(25); update customers set type = 'individual' where type is null;`,
+			`alter table customers add column type varchar(25)`,
+		),
+		execsql(
+			"update_customer_type",
+			`update customers set type = 'individual' where type is null;`,
 		),
 	)
 )
