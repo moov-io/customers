@@ -13,6 +13,7 @@ import (
 
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/base/k8s"
+	"github.com/moov-io/customers/client"
 	moovfed "github.com/moov-io/fed/client"
 
 	"github.com/antihax/optional"
@@ -21,7 +22,7 @@ import (
 
 type Client interface {
 	Ping() error
-	LookupRoutingNumber(routingNumber string) error
+	LookupInstitution(routingNumber string) (*client.InstitutionDetails, error)
 }
 
 type moovClient struct {
@@ -47,7 +48,7 @@ func (c *moovClient) Ping() error {
 	return err
 }
 
-func (c *moovClient) LookupRoutingNumber(routingNumber string) error {
+func (c *moovClient) LookupInstitution(routingNumber string) (*client.InstitutionDetails, error) {
 	// create a context just for this so ping requests don't require the setup of one
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
@@ -59,17 +60,28 @@ func (c *moovClient) LookupRoutingNumber(routingNumber string) error {
 		resp.Body.Close()
 	}
 	if resp == nil {
-		return fmt.Errorf("FED ping failed: %v", err)
+		return nil, fmt.Errorf("FED ping failed: %v", err)
 	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return fmt.Errorf("FED ping got status: %s", resp.Status)
+		return nil, fmt.Errorf("FED ping got status: %s", resp.Status)
 	}
 	for i := range achDict.ACHParticipants {
 		if achDict.ACHParticipants[i].RoutingNumber == routingNumber {
-			return nil // found match
+			part := achDict.ACHParticipants[i]
+			return &client.InstitutionDetails{
+				Name:          part.CustomerName,
+				RoutingNumber: part.RoutingNumber,
+				PhoneNumber:   part.PhoneNumber,
+				Address: client.InstitutionAddress{
+					Address1: part.AchLocation.Address,
+					City:     part.AchLocation.City,
+					State:    part.AchLocation.State,
+					Zip:      part.AchLocation.PostalCode,
+				},
+			}, nil
 		}
 	}
-	return errors.New("no ACH participants found")
+	return nil, errors.New("no ACH participants found")
 }
 
 var (

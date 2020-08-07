@@ -150,7 +150,7 @@ func main() {
 	}
 	transitStringKeeper := secrets.NewStringKeeper(transitKeeper, 10*time.Second)
 
-	fedClient := fed.NewClient(logger, os.Getenv("FED_ENDPOINT"))
+	fedClient := fed.Cache(logger, os.Getenv("FED_ENDPOINT"))
 	adminServer.AddLivenessCheck("fed", fedClient.Ping)
 
 	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"))

@@ -1115,12 +1115,52 @@ components:
           $ref: '#/components/schemas/AccountStatus'
         type:
           $ref: '#/components/schemas/AccountType'
+        institution:
+          $ref: '#/components/schemas/InstitutionDetails'
       required:
         - accountID
         - maskedAccountNumber
         - routingNumber
         - status
         - type
+    InstitutionDetails:
+      properties:
+        name:
+          type: string
+          example: First Bank
+        routingNumber:
+          type: string
+          example: "123456780"
+        phoneNumber:
+          type: string
+          example: "5551112222"
+        address:
+          $ref: '#/components/schemas/InstitutionAddress'
+      required:
+        - name
+        - routingNumber
+    InstitutionAddress:
+      properties:
+        address1:
+          type: string
+          example: "430 NORTH ST"
+        address2:
+          type: string
+          example: ""
+        city:
+          type: string
+          example: "CALDWELL"
+        state:
+          type: string
+          example: "OH"
+        zip:
+          type: string
+          example: "43724"
+      required:
+        - address1
+        - city
+        - state
+        - zip
     UpdateValidation:
       type: object
       properties:
