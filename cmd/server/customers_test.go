@@ -145,6 +145,24 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	}
 }
 
+func TestCustomers__GetCustomerEmpty(t *testing.T) {
+	repo := &testCustomerRepository{}
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", base.ID()), nil)
+	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-request-id", "test")
+
+	router := mux.NewRouter()
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusNotFound {
+		t.Errorf("bogus status code: %d", w.Code)
+	}
+}
+
 func TestCustomerRepository__createCustomer(t *testing.T) {
 	check := func(t *testing.T, repo *sqlCustomerRepository) {
 		cust, _, _ := (customerRequest{

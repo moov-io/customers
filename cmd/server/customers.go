@@ -68,9 +68,13 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID st
 		moovhttp.Problem(w, err)
 		return
 	}
-	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(cust)
+	if cust == nil {
+		w.WriteHeader(http.StatusNotFound)
+	} else {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(cust)
+	}
 }
 
 // customerRequest holds the information for creating a Customer from the HTTP api

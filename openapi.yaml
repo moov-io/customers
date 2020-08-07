@@ -103,6 +103,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
+        '400':
+          description: Problem getting customer, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
         '404':
           description: No Customer with the specified customerID was found
   /customers/{customerID}/address:
