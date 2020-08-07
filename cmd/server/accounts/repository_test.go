@@ -137,3 +137,40 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 		t.Errorf("unexpected status: %s", acct.Status)
 	}
 }
+
+func TestRepositoryUnique(t *testing.T) {
+	keeper := secrets.TestStringKeeper(t)
+
+	check := func(t *testing.T, repo *sqlAccountRepository) {
+		customerID, userID := base.ID(), base.ID()
+		req := &createAccountRequest{
+			AccountNumber: "156421",
+			RoutingNumber: "123456780",
+			Type:          client.SAVINGS,
+		}
+		if err := req.disfigure(keeper); err != nil {
+			t.Fatal(err)
+		}
+
+		// first write should pass
+		if _, err := repo.createCustomerAccount(customerID, userID, req); err != nil {
+			t.Fatal(err)
+		}
+		// second write should fail
+		if _, err := repo.createCustomerAccount(customerID, userID, req); err != nil {
+			if !database.UniqueViolation(err) {
+				t.Fatalf("unexpected error: %v", err)
+			}
+		}
+	}
+
+	// SQLite tests
+	sqliteDB := database.CreateTestSqliteDB(t)
+	defer sqliteDB.Close()
+	check(t, NewRepo(log.NewNopLogger(), sqliteDB.DB))
+
+	// MySQL tests
+	mysqlDB := database.CreateTestMySQLDB(t)
+	defer mysqlDB.Close()
+	check(t, NewRepo(log.NewNopLogger(), mysqlDB.DB))
+}
