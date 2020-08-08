@@ -63,8 +63,8 @@ docker: clean
 	docker build --pull -t moov/customers:$(VERSION) -f Dockerfile .
 	docker tag moov/customers:$(VERSION) moov/customers:latest
 # OpenShift Docker image
-	docker build --pull -t quay.io/moov/customers:$(VERSION) -f Dockerfile-openshift --build-arg VERSION=$(VERSION) .
-	docker tag quay.io/moov/customers:$(VERSION) quay.io/moov/customers:latest
+#	docker build --pull -t quay.io/moov/customers:$(VERSION) -f Dockerfile-openshift --build-arg VERSION=$(VERSION) .
+#	docker tag quay.io/moov/customers:$(VERSION) quay.io/moov/customers:latest
 
 clean-integration:
 	docker-compose kill
