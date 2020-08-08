@@ -75,6 +75,10 @@ var (
 			"create_accounts",
 			`create table if not exists accounts(account_id primary key, customer_id, user_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, status, type, created_at datetime, deleted_at datetime);`,
 		),
+		execsql(
+			"add_customer_type",
+			`alter table customers add column type; update customers set type = 'individual' where type is null;`,
+		),
 	)
 )
 

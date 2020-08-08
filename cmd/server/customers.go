@@ -121,6 +121,9 @@ func (req customerRequest) validate() error {
 	if req.FirstName == "" || req.LastName == "" {
 		return errors.New("create customer: empty name field(s)")
 	}
+	if err := validateCustomerType(req.Type); err != nil {
+		return fmt.Errorf("create customer: %v", err)
+	}
 	if err := validateMetadata(req.Metadata); err != nil {
 		return fmt.Errorf("create customer: %v", err)
 	}
@@ -130,6 +133,17 @@ func (req customerRequest) validate() error {
 		}
 	}
 	return nil
+}
+
+func validateCustomerType(t client.CustomerType) error {
+	norm := func(t client.CustomerType) string {
+		return strings.ToLower(string(t))
+	}
+	switch norm(t) {
+	case norm(client.INDIVIDUAL), norm(client.BUSINESS):
+		return nil
+	}
+	return fmt.Errorf("unknown type: %s", t)
 }
 
 func validateMetadata(meta map[string]string) error {
@@ -325,8 +339,8 @@ func (r *sqlCustomerRepository) createCustomer(c *client.Customer) error {
 	}
 
 	// Insert customer record
-	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, birth_date, status, email, created_at, last_modified)
-values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -334,7 +348,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	defer stmt.Close()
 
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.BirthDate, c.Status, c.Email, now, now)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BirthDate, c.Status, c.Email, now, now)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
@@ -376,7 +390,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 }
 
 func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer, error) {
-	query := `select first_name, middle_name, last_name, nick_name, suffix, birth_date, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
+	query := `select first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -386,7 +400,7 @@ func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer
 
 	var cust client.Customer
 	cust.CustomerID = customerID
-	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.BirthDate, &cust.Status, &cust.Email, &cust.CreatedAt, &cust.LastModified)
+	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.Type, &cust.BirthDate, &cust.Status, &cust.Email, &cust.CreatedAt, &cust.LastModified)
 	stmt.Close()
 	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
 		return nil, fmt.Errorf("getCustomer: %v", err)

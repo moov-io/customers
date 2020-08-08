@@ -205,7 +205,7 @@ func TestCustomers__GetCustomersError(t *testing.T) {
 }
 
 func TestCustomers__customerRequest(t *testing.T) {
-	req := &customerRequest{}
+	req := &customerRequest{Type: client.INDIVIDUAL}
 	if err := req.validate(); err == nil {
 		t.Error("expected error")
 	}
@@ -274,7 +274,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
 	phone := `{"number": "555.555.5555", "type": "mobile"}`
 	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
-	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "ssn": "123456789", "phones": [%s], "addresses": [%s]}`, phone, address)
+	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "ssn": "123456789", "type": "individual", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
@@ -723,6 +723,7 @@ func mockCustomerRequest() customerRequest {
 	c.LastName = "Doe"
 	c.Email = "johndoe@example.net"
 	c.SSN = "123456789"
+	c.Type = "individual"
 
 	p := phone{}
 	p.Number = "123-456-7892"
@@ -760,7 +761,7 @@ func TestCustomers__MetaDataValidate(t *testing.T) {
 
 func TestCustomers__minimumFields(t *testing.T) {
 	w := httptest.NewRecorder()
-	body := `{"firstName": "jane", "lastName": "doe"}`
+	body := `{"firstName": "jane", "lastName": "doe", "type": "individual"}`
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-user-id", "test")
 	req.Header.Set("x-request-id", "test")
