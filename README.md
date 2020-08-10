@@ -46,9 +46,6 @@ The following environmental variables can be set to configure behavior in Accoun
 | `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
 | `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
 | `DATABASE_TYPE` | Which database option to use (Options: `sqlite`, `mysql`) | Default: `sqlite` |
-| `OFAC_MATCH_THRESHOLD` | Percent match against OFAC data that's required for paygate to block a transaction. | `99%` |
-| `WATCHMAN_ENDPOINT` | HTTP address for [OFAC](https://github.com/moov-io/watchman) interaction, defaults to Kubernetes inside clusters and local dev otherwise. | Kubernetes DNS |
-
 
 #### Fed
 
@@ -57,6 +54,26 @@ The Moov [Fed](https://github.com/moov-io/fed) service is used for routing numbe
 | Environmental Variable | Description | Default |
 |-----|-----|-----|
 | `FED_ENDPOINT` | HTTP address for Moov Fed interaction to lookup ABA routing numbers. | `http://fed.apps.svc.cluster.local:8080` |
+| `FED_DEBUG_CALLS` | Print debugging information with all Fed API calls. | `false` |
+
+#### PayGate
+
+The Moov [PayGate](https://github.com/moov-io/paygate) service is used to initiate micro-deposits for account validation.
+
+| Environmental Variable | Description | Default |
+|-----|-----|-----|
+| `PAYGATE_ENDPOINT` | HTTP address for Moov PayGate interactions. | `http://paygate.apps.svc.cluster.local:8080` |
+| `PAYGATE_DEBUG_CALLS` | Print debugging information with all PayGate API calls. | `false` |
+
+#### Watchman
+
+The Moov [Watchman](https://github.com/moov-io/watchman) service is used for OFAC and other sanctions list searching and compliance.
+
+| Environmental Variable | Description | Default |
+|-----|-----|-----|
+| `OFAC_MATCH_THRESHOLD` | Percent match against OFAC data that's required for paygate to block a transaction. | `99%` |
+| `WATCHMAN_ENDPOINT` | HTTP address for [OFAC](https://github.com/moov-io/watchman) interaction, defaults to Kubernetes inside clusters and local dev otherwise. | Kubernetes DNS |
+| `WATCHMAN_DEBUG_CALLS` | Print debugging information with all Watchman API calls. | `false` |
 
 #### Account Numbers
 
