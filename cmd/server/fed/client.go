@@ -90,9 +90,10 @@ var (
 	}
 )
 
-func NewClient(logger log.Logger, endpoint string) Client {
+func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 	conf := moovfed.NewConfiguration()
 	conf.HTTPClient = httpClient
+	conf.Debug = debug
 
 	if endpoint != "" {
 		conf.BasePath = endpoint

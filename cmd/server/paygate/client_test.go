@@ -71,7 +71,7 @@ func spawnPayGate(t *testing.T) *deployment {
 		t.Fatal(err)
 	}
 
-	client := NewClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")))
+	client := NewClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")), false)
 	err = pool.Retry(func() error {
 		return client.Ping()
 	})
@@ -118,7 +118,7 @@ func writePayGateConfig(t *testing.T, dir string, tag string) {
 }
 
 func TestPayGate__client(t *testing.T) {
-	if client := NewClient(log.NewNopLogger(), ""); client == nil {
+	if client := NewClient(log.NewNopLogger(), "", false); client == nil {
 		t.Fatal("expected non-nil client")
 	}
 

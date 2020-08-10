@@ -116,7 +116,9 @@ func main() {
 	signer := setupStorageBucket(logger, bucketName, cloudProvider)
 
 	// Create our Watchman client
-	watchmanClient := newWatchmanClient(logger, util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT")))
+	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
+	watchmanEndpoint := util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT"))
+	watchmanClient := newWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
 	if watchmanClient == nil {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
@@ -150,10 +152,12 @@ func main() {
 	}
 	transitStringKeeper := secrets.NewStringKeeper(transitKeeper, 10*time.Second)
 
-	fedClient := fed.Cache(logger, os.Getenv("FED_ENDPOINT"))
+	debugFedCalls := util.Or(os.Getenv("FED_DEBUG_CALLS"), "false")
+	fedClient := fed.Cache(logger, os.Getenv("FED_ENDPOINT"), util.Yes(debugFedCalls))
 	adminServer.AddLivenessCheck("fed", fedClient.Ping)
 
-	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"))
+	debugPayGateCalls := util.Or(os.Getenv("PAYGATE_DEBUG_CALLS"), "false")
+	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"), util.Yes(debugPayGateCalls))
 	adminServer.AddLivenessCheck("paygate", paygateClient.Ping)
 
 	// Setup business HTTP routes

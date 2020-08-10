@@ -162,9 +162,10 @@ func (c *moovWatchmanClient) Search(ctx context.Context, name string, requestID 
 //
 // endpoint is a DNS record responsible for routing us to an Watchman instance.
 // Example: http://watchman.apps.svc.cluster.local:8080
-func newWatchmanClient(logger log.Logger, endpoint string) WatchmanClient {
+func newWatchmanClient(logger log.Logger, endpoint string, debug bool) WatchmanClient {
 	conf := watchman.NewConfiguration()
 	conf.BasePath = "http://localhost" + bind.HTTP("watchman")
+	conf.Debug = debug
 
 	if k8s.Inside() {
 		conf.BasePath = "http://watchman.apps.svc.cluster.local:8080"
