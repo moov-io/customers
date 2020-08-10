@@ -4,11 +4,13 @@ ADDITIONS
 
 - api,client: expose institution details on accounts
 - accounts: return InstitutionDetails next to routing number
+- cmd/server: add an endpoint for searching customers
 
 IMPROVEMENTS
 
 - accounts: reject duplicate accounts for a customer
 - cmd/server: read OFAC_ENDPOINT or WATCHMAN_ENDPOINT
+- customers: send back an array of search results, not null
 - database/mysql: fix migration for customer type
 - docs: reference ./cmd/genkey/ for SECRETS_LOCAL_BASE64_KEY
 - fed: support debugging API calls
