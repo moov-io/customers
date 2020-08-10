@@ -13,8 +13,8 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-func Cache(logger log.Logger, endpoint string) Client {
-	client := NewClient(logger, endpoint)
+func Cache(logger log.Logger, endpoint string, debug bool) Client {
+	client := NewClient(logger, endpoint, debug)
 
 	data := util.Or(os.Getenv("FED_CACHE_SIZE"), "1024")
 	maxSize, _ := strconv.ParseInt(data, 10, 32)

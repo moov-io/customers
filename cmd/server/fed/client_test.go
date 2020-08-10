@@ -21,7 +21,7 @@ func TestFED(t *testing.T) {
 		w.Write([]byte(`PONG`))
 	}))
 
-	client := NewClient(log.NewNopLogger(), svc.URL)
+	client := NewClient(log.NewNopLogger(), svc.URL, false)
 	if err := client.Ping(); err != nil {
 		t.Fatal(err)
 	}
@@ -37,7 +37,7 @@ func TestFED(t *testing.T) {
 		w.Write([]byte(`{"achParticipants": [{"routingNumber": "121042882"}]}`)) // partial fed.AchDictionary response
 	}))
 
-	client = NewClient(log.NewNopLogger(), svc.URL)
+	client = NewClient(log.NewNopLogger(), svc.URL, false)
 	if details, err := client.LookupInstitution("121042882"); err != nil {
 		t.Fatal(err)
 	} else {
@@ -49,7 +49,7 @@ func TestFED(t *testing.T) {
 }
 
 func TestFED__NewClient(t *testing.T) {
-	client := NewClient(log.NewNopLogger(), "")
+	client := NewClient(log.NewNopLogger(), "", false)
 	if client == nil {
 		t.Error("expected FED client")
 	}
