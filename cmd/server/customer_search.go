@@ -82,7 +82,7 @@ func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.
 		}
 	}
 
-	var customers []*client.Customer
+	customers := make([]*client.Customer, 0)
 	for i := range customerIDs {
 		cust, err := r.getCustomer(customerIDs[i])
 		if err != nil {
