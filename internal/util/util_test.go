@@ -19,3 +19,23 @@ func TestOr(t *testing.T) {
 		t.Errorf("v=%s", v)
 	}
 }
+
+func TestYes(t *testing.T) {
+	if !Yes("yes") {
+		t.Error("expected true")
+	}
+	if Yes("no") {
+		t.Error("expected no")
+	}
+
+	if !Yes("  true") {
+		t.Error("expected true")
+	}
+	if Yes("false") {
+		t.Error("expected no")
+	}
+
+	if Yes("") {
+		t.Error("expected no")
+	}
+}

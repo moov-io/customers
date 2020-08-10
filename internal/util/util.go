@@ -5,6 +5,7 @@
 package util
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -16,4 +17,14 @@ func Or(options ...string) string {
 		}
 	}
 	return ""
+}
+
+// Yes returns true if the provided case-insensitive string matches 'yes' and is used to parse config values.
+func Yes(in string) bool {
+	in = strings.TrimSpace(in)
+	if strings.EqualFold(in, "yes") {
+		return true
+	}
+	v, _ := strconv.ParseBool(in)
+	return v
 }
