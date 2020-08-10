@@ -116,7 +116,9 @@ func main() {
 	signer := setupStorageBucket(logger, bucketName, cloudProvider)
 
 	// Create our Watchman client
-	watchmanClient := newWatchmanClient(logger, util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT")))
+	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
+	watchmanEndpoint := util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT"))
+	watchmanClient := newWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
 	if watchmanClient == nil {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
