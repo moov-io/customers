@@ -154,7 +154,8 @@ func main() {
 	fedClient := fed.Cache(logger, os.Getenv("FED_ENDPOINT"), util.Yes(debugFedCalls))
 	adminServer.AddLivenessCheck("fed", fedClient.Ping)
 
-	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"))
+	debugPayGateCalls := util.Or(os.Getenv("PAYGATE_DEBUG_CALLS"), "false")
+	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"), util.Yes(debugPayGateCalls))
 	adminServer.AddLivenessCheck("paygate", paygateClient.Ping)
 
 	// Setup business HTTP routes
