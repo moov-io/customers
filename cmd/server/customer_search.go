@@ -59,9 +59,6 @@ func readSearchParams(u *url.URL) searchParams {
 func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.Customer, error) {
 	query, args := buildSearchQuery(params)
 
-	fmt.Printf("query=%q\n", query)
-	fmt.Printf("(got %d) args=%q\n", len(args), args)
-
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -97,7 +94,7 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 	var args []interface{}
 	query := `select customer_id from customers where deleted_at is null`
 	if params.Query != "" {
-		query += " and lower(first_name) || lower(last_name) LIKE ?"
+		query += " and lower(first_name) || \" \" || lower(last_name) LIKE ?"
 		args = append(args, "%"+strings.ToLower(params.Query)+"%")
 	}
 	if params.Email != "" {
@@ -106,7 +103,3 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 	}
 	return query + " order by created_at asc limit ?;", append(args, fmt.Sprintf("%d", params.Limit))
 }
-
-// /customers?query=sadler should return matches weighted by field on the user model, where name and email are given more weight. I'd expect customer metadata to be searched as well.
-//
-// email could be '@moov.io' or a full email
