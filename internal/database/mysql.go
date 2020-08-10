@@ -95,6 +95,10 @@ var (
 			"update_customer_type",
 			`update customers set type = 'individual' where type is null;`,
 		),
+		execsql(
+			"unique_accounts_per_customer",
+			`alter table accounts add constraint unique accounts_unique_to_customer (customer_id, hashed_account_number, routing_number);`,
+		),
 	)
 )
 

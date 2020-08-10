@@ -79,6 +79,36 @@ var (
 			"add_customer_type",
 			`alter table customers add column type; update customers set type = 'individual' where type is null;`,
 		),
+		execsql(
+			"unique_accounts_per_customer",
+			`
+PRAGMA foreign_keys=off;
+BEGIN TRANSACTION;
+
+ALTER TABLE accounts RENAME TO accounts_old;
+
+CREATE TABLE accounts
+(
+  account_id primary key,
+  customer_id,
+  user_id,
+  encrypted_account_number,
+  hashed_account_number,
+  masked_account_number,
+  routing_number,
+  status,
+  type,
+  created_at datetime,
+  deleted_at datetime,
+  CONSTRAINT accounts_unique_to_customer UNIQUE (customer_id, hashed_account_number, routing_number)
+);
+
+INSERT INTO accounts SELECT * FROM accounts_old;
+
+COMMIT;
+
+PRAGMA foreign_keys=on;`,
+		),
 	)
 )
 
