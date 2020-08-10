@@ -25,6 +25,7 @@ import (
 )
 
 func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
+	r.Methods("GET").Path("/customers").HandlerFunc(searchCustomers(logger, repo))
 	r.Methods("GET").Path("/customers/{customerID}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
 	r.Methods("PUT").Path("/customers/{customerID}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
@@ -312,6 +313,8 @@ type customerRepository interface {
 	getCustomer(customerID string) (*client.Customer, error)
 	createCustomer(c *client.Customer) error
 	updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error
+
+	searchCustomers(params searchParams) ([]*client.Customer, error)
 
 	getCustomerMetadata(customerID string) (map[string]string, error)
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
