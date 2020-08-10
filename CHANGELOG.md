@@ -1,11 +1,27 @@
-## v0.4.2 (Unreleased)
+## v0.5.0 (Unreleased)
+
+ADDITIONS
+
+- api,client: expose institution details on accounts
+- accounts: return InstitutionDetails next to routing number
 
 IMPROVEMENTS
 
+- accounts: reject duplicate accounts for a customer
+- cmd/server: read OFAC_ENDPOINT or WATCHMAN_ENDPOINT
+- database/mysql: fix migration for customer type
 - docs: reference ./cmd/genkey/ for SECRETS_LOCAL_BASE64_KEY
+- fed: support debugging API calls
+- paygate: support debugging API calls
+- watchman: support debugging API calls
 
 BUG FIXEs
 
+- accounts: return an empty array if no accounts are found
+- cmd/server: return 404 if customer isn't found
+- customers: render nil birthDate as null instead of time.Zero
+- customers: save customer type and marshal it back
+- customers: validate customer type on creation request
 - database/mysql: change customers.status to string
 - database/mysql: expand encrypted_account_number
 
