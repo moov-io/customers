@@ -14,6 +14,6 @@ type CustomerType string
 
 // List of CustomerType
 const (
-	INDIVIDUAL CustomerType = "Individual"
-	BUSINESS   CustomerType = "Business"
+	INDIVIDUAL CustomerType = "individual"
+	BUSINESS   CustomerType = "business"
 )
