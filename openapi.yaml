@@ -1079,6 +1079,10 @@ components:
           example: MKtcJkzlxUlGcW7Nf5xm5cg==
     CreateAccount:
       properties:
+        holderName:
+          type: string
+          description: Legal holder name on the account
+          example: "My Company,llc or Wade Arnold"
         accountNumber:
           type: string
           description: The account number for the bank account
@@ -1090,6 +1094,7 @@ components:
         type:
           $ref: '#/components/schemas/AccountType'
       required:
+        - holderName
         - accountNumber
         - routingNumber
         - type
@@ -1103,6 +1108,10 @@ components:
           type: string
           description: A unique identifier for this account
           example: e1b1544a
+        holderName:
+          type: string
+          description: Legal holder name on the account
+          example: "My Company,llc or Wade Arnold"
         maskedAccountNumber:
           type: string
           description: The masked account number for the bank account
@@ -1119,6 +1128,7 @@ components:
           $ref: '#/components/schemas/InstitutionDetails'
       required:
         - accountID
+        - holderName
         - maskedAccountNumber
         - routingNumber
         - status

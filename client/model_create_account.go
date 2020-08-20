@@ -11,6 +11,8 @@ package client
 
 // CreateAccount struct for CreateAccount
 type CreateAccount struct {
+	// Legal holder name on the account
+	HolderName string `json:"holderName"`
 	// The account number for the bank account
 	AccountNumber string `json:"accountNumber"`
 	// The ABA routing transit number for the bank account.

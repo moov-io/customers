@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**HolderName** | **string** | Legal holder name on the account | 
 **AccountNumber** | **string** | The account number for the bank account | 
 **RoutingNumber** | **string** | The ABA routing transit number for the bank account. | 
 **Type** | [**AccountType**](AccountType.md) |  | 

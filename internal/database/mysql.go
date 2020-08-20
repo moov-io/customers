@@ -99,6 +99,10 @@ var (
 			"unique_accounts_per_customer",
 			`alter table accounts add constraint unique accounts_unique_to_customer (customer_id, hashed_account_number, routing_number);`,
 		),
+		execsql(
+			"add_holder_name_to_accounts",
+			`alter table accounts add column holder_name varchar(60) default '';`,
+		),
 	)
 )
 
