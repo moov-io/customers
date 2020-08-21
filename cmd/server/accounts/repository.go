@@ -42,7 +42,7 @@ func (r *sqlAccountRepository) Close() error {
 }
 
 func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
-	query := `select account_id, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
+	query := `select account_id, holder_name, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) 
 
 	var a client.Account
 	row := stmt.QueryRow(customerID, accountID)
-	if err := row.Scan(&a.AccountID, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
+	if err := row.Scan(&a.AccountID, &a.HolderName, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
 		return nil, err
 	}
 	return &a, nil
@@ -95,10 +95,10 @@ func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, 
 		Type:                req.Type,
 	}
 	query := `insert into accounts (
-  account_id, customer_id, user_id,
+  account_id, customer_id, user_id, holder_name,
   encrypted_account_number, hashed_account_number, masked_account_number,
   routing_number, status, type, created_at
-) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, 
 	defer stmt.Close()
 
 	_, err = stmt.Exec(
-		account.AccountID, customerID, userID,
+		account.AccountID, customerID, userID, req.HolderName,
 		req.encryptedAccountNumber, req.hashedAccountNumber, req.maskedAccountNumber,
 		account.RoutingNumber, account.Status, account.Type, time.Now(),
 	)

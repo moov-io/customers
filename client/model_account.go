@@ -13,6 +13,8 @@ package client
 type Account struct {
 	// A unique identifier for this account
 	AccountID string `json:"accountID"`
+	// Legal holder name on the account
+	HolderName string `json:"holderName"`
 	// The masked account number for the bank account
 	MaskedAccountNumber string `json:"maskedAccountNumber"`
 	// The ABA routing transit number for the bank account.

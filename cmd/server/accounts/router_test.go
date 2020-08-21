@@ -63,6 +63,22 @@ func TestAccountRoutes(t *testing.T) {
 	}
 }
 
+func TestAccountCreationRequest(t *testing.T) {
+	req := &createAccountRequest{}
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+
+	req.HolderName = "John Doe"
+	req.AccountNumber = "12345"
+	req.RoutingNumber = "987654320"
+	req.Type = client.SAVINGS
+
+	if err := req.validate(); err != nil {
+		t.Error(err)
+	}
+}
+
 func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	customerID := base.ID()
 	repo := setupTestAccountRepository(t)
@@ -140,6 +156,7 @@ func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*c
 
 func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *client.Account {
 	params := &createAccountRequest{
+		HolderName:    "John Doe",
 		AccountNumber: "18749",
 		RoutingNumber: "987654320",
 		Type:          client.SAVINGS,

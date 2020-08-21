@@ -61,6 +61,7 @@ func decorateInstitutionDetails(accounts []*client.Account, client fed.Client) [
 }
 
 type createAccountRequest struct {
+	HolderName    string             `json:"holderName"`
 	AccountNumber string             `json:"accountNumber"`
 	RoutingNumber string             `json:"routingNumber"`
 	Type          client.AccountType `json:"type"`
@@ -72,6 +73,9 @@ type createAccountRequest struct {
 }
 
 func (req *createAccountRequest) validate() error {
+	if req.HolderName == "" {
+		return errors.New("missing HolderName")
+	}
 	if req.AccountNumber == "" {
 		return errors.New("missing AccountNumber")
 	}

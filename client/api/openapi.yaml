@@ -1383,9 +1383,14 @@ components:
     CreateAccount:
       example:
         routingNumber: "051504597"
+        holderName: My Company,llc or Wade Arnold
         accountNumber: "0001027028"
         type: checking
       properties:
+        holderName:
+          description: Legal holder name on the account
+          example: My Company,llc or Wade Arnold
+          type: string
         accountNumber:
           description: The account number for the bank account
           example: "0001027028"
@@ -1398,6 +1403,7 @@ components:
           $ref: '#/components/schemas/AccountType'
       required:
       - accountNumber
+      - holderName
       - routingNumber
       - type
     Accounts:
@@ -1418,6 +1424,7 @@ components:
             address1: 430 NORTH ST
             state: OH
           name: First Bank
+        holderName: My Company,llc or Wade Arnold
         type: checking
         maskedAccountNumber: "0001027028"
         status: microdeposits
@@ -1425,6 +1432,10 @@ components:
         accountID:
           description: A unique identifier for this account
           example: e1b1544a
+          type: string
+        holderName:
+          description: Legal holder name on the account
+          example: My Company,llc or Wade Arnold
           type: string
         maskedAccountNumber:
           description: The masked account number for the bank account
@@ -1442,6 +1453,7 @@ components:
           $ref: '#/components/schemas/InstitutionDetails'
       required:
       - accountID
+      - holderName
       - maskedAccountNumber
       - routingNumber
       - status

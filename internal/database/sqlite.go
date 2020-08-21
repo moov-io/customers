@@ -109,6 +109,10 @@ COMMIT;
 
 PRAGMA foreign_keys=on;`,
 		),
+		execsql(
+			"add_holder_name_to_accounts",
+			`alter table accounts add column holder_name default '';`,
+		),
 	)
 )
 
