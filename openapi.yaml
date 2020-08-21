@@ -311,6 +311,7 @@ paths:
             type: string
             example: e210a9d6-d755-4455-9bd2-9577ea7e1081
       requestBody:
+        required: true
         content:
           application/json:
             schema:

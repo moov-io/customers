@@ -169,7 +169,7 @@ No authorization required
 
 ## CreateCustomerAccount
 
-> Account CreateCustomerAccount(ctx, customerID, optional)
+> Account CreateCustomerAccount(ctx, customerID, createAccount, optional)
 
 Create Customer Account
 
@@ -182,6 +182,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| customerID of the Customer to add an Account onto | 
+**createAccount** | [**CreateAccount**](CreateAccount.md)|  | 
  **optional** | ***CreateCustomerAccountOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -192,9 +193,9 @@ Optional parameters are passed through a pointer to a CreateCustomerAccountOpts 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
+
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
  **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
- **createAccount** | [**optional.Interface of CreateAccount**](CreateAccount.md)|  | 
 
 ### Return type
 

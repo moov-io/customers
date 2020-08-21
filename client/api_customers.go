@@ -371,9 +371,8 @@ func (a *CustomersApiService) CreateCustomer(ctx _context.Context, createCustome
 
 // CreateCustomerAccountOpts Optional parameters for the method 'CreateCustomerAccount'
 type CreateCustomerAccountOpts struct {
-	XRequestID    optional.String
-	XUserID       optional.String
-	CreateAccount optional.Interface
+	XRequestID optional.String
+	XUserID    optional.String
 }
 
 /*
@@ -381,13 +380,13 @@ CreateCustomerAccount Create Customer Account
 Create an account for the given customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to add an Account onto
+ * @param createAccount
  * @param optional nil or *CreateCustomerAccountOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
  * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
- * @param "CreateAccount" (optional.Interface of CreateAccount) -
 @return Account
 */
-func (a *CustomersApiService) CreateCustomerAccount(ctx _context.Context, customerID string, localVarOptionals *CreateCustomerAccountOpts) (Account, *_nethttp.Response, error) {
+func (a *CustomersApiService) CreateCustomerAccount(ctx _context.Context, customerID string, createAccount CreateAccount, localVarOptionals *CreateCustomerAccountOpts) (Account, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -429,14 +428,7 @@ func (a *CustomersApiService) CreateCustomerAccount(ctx _context.Context, custom
 		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
 	}
 	// body params
-	if localVarOptionals != nil && localVarOptionals.CreateAccount.IsSet() {
-		localVarOptionalCreateAccount, localVarOptionalCreateAccountok := localVarOptionals.CreateAccount.Value().(CreateAccount)
-		if !localVarOptionalCreateAccountok {
-			return localVarReturnValue, nil, reportError("createAccount should be CreateAccount")
-		}
-		localVarPostBody = &localVarOptionalCreateAccount
-	}
-
+	localVarPostBody = &createAccount
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err

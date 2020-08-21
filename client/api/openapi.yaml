@@ -434,6 +434,7 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAccount'
+        required: true
       responses:
         "200":
           content:
