@@ -46,6 +46,7 @@ Class | Method | HTTP request | Description
 
  - [AccountStatus](docs/AccountStatus.md)
  - [CreateUserDisclaimer](docs/CreateUserDisclaimer.md)
+ - [CustomerStatus](docs/CustomerStatus.md)
  - [Error](docs/Error.md)
  - [LivenessProbes](docs/LivenessProbes.md)
  - [UpdateAccountStatus](docs/UpdateAccountStatus.md)

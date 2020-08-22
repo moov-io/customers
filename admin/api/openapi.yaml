@@ -238,16 +238,15 @@ components:
     UpdateCustomerStatus:
       example:
         comment: User submitted address information
-        status: OFAC
       properties:
         comment:
           description: Free form text for admin users
           example: User submitted address information
           type: string
         status:
-          description: Status to attempt transition towards
-          example: OFAC
-          type: string
+          $ref: '#/components/schemas/CustomerStatus'
+      required:
+      - status
     UpdateCustomerAddress:
       example:
         validated: false
@@ -278,4 +277,13 @@ components:
       - none
       - validated
       example: microdeposits
+      type: string
+    CustomerStatus:
+      description: State of the customer
+      enum:
+      - Deceased
+      - Rejected
+      - Unknown
+      - ReceiveOnly
+      - Verified
       type: string

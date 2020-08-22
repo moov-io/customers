@@ -9,9 +9,14 @@
 
 package admin
 
-// UpdateCustomerStatus struct for UpdateCustomerStatus
-type UpdateCustomerStatus struct {
-	// Free form text for admin users
-	Comment string         `json:"comment,omitempty"`
-	Status  CustomerStatus `json:"status"`
-}
+// CustomerStatus State of the customer
+type CustomerStatus string
+
+// List of CustomerStatus
+const (
+	DECEASED     CustomerStatus = "Deceased"
+	REJECTED     CustomerStatus = "Rejected"
+	UNKNOWN      CustomerStatus = "Unknown"
+	RECEIVE_ONLY CustomerStatus = "ReceiveOnly"
+	VERIFIED     CustomerStatus = "Verified"
+)
