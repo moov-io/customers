@@ -243,14 +243,18 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 			return
 		}
 
-		// Try an OFAC search with the Customer information
-		go func(logger log.Logger, cust *client.Customer, requestID string) {
-			if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
-				logger.Log("customers", fmt.Sprintf("error with OFAC search for customer=%s: %v", cust.CustomerID, err), "requestID", requestID)
-			}
-		}(logger, cust, requestID)
+		// Perform an OFAC search with the Customer information
+		if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
+			logger.Log("customers", fmt.Sprintf("error with OFAC search for customer=%s: %v", cust.CustomerID, err), "requestID", requestID)
+		}
 
 		logger.Log("customers", fmt.Sprintf("created customer=%s", cust.CustomerID), "requestID", requestID)
+
+		cust, err = repo.getCustomer(cust.CustomerID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(cust)
