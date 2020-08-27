@@ -30,6 +30,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
+	github.com/plaid/plaid-go v0.0.0-20200805000941-b566963d2892
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/common v0.13.0 // indirect
 	github.com/stretchr/testify v1.6.1
