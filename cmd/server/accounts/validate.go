@@ -42,9 +42,6 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		// following methods Get...ID have side effect inside: moovhttp.Problem(w, ErrNoCustomerID)
 		// customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
 		vars := mux.Vars(r)
-
-		fmt.Println(vars)
-
 		customerID, accountID := vars["customerID"], vars["accountID"]
 
 		if customerID == "" || accountID == "" {
@@ -53,6 +50,7 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		}
 
 		// check if account is not validated yet
+		// ...
 
 		// decode request params
 		req := &request{}
@@ -78,14 +76,16 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 			return
 		}
 
+		// within transaction create validation
+		// ...
+
+		// execute strategy and get vendor response
 		vendorResponse, err := strategy.InitAccountValidation("", "", "")
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		// within transaction create validation
-		// execute strategy and get vendor response
 		// render validation with vendor response
 		res := &response{
 			ValidationID:   "1234",
