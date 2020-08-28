@@ -10,13 +10,96 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/cmd/server/route"
 
 	"github.com/go-kit/kit/log"
 )
+
+func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
+	type request struct {
+		Strategy string `json:"strategy"`
+		Vendor   string `json:"vendor"`
+	}
+
+	type response struct {
+		ValidationID   string                    `json:"validationID"`
+		Status         string                    `json:"status"`
+		Strategy       string                    `json:"strategy"`
+		Vendor         string                    `json:"vendor"`
+		VendorResponse *validator.VendorResponse `json:"vendor_response"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		// check required parameters
+		w = route.Responder(logger, w, r)
+
+		// TODO discuss
+		// following methods Get...ID have side effect inside: moovhttp.Problem(w, ErrNoCustomerID)
+		// customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
+		vars := mux.Vars(r)
+
+		fmt.Println(vars)
+
+		customerID, accountID := vars["customerID"], vars["accountID"]
+
+		if customerID == "" || accountID == "" {
+			moovhttp.Problem(w, fmt.Errorf("missing customerID: %s and/or accountID: %s", customerID, accountID))
+			return
+		}
+
+		// check if account is not validated yet
+
+		// decode request params
+		req := &request{}
+		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
+			moovhttp.Problem(w, fmt.Errorf("unable to read request: %v", err))
+			return
+		}
+
+		// set default vendor if not specified
+		if req.Vendor == "" {
+			req.Vendor = "moov"
+		}
+
+		// find requested strategy
+		strategyKey := validator.StrategyKey{
+			Strategy: req.Strategy,
+			Vendor:   req.Vendor,
+		}
+
+		strategy, found := strategies[strategyKey]
+		if !found {
+			moovhttp.Problem(w, fmt.Errorf("strategy %s for vendor %s was not found", req.Strategy, req.Vendor))
+			return
+		}
+
+		vendorResponse, err := strategy.InitAccountValidation("", "", "")
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		// within transaction create validation
+		// execute strategy and get vendor response
+		// render validation with vendor response
+		res := &response{
+			ValidationID:   "1234",
+			Status:         "pending",
+			Strategy:       "test",
+			Vendor:         "moov",
+			VendorResponse: vendorResponse,
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(res)
+	}
+}
 
 func validateAccount(logger log.Logger, repo Repository, paygateClient paygate.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
