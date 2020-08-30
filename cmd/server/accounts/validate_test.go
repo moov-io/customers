@@ -7,12 +7,14 @@ package accounts
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers/admin"
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/microdeposits"
@@ -42,13 +44,40 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Test when account is validated already", func(t *testing.T) {
+		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+			AccountNumber: "1234",
+			RoutingNumber: "987654321",
+			Type:          client.CHECKING,
+		})
+		require.NoError(t, err)
+
+		err = repo.updateAccountStatus(acc.AccountID, admin.VALIDATED)
+		require.NoError(t, err)
+
+		params := map[string]string{
+			"strategy": "test",
+		}
+
+		var buf bytes.Buffer
+		err = json.NewEncoder(&buf).Encode(params)
+		require.NoError(t, err)
+		body := bytes.NewReader(buf.Bytes())
+
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("POST", "/", body)
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
+
+		handler := initAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler(w, req)
+
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.Contains(t, w.Body.String(), fmt.Sprintf("expected accountID=%s status to be 'none'", acc.AccountID))
 	})
 
 	t.Run("Test micro-deposits strategy", func(t *testing.T) {
-		paygateClient := &paygate.MockClient{
-			// this is how we make call to initiate micro deposit successful
-			Err: nil,
-		}
+		paygateClient := &paygate.MockClient{}
 
 		strategies := map[validator.StrategyKey]validator.Strategy{
 			validator.StrategyKey{"micro-deposits", "moov"}: microdeposits.NewStrategy(paygateClient),
@@ -142,6 +171,10 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
 	repo := setupTestAccountRepository(t)
 
+	strategies := map[validator.StrategyKey]validator.Strategy{
+		validator.StrategyKey{"test", "moov"}: validator.TestStrategy(),
+	}
+
 	// create account
 	acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
 		AccountNumber: "123",
@@ -149,6 +182,39 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		Type:          client.CHECKING,
 	})
 	require.NoError(t, err)
+
+	t.Run("Test when account is validated already", func(t *testing.T) {
+		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+			AccountNumber: "1234",
+			RoutingNumber: "987654321",
+			Type:          client.CHECKING,
+		})
+		require.NoError(t, err)
+
+		err = repo.updateAccountStatus(acc.AccountID, admin.VALIDATED)
+		require.NoError(t, err)
+
+		params := map[string]string{
+			"strategy": "test",
+		}
+
+		var buf bytes.Buffer
+		err = json.NewEncoder(&buf).Encode(params)
+		require.NoError(t, err)
+		body := bytes.NewReader(buf.Bytes())
+
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("POST", "/", body)
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
+
+		handler := completeAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler(w, req)
+
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.Contains(t, w.Body.String(), fmt.Sprintf("expected accountID=%s status to be 'none'", acc.AccountID))
+	})
 
 	t.Run("Test CompleteAccountValidation with micro-deposits strategy", func(t *testing.T) {
 		paygateClient := &paygate.MockClient{
