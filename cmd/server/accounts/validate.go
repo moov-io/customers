@@ -8,10 +8,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/admin"
+	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/pkg/client"
@@ -50,7 +52,15 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		}
 
 		// check if account is not validated yet
-		// ...
+		account, err := repo.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		if !strings.EqualFold(string(account.Status), string(client.NONE)) {
+			moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.NONE, account.Status))
+			return
+		}
 
 		// decode request params
 		req := &request{}
@@ -116,8 +126,16 @@ func completeAccountValidation(logger log.Logger, repo Repository, strategies ma
 			return
 		}
 
-		// check if account is not validated yet
-		// ...
+		// // check if account is not validated yet
+		// account, err := repo.getCustomerAccount(customerID, accountID)
+		// if err != nil {
+		// 	moovhttp.Problem(w, err)
+		// 	return
+		// }
+		// if !strings.EqualFold(string(account.Status), string(client.NONE)) {
+		// 	moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.NONE, account.Status))
+		// 	return
+		// }
 
 		// decode request params
 		req := &request{}
