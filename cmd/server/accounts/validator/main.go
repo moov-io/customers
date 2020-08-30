@@ -7,9 +7,11 @@ type StrategyKey struct {
 
 type Strategy interface {
 	InitAccountValidation(userID, accountID, customerID string) (*VendorResponse, error)
+	CompleteAccountValidation(userID, accountID, customerID string, request *VendorRequest) (*VendorResponse, error)
 }
 
-type VendorResponse map[string]string
+type VendorRequest map[string]interface{}
+type VendorResponse map[string]interface{}
 
 type testStrategy struct{}
 
@@ -18,6 +20,12 @@ func TestStrategy() Strategy {
 }
 
 func (t *testStrategy) InitAccountValidation(userID, accountID, customerID string) (*VendorResponse, error) {
+	return &VendorResponse{
+		"test": "ok",
+	}, nil
+}
+
+func (t *testStrategy) CompleteAccountValidation(userID, accountID, customerID string, request *VendorRequest) (*VendorResponse, error) {
 	return &VendorResponse{
 		"test": "ok",
 	}, nil
