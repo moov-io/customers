@@ -138,6 +138,8 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		}
 	})
 
+	// this test now does not add any value as microdeposits strategy
+	// has own tests
 	t.Run("Test micro-deposits strategy", func(t *testing.T) {
 		paygateClient := &paygate.MockClient{}
 
@@ -166,7 +168,6 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, w.Code)
 	})
-
 }
 
 func TestRouter__CompleteAccountValidation(t *testing.T) {
@@ -293,6 +294,9 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		}
 	})
 
+	// this test now does not add any value as microdeposits strategy
+	// has own tests. The only value I see right now is that it shows how
+	// request for microdeposits strategy may look like...
 	t.Run("Test micro-deposits strategy", func(t *testing.T) {
 		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
 			AccountNumber: "12345",
