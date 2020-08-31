@@ -16,7 +16,7 @@ func NewStrategy() validator.Strategy {
 
 func (t *testStrategy) InitAccountValidation(userID, accountID, customerID string) (*validator.VendorResponse, error) {
 	return &validator.VendorResponse{
-		"result": "success",
+		"result": "initiated",
 	}, nil
 }
 
@@ -35,6 +35,6 @@ func (t *testStrategy) CompleteAccountValidation(userID, accountID, customerID s
 	}
 
 	return &validator.VendorResponse{
-		"result": "success",
+		"result": "validated",
 	}, nil
 }

@@ -127,7 +127,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 		want := &validationResponse{
 			VendorResponse: map[string]string{
-				"result": "success",
+				"result": "initiated",
 			},
 		}
 
@@ -283,7 +283,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 
 		want := &validationResponse{
 			VendorResponse: map[string]string{
-				"result": "success",
+				"result": "validated",
 			},
 		}
 

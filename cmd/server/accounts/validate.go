@@ -20,12 +20,12 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
-	type request struct {
-		Strategy string `json:"strategy"`
-		Vendor   string `json:"vendor"`
-	}
+type initAccountValidationRequest struct {
+	Strategy string `json:"strategy"`
+	Vendor   string `json:"vendor"`
+}
 
+func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	type response struct {
 		// TODO: do we want to create DB records for validation?
 		// following fields may be stored in DB
@@ -62,7 +62,7 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		}
 
 		// decode request params
-		req := &request{}
+		req := &initAccountValidationRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			moovhttp.Problem(w, fmt.Errorf("unable to read request: %v", err))
 			return
@@ -103,13 +103,13 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 	}
 }
 
-func completeAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
-	type request struct {
-		Strategy      string                   `json:"strategy"`
-		Vendor        string                   `json:"vendor"`
-		VendorRequest *validator.VendorRequest `json:"vendor_request"`
-	}
+type completeAccountValidationRequest struct {
+	Strategy      string                   `json:"strategy"`
+	Vendor        string                   `json:"vendor"`
+	VendorRequest *validator.VendorRequest `json:"vendor_request"`
+}
 
+func completeAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	type response struct {
 		VendorResponse *validator.VendorResponse `json:"vendor_response"`
 	}
@@ -137,7 +137,7 @@ func completeAccountValidation(logger log.Logger, repo Repository, strategies ma
 		}
 
 		// decode request params
-		req := &request{}
+		req := &completeAccountValidationRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			moovhttp.Problem(w, fmt.Errorf("unable to read request: %v", err))
 			return

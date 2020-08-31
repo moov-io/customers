@@ -14,8 +14,8 @@ import (
 	"github.com/moov-io/ach"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/secrets/hash"
@@ -25,12 +25,14 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, paygateClient paygate.Client, keeper, transitKeeper *secrets.StringKeeper) {
+func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy) {
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, repo, fedClient))
 	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, repo, fedClient, keeper))
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, repo, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, repo))
-	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(validateAccount(logger, repo, paygateClient))
+
+	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(initAccountValidation(logger, repo, validationStrategies))
+	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(completeAccountValidation(logger, repo, validationStrategies))
 }
 
 func getCustomerAccounts(logger log.Logger, repo Repository, fedClient fed.Client) http.HandlerFunc {
