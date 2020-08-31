@@ -126,15 +126,15 @@ func completeAccountValidation(logger log.Logger, repo Repository, strategies ma
 		}
 
 		// // check if account is not validated yet
-		// account, err := repo.getCustomerAccount(customerID, accountID)
-		// if err != nil {
-		// 	moovhttp.Problem(w, err)
-		// 	return
-		// }
-		// if !strings.EqualFold(string(account.Status), string(client.NONE)) {
-		// 	moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.NONE, account.Status))
-		// 	return
-		// }
+		account, err := repo.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		if !strings.EqualFold(string(account.Status), string(client.NONE)) {
+			moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.NONE, account.Status))
+			return
+		}
 
 		// decode request params
 		req := &request{}
