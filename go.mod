@@ -10,6 +10,7 @@ require (
 	github.com/containerd/continuity v0.0.0-20200710164510-efbc4488d8fe // indirect
 	github.com/go-kit/kit v0.10.0
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/google/go-cmp v0.5.1
 	github.com/gorilla/mux v1.7.4
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
@@ -18,7 +19,7 @@ require (
 	github.com/hashicorp/vault/api v1.0.4
 	github.com/lopezator/migrator v0.3.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
-	github.com/mitchellh/mapstructure v1.3.3 // indirect
+	github.com/mitchellh/mapstructure v1.3.3
 	github.com/moov-io/ach v1.4.4
 	github.com/moov-io/base v0.11.0
 	github.com/moov-io/fed v0.5.1
