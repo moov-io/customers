@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
+	customersclient "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/paygate/pkg/client"
@@ -57,7 +58,7 @@ type completeAccountValidationRequest struct {
 	MicroDeposits []string `json:"micro-deposits,omitempty" mapstructure:"micro-deposits"`
 }
 
-func (t *microdepositsStrategy) CompleteAccountValidation(userID, accountID, customerID string, request *validator.VendorRequest) (*validator.VendorResponse, error) {
+func (t *microdepositsStrategy) CompleteAccountValidation(userID, customerID string, account *customersclient.Account, accountID string, request *validator.VendorRequest) (*validator.VendorResponse, error) {
 
 	micro, err := t.client.GetMicroDeposits(accountID, userID)
 	if err != nil {

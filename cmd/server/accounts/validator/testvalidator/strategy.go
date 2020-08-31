@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 )
 
@@ -24,7 +25,7 @@ type completeAccountValidationRequest struct {
 	Result string
 }
 
-func (t *testStrategy) CompleteAccountValidation(userID, accountID, customerID string, request *validator.VendorRequest) (*validator.VendorResponse, error) {
+func (t *testStrategy) CompleteAccountValidation(userID, customerID string, account *client.Account, accountNumber string, request *validator.VendorRequest) (*validator.VendorResponse, error) {
 	input := &completeAccountValidationRequest{}
 	if err := mapstructure.Decode(request, input); err != nil {
 		return nil, fmt.Errorf("unable to parse request params: %v", err)

@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/stretchr/testify/require"
@@ -35,7 +36,13 @@ func TestCompleteAccountValidation(t *testing.T) {
 		"micro-deposits": []string{"USD 0.03", "USD 0.07"},
 	}
 
-	response, err := strategy.CompleteAccountValidation("userID", "accountID", "customerID", request)
+	account := &client.Account{
+		AccountID:     "xxx",
+		RoutingNumber: "xxx",
+	}
+	accountNumber := "xxx"
+
+	response, err := strategy.CompleteAccountValidation("userID", "customerID", account, accountNumber, request)
 	require.NoError(t, err)
 	require.Equal(t, &validator.VendorResponse{}, response)
 }
