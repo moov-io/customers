@@ -33,7 +33,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 	repo := setupTestAccountRepository(t)
 
 	strategies := map[validator.StrategyKey]validator.Strategy{
-		validator.StrategyKey{"test", "moov"}: testvalidator.NewStrategy(),
+		{"test", "moov"}: testvalidator.NewStrategy(),
 	}
 
 	// create account
@@ -140,7 +140,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		paygateClient := &paygate.MockClient{}
 
 		strategies := map[validator.StrategyKey]validator.Strategy{
-			validator.StrategyKey{"micro-deposits", "moov"}: microdeposits.NewStrategy(paygateClient),
+			{"micro-deposits", "moov"}: microdeposits.NewStrategy(paygateClient),
 		}
 
 		// build request with strategy params
@@ -172,7 +172,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	strategies := map[validator.StrategyKey]validator.Strategy{
-		validator.StrategyKey{"test", "moov"}: testvalidator.NewStrategy(),
+		{"test", "moov"}: testvalidator.NewStrategy(),
 	}
 
 	t.Run("Test when account is validated already", func(t *testing.T) {
@@ -315,7 +315,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		}
 
 		strategies := map[validator.StrategyKey]validator.Strategy{
-			validator.StrategyKey{"micro-deposits", "moov"}: microdeposits.NewStrategy(paygateClient),
+			{"micro-deposits", "moov"}: microdeposits.NewStrategy(paygateClient),
 		}
 
 		// build request with strategy params
