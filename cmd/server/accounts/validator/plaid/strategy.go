@@ -39,10 +39,10 @@ func NewStrategy(options StrategyOptions) (validator.Strategy, error) {
 	}
 
 	plaidOptions := plaid.ClientOptions{
-		options.ClientID,
-		options.Secret,
-		env,
-		&http.Client{},
+		ClientID:    options.ClientID,
+		Secret:      options.Secret,
+		Environment: env,
+		HTTPClient:  &http.Client{},
 	}
 
 	client, err := plaid.NewClient(plaidOptions)

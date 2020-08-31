@@ -18,7 +18,6 @@ import (
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
 	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
@@ -27,10 +26,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-var (
-	testFedClient     = &fed.MockClient{}
-	testPayGateClient = &paygate.MockClient{}
-)
+var testFedClient = &fed.MockClient{}
 
 func TestAccountRoutes(t *testing.T) {
 	customerID := base.ID()
@@ -38,7 +34,7 @@ func TestAccountRoutes(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	validationStrategies := map[validator.StrategyKey]validator.Strategy{
-		{"test", "moov"}: testvalidator.NewStrategy(),
+		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
 	}
 
 	handler := mux.NewRouter()
