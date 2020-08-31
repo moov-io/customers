@@ -26,7 +26,7 @@ func TestStrategy(t *testing.T) {
 		os.Getenv("PLAID_CLIENT_ID"),
 		os.Getenv("PLAID_SECRET"),
 		"sandbox",
-		os.Getenv("PLAID_CLIENT_NAME"),
+		"Moov Test",
 	}
 
 	strategy, err := NewStrategy(options)
