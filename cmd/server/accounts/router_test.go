@@ -62,7 +62,6 @@ func TestAccountRoutes(t *testing.T) {
 		t.Errorf("got accounts: %v", accounts)
 	}
 
-	// TODO
 	// validate account
 	httpInitAccountValidation(t, handler, customerID, account.AccountID)
 	httpCompleteAccountValidation(t, handler, customerID, account.AccountID)
