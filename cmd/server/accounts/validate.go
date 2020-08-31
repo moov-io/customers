@@ -16,6 +16,7 @@ import (
 	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/route"
+	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
 )
@@ -109,7 +110,7 @@ type completeAccountValidationRequest struct {
 	VendorRequest *validator.VendorRequest `json:"vendor_request"`
 }
 
-func completeAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
+func completeAccountValidation(logger log.Logger, repo Repository, keeper *secrets.StringKeeper, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	type response struct {
 		VendorResponse *validator.VendorResponse `json:"vendor_response"`
 	}
@@ -162,8 +163,24 @@ func completeAccountValidation(logger log.Logger, repo Repository, strategies ma
 			return
 		}
 
+		// grab encrypted account number
+		encrypted, err := repo.getEncryptedAccountNumber(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		fmt.Println("Encrypted", encrypted)
+
+		// decrypt from database
+		accountNumber, err := keeper.DecryptString(encrypted)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
 		// execute strategy and get vendor response
-		vendorResponse, err := strategy.CompleteAccountValidation(userID, accountID, customerID, req.VendorRequest)
+		vendorResponse, err := strategy.CompleteAccountValidation(userID, customerID, account, accountNumber, req.VendorRequest)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

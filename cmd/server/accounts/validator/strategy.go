@@ -1,5 +1,7 @@
 package validator
 
+import "github.com/moov-io/customers/client"
+
 type StrategyKey struct {
 	Strategy string
 	Vendor   string
@@ -7,7 +9,7 @@ type StrategyKey struct {
 
 type Strategy interface {
 	InitAccountValidation(userID, accountID, customerID string) (*VendorResponse, error)
-	CompleteAccountValidation(userID, accountID, customerID string, request *VendorRequest) (*VendorResponse, error)
+	CompleteAccountValidation(userID, customerID string, account *client.Account, accountNumber string, request *VendorRequest) (*VendorResponse, error)
 }
 
 type VendorRequest map[string]interface{}

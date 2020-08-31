@@ -20,6 +20,7 @@ import (
 	"github.com/moov-io/customers/cmd/server/accounts/validator/microdeposits"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
 	"github.com/moov-io/customers/cmd/server/paygate"
+	"github.com/moov-io/customers/pkg/secrets"
 	payclient "github.com/moov-io/paygate/pkg/client"
 	"github.com/stretchr/testify/require"
 
@@ -30,7 +31,6 @@ import (
 func TestRouter__InitAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
 	repo := setupTestAccountRepository(t)
-	// keeper := secrets.TestStringKeeper(t)
 
 	strategies := map[validator.StrategyKey]validator.Strategy{
 		validator.StrategyKey{"test", "moov"}: testvalidator.NewStrategy(),
@@ -173,6 +173,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 func TestRouter__CompleteAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
 	repo := setupTestAccountRepository(t)
+	keeper := secrets.TestStringKeeper(t)
 
 	strategies := map[validator.StrategyKey]validator.Strategy{
 		validator.StrategyKey{"test", "moov"}: testvalidator.NewStrategy(),
@@ -208,7 +209,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
 		handler(w, req)
 
 		// require.Equal(t, http.StatusBadRequest, w.Code)
@@ -238,7 +239,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusBadRequest, w.Code)
@@ -246,10 +247,14 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	})
 
 	t.Run("Test 'test' strategy", func(t *testing.T) {
+		encrypted, err := keeper.EncryptString("1234")
+		require.NoError(t, err)
+
 		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
-			AccountNumber: "1234",
-			RoutingNumber: "987654321",
-			Type:          client.CHECKING,
+			AccountNumber:          "1234",
+			RoutingNumber:          "987654321",
+			Type:                   client.CHECKING,
+			encryptedAccountNumber: encrypted,
 		})
 		require.NoError(t, err)
 
@@ -272,7 +277,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusOK, w.Code)
@@ -298,10 +303,14 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	// has own tests. The only value I see right now is that it shows how
 	// request for microdeposits strategy may look like...
 	t.Run("Test micro-deposits strategy", func(t *testing.T) {
+		encrypted, err := keeper.EncryptString("12345")
+		require.NoError(t, err)
+
 		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
-			AccountNumber: "12345",
-			RoutingNumber: "987654322",
-			Type:          client.CHECKING,
+			AccountNumber:          "12345",
+			RoutingNumber:          "987654322",
+			Type:                   client.CHECKING,
+			encryptedAccountNumber: encrypted,
 		})
 		require.NoError(t, err)
 
@@ -336,7 +345,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusOK, w.Code)
