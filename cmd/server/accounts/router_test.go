@@ -11,9 +11,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers/cmd/server/accounts/validator"
+	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/internal/testclient"
@@ -34,8 +37,12 @@ func TestAccountRoutes(t *testing.T) {
 	repo := setupTestAccountRepository(t)
 	keeper := secrets.TestStringKeeper(t)
 
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{
+		validator.StrategyKey{"test", "moov"}: testvalidator.NewStrategy(),
+	}
+
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper, validationStrategies)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -54,6 +61,11 @@ func TestAccountRoutes(t *testing.T) {
 	if len(accounts) != 1 || accounts[0].AccountID != account.AccountID {
 		t.Errorf("got accounts: %v", accounts)
 	}
+
+	// TODO
+	// validate account
+	httpInitAccountValidation(t, handler, customerID, account.AccountID)
+	httpCompleteAccountValidation(t, handler, customerID, account.AccountID)
 
 	// delete and expect no accounts
 	httpDeleteAccount(t, handler, customerID, account.AccountID)
@@ -83,9 +95,10 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	customerID := base.ID()
 	repo := setupTestAccountRepository(t)
 	keeper := secrets.TestStringKeeper(t)
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{}
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper, validationStrategies)
 
 	client := testclient.New(t, handler)
 
@@ -119,9 +132,10 @@ func TestRoutes__EmptyAccounts(t *testing.T) {
 	customerID := base.ID()
 	repo := setupTestAccountRepository(t)
 	keeper := secrets.TestStringKeeper(t)
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{}
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper, validationStrategies)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)
@@ -182,6 +196,59 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 		t.Fatal(err)
 	}
 	return &account
+}
+
+func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) {
+	params := &initAccountValidationRequest{
+		Strategy: "test",
+	}
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(params); err != nil {
+		t.Fatal(err)
+	}
+	body := bytes.NewReader(buf.Bytes())
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/validate", customerID, accountID), body)
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	if !strings.Contains(w.Body.String(), "initiated") {
+		t.Errorf("expected successful response: %v", w.Body.String())
+	}
+}
+
+func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) {
+	params := &completeAccountValidationRequest{
+		Strategy: "test",
+		VendorRequest: &validator.VendorRequest{
+			"result": "success",
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(params); err != nil {
+		t.Fatal(err)
+	}
+	body := bytes.NewReader(buf.Bytes())
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/validate", customerID, accountID), body)
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	if !strings.Contains(w.Body.String(), "validated") {
+		t.Errorf("expected successful response: %v", w.Body.String())
+	}
 }
 
 func httpDeleteAccount(t *testing.T, handler *mux.Router, customerID, accountID string) {
