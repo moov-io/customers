@@ -37,6 +37,6 @@ func TestStrategy(t *testing.T) {
 		"result": "error",
 	}
 
-	response, err = strategy.CompleteAccountValidation("userID", "customerID", account, "accountNumber", request)
+	_, err = strategy.CompleteAccountValidation("userID", "customerID", account, "accountNumber", request)
 	require.Error(t, err)
 }

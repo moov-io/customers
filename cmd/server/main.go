@@ -261,15 +261,15 @@ func setupValidationStrategies(logger log.Logger, adminServer *admin.Server) (ma
 	debugPayGateCalls := util.Or(os.Getenv("PAYGATE_DEBUG_CALLS"), "false")
 	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"), util.Yes(debugPayGateCalls))
 	adminServer.AddLivenessCheck("paygate", paygateClient.Ping)
-	strategies[validator.StrategyKey{"micro-deposits", "moov"}] = microdeposits.NewStrategy(paygateClient)
+	strategies[validator.StrategyKey{Strategy: "micro-deposits", Vendor: "moov"}] = microdeposits.NewStrategy(paygateClient)
 
 	// setup Plaid instant account verification
 	if os.Getenv("PLAID_CLIENT_ID") != "" {
 		options := plaid.StrategyOptions{
-			os.Getenv("PLAID_CLIENT_ID"),
-			os.Getenv("PLAID_SECRET"),
-			os.Getenv("PLAID_ENVIRONMENT"),
-			os.Getenv("PLAID_CLIENT_NAME"),
+			ClientID:    os.Getenv("PLAID_CLIENT_ID"),
+			Secret:      os.Getenv("PLAID_SECRET"),
+			Environment: os.Getenv("PLAID_ENVIRONMENT"),
+			ClientName:  os.Getenv("PLAID_CLIENT_NAME"),
 		}
 
 		strategy, err := plaid.NewStrategy(options)
@@ -277,7 +277,7 @@ func setupValidationStrategies(logger log.Logger, adminServer *admin.Server) (ma
 			return nil, err
 		}
 
-		strategies[validator.StrategyKey{"instant", "plaid"}] = strategy
+		strategies[validator.StrategyKey{Strategy: "instant", Vendor: "plaid"}] = strategy
 	}
 
 	return strategies, nil

@@ -54,10 +54,10 @@ func TestStrategy(t *testing.T) {
 		)
 
 		var testClient, _ = plaid.NewClient(plaid.ClientOptions{
-			os.Getenv("PLAID_CLIENT_ID"),
-			os.Getenv("PLAID_SECRET"),
-			plaid.Sandbox,
-			&http.Client{},
+			ClientID:    os.Getenv("PLAID_CLIENT_ID"),
+			Secret:      os.Getenv("PLAID_SECRET"),
+			Environment: plaid.Sandbox,
+			HTTPClient:  &http.Client{},
 		})
 
 		sandboxResp, err := testClient.CreateSandboxPublicToken(sandboxInstitution, testProducts)
