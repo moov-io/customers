@@ -38,7 +38,7 @@ func TestAccountRoutes(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	validationStrategies := map[validator.StrategyKey]validator.Strategy{
-		validator.StrategyKey{"test", "moov"}: testvalidator.NewStrategy(),
+		{"test", "moov"}: testvalidator.NewStrategy(),
 	}
 
 	handler := mux.NewRouter()
