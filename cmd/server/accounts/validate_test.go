@@ -121,17 +121,13 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, w.Code)
 
-		type validationResponse struct {
-			VendorResponse map[string]string `json:"vendor_response"`
-		}
-
-		want := &validationResponse{
-			VendorResponse: map[string]string{
+		want := &initAccountValidationResponse{
+			VendorResponse: &validator.VendorResponse{
 				"result": "initiated",
 			},
 		}
 
-		got := &validationResponse{}
+		got := &initAccountValidationResponse{}
 		json.NewDecoder(w.Body).Decode(got)
 		if diff := cmp.Diff(got, want); len(diff) != 0 {
 			t.Errorf(diff)
@@ -191,9 +187,9 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		require.NoError(t, err)
 
 		// build request for test strategy
-		params := map[string]interface{}{
-			"strategy": "test",
-			"vendor_request": map[string]string{
+		params := &completeAccountValidationRequest{
+			Strategy: "test",
+			VendorRequest: &validator.VendorRequest{
 				"result": "success",
 			},
 		}
@@ -224,8 +220,8 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		params := map[string]string{
-			"strategy": "unknown",
+		params := &completeAccountValidationRequest{
+			Strategy: "unknown",
 		}
 
 		var buf bytes.Buffer
@@ -259,9 +255,9 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		require.NoError(t, err)
 
 		// build request for test strategy
-		params := map[string]interface{}{
-			"strategy": "test",
-			"vendor_request": map[string]string{
+		params := &completeAccountValidationRequest{
+			Strategy: "test",
+			VendorRequest: &validator.VendorRequest{
 				"result": "success",
 			},
 		}
@@ -282,17 +278,13 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 
 		require.Equal(t, http.StatusOK, w.Code)
 
-		type validationResponse struct {
-			VendorResponse map[string]string `json:"vendor_response"`
-		}
-
-		want := &validationResponse{
-			VendorResponse: map[string]string{
+		want := &completeAccountValidationResponse{
+			VendorResponse: &validator.VendorResponse{
 				"result": "validated",
 			},
 		}
 
-		got := &validationResponse{}
+		got := &completeAccountValidationResponse{}
 		json.NewDecoder(w.Body).Decode(got)
 		if diff := cmp.Diff(got, want); len(diff) != 0 {
 			t.Errorf(diff)
@@ -327,9 +319,9 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		}
 
 		// build request with strategy params
-		params := map[string]interface{}{
-			"strategy": "micro-deposits",
-			"vendor_request": map[string][]string{
+		params := &completeAccountValidationRequest{
+			Strategy: "micro-deposits",
+			VendorRequest: &validator.VendorRequest{
 				"micro-deposits": []string{"USD 0.03", "USD 0.07"},
 			},
 		}

@@ -26,21 +26,21 @@ type initAccountValidationRequest struct {
 	Vendor   string `json:"vendor"`
 }
 
-func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
-	type response struct {
-		// TODO: do we want to create DB records for validation?
-		// following fields may be stored in DB
-		// ValidationID   string                    `json:"validationID"`
-		// Status         string                    `json:"status"`
-		// Strategy       string                    `json:"strategy"`
-		// Vendor         string                    `json:"vendor"`
-		VendorResponse *validator.VendorResponse `json:"vendor_response"`
-	}
+type initAccountValidationResponse struct {
+	// TODO: do we want to create DB records for validation?
+	// following fields may be stored in DB
+	// ValidationID   string                    `json:"validationID"`
+	// Status         string                    `json:"status"`
+	// Strategy       string                    `json:"strategy"`
+	// Vendor         string                    `json:"vendor"`
+	VendorResponse *validator.VendorResponse `json:"vendor_response"`
+}
 
+func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		// TODO discuss
+		// TODO: discuss
 		// following methods Get...ID have side effect inside: moovhttp.Problem(w, ErrNoCustomerID)
 		// customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
 		vars := mux.Vars(r)
@@ -51,7 +51,7 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 			return
 		}
 
-		// check if account is not validated yet
+		// Lookup the account and verify it needs to be validated
 		account, err := repo.getCustomerAccount(customerID, accountID)
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -94,7 +94,7 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		}
 
 		// render validation with vendor response
-		res := &response{
+		res := &initAccountValidationResponse{
 			VendorResponse: vendorResponse,
 		}
 
@@ -110,11 +110,11 @@ type completeAccountValidationRequest struct {
 	VendorRequest *validator.VendorRequest `json:"vendor_request"`
 }
 
-func completeAccountValidation(logger log.Logger, repo Repository, keeper *secrets.StringKeeper, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
-	type response struct {
-		VendorResponse *validator.VendorResponse `json:"vendor_response"`
-	}
+type completeAccountValidationResponse struct {
+	VendorResponse *validator.VendorResponse `json:"vendor_response"`
+}
 
+func completeAccountValidation(logger log.Logger, repo Repository, keeper *secrets.StringKeeper, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -196,7 +196,7 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 		}
 
 		// render validation with vendor response
-		res := &response{
+		res := &completeAccountValidationResponse{
 			VendorResponse: vendorResponse,
 		}
 
