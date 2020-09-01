@@ -23,10 +23,10 @@ func TestStrategy(t *testing.T) {
 	}
 
 	options := StrategyOptions{
-		os.Getenv("PLAID_CLIENT_ID"),
-		os.Getenv("PLAID_SECRET"),
-		"sandbox",
-		"Moov Test",
+		ClientID:    os.Getenv("PLAID_CLIENT_ID"),
+		Secret:      os.Getenv("PLAID_SECRET"),
+		Environment: "sandbox",
+		ClientName:  "Moov Test",
 	}
 
 	strategy, err := NewStrategy(options)
