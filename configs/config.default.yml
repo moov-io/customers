@@ -1,0 +1,21 @@
+Customers:
+  Servers:
+    Public:
+      Bind:
+        Address: ":8087"
+    Admin:
+      Bind:
+        Address: ":9097"
+  Database:
+    DatabaseName: "customers"
+    SQLLite:
+      Path: ":memory:"
+  Gateway:
+    # Examples of how to set up this config.
+    # keys:
+    #   http:
+    #    urls:
+    #    - http://tumbler:8204/.well-known/jwks.json
+    #   file:
+    #     paths: 
+    #     - ./configs/gateway-jwks-sig-pub.json

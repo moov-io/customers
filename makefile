@@ -1,97 +1,54 @@
 PLATFORM=$(shell uname -s | tr '[:upper:]' '[:lower:]')
 VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+(-[a-zA-Z0-9]*)?)' version.go)
 
-.PHONY: build build-server build-examples docker release check
+USERID := $(shell id -u $$USER)
+GROUPID:= $(shell id -g $$USER)
 
-build: check build-server
+# General make commands for projects
 
-build-server:
-	CGO_ENABLED=1 go build -o ./bin/server github.com/moov-io/customers/cmd/server
+.PHONY: build
+build: customers
 
 .PHONY: check
-check:
+check: build services
 ifeq ($(OS),Windows_NT)
 	@echo "Skipping checks on Windows, currently unsupported."
 else
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
-	GOCYCLO_LIMIT=27 ./lint-project.sh
+	./lint-project.sh
 endif
 
-.PHONY: admin
-admin:
+dist: clean build
 ifeq ($(OS),Windows_NT)
-	@echo "Please generate ./admin/ on macOS or Linux, currently unsupported on windows."
+	CGO_ENABLED=1 GOOS=windows go build -o bin/customers.exe cmd/customers/*
 else
-# Versions from https://github.com/OpenAPITools/openapi-generator/releases
-	@chmod +x ./openapi-generator
-	@rm -rf ./admin
-	OPENAPI_GENERATOR_VERSION=4.3.0 ./openapi-generator generate --package-name admin -i openapi-admin.yaml -g go -o ./admin
-	rm -f admin/go.mod admin/go.sum
-	go fmt ./...
-	go test ./admin
+	CGO_ENABLED=0 GOOS=$(PLATFORM) go build -o bin/customers-$(PLATFORM)-amd64 cmd/customers/*
 endif
 
-.PHONY: client
-client:
-ifeq ($(OS),Windows_NT)
-	@echo "Please generate ./client/ on macOS or Linux, currently unsupported on windows."
-else
-# Versions from https://github.com/OpenAPITools/openapi-generator/releases
-	@chmod +x ./openapi-generator
-	@rm -rf ./client
-	OPENAPI_GENERATOR_VERSION=4.3.0 ./openapi-generator generate --package-name client -i openapi.yaml -g go -o ./client
-	rm -f client/go.mod client/go.sum
-	go fmt ./...
-	go build github.com/moov-io/customers/client
-	go test ./client
-endif
+docker: clean install
+	pkger
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -o ${PWD}/bin/.docker/customers cmd/customers/*
 
-.PHONY: clean
-clean:
-	@rm -rf ./bin/ cover.out coverage.txt openapi-generator-cli-*.jar misspell* staticcheck* lint-project.sh
-
-dist: clean admin client build
-ifeq ($(OS),Windows_NT)
-	CGO_ENABLED=1 GOOS=windows go build -o bin/customers.exe github.com/moov-io/customers/cmd/server
-else
-	CGO_ENABLED=1 GOOS=$(PLATFORM) go build -o bin/customers-$(PLATFORM)-amd64 github.com/moov-io/customers/cmd/server
-endif
-
-docker: clean
 # Docker image
 	docker build --pull -t moov/customers:$(VERSION) -f Dockerfile .
 	docker tag moov/customers:$(VERSION) moov/customers:latest
-# OpenShift Docker image
-#	docker build --pull -t quay.io/moov/customers:$(VERSION) -f Dockerfile-openshift --build-arg VERSION=$(VERSION) .
-#	docker tag quay.io/moov/customers:$(VERSION) quay.io/moov/customers:latest
 
-clean-integration:
-	docker-compose kill
-	docker-compose rm -v -f
+.PHONY: clean
+clean:
+ifeq ($(OS),Windows_NT)
+	@echo "Skipping cleanup on Windows, currently unsupported."
+else
+	@rm -rf cover.out coverage.txt misspell* staticcheck*
+	@rm -rf ./bin/
+endif
 
-test-integration: clean-integration
-	docker-compose up -d
-	sleep 10
-	curl -v http://localhost:9097/live
-
-release: docker AUTHORS
-	go vet ./...
-	go test -coverprofile=cover-$(VERSION).out ./...
-	git tag -f $(VERSION)
-
-release-push:
-	docker push moov/customers:$(VERSION)
-	docker push moov/customers:latest
-
-# quay-push:
-# 	docker push quay.io/moov/customers:$(VERSION)
-# 	docker push quay.io/moov/customers:latest
-
-.PHONY: cover-test cover-web
-cover-test:
+.PHONY: cover-test
+cover-test: services
 	go test -coverprofile=cover.out ./...
-cover-web:
+
+.PHONY: cover-web
+cover-web: services
 	go tool cover -html=cover.out
 
 # From https://github.com/genuinetools/img
@@ -100,3 +57,59 @@ AUTHORS:
 	@$(file >$@,# This file lists all individuals having contributed content to the repository.)
 	@$(file >>$@,# For how it is generated, see `make AUTHORS`.)
 	@echo "$(shell git log --format='\n%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)" >> $@
+
+release: docker AUTHORS
+	go vet ./...
+	go test -coverprofile=cover-$(VERSION).out ./...
+	git tag -f $(VERSION)
+
+docker-push:
+	docker push moov/customers:$(VERSION)
+	docker push moov/customers:latest
+
+quay-push:
+	docker push quay.io/moov/customers:$(VERSION)
+	docker push quay.io/moov/customers:latest
+
+# Custom to go-services
+
+docker-run:
+	docker run -v ${PWD}/data:/data -v ${PWD}/configs:/configs --env APP_CONFIG="/configs/config.yml" -it --rm moov/customers:$(VERSION)
+
+install:
+	go install github.com/markbates/pkger/cmd/pkger
+	git checkout LICENSE
+
+customers:
+	pkger
+	go build -o ${PWD}/bin/customers cmd/customers/*
+
+run: customers
+	./bin/customers
+
+test: services build
+	go test -cover ./...
+
+services:
+	-docker-compose up -d --force-recreate
+
+# Generate the go code from the public and internal api's
+openapitools: openapi-admin openapi-client
+
+openapi-admin:
+	rm -rf ./pkg/admin
+	docker run --rm \
+		-u $(USERID):$(GROUPID) \
+		-e OPENAPI_GENERATOR_VERSION='4.2.0' \
+		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/admin-generator-config.yml
+	rm -rf ./pkg/admin/go.mod ./pkg/admin/go.sum
+	gofmt -w ./pkg/admin/
+
+openapi-client:
+	rm -rf ./pkg/client
+	docker run --rm \
+		-u $(USERID):$(GROUPID) \
+		-e OPENAPI_GENERATOR_VERSION='4.2.0' \
+		-v ${PWD}:/local openapitools/openapi-generator-cli batch -- /local/.openapi-generator/client-generator-config.yml
+	rm -rf ./pkg/client/go.mod ./pkg/client/go.sum
+	gofmt -w ./pkg/client/

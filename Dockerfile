@@ -1,20 +1,16 @@
-FROM golang:1.15-buster as builder
-WORKDIR /go/src/github.com/moov-io/customers
-RUN apt-get update && apt-get install -y make gcc g++ time
-COPY . .
-RUN make build
-
-FROM debian:10
+FROM debian:buster AS runtime
 LABEL maintainer="Moov <support@moov.io>"
 
-RUN apt-get update && apt-get install -y ca-certificates
+WORKDIR /
 
-COPY --from=builder /go/src/github.com/moov-io/customers/bin/server /bin/server
+RUN apt-get update && apt-get install -y ca-certificates \
+	&& rm -rf /var/lib/apt/lists/*
 
-VOLUME "/data"
-ENV SQLITE_DB_PATH /data/customers.db
+COPY bin/.docker/customers /app/customers
 
-# USER moov
-EXPOSE 8080
-EXPOSE 9090
-ENTRYPOINT ["/bin/server"]
+EXPOSE 8087/tcp
+EXPOSE 9097/tcp
+
+VOLUME [ "/data", "/configs" ]
+
+ENTRYPOINT ["/app/customers"]

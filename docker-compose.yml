@@ -1,26 +1,3 @@
 version: '3'
-services:
-  customers:
-    image: moov/customers:latest
-    ports:
-      - "8087:8087"
-      - "9097:9097"
-    environment:
-      FED_ENDPOINT: 'http://fed:8086'
-      WATCHMAN_ENDPOINT: 'http://watchman:8084'
-    depends_on:
-      - fed
-      - watchman
-  fed:
-    image: moov/fed:v0.5.1
-    ports:
-      - "8086:8086"
-      - "9096:9096"
-    environment:
-      FEDACH_DATA_PATH: './data/fed/FedACHdir.txt'
-      FEDWIRE_DATA_PATH: './data/fed/fpddir.txt'
-  watchman:
-    image: moov/watchman:v0.14.2
-    ports:
-      - "8084:8084"
-      - "9094:9094"
+
+services: {}

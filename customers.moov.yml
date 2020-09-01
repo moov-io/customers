@@ -1,0 +1,144 @@
+# What file path to generate the project in.
+ProjectPath: "."
+# If this is a test run where no output is created or modified.
+# TestRun: true
+# To turn off gofmt cleaning
+NoCleanup: false
+
+Project:
+  # Github project id
+  ProjectID: "customers"
+  # Human descriptive name for the project
+  ProjectName: "Customers"
+  Description: Example project make with the templater
+
+# Some templates require services and this allows them to synchronize on that external service.
+# This one in particular is for MySQL
+MySQL:
+  Port: 0
+
+# List of all the templates to run
+Templates:
+  # Creates a the entire project and the Environment and Config setup.
+  MoovProject:
+    Run: true
+  GoService:
+     # Github project id
+    ProjectID: "customers"
+    # Human descriptive name for the project
+    ProjectName: "Customers"
+    # Description to use in README.md, OpenAPI spec, and other docs.
+    # Public service port where most services run
+    ServicePort: 8087
+    # Health / Admin port
+    HealthPort: 9097
+  GoGithubActionsPublic:
+    - Executable: customers
+  # Adds new custom endpoints.
+  GoEndpoint:
+    # simple endpoint
+      # Github project ID
+    - ProjectID: "customers"
+      # Package to place this in, in the project
+      PackageID: "customers"
+      # What to name the controller
+      CollectionName: "customers"
+      # Private name of the controller
+      CollectionID: "customers"
+      # List of all endpoints this controller handles
+      Endpoints:
+        # Name of the action of the endpoint
+      - EndpointID: "createCustomer"
+        Method: "POST"
+        Path: "/customers"
+        # If the requestbody has content, deserialize into this model
+        RequestBody: "Customer"
+      - EndpointID: "retrieveCustomer"
+        Method: "GET"
+        Path: "/customers/{customerID}"
+        PathParams:
+          - "customerID"
+      - EndpointID: "addCustomerAddress"
+        Method: "POST"
+        Path: "/customers/{customerID}/address"
+        RequestBody: "CreateCustomerAddress"
+        PathParams:
+          - "customerID"
+      - EndpointID: "updateCustomerMetadata"
+        Method: "PUT"
+        Path: "/customers/{customerID}/metadata"
+        RequestBody: "CustomerMetadata"
+        PathParams:
+          - "customerID"
+      - EndpointID: "updateCustomerStatus"
+        Method: "PUT"
+        Path: "/customers/{customerID}/status"
+        RequestBody: "UpdateCustomerStatus"
+        PathParams:
+          - "customerID"
+      - EndpointID: "getCustomerAccounts"
+        Method: "GET"
+        Path: "/customers/{customerID}/accounts"
+        PathParams:
+          - "customerID"
+      - EndpointID: "createCustomerAccount"
+        Method: "POST"
+        Path: "/customers/{customerID}/accounts"
+        RequestBody: "CreateAccount"
+        PathParams:
+          - "customerID"
+      - EndpointID: "deleteCustomerAccount"
+        Method: "DELETE"
+        Path: "/customers/{customerID}/accounts/{accountID}"
+        PathParams:
+          - "customerID"
+          - "accountID"
+      - EndpointID: "decryptAccountNumber"
+        Method: "POST"
+        Path: "/customers/{customerID}/accounts/{accountID}/decrypt"
+        PathParams:
+          - "customerID"
+          - "accountID"
+      - EndpointID: "validateAccount"
+        Method: "POST"
+        Path: "/customers/{customerID}/accounts/{accountID}/validate"
+        PathParams:
+          - "customerID"
+          - "accountID"
+      - EndpointID: "getCustomerDisclaimers"
+        Method: "POST"
+        Path: "/customers/{customerID}/disclaimers"
+        PathParams:
+          - "customerID"
+      - EndpointID: "acceptDisclaimer"
+        Method: "POST"
+        Path: "/customers/{customerID}/disclaimers/{disclaimerID}"
+        PathParams:
+          - "customerID"
+          - "disclaimerID"
+      - EndpointID: "getCustomerDocuments"
+        Method: "GET"
+        Path: "/customers/{customerID}/documents"
+        PathParams:
+          - "customerID"
+      - EndpointID: "uploadCustomerDocument"
+        Method: "POST"
+        Path: "/customers/{customerID}/documents"
+        PathParams:
+          - "customerID"
+      - EndpointID: "getCustomerDocument"
+        Method: "GET"
+        Path: "/customers/{customerID}/documents/{documentID}"
+        PathParams:
+          - "customerID"
+          - "documentID"
+      - EndpointID: "getLatestOFACSearch"
+        Method: "GET"
+        Path: "/customers/{customerID}/ofac"
+        PathParams:
+          - "customerID"
+      - EndpointID: "refreshOFACSearch"
+        Method: "PUT"
+        Path: "/customers/{customerID}/refresh/ofac"
+        PathParams:
+          - "customerID"

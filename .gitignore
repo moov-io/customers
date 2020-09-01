@@ -1,29 +1,35 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
+# Compiled Object files, Static and Dynamic libs (Shared Objects)
+*.o
+*.a
 *.so
-*.dylib
 
-# Test binary, build with `go test -c`
+# Folders
+_obj
+_test
+
+# Architecture specific extensions/prefixes
+*.[568vq]
+[568vq].out
+
+*.cgo1.go
+*.cgo2.c
+_cgo_defun.c
+_cgo_gotypes.go
+_cgo_export.*
+
+_testmain.go
+
+*.exe
 *.test
-
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
-
-/bin/
+*.prof
+bin/
 *.db
-/coverage.txt
-misspell*
-staticcheck*
-
-openapi-generator-cli-*.jar
-/storage/
-
-.DS_Store
-
-# code coverage
-coverage.html
-cover.out
 
 /lint-project.sh
+misspell*
+staticcheck*
+coverage.txt
+
+pkger*
+pkged.go
+cover.out
