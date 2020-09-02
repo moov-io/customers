@@ -149,6 +149,13 @@ func TestGet20MostRecentlyCreatedCustomersByDefault(t *testing.T) {
 	scope.assert.Equal(20, len(customers))
 }
 
+func TestGet10MostRecentlyCreatedCustomersByDefault(t *testing.T) {
+	scope := Setup(t)
+	scope.CreateCustomers(10)
+	customers, _ := scope.GetCustomers("")
+	scope.assert.Equal(10, len(customers))
+}
+
 func TestGet50MostRecentlyCreatedCustomersWhenSpecifyingLimit(t *testing.T) {
 	scope := Setup(t)
 	scope.CreateCustomers(100)
