@@ -97,15 +97,15 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 	query := `select customer_id from customers where deleted_at is null`
 	if params.Query != "" {
 		query += " and lower(first_name) || \" \" || lower(last_name) LIKE ?"
-		args = append(args, "%"+strings.ToLower(params.Query)+"%")
+		args = append(args, "%"+params.Query+"%")
 	}
 	if params.Email != "" {
 		query += " and lower(email) like ?"
-		args = append(args, "%"+strings.ToLower(params.Email))
+		args = append(args, "%"+params.Email)
 	}
 	if params.Status != "" {
 		query += " and status like ?"
-		args = append(args, "%"+strings.ToLower(params.Status))
+		args = append(args, "%"+params.Status)
 	}
 	return query + " order by created_at asc limit ?;", append(args, fmt.Sprintf("%d", params.Limit))
 }
