@@ -7,14 +7,13 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"testing"
-
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/internal/database"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 )
 
 func TestCustomersSearchRouter(t *testing.T) {
@@ -141,4 +140,32 @@ func TestCustomerSearch__query(t *testing.T) {
 	if len(args) != 3 {
 		t.Errorf("unexpected args: %#v", args)
 	}
+}
+
+func TestGet20MostRecentlyCreatedCustomersByDefault(t *testing.T) {
+	scope := Setup(t)
+	scope.CreateCustomers(100)
+	customers, _ := scope.GetCustomers("")
+	scope.assert.Equal(20, len(customers))
+}
+
+func TestGet10MostRecentlyCreatedCustomersByDefault(t *testing.T) {
+	scope := Setup(t)
+	scope.CreateCustomers(10)
+	customers, _ := scope.GetCustomers("")
+	scope.assert.Equal(10, len(customers))
+}
+
+func TestGet50MostRecentlyCreatedCustomersWhenSpecifyingLimit(t *testing.T) {
+	scope := Setup(t)
+	scope.CreateCustomers(100)
+	customers, _ := scope.GetCustomers("?limit=50")
+	scope.assert.Equal(50, len(customers))
+}
+
+func TestGet100MostRecentlyCreatedCustomersWhenSpecifyingMoreThanAvailable(t *testing.T) {
+	scope := Setup(t)
+	scope.CreateCustomers(100)
+	customers, _ := scope.GetCustomers("?limit=120")
+	scope.assert.Equal(100, len(customers))
 }

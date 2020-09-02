@@ -27,3 +27,5 @@ coverage.html
 cover.out
 
 /lint-project.sh
+
+.idea/*

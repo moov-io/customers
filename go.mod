@@ -10,7 +10,9 @@ require (
 	github.com/containerd/continuity v0.0.0-20200710164510-efbc4488d8fe // indirect
 	github.com/go-kit/kit v0.10.0
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/gorilla/mux v1.7.4
+	github.com/google/gofuzz v1.2.0
+	github.com/google/uuid v1.1.1
+	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
 	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
@@ -22,6 +24,7 @@ require (
 	github.com/moov-io/ach v1.4.4
 	github.com/moov-io/base v0.11.0
 	github.com/moov-io/fed v0.5.1
+	github.com/moov-io/identity v0.2.7
 	github.com/moov-io/paygate v0.8.0
 	github.com/moov-io/watchman v0.14.2
 	github.com/opencontainers/go-digest v1.0.0 // indirect
@@ -29,6 +32,7 @@ require (
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/common v0.13.0 // indirect
+	github.com/stretchr/testify v1.6.1
 	gocloud.dev v0.20.0
 	gocloud.dev/secrets/hashivault v0.20.0
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a // indirect
@@ -36,7 +40,7 @@ require (
 	golang.org/x/sys v0.0.0-20200821140526-fda516888d29 // indirect
 	golang.org/x/time v0.0.0-20200630173020-3af7569d3a1e // indirect
 	golang.org/x/tools v0.0.0-20200821200730-1e23e48ab93b // indirect
-	gopkg.in/square/go-jose.v2 v2.5.1 // indirect
+	gopkg.in/square/go-jose.v2 v2.5.1
 	gopkg.in/yaml.v2 v2.3.0
 	honnef.co/go/tools v0.0.1-2020.1.5 // indirect
 )
