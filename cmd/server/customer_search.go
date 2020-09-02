@@ -42,6 +42,7 @@ func searchCustomers(logger log.Logger, repo customerRepository) http.HandlerFun
 type searchParams struct {
 	Query string
 	Email string
+	Status string
 	Limit int64
 }
 
@@ -49,6 +50,7 @@ func readSearchParams(u *url.URL) searchParams {
 	params := searchParams{
 		Query: strings.ToLower(strings.TrimSpace(u.Query().Get("query"))),
 		Email: strings.ToLower(strings.TrimSpace(u.Query().Get("email"))),
+		Status: strings.ToLower(strings.TrimSpace(u.Query().Get("status"))),
 	}
 	if limit, err := strconv.ParseInt(util.Or(u.Query().Get("limit"), "20"), 10, 32); err == nil {
 		params.Limit = limit
@@ -95,11 +97,15 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 	query := `select customer_id from customers where deleted_at is null`
 	if params.Query != "" {
 		query += " and lower(first_name) || \" \" || lower(last_name) LIKE ?"
-		args = append(args, "%"+strings.ToLower(params.Query)+"%")
+		args = append(args, "%"+params.Query+"%")
 	}
 	if params.Email != "" {
 		query += " and lower(email) like ?"
-		args = append(args, "%"+strings.ToLower(params.Email))
+		args = append(args, "%"+params.Email)
+	}
+	if params.Status != "" {
+		query += " and status like ?"
+		args = append(args, "%"+params.Status)
 	}
 	return query + " order by created_at asc limit ?;", append(args, fmt.Sprintf("%d", params.Limit))
 }
