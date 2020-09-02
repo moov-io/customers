@@ -169,3 +169,33 @@ func TestGet100MostRecentlyCreatedCustomersWhenSpecifyingMoreThanAvailable(t *te
 	customers, _ := scope.GetCustomers("?limit=120")
 	scope.assert.Equal(100, len(customers))
 }
+
+func TestGetCustomersWithVerifiedStatus(t *testing.T) {
+	// Create two customers. 1 with Unknown STATUS and 1 with Verified
+	scope := Setup(t)
+	scope.CreateCustomers(2)
+	customers, _ := scope.GetCustomers("?limit=120")
+	scope.assert.Equal(2, len(customers))
+	for i := 0; i < len(customers); i++ {
+		if i % 2 == 0 {
+			// update status
+			if err := scope.customerRepo.updateCustomerStatus(customers[i].CustomerID, client.VERIFIED, "test comment"); err != nil {
+				print(err)
+			}
+		}
+	}
+
+	// Should have 1 Verified Status
+	customers, _ = scope.GetCustomers("?status=Verified&limit=20")
+	scope.assert.Equal(1, len(customers))
+	for i := 0; i < len(customers); i++ {
+		scope.assert.Equal("Verified", string(customers[i].Status))
+	}
+
+	// Should have 1 Unknown Status
+	customers, _ = scope.GetCustomers("?status=Unknown&limit=20")
+	scope.assert.Equal(1, len(customers))
+	for i := 0; i < len(customers); i++ {
+		scope.assert.Equal("Unknown", string(customers[i].Status))
+	}
+}
