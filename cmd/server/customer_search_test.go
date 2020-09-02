@@ -199,3 +199,17 @@ func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 		scope.assert.Equal("Unknown", string(customers[i].Status))
 	}
 }
+
+func TestGetCustomersWithFirstNameAndLastName(t *testing.T) {
+	scope := Setup(t)
+	var firstName string
+	var lastName string
+	var email string
+	firstName = "John"
+	lastName = "Doe"
+	email = "test@aol.com"
+	customer := scope.CreateCustomer(firstName, lastName, email)
+
+	custs, _ := scope.GetCustomers("?first_name=" + customer.FirstName + "&limit=20")
+	scope.assert.Equal(1, len(custs))
+}
