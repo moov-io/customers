@@ -520,6 +520,7 @@ paths:
                 Micro-deposits:
                   value:
                     vendor_response:
+                      result: "initiated"
                 Plaid:
                   value:
                     vendor_response:

@@ -53,7 +53,9 @@ func (t *microdepositsStrategy) InitAccountValidation(userID, accountID, custome
 		}
 	}
 
-	return &validator.VendorResponse{}, nil
+	return &validator.VendorResponse{
+		"result": "initiated",
+	}, nil
 }
 
 // here we can use struct generated from open-api
@@ -86,8 +88,10 @@ func (t *microdepositsStrategy) CompleteAccountValidation(userID, customerID str
 		if err := validateAmounts(micro, input.MicroDeposits); err != nil {
 			return nil, err
 		}
-		// Amounts validated, so mark the Account has approved
-		return &validator.VendorResponse{}, nil
+
+		return &validator.VendorResponse{
+			"result": "validated",
+		}, nil
 	}
 
 	return nil, fmt.Errorf("microDepositID=%s is in status: %s", micro.MicroDepositID, micro.Status)
