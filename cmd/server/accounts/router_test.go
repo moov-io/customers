@@ -194,7 +194,7 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 }
 
 func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) {
-	params := &initAccountValidationRequest{
+	params := &client.InitAccountValidationRequest{
 		Strategy: "test",
 	}
 
@@ -219,9 +219,9 @@ func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, ac
 }
 
 func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) {
-	params := &completeAccountValidationRequest{
+	params := &client.CompleteAccountValidationRequest{
 		Strategy: "test",
-		VendorRequest: &validator.VendorRequest{
+		VendorRequest: validator.VendorRequest{
 			"result": "success",
 		},
 	}

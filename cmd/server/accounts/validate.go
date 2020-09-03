@@ -21,21 +21,6 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-type initAccountValidationRequest struct {
-	Strategy string `json:"strategy"`
-	Vendor   string `json:"vendor"`
-}
-
-type initAccountValidationResponse struct {
-	// TODO: do we want to create DB records for validation?
-	// following fields may be stored in DB
-	// ValidationID   string                    `json:"validationID"`
-	// Status         string                    `json:"status"`
-	// Strategy       string                    `json:"strategy"`
-	// Vendor         string                    `json:"vendor"`
-	VendorResponse *validator.VendorResponse `json:"vendor_response"`
-}
-
 func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
@@ -63,7 +48,7 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		}
 
 		// decode request params
-		req := &initAccountValidationRequest{}
+		req := &client.InitAccountValidationRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			moovhttp.Problem(w, fmt.Errorf("unable to read request: %v", err))
 			return
@@ -94,24 +79,14 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		}
 
 		// render validation with vendor response
-		res := &initAccountValidationResponse{
-			VendorResponse: vendorResponse,
+		res := client.InitAccountValidationResponse{
+			VendorResponse: *vendorResponse,
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(res)
 	}
-}
-
-type completeAccountValidationRequest struct {
-	Strategy      string                   `json:"strategy"`
-	Vendor        string                   `json:"vendor"`
-	VendorRequest *validator.VendorRequest `json:"vendor_request"`
-}
-
-type completeAccountValidationResponse struct {
-	VendorResponse *validator.VendorResponse `json:"vendor_response"`
 }
 
 func completeAccountValidation(logger log.Logger, repo Repository, keeper *secrets.StringKeeper, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
@@ -138,7 +113,7 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 		}
 
 		// decode request params
-		req := &completeAccountValidationRequest{}
+		req := &client.CompleteAccountValidationRequest{}
 		if err := json.NewDecoder(r.Body).Decode(req); err != nil {
 			moovhttp.Problem(w, fmt.Errorf("unable to read request: %v", err))
 			return
@@ -170,8 +145,6 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 			return
 		}
 
-		fmt.Println("Encrypted", encrypted)
-
 		// decrypt from database
 		accountNumber, err := keeper.DecryptString(encrypted)
 		if err != nil {
@@ -179,8 +152,8 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 			return
 		}
 
-		// execute strategy and get vendor response
-		vendorResponse, err := strategy.CompleteAccountValidation(userID, customerID, account, accountNumber, req.VendorRequest)
+		vendorRequest := validator.VendorRequest(req.VendorRequest)
+		vendorResponse, err := strategy.CompleteAccountValidation(userID, customerID, account, accountNumber, &vendorRequest)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -196,8 +169,8 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 		}
 
 		// render validation with vendor response
-		res := &completeAccountValidationResponse{
-			VendorResponse: vendorResponse,
+		res := &client.CompleteAccountValidationResponse{
+			VendorResponse: *vendorResponse,
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
