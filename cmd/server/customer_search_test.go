@@ -265,3 +265,24 @@ func TestGetCustomersByNameAndEmail(t *testing.T) {
 	customers, _ = scope.GetCustomers("?query=jim&email=jane.doe@gmail.com")
 	scope.assert.Equal(0, len(customers))
 }
+
+func TestGetCustomersUsingPaging(t *testing.T) {
+	scope := Setup(t)
+	_ = scope.CreateCustomers(30)
+
+	// Get first page of 10
+	customers, _ := scope.GetCustomers("?page=1&limit=10")
+	scope.assert.Equal(10, len(customers))
+
+	// Get second page of 10
+	customers, _ = scope.GetCustomers("?page=2&limit=10")
+	scope.assert.Equal(10, len(customers))
+
+	// Get third page of 10
+	customers, _ = scope.GetCustomers("?page=3&limit=10")
+	scope.assert.Equal(10, len(customers))
+
+	// Should be no 4th page of 10
+	customers, _ = scope.GetCustomers("?page=4&limit=10")
+	scope.assert.Equal(0, len(customers))
+}

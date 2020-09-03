@@ -43,6 +43,7 @@ type searchParams struct {
 	Query string
 	Email string
 	Status string
+	Page int64
 	Limit int64
 }
 
@@ -54,6 +55,11 @@ func readSearchParams(u *url.URL) searchParams {
 	}
 	if limit, err := strconv.ParseInt(util.Or(u.Query().Get("limit"), "20"), 10, 32); err == nil {
 		params.Limit = limit
+	}
+	if page, err := strconv.ParseInt(util.Or(u.Query().Get("page"), "0"), 10, 32); err == nil {
+		if page > 0{
+			params.Page = page
+		}
 	}
 	return params
 }
@@ -107,5 +113,14 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 		query += " and status like ?"
 		args = append(args, "%"+params.Status)
 	}
-	return query + " order by created_at asc limit ?;", append(args, fmt.Sprintf("%d", params.Limit))
+	query += " order by created_at asc limit ?"
+	args = append(args, fmt.Sprintf("%d", params.Limit))
+
+	if params.Page > 0 {
+		query += " offset ?"
+		offset := (params.Page - 1) * params.Limit
+		args = append(args, fmt.Sprintf("%d", offset))
+	}
+	query += ";"
+	return query, args
 }
