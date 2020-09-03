@@ -469,11 +469,10 @@ paths:
   /customers/{customerID}/accounts/{accountID}/validate:
     post:
       tags: [Customers]
-      summary: Validate Account
+      summary: Initiate Account Validation
       description: |
-        Initiate or validatae account with availble validation strategies.
-        Currently the only available strategy is micro-deposits.
-      operationId: validateAccount
+        Initiate account validation with specified strategy and vendor.
+      operationId: initAccountValidation
       parameters:
         - name: X-Request-ID
           in: header
@@ -502,15 +501,102 @@ paths:
             type: string
             example: b74d7c51
       requestBody:
+        required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateValidation'
+                $ref: '#/components/schemas/InitAccountValidationRequest'
+            example:
+              strategy: micro-deposits
+              vendor: moov
       responses:
         '200':
-          description: Account validated or validtion started
+          description: Account validation initiated successfully
+          content:
+            application/json:
+              schema:
+                    $ref: '#/components/schemas/InitAccountValidationResponse'
+              examples:
+                Micro-deposits:
+                  value:
+                    vendor_response:
+                Plaid:
+                  value:
+                    vendor_response:
+                      link_token: "link-sandbox-32771002-45e1-4f9b-93fd-000000000000"
+                      expiration: "2020-08-25T13:07:19Z"
         '400':
-          description: Failed to validate account, see error(s)
+          description: Failed to initiate account validation, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+    put:
+      tags: [Customers]
+      summary: Complete Account Validation
+      description: |
+        Complete account validation with specified strategy and vendor.
+      operationId: completeAccountValidation
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer the accountID belongs to
+          required: true
+          schema:
+            type: string
+            example: 51dd8cdd
+        - name: accountID
+          in: path
+          description: accountID of the Account to validate
+          required: true
+          schema:
+            type: string
+            example: b74d7c51
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+                $ref: '#/components/schemas/CompleteAccountValidationRequest'
+            examples:
+              Micro-deposits:
+                value:
+                  strategy: micro-deposits
+                  vendor: moov
+                  vendor_request:
+                    micro-deposits:
+                      - "USD 0.03"
+                      - "USD 0.07"
+              Plaid:
+                value:
+                  strategy: instant
+                  vendor: plaid
+                  vendor_request:
+                    public_token: "public-sandbox-59eb4718-93d8-41a0-a338-000000000000"
+      responses:
+        '200':
+          description: Account validation initiated successfully
+          content:
+            application/json:
+              schema:
+                    $ref: '#/components/schemas/CompleteAccountValidationResponse'
+              example:
+                vendor_response:
+                  result: "validated"
+        '400':
+          description: Failed to complete account validation, see error(s)
           content:
             application/json:
               schema:
@@ -1344,3 +1430,65 @@ components:
         - sdnType
         - match
         - createdAt
+    InitAccountValidationRequest:
+      type: object
+      properties:
+        strategy:
+          type: string
+          enum:
+            - "micro-deposits"
+            - "instant"
+          example: micro-deposits
+          description: |
+            Validation strategy to use for the account.
+
+            micro-deposits: Initiate two small credits to the account along with a later balancing debit.
+
+            instant: Initiate instant account validation with specified vendor (e.g. Plaid, MX).
+        vendor:
+          type: string
+          enum:
+            - "moov"
+            - "plaid"
+          default: "moov"
+          example: moov
+      required:
+        - strategy
+    InitAccountValidationResponse:
+      type: object
+      properties:
+        vendor_response:
+          type: object
+          description: key/value map of vendor specific params
+    CompleteAccountValidationRequest:
+      type: object
+      properties:
+        strategy:
+          type: string
+          enum:
+            - "micro-deposits"
+            - "instant"
+          description: |
+            Validation strategy to use for the account.
+
+            micro-deposits: Initiate two small credits to the account along with a later balancing debit.
+
+            instant: Initiate instant account validation with specified vendor (e.g. Plaid, MX).
+        vendor:
+          type: string
+          enum:
+            - "moov"
+            - "plaid"
+          default: "moov"
+        vendor_request:
+          type: object
+          description: key/value map of vendor specific params
+      required:
+        - strategy
+        - vendor_request
+    CompleteAccountValidationResponse:
+      type: object
+      properties:
+        vendor_response:
+          type: object
+          description: key/value map of vendor specific params
