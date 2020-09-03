@@ -159,9 +159,6 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 			return
 		}
 
-		// TODO: why admin.VALIDATED is used here?
-		// account.Status is client.AccountStatus (with client.VALIDATED)
-		// should I change it into client.VALIDATED?
 		err = repo.updateAccountStatus(accountID, admin.VALIDATED)
 		if err != nil {
 			moovhttp.Problem(w, err)

@@ -1209,7 +1209,7 @@ components:
       enum:
         - none
         - validated
-      example: microdeposits
+      example: validated
     AccountType:
       type: string
       description: |

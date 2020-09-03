@@ -208,7 +208,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
 		handler(w, req)
 
-		// require.Equal(t, http.StatusBadRequest, w.Code)
+		require.Equal(t, http.StatusBadRequest, w.Code)
 		require.Contains(t, w.Body.String(), fmt.Sprintf("expected accountID=%s status to be 'none'", acc.AccountID))
 	})
 
