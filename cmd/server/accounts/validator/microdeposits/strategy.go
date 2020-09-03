@@ -50,14 +50,11 @@ func (t *microdepositsStrategy) InitAccountValidation(userID, accountID, custome
 	}, nil
 }
 
-// here we can use struct generated from open-api
-// but not sure how it will work with mapstructure.Decode :)
 type completeAccountValidationRequest struct {
 	MicroDeposits []string `json:"micro-deposits,omitempty" mapstructure:"micro-deposits"`
 }
 
 func (t *microdepositsStrategy) CompleteAccountValidation(userID, customerID string, account *customersclient.Account, accountID string, request *validator.VendorRequest) (*validator.VendorResponse, error) {
-
 	micro, err := t.client.GetMicroDeposits(accountID, userID)
 	if err != nil {
 		return nil, fmt.Errorf("problem reading micro-deposits for accountID=%s: %v", accountID, err)
@@ -65,7 +62,7 @@ func (t *microdepositsStrategy) CompleteAccountValidation(userID, customerID str
 
 	// If no micro-deposit was found then no init call was made?
 	if micro == nil || micro.MicroDepositID == "" {
-		return nil, fmt.Errorf("no micro-deposits was found")
+		return nil, fmt.Errorf("no micro-deposits record was found")
 	}
 
 	// If the micro-deposits have been processed then require amounts as we will only call
@@ -86,7 +83,7 @@ func (t *microdepositsStrategy) CompleteAccountValidation(userID, customerID str
 		}, nil
 	}
 
-	return nil, fmt.Errorf("microDepositID=%s is in status: %s", micro.MicroDepositID, micro.Status)
+	return nil, fmt.Errorf("microDepositID=%s is in status: %s but expected to be in %s", micro.MicroDepositID, micro.Status, client.PROCESSED)
 }
 
 func validateAmounts(micro *client.MicroDeposits, requestAmounts []string) error {

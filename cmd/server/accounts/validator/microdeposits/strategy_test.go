@@ -61,7 +61,19 @@ func TestCompleteAccountValidation(t *testing.T) {
 	}
 	accountNumber := "xxx"
 
-	response, err := strategy.CompleteAccountValidation("userID", "customerID", account, accountNumber, request)
-	require.NoError(t, err)
-	require.Equal(t, &validator.VendorResponse{"result": "validated"}, response)
+	t.Run("Test when micro-deposits were processed", func(t *testing.T) {
+		paygateClient.Micro.Status = payclient.PROCESSED
+
+		response, err := strategy.CompleteAccountValidation("userID", "customerID", account, accountNumber, request)
+		require.NoError(t, err)
+		require.Equal(t, &validator.VendorResponse{"result": "validated"}, response)
+	})
+
+	t.Run("Test when micro-deposits status in not processed", func(t *testing.T) {
+		paygateClient.Micro.Status = payclient.PENDING
+
+		_, err := strategy.CompleteAccountValidation("userID", "customerID", account, accountNumber, request)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "is in status: pending but expected to be in processed")
+	})
 }
