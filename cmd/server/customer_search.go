@@ -41,8 +41,6 @@ func searchCustomers(logger log.Logger, repo customerRepository) http.HandlerFun
 
 type searchParams struct {
 	Query string
-	FirstName string
-	LastName string
 	Email string
 	Status string
 	Limit int64
@@ -52,8 +50,6 @@ func readSearchParams(u *url.URL) searchParams {
 	params := searchParams{
 		Query: strings.ToLower(strings.TrimSpace(u.Query().Get("query"))),
 		Email: strings.ToLower(strings.TrimSpace(u.Query().Get("email"))),
-		FirstName: strings.ToLower(strings.TrimSpace(u.Query().Get("first_name"))),
-		LastName: strings.ToLower(strings.TrimSpace(u.Query().Get("last_name"))),
 		Status: strings.ToLower(strings.TrimSpace(u.Query().Get("status"))),
 	}
 	if limit, err := strconv.ParseInt(util.Or(u.Query().Get("limit"), "20"), 10, 32); err == nil {
@@ -102,10 +98,6 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 	if params.Query != "" {
 		query += " and lower(first_name) || \" \" || lower(last_name) LIKE ?"
 		args = append(args, "%"+params.Query+"%")
-	}
-	if params.FirstName != "" {
-		query += " and lower(first_name) LIKE ?"
-		args = append(args, "%"+params.FirstName+"%")
 	}
 	if params.Email != "" {
 		query += " and lower(email) like ?"
