@@ -6,6 +6,7 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 [**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add customer address
+[**CompleteAccountValidation**](CustomersApi.md#CompleteAccountValidation) | **Put** /customers/{customerID}/accounts/{accountID}/validate | Complete Account Validation
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create customer
 [**CreateCustomerAccount**](CustomersApi.md#CreateCustomerAccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
 [**DecryptAccountNumber**](CustomersApi.md#DecryptAccountNumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
@@ -16,12 +17,12 @@ Method | HTTP request | Description
 [**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
 [**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
+[**InitAccountValidation**](CustomersApi.md#InitAccountValidation) | **Post** /customers/{customerID}/accounts/{accountID}/validate | Initiate Account Validation
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
 [**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
-[**ValidateAccount**](CustomersApi.md#ValidateAccount) | **Post** /customers/{customerID}/accounts/{accountID}/validate | Validate Account
 
 
 
@@ -106,6 +107,56 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Customer**](Customer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## CompleteAccountValidation
+
+> CompleteAccountValidationResponse CompleteAccountValidation(ctx, customerID, accountID, completeAccountValidationRequest, optional)
+
+Complete Account Validation
+
+Complete account validation with specified strategy and vendor. 
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID of the Customer the accountID belongs to | 
+**accountID** | **string**| accountID of the Account to validate | 
+**completeAccountValidationRequest** | [**CompleteAccountValidationRequest**](CompleteAccountValidationRequest.md)|  | 
+ **optional** | ***CompleteAccountValidationOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a CompleteAccountValidationOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+
+### Return type
+
+[**CompleteAccountValidationResponse**](CompleteAccountValidationResponse.md)
 
 ### Authorization
 
@@ -230,7 +281,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| customerID of the Customer the accountID belongs to | 
-**accountID** | **string**| accountID of the Account to validate | 
+**accountID** | **string**| accountID of the Account to get decrypted account number | 
  **optional** | ***DecryptAccountNumberOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -587,6 +638,56 @@ No authorization required
 [[Back to README]](../README.md)
 
 
+## InitAccountValidation
+
+> InitAccountValidationResponse InitAccountValidation(ctx, customerID, accountID, initAccountValidationRequest, optional)
+
+Initiate Account Validation
+
+Initiate account validation with specified strategy and vendor. 
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID of the Customer the accountID belongs to | 
+**accountID** | **string**| accountID of the Account to validate | 
+**initAccountValidationRequest** | [**InitAccountValidationRequest**](InitAccountValidationRequest.md)|  | 
+ **optional** | ***InitAccountValidationOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a InitAccountValidationOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+
+### Return type
+
+[**InitAccountValidationResponse**](InitAccountValidationResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## Ping
 
 > Ping(ctx, )
@@ -802,55 +903,6 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: multipart/form-data
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## ValidateAccount
-
-> ValidateAccount(ctx, customerID, accountID, optional)
-
-Validate Account
-
-Initiate or validatae account with availble validation strategies. Currently the only available strategy is micro-deposits. 
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| customerID of the Customer the accountID belongs to | 
-**accountID** | **string**| accountID of the Account to validate | 
- **optional** | ***ValidateAccountOpts** | optional parameters | nil if no parameters
-
-### Optional Parameters
-
-Optional parameters are passed through a pointer to a ValidateAccountOpts struct
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
- **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
- **updateValidation** | [**optional.Interface of UpdateValidation**](UpdateValidation.md)|  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

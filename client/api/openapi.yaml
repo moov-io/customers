@@ -486,7 +486,7 @@ paths:
           example: 51dd8cdd
           type: string
         style: simple
-      - description: accountID of the Account to validate
+      - description: accountID of the Account to get decrypted account number
         explode: false
         in: path
         name: accountID
@@ -507,16 +507,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          description: Failed to validate account, see error(s)
+          description: Failed to decrypt account number, see error(s)
       summary: Decrypt Account Number
       tags:
       - Customers
   /customers/{customerID}/accounts/{accountID}/validate:
     post:
       description: |
-        Initiate or validatae account with availble validation strategies.
-        Currently the only available strategy is micro-deposits.
-      operationId: validateAccount
+        Initiate account validation with specified strategy and vendor.
+      operationId: initAccountValidation
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -559,18 +558,118 @@ paths:
       requestBody:
         content:
           application/json:
+            example:
+              strategy: micro-deposits
+              vendor: moov
             schema:
-              $ref: '#/components/schemas/UpdateValidation'
+              $ref: '#/components/schemas/InitAccountValidationRequest'
+        required: true
       responses:
         "200":
-          description: Account validated or validtion started
+          content:
+            application/json:
+              examples:
+                Micro-deposits:
+                  value:
+                    vendor_response: null
+                Plaid:
+                  value:
+                    vendor_response:
+                      link_token: link-sandbox-32771002-45e1-4f9b-93fd-000000000000
+                      expiration: 2020-08-25T13:07:19Z
+              schema:
+                $ref: '#/components/schemas/InitAccountValidationResponse'
+          description: Account validation initiated successfully
         "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-          description: Failed to validate account, see error(s)
-      summary: Validate Account
+          description: Failed to initiate account validation, see error(s)
+      summary: Initiate Account Validation
+      tags:
+      - Customers
+    put:
+      description: |
+        Complete account validation with specified strategy and vendor.
+      operationId: completeAccountValidation
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer the accountID belongs to
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: 51dd8cdd
+          type: string
+        style: simple
+      - description: accountID of the Account to validate
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            examples:
+              Micro-deposits:
+                value:
+                  strategy: micro-deposits
+                  vendor: moov
+                  vendor_request:
+                    micro-deposits:
+                    - USD 0.03
+                    - USD 0.07
+              Plaid:
+                value:
+                  strategy: instant
+                  vendor: plaid
+                  vendor_request:
+                    public_token: public-sandbox-59eb4718-93d8-41a0-a338-000000000000
+            schema:
+              $ref: '#/components/schemas/CompleteAccountValidationRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                vendor_response:
+                  result: validated
+              schema:
+                $ref: '#/components/schemas/CompleteAccountValidationResponse'
+          description: Account validation initiated successfully
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to complete account validation, see error(s)
+      summary: Complete Account Validation
       tags:
       - Customers
   /customers/{customerID}/disclaimers:
@@ -1513,11 +1612,6 @@ components:
       - state
       - zip
     UpdateValidation:
-      example:
-        strategy: micro-deposits
-        micro-deposits:
-        - USD 0.01
-        - USD 0.13
       properties:
         strategy:
           description: |
@@ -1652,6 +1746,79 @@ components:
       - match
       - sdnName
       - sdnType
+      type: object
+    InitAccountValidationRequest:
+      example:
+        vendor: moov
+        strategy: micro-deposits
+      properties:
+        strategy:
+          description: |
+            Validation strategy to use for the account.
+
+            micro-deposits: Initiate two small credits to the account along with a later balancing debit.
+
+            instant: Initiate instant account validation with specified vendor (e.g. Plaid, MX).
+          enum:
+          - micro-deposits
+          - instant
+          example: micro-deposits
+          type: string
+        vendor:
+          default: moov
+          enum:
+          - moov
+          - plaid
+          example: moov
+          type: string
+      required:
+      - strategy
+      type: object
+    InitAccountValidationResponse:
+      example:
+        vendor_response: '{}'
+      properties:
+        vendor_response:
+          description: key/value map of vendor specific params
+          type: object
+      type: object
+    CompleteAccountValidationRequest:
+      example:
+        vendor: moov
+        strategy: micro-deposits
+        vendor_request: '{}'
+      properties:
+        strategy:
+          description: |
+            Validation strategy to use for the account.
+
+            micro-deposits: Initiate two small credits to the account along with a later balancing debit.
+
+            instant: Initiate instant account validation with specified vendor (e.g. Plaid, MX).
+          enum:
+          - micro-deposits
+          - instant
+          type: string
+        vendor:
+          default: moov
+          enum:
+          - moov
+          - plaid
+          type: string
+        vendor_request:
+          description: key/value map of vendor specific params
+          type: object
+      required:
+      - strategy
+      - vendor_request
+      type: object
+    CompleteAccountValidationResponse:
+      example:
+        vendor_response: '{}'
+      properties:
+        vendor_response:
+          description: key/value map of vendor specific params
+          type: object
       type: object
     Error:
       properties:
