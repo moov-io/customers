@@ -22,7 +22,7 @@ func TestInitAccountValidation(t *testing.T) {
 
 	response, err := strategy.InitAccountValidation("userID", "accountID", "customerID")
 	require.NoError(t, err)
-	require.Equal(t, &validator.VendorResponse{}, response)
+	require.Equal(t, &validator.VendorResponse{"result": "initiated"}, response)
 }
 
 func TestCompleteAccountValidation(t *testing.T) {
@@ -48,5 +48,5 @@ func TestCompleteAccountValidation(t *testing.T) {
 
 	response, err := strategy.CompleteAccountValidation("userID", "customerID", account, accountNumber, request)
 	require.NoError(t, err)
-	require.Equal(t, &validator.VendorResponse{}, response)
+	require.Equal(t, &validator.VendorResponse{"result": "validated"}, response)
 }
