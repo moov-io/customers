@@ -199,3 +199,69 @@ func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 		scope.assert.Equal("Unknown", string(customers[i].Status))
 	}
 }
+
+func TestGetCustomersByName(t *testing.T) {
+	scope := Setup(t)
+	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com")
+	_ = scope.CreateCustomer("John", "Doe", "jane.doe@gmail.com")
+
+	customers, _ := scope.GetCustomers("?query=jane")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=jane+doe")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=john")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=john+doe")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=doe")
+	scope.assert.Equal(2, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=jim+doe")
+	scope.assert.Equal(0, len(customers))
+}
+
+func TestGetCustomersByEmail(t *testing.T) {
+	scope := Setup(t)
+	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com")
+	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com")
+
+	customers, _ := scope.GetCustomers("?email=jane.doe@gmail.com")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?email=john.doe@gmail.com")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?email=jim.doe@gmail.com")
+	scope.assert.Equal(0, len(customers))
+}
+
+func TestGetCustomersByNameAndEmail(t *testing.T) {
+	scope := Setup(t)
+	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com")
+	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com")
+
+	customers, _ := scope.GetCustomers("?query=jane+doe&email=jane.doe@gmail.com")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=jane&email=jane.doe@gmail.com")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=john+doe&email=john.doe@gmail.com")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=john&email=john.doe@gmail.com")
+	scope.assert.Equal(1, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=jane+doe&email=jim.doe@gmail.com")
+	scope.assert.Equal(0, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=jane&email=jim.doe@gmail.com")
+	scope.assert.Equal(0, len(customers))
+
+	customers, _ = scope.GetCustomers("?query=jim&email=jane.doe@gmail.com")
+	scope.assert.Equal(0, len(customers))
+}

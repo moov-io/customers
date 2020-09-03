@@ -41,7 +41,8 @@ func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error){
 	return customers, nil
 }
 
-func (scope *Scope) CreateCustomers(count int){
+func (scope *Scope) CreateCustomers(count int) []client.Customer{
+	var customers []client.Customer
 	for i := 0; i < count; i++ {
 		var firstName string
 		var lastName string
@@ -57,6 +58,19 @@ func (scope *Scope) CreateCustomers(count int){
 		if err := scope.customerRepo.createCustomer(cust); err != nil {
 			scope.t.Error(err)
 		}
+		customers = append(customers, *cust)
 	}
+	return customers
 }
 
+func (scope *Scope) CreateCustomer(firstName, lastName, email string) client.Customer {
+	cust, _, _ := (customerRequest{
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
+	}).asCustomer(testCustomerSSNStorage(scope.t))
+	if err := scope.customerRepo.createCustomer(cust); err != nil {
+		scope.t.Error(err)
+	}
+	return *cust
+}
