@@ -28,29 +28,21 @@ func NewStrategy(paygateClient paygate.Client) validator.Strategy {
 }
 
 func (t *microdepositsStrategy) InitAccountValidation(userID, accountID, customerID string) (*validator.VendorResponse, error) {
-	// TODO let's disucss this:
-	// we should expect that if we are here it means that no micro-depists was created before
-	// or we can create two more new micro deposits (not sure if it makes sense)?
 	micro, err := t.client.GetMicroDeposits(accountID, userID)
 	if err != nil {
 		return nil, fmt.Errorf("problem reading micro-deposits for accountID=%s: %v", accountID, err)
 	}
 
-	// TODO
-	// if micro-deposits was found then return error as
-	// you can't run microdeposits twice?
+	if micro != nil {
+		return nil, fmt.Errorf("micro-deposits were already created for accountID=%s", accountID)
+	}
 
-	// If no micro-deposit was found then initiate them.
-	// TODO why do we check both micro and MicroDepositID?
-	// is it possible to get micro with empty MicroDepositID?
-	if micro == nil || micro.MicroDepositID == "" {
-		err = t.client.InitiateMicroDeposits(userID, client.Destination{
-			CustomerID: customerID,
-			AccountID:  accountID,
-		})
-		if err != nil {
-			return nil, fmt.Errorf("problem initiating micro-deposits for acocuntID=%s: %v", accountID, err)
-		}
+	err = t.client.InitiateMicroDeposits(userID, client.Destination{
+		CustomerID: customerID,
+		AccountID:  accountID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("problem initiating micro-deposits for accountID=%s: %v", accountID, err)
 	}
 
 	return &validator.VendorResponse{
