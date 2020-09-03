@@ -1379,7 +1379,6 @@ components:
           enum:
             - "micro-deposits"
             - "instant"
-          example: micro-deposits
           description: |
             Validation strategy to use for the account.
 
@@ -1392,7 +1391,6 @@ components:
             - "moov"
             - "plaid"
           default: "moov"
-          example: moov
       required:
         - strategy
     InitAccountValidationResponse:
