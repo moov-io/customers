@@ -1083,11 +1083,13 @@ components:
           description: Second line of the address
         city:
           type: string
+          example: Denver
         state:
           type: string
           minimum: 2
           maximum: 2
           description: two charcer code of US state
+          example: CO
         postalCode:
           type: string
         country:
