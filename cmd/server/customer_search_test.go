@@ -177,7 +177,7 @@ func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 	customers, _ := scope.GetCustomers("?limit=120")
 	scope.assert.Equal(2, len(customers))
 	for i := 0; i < len(customers); i++ {
-		if i % 2 == 0 {
+		if i%2 == 0 {
 			// update status
 			if err := scope.customerRepo.updateCustomerStatus(customers[i].CustomerID, client.VERIFIED, "test comment"); err != nil {
 				print(err)
