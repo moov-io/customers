@@ -23,6 +23,7 @@ import (
 	"github.com/moov-io/customers/cmd/server/accounts"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/microdeposits"
+	"github.com/moov-io/customers/cmd/server/accounts/validator/mx"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/plaid"
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/cmd/server/paygate"
@@ -278,6 +279,15 @@ func setupValidationStrategies(logger log.Logger, adminServer *admin.Server) (ma
 		}
 
 		strategies[validator.StrategyKey{Strategy: "instant", Vendor: "plaid"}] = strategy
+	}
+
+	if os.Getenv("ATRIUM_CLIENT_ID") != "" {
+		options := mx.StrategyOptions{
+			ClientID: os.Getenv("ATRIUM_CLIENT_ID"),
+			APIKey:   os.Getenv("ATRIUM_API_KEY"),
+		}
+		strategy := mx.NewStrategy(options)
+		strategies[validator.StrategyKey{Strategy: "instant", Vendor: "mx"}] = strategy
 	}
 
 	return strategies, nil
