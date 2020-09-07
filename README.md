@@ -88,12 +88,22 @@ Customers has an endpoint which encrypts an account number for transit to anothe
 
 Following parameters should be set via environment to configure the account validation strategy with Plaid:
 
-* `PLAID_CLIENT_ID`: client_id
+* `PLAID_CLIENT_ID`: Client ID
 * `PLAID_SECRET`: API secret (depends on the environent)
 * `PLAID_ENVIRONMENT`: Plaid environment (e.g., sandbox, development or production)
 * `PLAID_CLIENT_NAME`: The app name that should be displayed in Link
 
-[Here](https://plaid.com/docs/#api-keys-and-access) you can read more information on how to get them.
+[Here](https://plaid.com/docs/#api-keys-and-access) you can find more information on how to get them.
+
+##### MX
+
+Following parameters should be set via environment to configure the account validation strategy with MX:
+
+* `ATRIUM_CLIENT_ID`: Client ID
+* `ATRIUM_API_KEY`: API Key
+
+[Here](https://atrium.mx.com/docs#authentication-and-security) you can find more information on how to get them.
+
 
 #### Storage
 

@@ -72,9 +72,9 @@ The diagram below shows how account verification with Plaid works:
 
 ![moov plaid IAV flow](./images/plaid-flow.svg)
 
-1. Make a request to Initiate Account Validation and get link_token for Plaid Link from the response
+1. Make a request to Initiate Account Validation and get `link_token` for Plaid Link from the response
 2. Open Plaid Link with link_token for your customer.
-3. Make request to Complete Account Validation by providing public_token received from Plaid Link in the onSuccess callback. 
+3. Make request to Complete Account Validation by providing `public_token` received from Plaid Link in the onSuccess callback. 
 
 ### 1. Initiate Account Validation
 
@@ -173,5 +173,123 @@ The response contains link_token that should be used to open Plaid Link:
   }
 }
 ```
+## Instant Validation with MX
 
+Moov Customers is integrated with [MX Platform API](https://www.mx.com/products/platform-api/) allowing our users to instantly authenticate bank accounts for payments and set up ACH transfers. See [the configuration](../README.md#configuration) for the MX validation strategy.
 
+### How it Works
+
+Moov Customers makes required calls to MX Platform API while you have to configure and add [MX Connect widget](https://atrium.mx.com/docs#mx-connect-widget) by embedding it in a [website with an iframe](https://atrium.mx.com/docs#embedding-in-a-website) or a mobile application with a [WebView](https://atrium.mx.com/docs#embedding-in-webviews). MX Connect is a ready-made and embeddable application that allows you to quickly perform account verification of your customers.
+
+The diagram below shows how account verification with MX works:
+
+![moov MX IAV flow](./images/mx-flow.svg)
+
+1. Make a request to Initiate Account Validation and get `connect_widget_url` for MX Connect widget from the response
+2. Open MX Connect for your customer.
+3. Make request to Complete Account Validation by providing `user_guid` and `member_guid` received from MX Connect in the onSuccess callback. 
+
+### 1. Initiate Account Validation
+
+Here is an example of API call to initiate account validation:
+
+```bash
+curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
+-H "Expect:" \
+-H 'Content-Type: application/json; charset=utf-8' \
+-d @- <<'EOF'
+{
+  "strategy":"instant",
+  "vendor":"mx"
+}
+EOF
+```
+
+The response contains link_token that should be used to open Plaid Link:
+
+```json
+{
+  "vendor_response":{
+    "connect_widget_url":"https://int-widgets.moneydesktop.com/xxxxxx"
+  }
+}
+```
+
+### 2. Open MX Connect Widget
+
+Please, find more details on [how to setup and configure MX Connect](https://atrium.mx.com/docs#mx-connect-widget). Here we provide a simplified example of how MX Connect widget may be used:
+
+```html
+<html>
+	<body>
+		<button id="link-button">Verify Account with MX</button>
+		<p>Select MX bank and use test_atrium/password or test_atrium/challenge with "correct" as MFA answer</p>
+		<div id="verifyAccount"></div>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+		<script src="https://atrium.mx.com/connect.js"></script>
+		<script type="text/javascript">
+			var handler;
+
+			// 1. send POST request to your app server (e.g., /verify)
+			$.post('/verify', {}, function(data){
+				console.log(data, data.connect_widget_url);
+
+        // 2.1 Configure MX Connect Widget
+				handler = new MXConnect({
+					config: {
+						is_mobile_webview: false,
+					},
+					id: "verifyAccount",
+					url: data.connect_widget_url,
+					onSuccess: function (data) {
+						// 3. send data including user_guid and memeber_guid to your app server
+            $.ajax({
+							type: "PUT",
+							url: "/verify",
+							data: data,
+							success: function(data) {
+								console.log("Verification result: ", data);
+							},
+						});
+					},
+				});
+			});
+
+			$('#link-button').on('click', function(e) {
+				// 2.2 Open MX Connect Widget
+        handler.load();
+			});
+		</script>
+	</body>
+</html>
+```
+
+### 3. Complete Account Validation
+
+When you get `user_guid` and `member_guid` to your app server from MX Connect can compelte account validation by making API request to Moov Customers. Here is an example of API call:
+
+```bash
+curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
+-H "Expect:" \
+-H 'Content-Type: application/json; charset=utf-8' \
+-d @- <<'EOF'
+{
+  "strategy":"instant",
+  "vendor":"plaid",
+  "vendor_request":{
+    "user_guid":"USR-d6a55e69-8711-4b21-b594-2538551231231",
+    "member_guid":"MBR-1c38dad9-e699-4f01-baf7-d91231231231"
+  }
+}
+EOF
+```
+
+The response contains link_token that should be used to open Plaid Link:
+
+```json
+{
+  "vendor_response":{
+    "result":"validated"
+  }
+}
+```
