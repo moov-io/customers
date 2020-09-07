@@ -33,7 +33,7 @@ func (t *microdepositsStrategy) InitAccountValidation(userID, accountID, custome
 		return nil, fmt.Errorf("problem reading micro-deposits for accountID=%s: %v", accountID, err)
 	}
 
-	if micro != nil {
+	if micro != nil && micro.MicroDepositID != "" {
 		return nil, fmt.Errorf("micro-deposits were already created for accountID=%s", accountID)
 	}
 
