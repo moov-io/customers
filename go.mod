@@ -28,6 +28,7 @@ require (
 	github.com/moov-io/identity v0.2.7
 	github.com/moov-io/paygate v0.8.0
 	github.com/moov-io/watchman v0.15.0
+	github.com/mxenabled/atrium-go v1.2.1-0.20200616191425-c9e0ead005ba
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
