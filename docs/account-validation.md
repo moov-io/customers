@@ -14,6 +14,8 @@ In order to validate Account two micro-depoists under $0.50 will be created with
 1. Initiate Account Validation
 2. Complete Account Validation
 
+To use this strategy PayGate should be [configured](../README.md#paygate#paygate).
+
 ### Configuration
 
 To use this strategy you have to set `PAYGATE_ENDPOINT` environment variable.
