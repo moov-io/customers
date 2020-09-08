@@ -90,7 +90,7 @@ func TestCustomerSearch__query(t *testing.T) {
 	// Query search
 	query, args := buildSearchQuery(searchParams{
 		Query: "jane doe",
-		Limit: 100,
+		Count: 100,
 	})
 	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at asc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
@@ -126,7 +126,7 @@ func TestCustomerSearch__query(t *testing.T) {
 	query, args = buildSearchQuery(searchParams{
 		Query: "jane doe",
 		Email: "jane.doe@moov.io",
-		Limit: 25,
+		Count: 25,
 	})
 	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at asc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
@@ -271,18 +271,18 @@ func TestGetCustomersUsingPaging(t *testing.T) {
 	_ = scope.CreateCustomers(30)
 
 	// Get first page of 10
-	customers, _ := scope.GetCustomers("?page=1&limit=10")
+	customers, _ := scope.GetCustomers("?skip=0&count=10")
 	scope.assert.Equal(10, len(customers))
 
 	// Get second page of 10
-	customers, _ = scope.GetCustomers("?page=2&limit=10")
+	customers, _ = scope.GetCustomers("?skip=10&count=10")
 	scope.assert.Equal(10, len(customers))
 
 	// Get third page of 10
-	customers, _ = scope.GetCustomers("?page=3&limit=10")
+	customers, _ = scope.GetCustomers("?skip=20&limit=10")
 	scope.assert.Equal(10, len(customers))
 
 	// Should be no 4th page of 10
-	customers, _ = scope.GetCustomers("?page=4&limit=10")
+	customers, _ = scope.GetCustomers("?skip=30&count=10")
 	scope.assert.Equal(0, len(customers))
 }

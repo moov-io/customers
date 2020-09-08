@@ -7,24 +7,26 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
-	"net/url"
 	"strconv"
 	"strings"
 
+	"github.com/go-kit/kit/log"
 	moovhttp "github.com/moov-io/base/http"
 	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/route"
-	"github.com/moov-io/customers/internal/util"
-
-	"github.com/go-kit/kit/log"
 )
 
 func searchCustomers(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		params := readSearchParams(r.URL)
+		params, err := readSearchParams(r)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
 		customers, err := repo.searchCustomers(params)
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -40,29 +42,62 @@ func searchCustomers(logger log.Logger, repo customerRepository) http.HandlerFun
 }
 
 type searchParams struct {
-	Query string
-	Email string
+	Query  string
+	Email  string
 	Status string
-	Page int64
-	Limit int64
+	Skip   int64
+	Count  int64
 }
 
-func readSearchParams(u *url.URL) searchParams {
-	params := searchParams{
-		Query: strings.ToLower(strings.TrimSpace(u.Query().Get("query"))),
-		Email: strings.ToLower(strings.TrimSpace(u.Query().Get("email"))),
-		Status: strings.ToLower(strings.TrimSpace(u.Query().Get("status"))),
+// TODO - REMOVE
+// Using this until I get new build
+
+// GetSkipAndCount returns the skip and count pagination values from the query parameters
+// skip is the number of records to pass over before starting a search
+// count is the number of records to retrieve in the search
+// exists indicates if skip or count was passed into the request URL
+func GetSkipAndCount(r *http.Request) (skip int, count int, exists bool, errors []error) {
+	skipVal := r.URL.Query().Get("skip")
+	var err error
+	skip, err = strconv.Atoi(skipVal)
+	skip = int(math.Min(float64(skip), 10000))
+	skip = int(math.Max(0, float64(skip)))
+	if err != nil && skip == 0 && skipVal != "" {
+		errors = append(errors, err)
+		skip = -1
 	}
-	if limit, err := strconv.ParseInt(util.Or(u.Query().Get("limit"), "20"), 10, 32); err == nil {
-		params.Limit = limit
+
+	countVal := r.URL.Query().Get("count")
+	count, _ = strconv.Atoi(countVal)
+	count = int(math.Min(float64(count), 200))
+	count = int(math.Max(0, float64(count)))
+	if err != nil && count == 0 && countVal != "" {
+		errors = append(errors, err)
+		count = -1
 	}
-	if page, err := strconv.ParseInt(util.Or(u.Query().Get("page"), "0"), 10, 32); err == nil {
-		if page > 0{
-			params.Page = page
-		}
-	}
-	return params
+
+	exists = skipVal != "" || countVal != ""
+	return skip, count, exists, errors
 }
+
+func readSearchParams(r *http.Request) (searchParams, bool)  {
+	params := searchParams{
+		Query: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
+		Email: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
+		Status: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("status"))),
+	}
+	skip, count, exists, errors := GetSkipAndCount(r)
+	// TODO - Handle/log errors
+	if exists && len(errors) > 0 {
+		return params, true
+	}
+
+	params.Skip = int64(skip)
+	params.Count = int64(count)
+
+	return params, false
+}
+
 
 func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.Customer, error) {
 	query, args := buildSearchQuery(params)
@@ -114,12 +149,11 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 		args = append(args, "%"+params.Status)
 	}
 	query += " order by created_at asc limit ?"
-	args = append(args, fmt.Sprintf("%d", params.Limit))
+	args = append(args, fmt.Sprintf("%d", params.Count))
 
-	if params.Page > 0 {
+	if params.Skip > 0 {
 		query += " offset ?"
-		offset := (params.Page - 1) * params.Limit
-		args = append(args, fmt.Sprintf("%d", offset))
+		args = append(args, fmt.Sprintf("%d", params.Skip))
 	}
 	query += ";"
 	return query, args
