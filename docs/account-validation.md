@@ -164,7 +164,7 @@ curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
 EOF
 ```
 
-The response contains link_token that should be used to open Plaid Link:
+The response with validation result:
 
 ```json
 {
@@ -205,7 +205,7 @@ curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
 EOF
 ```
 
-The response contains link_token that should be used to open Plaid Link:
+The response contains connect_widget_url that should be used to open MX Connect:
 
 ```json
 {
@@ -284,7 +284,7 @@ curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
 EOF
 ```
 
-The response contains link_token that should be used to open Plaid Link:
+The response with validation result
 
 ```json
 {
