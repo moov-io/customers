@@ -113,6 +113,27 @@ PRAGMA foreign_keys=on;`,
 			"add_holder_name_to_accounts",
 			`alter table accounts add column holder_name default '';`,
 		),
+		execsql(
+			"create_validations",
+			`create table if not exists validations(
+				validation_id primary key,
+				account_id,
+				status,
+				strategy,
+				vendor,
+				created_at datetime,
+				updated_at datetime
+			);`,
+		),
+		execsql(
+			"create validations index",
+			`
+			create unique index
+				idx_validations_validation_account_ids
+			on
+				validations (validation_id, account_id);
+			`,
+		),
 	)
 )
 
