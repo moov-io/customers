@@ -27,11 +27,6 @@ jobs:
       if: runner.os == 'Windows'
       run: choco install -y make mingw
 
-    - name: Generate Code
-      run: |
-        make admin
-        make client
-
     - name: Check
       run: make check
 
