@@ -21,13 +21,10 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
+func initAccountValidation(logger log.Logger, accounts Repository, validations validator.Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		// TODO: discuss
-		// following methods Get...ID have side effect inside: moovhttp.Problem(w, ErrNoCustomerID)
-		// customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
 		vars := mux.Vars(r)
 		userID, customerID, accountID := moovhttp.GetUserID(r), vars["customerID"], vars["accountID"]
 
@@ -37,7 +34,7 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 		}
 
 		// Lookup the account and verify it needs to be validated
-		account, err := repo.getCustomerAccount(customerID, accountID)
+		account, err := accounts.getCustomerAccount(customerID, accountID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -71,6 +68,20 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 			return
 		}
 
+		// TODO I would wrap it into transaction, so if strategy fails
+		// then no validation record is created
+		validation := &validator.Validation{
+			AccountID: accountID,
+			Strategy:  req.Strategy,
+			Vendor:    req.Vendor,
+			Status:    validator.StatusInit,
+		}
+		err = validations.CreateValidation(validation)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
 		// execute strategy and get vendor response
 		vendorResponse, err := strategy.InitAccountValidation(userID, accountID, customerID)
 		if err != nil {
@@ -80,6 +91,12 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 
 		// render validation with vendor response
 		res := client.InitAccountValidationResponse{
+			ValidationID:   validation.ValidationID,
+			Strategy:       validation.Strategy,
+			Vendor:         validation.Vendor,
+			Status:         validation.Status,
+			CreatedAt:      validation.CreatedAt,
+			UpdatedAt:      validation.UpdatedAt,
 			VendorResponse: *vendorResponse,
 		}
 
