@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	moovadmin "github.com/moov-io/base/admin"
-	"github.com/moov-io/customers/admin"
-	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/admin"
+	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/gorilla/mux"
 )

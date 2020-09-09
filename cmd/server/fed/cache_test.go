@@ -8,7 +8,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/client"
 )
 
 func TestCache(t *testing.T) {

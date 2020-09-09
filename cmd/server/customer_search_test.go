@@ -7,13 +7,14 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"github.com/go-kit/kit/log"
-	"github.com/gorilla/mux"
-	client "github.com/moov-io/customers/client"
-	"github.com/moov-io/customers/internal/database"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-kit/kit/log"
+	"github.com/gorilla/mux"
+	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/customers/pkg/client"
 )
 
 func TestCustomersSearchRouter(t *testing.T) {

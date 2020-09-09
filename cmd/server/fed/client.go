@@ -13,7 +13,7 @@ import (
 
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/base/k8s"
-	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/client"
 	moovfed "github.com/moov-io/fed/client"
 
 	"github.com/antihax/optional"

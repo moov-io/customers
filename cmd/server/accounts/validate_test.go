@@ -13,8 +13,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/paygate"
+	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
 	payclient "github.com/moov-io/paygate/pkg/client"
 

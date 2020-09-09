@@ -5,7 +5,7 @@
 package fed
 
 import (
-	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/client"
 )
 
 type MockClient struct {

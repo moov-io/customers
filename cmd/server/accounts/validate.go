@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/cmd/server/route"
+	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/go-kit/kit/log"
 )

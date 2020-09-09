@@ -5,8 +5,8 @@
 package accounts
 
 import (
-	"github.com/moov-io/customers/admin"
-	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/admin"
+	"github.com/moov-io/customers/pkg/client"
 )
 
 type mockRepository struct {
