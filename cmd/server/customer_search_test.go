@@ -90,7 +90,7 @@ func TestCustomerSearch__query(t *testing.T) {
 	// Query search
 	query, args := buildSearchQuery(searchParams{
 		Query: "jane doe",
-		Limit: 100,
+		Count: 100,
 	})
 	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at asc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
@@ -126,7 +126,7 @@ func TestCustomerSearch__query(t *testing.T) {
 	query, args = buildSearchQuery(searchParams{
 		Query: "jane doe",
 		Email: "jane.doe@moov.io",
-		Limit: 25,
+		Count: 25,
 	})
 	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at asc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
@@ -159,14 +159,14 @@ func TestGet10MostRecentlyCreatedCustomersByDefault(t *testing.T) {
 func TestGet50MostRecentlyCreatedCustomersWhenSpecifyingLimit(t *testing.T) {
 	scope := Setup(t)
 	scope.CreateCustomers(100)
-	customers, _ := scope.GetCustomers("?limit=50")
+	customers, _ := scope.GetCustomers("?count=50")
 	scope.assert.Equal(50, len(customers))
 }
 
 func TestGet100MostRecentlyCreatedCustomersWhenSpecifyingMoreThanAvailable(t *testing.T) {
 	scope := Setup(t)
 	scope.CreateCustomers(100)
-	customers, _ := scope.GetCustomers("?limit=120")
+	customers, _ := scope.GetCustomers("?count=120")
 	scope.assert.Equal(100, len(customers))
 }
 
@@ -174,7 +174,7 @@ func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 	// Create two customers. 1 with Unknown STATUS and 1 with Verified
 	scope := Setup(t)
 	scope.CreateCustomers(2)
-	customers, _ := scope.GetCustomers("?limit=120")
+	customers, _ := scope.GetCustomers("?count=120")
 	scope.assert.Equal(2, len(customers))
 	for i := 0; i < len(customers); i++ {
 		if i%2 == 0 {
@@ -186,14 +186,14 @@ func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 	}
 
 	// Should have 1 Verified Status
-	customers, _ = scope.GetCustomers("?status=Verified&limit=20")
+	customers, _ = scope.GetCustomers("?status=Verified&count=20")
 	scope.assert.Equal(1, len(customers))
 	for i := 0; i < len(customers); i++ {
 		scope.assert.Equal("Verified", string(customers[i].Status))
 	}
 
 	// Should have 1 Unknown Status
-	customers, _ = scope.GetCustomers("?status=Unknown&limit=20")
+	customers, _ = scope.GetCustomers("?status=Unknown&count=20")
 	scope.assert.Equal(1, len(customers))
 	for i := 0; i < len(customers); i++ {
 		scope.assert.Equal("Unknown", string(customers[i].Status))
@@ -263,5 +263,40 @@ func TestGetCustomersByNameAndEmail(t *testing.T) {
 	scope.assert.Equal(0, len(customers))
 
 	customers, _ = scope.GetCustomers("?query=jim&email=jane.doe@gmail.com")
+	scope.assert.Equal(0, len(customers))
+}
+
+func TestGetCustomersUsingPaging(t *testing.T) {
+	scope := Setup(t)
+	_ = scope.CreateCustomers(30)
+
+	// Get first page of 10
+	customers, _ := scope.GetCustomers("?skip=0&count=10")
+	scope.assert.Equal(10, len(customers))
+
+	// Get second page of 10
+	customers, _ = scope.GetCustomers("?skip=10&count=10")
+	scope.assert.Equal(10, len(customers))
+
+	// Get third page of 10
+	customers, _ = scope.GetCustomers("?skip=20&count=10")
+	scope.assert.Equal(10, len(customers))
+
+	// Should be no 4th page of 10
+	customers, _ = scope.GetCustomers("?skip=30&count=10")
+	scope.assert.Equal(0, len(customers))
+}
+
+func TestGetCustomersUsingPagingFailure(t *testing.T) {
+	scope := Setup(t)
+	_ = scope.CreateCustomers(30)
+
+	customers, _ := scope.GetCustomers("?skip=123abc")
+	scope.assert.Equal(0, len(customers))
+
+	customers, _ = scope.GetCustomers("?count=123abc")
+	scope.assert.Equal(0, len(customers))
+
+	customers, _ = scope.GetCustomers("?skip=123abc&count=123abc")
 	scope.assert.Equal(0, len(customers))
 }

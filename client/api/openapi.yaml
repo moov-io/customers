@@ -32,6 +32,73 @@ paths:
       tags:
       - Customers
   /customers:
+    get:
+      description: Search for customers using different filter parameters
+      operationId: searchCustomers
+      parameters:
+      - description: Optional parameter for searching by customer name
+        example: jane
+        explode: false
+        in: path
+        name: query
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Optional parameter for searching by customer email
+        example: jane@doe.com
+        explode: false
+        in: path
+        name: email
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Optional parameter for searching by customer status
+        example: Verified
+        explode: false
+        in: path
+        name: status
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Optional parameter for searching for customers by skipping over
+          an initial group
+        example: 10
+        explode: false
+        in: path
+        name: skip
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Optional parameter for searching for customers by specifying
+          the amount to return
+        example: 20
+        explode: false
+        in: path
+        name: count
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customers'
+          description: Customers were successfully retrieved
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customers were not retrieved, see error(s)
+      summary: Get customers
+      tags:
+      - Customers
     post:
       description: Create a Customer object from the given details of a human or business
       operationId: createCustomer
@@ -1179,6 +1246,10 @@ components:
       - status
       - type
       type: object
+    Customers:
+      items:
+        $ref: '#/components/schemas/Customer'
+      type: array
     CustomerType:
       description: Note if this Customer represents an individual or business
       enum:

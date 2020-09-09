@@ -676,6 +676,8 @@ github.com/moov-io/base v0.11.0-rc1.0.20191121181647-cd3e7a9609db h1:O6qBkf9lubI
 github.com/moov-io/base v0.11.0-rc1.0.20191121181647-cd3e7a9609db/go.mod h1:oXZRZBQiO7HX+Wc7Q3jJHLfkDPxrMXRbgYhURQqfXD8=
 github.com/moov-io/base v0.11.0 h1:1dhI8qsIxsUjMmbzE52ycyy2S1z3DGUN6swGYjSmOLs=
 github.com/moov-io/base v0.11.0/go.mod h1:jEkZukoSaJ4rDFoe00S5zuoLE+p3U3BEunSEPchgSbU=
+github.com/moov-io/base v0.11.1 h1:5qGfUr3eKWFmjttK2WllKgBg0Pnzx50+JBnRQQi8Gl0=
+github.com/moov-io/base v0.11.1/go.mod h1:kiWd5d0G3Ji+V9VhCNyzgfMNfbpzBblSL+QY2n2eywE=
 github.com/moov-io/customers v0.4.0-rc4/go.mod h1:wNz/qIiG24rJrjnK3VOvzj0MbdfGznj6INO/uyntgNM=
 github.com/moov-io/customers v0.4.0-rc4.0.20200519011716-05c4c319c49b/go.mod h1:wmBTMaZ7OzoXhDtLqGngNrEaRlsk7VFLxY0kl3HzoHc=
 github.com/moov-io/customers v0.4.0-rc5.0.20200605165738-057f20d4d580/go.mod h1:2viqzwFr1cp5gXL9lhOIXl7KE1pDIA8Z4I5smZBRUSo=
@@ -910,6 +912,7 @@ github.com/spf13/pflag v1.0.3 h1:zPAT6CGy6wXeQ7NtTnaTerfKOsV6V6F8agHXFiazDkg=
 github.com/spf13/pflag v1.0.3/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
 github.com/spf13/viper v1.7.0 h1:xVKxvI7ouOI5I+U9s2eeiUfMaWBVoXA3AWskkrqK0VM=
 github.com/spf13/viper v1.7.0/go.mod h1:8WkrPz2fc9jxqZNCJI/76HCieCp4Q8HaLFoCha5qpdg=
+github.com/spf13/viper v1.7.1 h1:pM5oEahlgWv/WnHXpgbKz7iLIxRf65tye2Ci+XFK5sk=
 github.com/spf13/viper v1.7.1/go.mod h1:8WkrPz2fc9jxqZNCJI/76HCieCp4Q8HaLFoCha5qpdg=
 github.com/square/go-jose v2.5.1+incompatible/go.mod h1:7MxpAF/1WTVUu8Am+T5kNy+t0902CaLWM4Z745MkOa8=
 github.com/streadway/amqp v0.0.0-20190404075320-75d898a42a94/go.mod h1:AZpEONHx3DKn8O/DFsRAY58/XVQiIPMTMB1SddzLXVw=

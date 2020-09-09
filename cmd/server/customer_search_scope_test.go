@@ -50,15 +50,8 @@ func (scope *Scope) CreateCustomers(count int) []client.Customer {
 		scope.fuzzer.Fuzz(&firstName)
 		scope.fuzzer.Fuzz(&lastName)
 		scope.fuzzer.Fuzz(&email)
-		cust, _, _ := (customerRequest{
-			FirstName: firstName,
-			LastName:  lastName,
-			Email:     email,
-		}).asCustomer(testCustomerSSNStorage(scope.t))
-		if err := scope.customerRepo.createCustomer(cust); err != nil {
-			scope.t.Error(err)
-		}
-		customers = append(customers, *cust)
+		customer := scope.CreateCustomer(firstName, lastName, email)
+		customers = append(customers, customer)
 	}
 	return customers
 }

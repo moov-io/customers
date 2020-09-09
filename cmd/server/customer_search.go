@@ -8,23 +8,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/url"
-	"strconv"
 	"strings"
 
+	"github.com/go-kit/kit/log"
 	moovhttp "github.com/moov-io/base/http"
 	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/route"
-	"github.com/moov-io/customers/internal/util"
-
-	"github.com/go-kit/kit/log"
 )
 
 func searchCustomers(logger log.Logger, repo customerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		params := readSearchParams(r.URL)
+		params, err := readSearchParams(r)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
 		customers, err := repo.searchCustomers(params)
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -43,19 +43,25 @@ type searchParams struct {
 	Query  string
 	Email  string
 	Status string
-	Limit  int64
+	Skip   int64
+	Count  int64
 }
 
-func readSearchParams(u *url.URL) searchParams {
+func readSearchParams(r *http.Request) (searchParams, error) {
 	params := searchParams{
-		Query:  strings.ToLower(strings.TrimSpace(u.Query().Get("query"))),
-		Email:  strings.ToLower(strings.TrimSpace(u.Query().Get("email"))),
-		Status: strings.ToLower(strings.TrimSpace(u.Query().Get("status"))),
+		Query:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
+		Email:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
+		Status: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("status"))),
 	}
-	if limit, err := strconv.ParseInt(util.Or(u.Query().Get("limit"), "20"), 10, 32); err == nil {
-		params.Limit = limit
+	skip, count, exists, err := moovhttp.GetSkipAndCount(r)
+	if exists && err != nil {
+		return params, err
 	}
-	return params
+
+	params.Skip = int64(skip)
+	params.Count = int64(count)
+
+	return params, nil
 }
 
 func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.Customer, error) {
@@ -107,5 +113,13 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 		query += " and status like ?"
 		args = append(args, "%"+params.Status)
 	}
-	return query + " order by created_at asc limit ?;", append(args, fmt.Sprintf("%d", params.Limit))
+	query += " order by created_at asc limit ?"
+	args = append(args, fmt.Sprintf("%d", params.Count))
+
+	if params.Skip > 0 {
+		query += " offset ?"
+		args = append(args, fmt.Sprintf("%d", params.Skip))
+	}
+	query += ";"
+	return query, args
 }

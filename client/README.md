@@ -53,6 +53,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers
 *CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
+*CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Get customers
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update customer status
 *CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload document
 *CustomersApi* | [**ValidateAccount**](docs/CustomersApi.md#validateaccount) | **Post** /customers/{customerID}/accounts/{accountID}/validate | Validate Account
