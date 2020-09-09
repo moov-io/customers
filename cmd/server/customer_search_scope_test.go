@@ -20,18 +20,18 @@ type Scope struct {
 
 func Setup(t *testing.T) Scope {
 	return Scope{
-		assert: require.New(t),
+		assert:       require.New(t),
 		customerRepo: createTestCustomerRepository(t),
-		fuzzer: fuzz.New(),
-		t: t,
+		fuzzer:       fuzz.New(),
+		t:            t,
 	}
 }
 
-func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error){
+func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error) {
 	router := mux.NewRouter()
 	addCustomerRoutes(log.NewNopLogger(), router, scope.customerRepo, nil, nil)
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/customers" + query, nil)
+	req := httptest.NewRequest("GET", "/customers"+query, nil)
 	router.ServeHTTP(w, req)
 
 	var customers []*client.Customer
@@ -41,7 +41,7 @@ func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error){
 	return customers, nil
 }
 
-func (scope *Scope) CreateCustomers(count int) []client.Customer{
+func (scope *Scope) CreateCustomers(count int) []client.Customer {
 	var customers []client.Customer
 	for i := 0; i < count; i++ {
 		var firstName string

@@ -177,7 +177,7 @@ func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 	customers, _ := scope.GetCustomers("?count=120")
 	scope.assert.Equal(2, len(customers))
 	for i := 0; i < len(customers); i++ {
-		if i % 2 == 0 {
+		if i%2 == 0 {
 			// update status
 			if err := scope.customerRepo.updateCustomerStatus(customers[i].CustomerID, client.VERIFIED, "test comment"); err != nil {
 				print(err)
@@ -240,33 +240,6 @@ func TestGetCustomersByEmail(t *testing.T) {
 }
 
 func TestGetCustomersByNameAndEmail(t *testing.T) {
-	scope := Setup(t)
-	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com")
-	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com")
-
-	customers, _ := scope.GetCustomers("?query=jane+doe&email=jane.doe@gmail.com")
-	scope.assert.Equal(1, len(customers))
-
-	customers, _ = scope.GetCustomers("?query=jane&email=jane.doe@gmail.com")
-	scope.assert.Equal(1, len(customers))
-
-	customers, _ = scope.GetCustomers("?query=john+doe&email=john.doe@gmail.com")
-	scope.assert.Equal(1, len(customers))
-
-	customers, _ = scope.GetCustomers("?query=john&email=john.doe@gmail.com")
-	scope.assert.Equal(1, len(customers))
-
-	customers, _ = scope.GetCustomers("?query=jane+doe&email=jim.doe@gmail.com")
-	scope.assert.Equal(0, len(customers))
-
-	customers, _ = scope.GetCustomers("?query=jane&email=jim.doe@gmail.com")
-	scope.assert.Equal(0, len(customers))
-
-	customers, _ = scope.GetCustomers("?query=jim&email=jane.doe@gmail.com")
-	scope.assert.Equal(0, len(customers))
-}
-
-func TestGetCustomersByType(t *testing.T) {
 	scope := Setup(t)
 	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com")
 	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com")
