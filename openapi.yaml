@@ -33,6 +33,56 @@ paths:
         '200':
           description: Service is running properly
   /customers:
+    get:
+      tags: [Customers]
+      summary: Get customers
+      description: Search for customers using different filter parameters
+      operationId: searchCustomers
+      parameters:
+        - name: query
+          in: path
+          description: Optional parameter for searching by customer name
+          example: jane
+          schema:
+            type: string
+          required: false
+        - name: email
+          in: path
+          description: Optional parameter for searching by customer email
+          example: jane@doe.com
+          schema:
+            type: string
+        - name: status
+          in: path
+          description: Optional parameter for searching by customer status
+          example: Verified
+          schema:
+            type: string
+        - name: skip
+          in: path
+          description: Optional parameter for searching for customers by skipping over an initial group
+          example: 10
+          schema:
+            type: string
+        - name: count
+          in: path
+          description: Optional parameter for searching for customers by specifying the amount to return
+          example: 20
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customers were successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customers'
+        '400':
+          description: Customers were not retrieved, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
     post:
       tags: [Customers]
       summary: Create customer
@@ -910,6 +960,10 @@ components:
         - email
         - createdAt
         - lastModified
+    Customers:
+      type: array
+      items:
+        $ref: '#/components/schemas/Customer'
     CustomerType:
       type: string
       description: Note if this Customer represents an individual or business

@@ -19,6 +19,7 @@ Method | HTTP request | Description
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
 [**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
+[**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Get customers
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
 [**ValidateAccount**](CustomersApi.md#ValidateAccount) | **Post** /customers/{customerID}/accounts/{accountID}/validate | Validate Account
@@ -704,6 +705,44 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## SearchCustomers
+
+> []Customer SearchCustomers(ctx, query, email, status, skip, count)
+
+Get customers
+
+Search for customers using different filter parameters
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**query** | **string**| Optional parameter for searching by customer name | 
+**email** | **string**| Optional parameter for searching by customer email | 
+**status** | **string**| Optional parameter for searching by customer status | 
+**skip** | **string**| Optional parameter for searching for customers by skipping over an initial group | 
+**count** | **string**| Optional parameter for searching for customers by specifying the amount to return | 
+
+### Return type
+
+[**[]Customer**](Customer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
