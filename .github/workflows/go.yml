@@ -28,7 +28,9 @@ jobs:
       run: choco install -y make mingw
 
     - name: Generate Code
-      run: make admin && make client
+      run: |
+        make admin
+        make client
 
     - name: Check
       run: make check
