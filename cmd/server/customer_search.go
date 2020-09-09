@@ -7,9 +7,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/go-kit/kit/log"
@@ -49,55 +47,22 @@ type searchParams struct {
 	Count  int64
 }
 
-// TODO - REMOVE
-// Using this until I get new build
-
-// GetSkipAndCount returns the skip and count pagination values from the query parameters
-// skip is the number of records to pass over before starting a search
-// count is the number of records to retrieve in the search
-// exists indicates if skip or count was passed into the request URL
-func GetSkipAndCount(r *http.Request) (skip int, count int, exists bool, errors []error) {
-	skipVal := r.URL.Query().Get("skip")
-	var err error
-	skip, err = strconv.Atoi(skipVal)
-	skip = int(math.Min(float64(skip), 10000))
-	skip = int(math.Max(0, float64(skip)))
-	if err != nil && skip == 0 && skipVal != "" {
-		errors = append(errors, err)
-		skip = -1
-	}
-
-	countVal := r.URL.Query().Get("count")
-	count, _ = strconv.Atoi(countVal)
-	count = int(math.Min(float64(count), 200))
-	count = int(math.Max(0, float64(count)))
-	if err != nil && count == 0 && countVal != "" {
-		errors = append(errors, err)
-		count = -1
-	}
-
-	exists = skipVal != "" || countVal != ""
-	return skip, count, exists, errors
-}
-
-func readSearchParams(r *http.Request) (searchParams, bool)  {
+func readSearchParams(r *http.Request) (searchParams, error)  {
 	params := searchParams{
 		Query: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
 		Email: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
 		Status: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("status"))),
 	}
-	skip, count, exists, errors := GetSkipAndCount(r)
-	// TODO - Handle/log errors
-	if exists && len(errors) > 0 {
-		return params, true
+	skip, count, exists, err := moovhttp.GetSkipAndCount(r)
+	if exists && err != nil {
+		return params, err
 	}
 
 	params.Skip = int64(skip)
 	params.Count = int64(count)
 
-	return params, false
+	return params, nil
 }
-
 
 func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.Customer, error) {
 	query, args := buildSearchQuery(params)
