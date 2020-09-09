@@ -47,10 +47,10 @@ type searchParams struct {
 	Count  int64
 }
 
-func readSearchParams(r *http.Request) (searchParams, error)  {
+func readSearchParams(r *http.Request) (searchParams, error) {
 	params := searchParams{
-		Query: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
-		Email: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
+		Query:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
+		Email:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
 		Status: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("status"))),
 	}
 	skip, count, exists, err := moovhttp.GetSkipAndCount(r)
