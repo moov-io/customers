@@ -6,7 +6,6 @@ package accounts
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -19,26 +18,17 @@ import (
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
 	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/secrets"
+	"github.com/stretchr/testify/require"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
 
-var testFedClient = &fed.MockClient{}
-
 func TestAccountRoutes(t *testing.T) {
 	customerID := base.ID()
-	repo := setupTestAccountRepository(t)
-	keeper := secrets.TestStringKeeper(t)
 
-	validationStrategies := map[validator.StrategyKey]validator.Strategy{
-		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
-	}
-
-	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper, validationStrategies)
+	handler := setupRouter(t)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -88,14 +78,8 @@ func TestAccountCreationRequest(t *testing.T) {
 
 func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	customerID := base.ID()
-	repo := setupTestAccountRepository(t)
-	keeper := secrets.TestStringKeeper(t)
-	validationStrategies := map[validator.StrategyKey]validator.Strategy{}
 
-	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper, validationStrategies)
-
-	client := testclient.New(t, handler)
+	handler := setupRouter(t)
 
 	// create an account
 	account := httpCreateAccount(t, handler, customerID)
@@ -103,34 +87,13 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 		t.Fatal("missing account")
 	}
 
-	transit, resp, err := client.CustomersApi.DecryptAccountNumber(context.TODO(), customerID, account.AccountID, nil)
-	if resp != nil && resp.Body != nil {
-		resp.Body.Close()
-	}
-	if err != nil {
-		t.Error(err)
-	}
-	if transit.AccountNumber == "" {
-		t.Error("missing transit AccountNumber")
-	}
-
-	decrypted, err := keeper.DecryptString(transit.AccountNumber)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if decrypted != "18749" {
-		t.Errorf("decrypted=%q", decrypted)
-	}
+	httpDecryptAccountNumber(t, handler, customerID, account.AccountID)
 }
 
 func TestRoutes__EmptyAccounts(t *testing.T) {
 	customerID := base.ID()
-	repo := setupTestAccountRepository(t)
-	keeper := secrets.TestStringKeeper(t)
-	validationStrategies := map[validator.StrategyKey]validator.Strategy{}
 
-	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, keeper, keeper, validationStrategies)
+	handler := setupRouter(t)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)
@@ -144,6 +107,22 @@ func TestRoutes__EmptyAccounts(t *testing.T) {
 	if body := w.Body.String(); body != "[]\n" {
 		t.Errorf("unexpected response body: %q", body)
 	}
+}
+
+func setupRouter(t *testing.T) *mux.Router {
+	handler := mux.NewRouter()
+
+	testFedClient := &fed.MockClient{}
+	accounts := setupTestAccountRepository(t)
+	validations := &validator.MockRepository{}
+	keeper := secrets.TestStringKeeper(t)
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{
+		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
+	}
+
+	RegisterRoutes(log.NewNopLogger(), handler, accounts, validations, testFedClient, keeper, keeper, validationStrategies)
+
+	return handler
 }
 
 func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*client.Account {
@@ -255,4 +234,19 @@ func httpDeleteAccount(t *testing.T, handler *mux.Router, customerID, accountID 
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
 	}
+}
+
+func httpDecryptAccountNumber(t *testing.T, handler *mux.Router, customerID, accountID string) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/decrypt", customerID, accountID), nil)
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	// check if response body contains accountNumber.
+	// Example:
+	//   {"accountNumber":"XueflKMjfidC2Ifommst9iSK+xF/sn2x+pK/K"}
+	require.Contains(t, w.Body.String(), `"accountNumber":`)
 }
