@@ -30,14 +30,15 @@ import (
 
 func TestRouter__InitAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
-	repo := setupTestAccountRepository(t)
+	accounts := setupTestAccountRepository(t)
+	validations := &validator.MockRepository{}
 
 	strategies := map[validator.StrategyKey]validator.Strategy{
 		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
 	}
 
 	// create account
-	acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+	acc, err := accounts.createCustomerAccount(customerID, userID, &createAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.CHECKING,
@@ -45,14 +46,14 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Test when account is validated already", func(t *testing.T) {
-		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+		acc, err := accounts.createCustomerAccount(customerID, userID, &createAccountRequest{
 			AccountNumber: "1234",
 			RoutingNumber: "987654321",
 			Type:          client.CHECKING,
 		})
 		require.NoError(t, err)
 
-		err = repo.updateAccountStatus(acc.AccountID, admin.VALIDATED)
+		err = accounts.updateAccountStatus(acc.AccountID, admin.VALIDATED)
 		require.NoError(t, err)
 
 		params := map[string]string{
@@ -70,7 +71,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := initAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := initAccountValidation(log.NewNopLogger(), accounts, validations, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusBadRequest, w.Code)
@@ -93,7 +94,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := initAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := initAccountValidation(log.NewNopLogger(), accounts, validations, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusBadRequest, w.Code)
@@ -116,12 +117,22 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := initAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := initAccountValidation(log.NewNopLogger(), accounts, validations, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusOK, w.Code)
 
+		// get created validation from validation mock repo
+		require.Len(t, validations.Validations, 1)
+		validation := validations.Validations[0]
+
 		want := &client.InitAccountValidationResponse{
+			ValidationID: validation.ValidationID,
+			Strategy:     "test",
+			Vendor:       "moov",
+			Status:       validator.StatusInit,
+			CreatedAt:    validation.CreatedAt,
+			UpdatedAt:    validation.UpdatedAt,
 			VendorResponse: validator.VendorResponse{
 				"result": "initiated",
 			},
@@ -159,7 +170,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
 
-		handler := initAccountValidation(log.NewNopLogger(), repo, strategies)
+		handler := initAccountValidation(log.NewNopLogger(), accounts, validations, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusOK, w.Code)
