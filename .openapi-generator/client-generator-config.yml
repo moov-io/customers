@@ -1,0 +1,9 @@
+inputSpec: /local/openapi.yaml
+outputDir: /local/client
+generatorName: go
+artifactId: "client"
+gitUserId: moov-io
+gitRepoId: "customers"
+additionalProperties:
+  isGoSubmodule: true
+  packageName: client

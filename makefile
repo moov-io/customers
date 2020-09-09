@@ -35,7 +35,10 @@ endif
 .PHONY: client
 client:
 ifeq ($(OS),Windows_NT)
-	@echo "Please generate ./client/ on macOS or Linux, currently unsupported on windows."
+	docker run --rm \
+		-e OPENAPI_GENERATOR_VERSION='4.2.0' \
+		-v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 batch -- /local/.openapi-generator/client-generator-config.yml
+	gofmt -w ./client/
 else
 # Versions from https://github.com/OpenAPITools/openapi-generator/releases
 	@chmod +x ./openapi-generator
