@@ -286,3 +286,17 @@ func TestGetCustomersUsingPaging(t *testing.T) {
 	customers, _ = scope.GetCustomers("?skip=30&count=10")
 	scope.assert.Equal(0, len(customers))
 }
+
+func TestGetCustomersUsingPagingFailure(t *testing.T) {
+	scope := Setup(t)
+	_ = scope.CreateCustomers(30)
+
+	customers, _ := scope.GetCustomers("?skip=123abc")
+	scope.assert.Equal(0, len(customers))
+
+	customers, _ = scope.GetCustomers("?count=123abc")
+	scope.assert.Equal(0, len(customers))
+
+	customers, _ = scope.GetCustomers("?skip=123abc&count=123abc")
+	scope.assert.Equal(0, len(customers))
+}
