@@ -23,7 +23,7 @@ const (
 	StatusCompleted = "completed"
 )
 
-type ValidationRepository interface {
+type Repository interface {
 	CreateValidation(*Validation) error
 	GetValidation(accountID, validationID string) (*Validation, error)
 	UpdateValidation(*Validation) error
@@ -38,10 +38,6 @@ func (r *sqlRepository) CreateValidation(validation *Validation) error {
 	now := time.Now()
 	validation.CreatedAt = now
 	validation.UpdatedAt = now
-
-	if validation.Status == "" {
-		validation.Status = StatusInit
-	}
 
 	query := `
 		insert into validations (

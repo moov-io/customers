@@ -14,6 +14,10 @@ func TestRepository(t *testing.T) {
 
 	accountID := base.ID()
 
+	// no validations yet
+	_, err := repo.GetValidation(accountID, "hello")
+	require.Error(t, err)
+
 	validation := &Validation{
 		AccountID: accountID,
 		Status:    StatusInit,
@@ -21,7 +25,7 @@ func TestRepository(t *testing.T) {
 		Vendor:    "mx",
 	}
 
-	err := repo.CreateValidation(validation)
+	err = repo.CreateValidation(validation)
 	require.NoError(t, err)
 	require.NotEmpty(t, validation.ValidationID)
 
