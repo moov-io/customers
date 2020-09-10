@@ -313,4 +313,3 @@ func TestGetCustomersByType(t *testing.T) {
 	businessCustomers, _ := scope.GetCustomers("?type=business")
 	scope.assert.Equal(20, len(businessCustomers))
 }
-

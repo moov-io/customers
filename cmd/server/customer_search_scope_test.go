@@ -62,7 +62,7 @@ func (scope *Scope) CreateCustomer(firstName, lastName, email string, customerTy
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
-		Type: customerType,
+		Type:      customerType,
 	}).asCustomer(testCustomerSSNStorage(scope.t))
 	if err := scope.customerRepo.createCustomer(cust); err != nil {
 		scope.t.Error(err)

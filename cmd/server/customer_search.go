@@ -53,7 +53,7 @@ func readSearchParams(r *http.Request) (searchParams, error) {
 		Query:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
 		Email:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
 		Status: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("status"))),
-		Type: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("type"))),
+		Type:   strings.ToLower(strings.TrimSpace(r.URL.Query().Get("type"))),
 	}
 	skip, count, exists, err := moovhttp.GetSkipAndCount(r)
 	if exists && err != nil {

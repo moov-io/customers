@@ -1534,11 +1534,12 @@ Search for customers using different filter parameters
  * @param query Optional parameter for searching by customer name
  * @param email Optional parameter for searching by customer email
  * @param status Optional parameter for searching by customer status
+ * @param type_ Optional parameter for searching by customer type
  * @param skip Optional parameter for searching for customers by skipping over an initial group
  * @param count Optional parameter for searching for customers by specifying the amount to return
 @return []Customer
 */
-func (a *CustomersApiService) SearchCustomers(ctx _context.Context, query string, email string, status string, skip string, count string) ([]Customer, *_nethttp.Response, error) {
+func (a *CustomersApiService) SearchCustomers(ctx _context.Context, query string, email string, status string, type_ string, skip string, count string) ([]Customer, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -1555,6 +1556,8 @@ func (a *CustomersApiService) SearchCustomers(ctx _context.Context, query string
 	localVarPath = strings.Replace(localVarPath, "{"+"email"+"}", _neturl.QueryEscape(parameterToString(email, "")), -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"status"+"}", _neturl.QueryEscape(parameterToString(status, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"type"+"}", _neturl.QueryEscape(parameterToString(type_, "")), -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"skip"+"}", _neturl.QueryEscape(parameterToString(skip, "")), -1)
 

@@ -714,7 +714,7 @@ No authorization required
 
 ## SearchCustomers
 
-> []Customer SearchCustomers(ctx, query, email, status, skip, count)
+> []Customer SearchCustomers(ctx, query, email, status, type_, skip, count)
 
 Get customers
 
@@ -729,6 +729,7 @@ Name | Type | Description  | Notes
 **query** | **string**| Optional parameter for searching by customer name | 
 **email** | **string**| Optional parameter for searching by customer email | 
 **status** | **string**| Optional parameter for searching by customer status | 
+**type_** | **string**| Optional parameter for searching by customer type | 
 **skip** | **string**| Optional parameter for searching for customers by skipping over an initial group | 
 **count** | **string**| Optional parameter for searching for customers by specifying the amount to return | 
 
