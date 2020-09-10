@@ -2,13 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"net/http/httptest"
+	"testing"
+
 	"github.com/go-kit/kit/log"
 	fuzz "github.com/google/gofuzz"
 	"github.com/gorilla/mux"
-	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/client"
 	"github.com/stretchr/testify/require"
-	"net/http/httptest"
-	"testing"
 )
 
 type Scope struct {

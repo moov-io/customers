@@ -1,6 +1,9 @@
 PLATFORM=$(shell uname -s | tr '[:upper:]' '[:lower:]')
 VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+(-[a-zA-Z0-9]*)?)' version.go)
 
+USERID := $(shell id -u $$USER)
+GROUPID:= $(shell id -g $$USER)
+
 .PHONY: build build-server build-examples docker release check
 
 build: check build-server
@@ -20,32 +23,23 @@ endif
 
 .PHONY: admin
 admin:
-ifeq ($(OS),Windows_NT)
-	@echo "Please generate ./admin/ on macOS or Linux, currently unsupported on windows."
-else
-# Versions from https://github.com/OpenAPITools/openapi-generator/releases
-	@chmod +x ./openapi-generator
-	@rm -rf ./admin
-	OPENAPI_GENERATOR_VERSION=4.3.0 ./openapi-generator generate --package-name admin -i openapi-admin.yaml -g go -o ./admin
-	rm -f admin/go.mod admin/go.sum
-	go fmt ./...
-	go test ./admin
-endif
+	@rm -rf ./pkg/admin
+	docker run --rm \
+		-u $(USERID):$(GROUPID) \
+		-v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 batch -- /local/.openapi-generator/admin-generator-config.yml
+	rm -f ./pkg/admin/go.mod ./pkg/admin/go.sum
+	gofmt -w ./pkg/admin/
+	go build github.com/moov-io/customers/pkg/admin
 
 .PHONY: client
 client:
-ifeq ($(OS),Windows_NT)
-	@echo "Please generate ./client/ on macOS or Linux, currently unsupported on windows."
-else
-# Versions from https://github.com/OpenAPITools/openapi-generator/releases
-	@chmod +x ./openapi-generator
-	@rm -rf ./client
-	OPENAPI_GENERATOR_VERSION=4.3.0 ./openapi-generator generate --package-name client -i openapi.yaml -g go -o ./client
-	rm -f client/go.mod client/go.sum
-	go fmt ./...
-	go build github.com/moov-io/customers/client
-	go test ./client
-endif
+	@rm -rf ./pkg/client
+	docker run --rm \
+		-u $(USERID):$(GROUPID) \
+		-v ${PWD}:/local openapitools/openapi-generator-cli:v4.3.1 batch -- /local/.openapi-generator/client-generator-config.yml
+	rm -f ./pkg/client/go.mod ./pkg/client/go.sum
+	gofmt -w ./pkg/client/
+	go build github.com/moov-io/customers/pkg/client
 
 .PHONY: clean
 clean:

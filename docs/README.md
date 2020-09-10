@@ -11,7 +11,7 @@ The Customers project focuses on solving authentic identification of humans who 
 **Running Customers**
 
 1. [Configuration](../README.md#configuration)
-1. [API Endpoints](https://moov-io.github.io/customers/)
+1. [API Endpoints](https://moov-io.github.io/customers/api/)
 1. [Admin Endpoints](https://moov-io.github.io/customers/admin/)
 
 **Dependencies**

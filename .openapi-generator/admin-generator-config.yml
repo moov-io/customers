@@ -1,0 +1,9 @@
+inputSpec: /local/api/admin.yaml
+outputDir: /local/pkg/admin
+generatorName: go
+artifactId: "customers-admin"
+gitUserId: moov-io
+gitRepoId: "customers"
+additionalProperties:
+  isGoSubmodule: true
+  packageName: admin

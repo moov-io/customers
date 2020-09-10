@@ -15,7 +15,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base"
-	client "github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/client"
 	watchman "github.com/moov-io/watchman/client"
 )
 

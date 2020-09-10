@@ -7,7 +7,7 @@ package fed
 import (
 	"errors"
 
-	"github.com/moov-io/customers/client"
+	"github.com/moov-io/customers/pkg/client"
 
 	hashlru "github.com/hashicorp/golang-lru"
 )

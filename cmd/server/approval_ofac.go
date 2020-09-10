@@ -13,8 +13,8 @@ import (
 	"time"
 
 	moovhttp "github.com/moov-io/base/http"
-	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/route"
+	"github.com/moov-io/customers/pkg/client"
 	watchman "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"

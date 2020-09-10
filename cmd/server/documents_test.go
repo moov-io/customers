@@ -20,8 +20,8 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
-	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"

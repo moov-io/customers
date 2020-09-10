@@ -12,8 +12,8 @@ import (
 
 	"github.com/go-kit/kit/log"
 	moovhttp "github.com/moov-io/base/http"
-	client "github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/route"
+	"github.com/moov-io/customers/pkg/client"
 )
 
 func searchCustomers(logger log.Logger, repo customerRepository) http.HandlerFunc {
