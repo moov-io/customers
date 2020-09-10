@@ -49,8 +49,8 @@ func TestAccountRoutes(t *testing.T) {
 	}
 
 	// validate account
-	httpInitAccountValidation(t, handler, customerID, account.AccountID)
-	httpCompleteAccountValidation(t, handler, customerID, account.AccountID)
+	validationID := httpInitAccountValidation(t, handler, customerID, account.AccountID)
+	httpCompleteAccountValidation(t, handler, customerID, account.AccountID, validationID)
 
 	// delete and expect no accounts
 	httpDeleteAccount(t, handler, customerID, account.AccountID)
@@ -172,7 +172,7 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 	return &account
 }
 
-func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) {
+func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) (validationID string) {
 	params := &client.InitAccountValidationRequest{
 		Strategy: "test",
 	}
@@ -192,14 +192,20 @@ func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, ac
 		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
 	}
 
-	if !strings.Contains(w.Body.String(), "initiated") {
+	var response client.CompleteAccountValidationResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+
+	if !strings.Contains(response.VendorResponse["result"].(string), "initiated") {
 		t.Errorf("expected successful response: %v", w.Body.String())
 	}
+
+	return response.ValidationID
 }
 
-func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) {
+func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID, validationID string) {
 	params := &client.CompleteAccountValidationRequest{
-		Strategy: "test",
 		VendorRequest: validator.VendorRequest{
 			"result": "success",
 		},
@@ -212,7 +218,7 @@ func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID
 	body := bytes.NewReader(buf.Bytes())
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/validate", customerID, accountID), body)
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/validate/%s", customerID, accountID, validationID), body)
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
