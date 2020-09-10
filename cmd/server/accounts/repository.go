@@ -6,6 +6,7 @@ package accounts
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -52,6 +53,9 @@ func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) 
 	var a client.Account
 	row := stmt.QueryRow(customerID, accountID)
 	if err := row.Scan(&a.AccountID, &a.HolderName, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("account: %s for customer: %s was not found", accountID, customerID)
+		}
 		return nil, err
 	}
 	return &a, nil

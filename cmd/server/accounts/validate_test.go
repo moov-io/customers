@@ -181,10 +181,18 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
 	repo := setupTestAccountRepository(t)
 	keeper := secrets.TestStringKeeper(t)
+	validations := &validator.MockRepository{}
 
 	strategies := map[validator.StrategyKey]validator.Strategy{
 		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
 	}
+
+	acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+		AccountNumber: "123456",
+		RoutingNumber: "987654323",
+		Type:          client.CHECKING,
+	})
+	require.NoError(t, err)
 
 	t.Run("Test when account is validated already", func(t *testing.T) {
 		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
@@ -214,43 +222,65 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("POST", "/", body)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
-		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
+		req = mux.SetURLVars(req, map[string]string{
+			"customerID":   customerID,
+			"accountID":    acc.AccountID,
+			"validationID": "xxx",
+		})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, validations, keeper, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusBadRequest, w.Code)
 		require.Contains(t, w.Body.String(), fmt.Sprintf("expected accountID=%s status to be 'none'", acc.AccountID))
 	})
 
-	t.Run("Test unknown strategy is requested", func(t *testing.T) {
-		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
-			AccountNumber: "1236",
-			RoutingNumber: "987654323",
-			Type:          client.CHECKING,
-		})
-		require.NoError(t, err)
-
-		params := &client.CompleteAccountValidationRequest{
-			Strategy: "unknown",
-		}
-
-		var buf bytes.Buffer
-		err = json.NewEncoder(&buf).Encode(params)
-		require.NoError(t, err)
-		body := bytes.NewReader(buf.Bytes())
-
+	t.Run("Test when validation was not found", func(t *testing.T) {
 		w := httptest.NewRecorder()
-		req, err := http.NewRequest("POST", "/", body)
+		req, err := http.NewRequest("POST", "/", bytes.NewReader([]byte("{}")))
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
-		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
+		req = mux.SetURLVars(req, map[string]string{
+			"customerID":   customerID,
+			"accountID":    acc.AccountID,
+			"validationID": "xxx",
+		})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, validations, keeper, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusBadRequest, w.Code)
-		require.Contains(t, w.Body.String(), "strategy unknown for vendor moov was not found")
+
+		require.Contains(t, w.Body.String(), fmt.Sprintf("validation: %s was not found", "xxx"))
+	})
+
+	// Test validation status should be init
+	// Test validation status after complete should be complete
+	t.Run("Test when validation status is not init", func(t *testing.T) {
+		validation := &validator.Validation{
+			AccountID: acc.AccountID,
+			Strategy:  "test",
+			Vendor:    "moov",
+			Status:    validator.StatusCompleted,
+		}
+		err = validations.CreateValidation(validation)
+		require.NoError(t, err)
+
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("POST", "/", bytes.NewReader([]byte("{}")))
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		req = mux.SetURLVars(req, map[string]string{
+			"customerID":   customerID,
+			"accountID":    acc.AccountID,
+			"validationID": validation.ValidationID,
+		})
+
+		handler := completeAccountValidation(log.NewNopLogger(), repo, validations, keeper, strategies)
+		handler(w, req)
+
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.Contains(t, w.Body.String(), fmt.Sprintf("validation: %s status to be 'init'", validation.ValidationID))
 	})
 
 	t.Run("Test 'test' strategy", func(t *testing.T) {
@@ -265,9 +295,17 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		})
 		require.NoError(t, err)
 
+		validation := &validator.Validation{
+			AccountID: acc.AccountID,
+			Strategy:  "test",
+			Vendor:    "moov",
+			Status:    validator.StatusInit,
+		}
+		err = validations.CreateValidation(validation)
+		require.NoError(t, err)
+
 		// build request for test strategy
 		params := &client.CompleteAccountValidationRequest{
-			Strategy: "test",
 			VendorRequest: validator.VendorRequest{
 				"result": "success",
 			},
@@ -282,14 +320,24 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("POST", "/", body)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
-		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
+		req = mux.SetURLVars(req, map[string]string{
+			"customerID":   customerID,
+			"accountID":    acc.AccountID,
+			"validationID": validation.ValidationID,
+		})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, validations, keeper, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusOK, w.Code)
 
 		want := &client.CompleteAccountValidationResponse{
+			ValidationID: validation.ValidationID,
+			Strategy:     "test",
+			Vendor:       "moov",
+			Status:       validator.StatusCompleted,
+			CreatedAt:    validation.CreatedAt,
+			UpdatedAt:    validation.UpdatedAt,
 			VendorResponse: validator.VendorResponse{
 				"result": "validated",
 			},
@@ -317,6 +365,15 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		})
 		require.NoError(t, err)
 
+		validation := &validator.Validation{
+			AccountID: acc.AccountID,
+			Strategy:  "micro-deposits",
+			Vendor:    "moov",
+			Status:    validator.StatusInit,
+		}
+		err = validations.CreateValidation(validation)
+		require.NoError(t, err)
+
 		paygateClient := &paygate.MockClient{
 			Micro: &payclient.MicroDeposits{
 				MicroDepositID: base.ID(),
@@ -331,7 +388,6 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 
 		// build request with strategy params
 		params := &client.CompleteAccountValidationRequest{
-			Strategy: "micro-deposits",
 			VendorRequest: validator.VendorRequest{
 				"micro-deposits": []string{"USD 0.03", "USD 0.07"},
 			},
@@ -346,15 +402,25 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("PUT", "/", body)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
-		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
+		req = mux.SetURLVars(req, map[string]string{
+			"customerID":   customerID,
+			"accountID":    acc.AccountID,
+			"validationID": validation.ValidationID,
+		})
 
-		handler := completeAccountValidation(log.NewNopLogger(), repo, keeper, strategies)
+		handler := completeAccountValidation(log.NewNopLogger(), repo, validations, keeper, strategies)
 		handler(w, req)
 
 		require.Equal(t, http.StatusOK, w.Code)
 
+		// check if account status was set to validated
 		updatedAccount, err := repo.getCustomerAccount(customerID, acc.AccountID)
 		require.NoError(t, err)
 		require.Equal(t, client.VALIDATED, updatedAccount.Status)
+
+		// check if validation status was set to completed
+		validation, err = validations.GetValidation(validation.AccountID, validation.ValidationID)
+		require.NoError(t, err)
+		require.Equal(t, validator.StatusCompleted, validation.Status)
 	})
 }

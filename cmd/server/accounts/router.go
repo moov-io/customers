@@ -32,7 +32,7 @@ func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, valid
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, accounts))
 
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(initAccountValidation(logger, accounts, validations, validationStrategies))
-	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(completeAccountValidation(logger, accounts, keeper, validationStrategies))
+	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(completeAccountValidation(logger, accounts, validations, keeper, validationStrategies))
 }
 
 func getCustomerAccounts(logger log.Logger, repo Repository, fedClient fed.Client) http.HandlerFunc {
