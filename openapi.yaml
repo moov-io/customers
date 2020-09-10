@@ -1410,39 +1410,68 @@ components:
     InitAccountValidationResponse:
       type: object
       properties:
+        validationID:
+          type: string
+          description: A unique identifier for the validation
+          example: e210a9d6
+        strategy:
+          type: string
+          description: Validation strategy
+          example: instant
+        vendor:
+          type: string
+          description: Validation vendor
+          example: plaid
+        status:
+          type: string
+          description: Validation status
+          example: init
+        createdAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
         vendor_response:
           type: object
           description: key/value map of vendor specific params
     CompleteAccountValidationRequest:
       type: object
       properties:
-        strategy:
-          type: string
-          enum:
-            - "micro-deposits"
-            - "instant"
-          description: |
-            Validation strategy to use for the account.
-
-            micro-deposits: Initiate two small credits to the account along with a later balancing debit.
-
-            instant: Initiate instant account validation with specified vendor (e.g. Plaid, MX).
-        vendor:
-          type: string
-          enum:
-            - "moov"
-            - "plaid"
-            - "mx"
-          default: "moov"
         vendor_request:
           type: object
           description: key/value map of vendor specific params
       required:
-        - strategy
         - vendor_request
     CompleteAccountValidationResponse:
       type: object
       properties:
+        validationID:
+          type: string
+          description: A unique identifier for the validation
+          example: e210a9d6
+        strategy:
+          type: string
+          description: Validation strategy
+          example: instant
+        vendor:
+          type: string
+          description: Validation vendor
+          example: plaid
+        status:
+          type: string
+          description: Validation status
+          example: completed
+        createdAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
         vendor_response:
           type: object
           description: key/value map of vendor specific params

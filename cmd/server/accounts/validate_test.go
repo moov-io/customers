@@ -207,7 +207,6 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 
 		// build request for test strategy
 		params := &client.CompleteAccountValidationRequest{
-			Strategy: "test",
 			VendorRequest: validator.VendorRequest{
 				"result": "success",
 			},

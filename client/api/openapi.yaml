@@ -571,12 +571,17 @@ paths:
               examples:
                 Micro-deposits:
                   value:
-                    vendor_response: null
+                    vendor_response:
+                      result: initiated
                 Plaid:
                   value:
                     vendor_response:
                       link_token: link-sandbox-32771002-45e1-4f9b-93fd-000000000000
                       expiration: 2020-08-25T13:07:19Z
+                MX:
+                  value:
+                    vendor_response:
+                      connect_widget_url: https://int-widgets.moneydesktop.com/xxxxxx
               schema:
                 $ref: '#/components/schemas/InitAccountValidationResponse'
           description: Account validation initiated successfully
@@ -650,6 +655,13 @@ paths:
                   vendor: plaid
                   vendor_request:
                     public_token: public-sandbox-59eb4718-93d8-41a0-a338-000000000000
+              MX:
+                value:
+                  strategy: instant
+                  vendor: mx
+                  vendor_request:
+                    user_guid: USR-d6a55e69-8711-4b21-b594-2538551231231
+                    member_guid: MBR-1c38dad9-e699-4f01-baf7-d91231231231
             schema:
               $ref: '#/components/schemas/CompleteAccountValidationRequest'
         required: true
@@ -1074,17 +1086,17 @@ components:
         addresses:
         - country: US
           address2: address2
-          city: city
+          city: Denver
           address1: address1
           postalCode: postalCode
-          state: state
+          state: CO
           type: Primary
         - country: US
           address2: address2
-          city: city
+          city: Denver
           address1: address1
           postalCode: postalCode
-          state: state
+          state: CO
           type: Primary
         metadata:
           paygateID: 23beb5fd
@@ -1365,10 +1377,10 @@ components:
       example:
         country: US
         address2: address2
-        city: city
+        city: Denver
         address1: address1
         postalCode: postalCode
-        state: state
+        state: CO
         type: Primary
       properties:
         type:
@@ -1383,9 +1395,11 @@ components:
           description: Second line of the address
           type: string
         city:
+          example: Denver
           type: string
         state:
           description: two charcer code of US state
+          example: CO
           maximum: 2
           minimum: 2
           type: string
@@ -1461,7 +1475,7 @@ components:
       enum:
       - none
       - validated
-      example: microdeposits
+      example: validated
       type: string
     AccountType:
       description: |
@@ -1527,7 +1541,7 @@ components:
         holderName: My Company,llc or Wade Arnold
         type: checking
         maskedAccountNumber: "0001027028"
-        status: microdeposits
+        status: validated
       properties:
         accountID:
           description: A unique identifier for this account
@@ -1762,60 +1776,99 @@ components:
           enum:
           - micro-deposits
           - instant
-          example: micro-deposits
           type: string
         vendor:
           default: moov
           enum:
           - moov
           - plaid
-          example: moov
+          - mx
           type: string
       required:
       - strategy
       type: object
     InitAccountValidationResponse:
       example:
+        createdAt: 2016-08-29T09:12:33.001Z
+        validationID: e210a9d6
+        vendor: plaid
         vendor_response: '{}'
+        strategy: instant
+        status: init
+        updatedAt: 2016-08-29T09:12:33.001Z
       properties:
+        validationID:
+          description: A unique identifier for the validation
+          example: e210a9d6
+          type: string
+        strategy:
+          description: Validation strategy
+          example: instant
+          type: string
+        vendor:
+          description: Validation vendor
+          example: plaid
+          type: string
+        status:
+          description: Validation status
+          example: init
+          type: string
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        updatedAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
         vendor_response:
           description: key/value map of vendor specific params
           type: object
       type: object
     CompleteAccountValidationRequest:
       example:
-        vendor: moov
-        strategy: micro-deposits
         vendor_request: '{}'
       properties:
-        strategy:
-          description: |
-            Validation strategy to use for the account.
-
-            micro-deposits: Initiate two small credits to the account along with a later balancing debit.
-
-            instant: Initiate instant account validation with specified vendor (e.g. Plaid, MX).
-          enum:
-          - micro-deposits
-          - instant
-          type: string
-        vendor:
-          default: moov
-          enum:
-          - moov
-          - plaid
-          type: string
         vendor_request:
           description: key/value map of vendor specific params
           type: object
       required:
-      - strategy
       - vendor_request
       type: object
     CompleteAccountValidationResponse:
       example:
+        createdAt: 2016-08-29T09:12:33.001Z
+        validationID: e210a9d6
+        vendor: plaid
         vendor_response: '{}'
+        strategy: instant
+        status: completed
+        updatedAt: 2016-08-29T09:12:33.001Z
       properties:
+        validationID:
+          description: A unique identifier for the validation
+          example: e210a9d6
+          type: string
+        strategy:
+          description: Validation strategy
+          example: instant
+          type: string
+        vendor:
+          description: Validation vendor
+          example: plaid
+          type: string
+        status:
+          description: Validation status
+          example: completed
+          type: string
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        updatedAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
         vendor_response:
           description: key/value map of vendor specific params
           type: object
