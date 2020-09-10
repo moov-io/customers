@@ -43,6 +43,7 @@ type searchParams struct {
 	Query  string
 	Email  string
 	Status string
+	Type   string
 	Skip   int64
 	Count  int64
 }
@@ -52,6 +53,7 @@ func readSearchParams(r *http.Request) (searchParams, error) {
 		Query:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
 		Email:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
 		Status: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("status"))),
+		Type: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("type"))),
 	}
 	skip, count, exists, err := moovhttp.GetSkipAndCount(r)
 	if exists && err != nil {
@@ -112,6 +114,10 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 	if params.Status != "" {
 		query += " and status like ?"
 		args = append(args, "%"+params.Status)
+	}
+	if params.Type != "" {
+		query += " and type like ?"
+		args = append(args, "%"+params.Type)
 	}
 	query += " order by created_at asc limit ?"
 	args = append(args, fmt.Sprintf("%d", params.Count))
