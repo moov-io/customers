@@ -40,38 +40,38 @@ paths:
       operationId: searchCustomers
       parameters:
         - name: query
-          in: path
+          in: query
           description: Optional parameter for searching by customer name
           example: jane
           schema:
             type: string
           required: false
         - name: email
-          in: path
+          in: query
           description: Optional parameter for searching by customer email
           example: jane@doe.com
           schema:
             type: string
         - name: status
-          in: path
+          in: query
           description: Optional parameter for searching by customer status
           example: Verified
           schema:
             type: string
         - name: type
-          in: path
+          in: query
           description: Optional parameter for searching by customer type
           example: individual
           schema:
             type: string
         - name: skip
-          in: path
+          in: query
           description: Optional parameter for searching for customers by skipping over an initial group
           example: 10
           schema:
             type: string
         - name: count
-          in: path
+          in: query
           description: Optional parameter for searching for customers by specifying the amount to return
           example: 20
           schema:

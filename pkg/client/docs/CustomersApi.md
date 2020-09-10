@@ -714,7 +714,7 @@ No authorization required
 
 ## SearchCustomers
 
-> []Customer SearchCustomers(ctx, query, email, status, type_, skip, count)
+> []Customer SearchCustomers(ctx, optional)
 
 Get customers
 
@@ -726,12 +726,21 @@ Search for customers using different filter parameters
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**query** | **string**| Optional parameter for searching by customer name | 
-**email** | **string**| Optional parameter for searching by customer email | 
-**status** | **string**| Optional parameter for searching by customer status | 
-**type_** | **string**| Optional parameter for searching by customer type | 
-**skip** | **string**| Optional parameter for searching for customers by skipping over an initial group | 
-**count** | **string**| Optional parameter for searching for customers by specifying the amount to return | 
+ **optional** | ***SearchCustomersOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a SearchCustomersOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **query** | **optional.String**| Optional parameter for searching by customer name | 
+ **email** | **optional.String**| Optional parameter for searching by customer email | 
+ **status** | **optional.String**| Optional parameter for searching by customer status | 
+ **type_** | **optional.String**| Optional parameter for searching by customer type | 
+ **skip** | **optional.String**| Optional parameter for searching for customers by skipping over an initial group | 
+ **count** | **optional.String**| Optional parameter for searching for customers by specifying the amount to return | 
 
 ### Return type
 

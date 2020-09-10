@@ -1527,19 +1527,30 @@ func (a *CustomersApiService) ReplaceCustomerMetadata(ctx _context.Context, cust
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+// SearchCustomersOpts Optional parameters for the method 'SearchCustomers'
+type SearchCustomersOpts struct {
+	Query  optional.String
+	Email  optional.String
+	Status optional.String
+	Type_  optional.String
+	Skip   optional.String
+	Count  optional.String
+}
+
 /*
 SearchCustomers Get customers
 Search for customers using different filter parameters
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param query Optional parameter for searching by customer name
- * @param email Optional parameter for searching by customer email
- * @param status Optional parameter for searching by customer status
- * @param type_ Optional parameter for searching by customer type
- * @param skip Optional parameter for searching for customers by skipping over an initial group
- * @param count Optional parameter for searching for customers by specifying the amount to return
+ * @param optional nil or *SearchCustomersOpts - Optional Parameters:
+ * @param "Query" (optional.String) -  Optional parameter for searching by customer name
+ * @param "Email" (optional.String) -  Optional parameter for searching by customer email
+ * @param "Status" (optional.String) -  Optional parameter for searching by customer status
+ * @param "Type_" (optional.String) -  Optional parameter for searching by customer type
+ * @param "Skip" (optional.String) -  Optional parameter for searching for customers by skipping over an initial group
+ * @param "Count" (optional.String) -  Optional parameter for searching for customers by specifying the amount to return
 @return []Customer
 */
-func (a *CustomersApiService) SearchCustomers(ctx _context.Context, query string, email string, status string, type_ string, skip string, count string) ([]Customer, *_nethttp.Response, error) {
+func (a *CustomersApiService) SearchCustomers(ctx _context.Context, localVarOptionals *SearchCustomersOpts) ([]Customer, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -1551,22 +1562,28 @@ func (a *CustomersApiService) SearchCustomers(ctx _context.Context, query string
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers"
-	localVarPath = strings.Replace(localVarPath, "{"+"query"+"}", _neturl.QueryEscape(parameterToString(query, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"email"+"}", _neturl.QueryEscape(parameterToString(email, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"status"+"}", _neturl.QueryEscape(parameterToString(status, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"type"+"}", _neturl.QueryEscape(parameterToString(type_, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"skip"+"}", _neturl.QueryEscape(parameterToString(skip, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"count"+"}", _neturl.QueryEscape(parameterToString(count, "")), -1)
-
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.Query.IsSet() {
+		localVarQueryParams.Add("query", parameterToString(localVarOptionals.Query.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Email.IsSet() {
+		localVarQueryParams.Add("email", parameterToString(localVarOptionals.Email.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Status.IsSet() {
+		localVarQueryParams.Add("status", parameterToString(localVarOptionals.Status.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Type_.IsSet() {
+		localVarQueryParams.Add("type", parameterToString(localVarOptionals.Type_.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Skip.IsSet() {
+		localVarQueryParams.Add("skip", parameterToString(localVarOptionals.Skip.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Count.IsSet() {
+		localVarQueryParams.Add("count", parameterToString(localVarOptionals.Count.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
 

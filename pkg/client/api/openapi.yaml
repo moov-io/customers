@@ -38,60 +38,60 @@ paths:
       parameters:
       - description: Optional parameter for searching by customer name
         example: jane
-        explode: false
-        in: path
+        explode: true
+        in: query
         name: query
         required: false
         schema:
           type: string
-        style: simple
+        style: form
       - description: Optional parameter for searching by customer email
         example: jane@doe.com
-        explode: false
-        in: path
+        explode: true
+        in: query
         name: email
         required: false
         schema:
           type: string
-        style: simple
+        style: form
       - description: Optional parameter for searching by customer status
         example: Verified
-        explode: false
-        in: path
+        explode: true
+        in: query
         name: status
         required: false
         schema:
           type: string
-        style: simple
+        style: form
       - description: Optional parameter for searching by customer type
         example: individual
-        explode: false
-        in: path
+        explode: true
+        in: query
         name: type
         required: false
         schema:
           type: string
-        style: simple
+        style: form
       - description: Optional parameter for searching for customers by skipping over
           an initial group
         example: 10
-        explode: false
-        in: path
+        explode: true
+        in: query
         name: skip
         required: false
         schema:
           type: string
-        style: simple
+        style: form
       - description: Optional parameter for searching for customers by specifying
           the amount to return
         example: 20
-        explode: false
-        in: path
+        explode: true
+        in: query
         name: count
         required: false
         schema:
           type: string
-        style: simple
+        style: form
       responses:
         "200":
           content:
