@@ -27,7 +27,6 @@ func (r *MockRepository) CreateValidation(validation *Validation) error {
 	}
 
 	r.Validations = append(r.Validations, validation)
-	fmt.Println(r.Validations)
 
 	return nil
 }
@@ -37,11 +36,13 @@ func (r *MockRepository) GetValidation(accountID, validationID string) (*Validat
 		return nil, r.Err
 	}
 
-	if len(r.Validations) == 0 {
-		return nil, fmt.Errorf("Validation: %s was not found", validationID)
+	for _, validation := range r.Validations {
+		if validation.ValidationID == validationID && validation.AccountID == accountID {
+			return validation, nil
+		}
 	}
 
-	return r.Validations[0], nil
+	return nil, fmt.Errorf("validation: %s was not found", validationID)
 }
 
 func (r *MockRepository) UpdateValidation(validation *Validation) error {

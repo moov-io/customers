@@ -106,6 +106,7 @@ func (r *sqlRepository) GetValidation(accountID, validationID string) (*Validati
 	); err != nil {
 		return nil, err
 	}
+
 	return &validation, nil
 }
 
