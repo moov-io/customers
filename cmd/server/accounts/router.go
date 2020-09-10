@@ -31,7 +31,9 @@ func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, valid
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, accounts, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, accounts))
 
+	// TODO rename validate into validations?
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/validate").HandlerFunc(initAccountValidation(logger, accounts, validations, validationStrategies))
+	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/validate/{validationID}").HandlerFunc(getAccountValidation(logger, accounts, validations))
 	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validate/{validationID}").HandlerFunc(completeAccountValidation(logger, accounts, validations, keeper, validationStrategies))
 }
 

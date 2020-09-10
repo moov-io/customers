@@ -21,6 +21,47 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
+func getAccountValidation(logger log.Logger, accounts Repository, validations validator.Repository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+
+		vars := mux.Vars(r)
+		// ASK do we need userID here and in methods below?
+		// with micro-deposits it's clear that we need to pass it
+		// to paygate. But
+		// userID := moovhttp.GetUserID(r)
+
+		customerID := vars["customerID"]
+		accountID := vars["accountID"]
+		validationID := vars["validationID"]
+
+		account, err := accounts.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		validation, err := validations.GetValidation(account.AccountID, validationID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		res := client.AccountValidationResponse{
+			ValidationID: validation.ValidationID,
+			Strategy:     validation.Strategy,
+			Vendor:       validation.Vendor,
+			Status:       validation.Status,
+			CreatedAt:    validation.CreatedAt,
+			UpdatedAt:    validation.UpdatedAt,
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(res)
+	}
+}
+
 func initAccountValidation(logger log.Logger, accounts Repository, validations validator.Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
@@ -129,7 +170,7 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 			return
 		}
 
-		validation, err := validations.GetValidation(accountID, validationID)
+		validation, err := validations.GetValidation(account.AccountID, validationID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			moovhttp.Problem(w, fmt.Errorf("validation: %s for account: %s was not found", validationID, accountID))
