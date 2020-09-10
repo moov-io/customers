@@ -28,6 +28,72 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func TestRouter__AccountValidation(t *testing.T) {
+	customerID, userID := base.ID(), base.ID()
+	accounts := setupTestAccountRepository(t)
+	validations := &validator.MockRepository{}
+
+	// create account
+	acc, err := accounts.createCustomerAccount(customerID, userID, &createAccountRequest{
+		AccountNumber: "123",
+		RoutingNumber: "987654320",
+		Type:          client.CHECKING,
+	})
+	require.NoError(t, err)
+
+	t.Run("Test when validation was not found", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/", nil)
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		req = mux.SetURLVars(req, map[string]string{
+			"customerID":   customerID,
+			"accountID":    acc.AccountID,
+			"validationID": "xxx",
+		})
+
+		handler := getAccountValidation(log.NewNopLogger(), accounts, validations)
+		handler(w, req)
+
+		require.Equal(t, http.StatusBadRequest, w.Code)
+		require.Contains(t, w.Body.String(), fmt.Sprintf("validation: %s was not found", "xxx"))
+	})
+
+	t.Run("Test when validation was not found", func(t *testing.T) {
+		validation := &validator.Validation{
+			AccountID: acc.AccountID,
+			Strategy:  "test",
+			Vendor:    "moov",
+			Status:    validator.StatusInit,
+		}
+		err = validations.CreateValidation(validation)
+		require.NoError(t, err)
+
+		w := httptest.NewRecorder()
+		req, err := http.NewRequest("GET", "/", nil)
+		require.NoError(t, err)
+		req.Header.Set("Content-Type", "application/json")
+		req = mux.SetURLVars(req, map[string]string{
+			"customerID":   customerID,
+			"accountID":    acc.AccountID,
+			"validationID": validation.ValidationID,
+		})
+
+		handler := getAccountValidation(log.NewNopLogger(), accounts, validations)
+		handler(w, req)
+
+		require.Equal(t, http.StatusOK, w.Code)
+
+		var response client.AccountValidationResponse
+		if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+			t.Fatal(err)
+		}
+
+		require.Equal(t, validation.ValidationID, response.ValidationID)
+		require.Equal(t, validation.Status, response.Status)
+	})
+}
+
 func TestRouter__InitAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
 	accounts := setupTestAccountRepository(t)

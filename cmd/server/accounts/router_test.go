@@ -51,6 +51,7 @@ func TestAccountRoutes(t *testing.T) {
 	// validate account
 	validationID := httpInitAccountValidation(t, handler, customerID, account.AccountID)
 	httpCompleteAccountValidation(t, handler, customerID, account.AccountID, validationID)
+	httpGetAccountValidation(t, handler, customerID, account.AccountID, validationID)
 
 	// delete and expect no accounts
 	httpDeleteAccount(t, handler, customerID, account.AccountID)
@@ -229,6 +230,18 @@ func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID
 	if !strings.Contains(w.Body.String(), "validated") {
 		t.Errorf("expected successful response: %v", w.Body.String())
 	}
+}
+
+func httpGetAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID, validationID string) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s/validate/%s", customerID, accountID, validationID), nil)
+	handler.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var response client.AccountValidationResponse
+	err := json.NewDecoder(w.Body).Decode(&response)
+	require.NoError(t, err)
 }
 
 func httpDeleteAccount(t *testing.T, handler *mux.Router, customerID, accountID string) {

@@ -511,6 +511,82 @@ paths:
       summary: Decrypt Account Number
       tags:
       - Customers
+  /customers/{customerID}/accounts/{accountID}/validate/{validationID}:
+    get:
+      description: |
+        Get information about account validation strategy, status, etc.
+      operationId: getAccountValidation
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer the accountID belongs to
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: 51dd8cdd
+          type: string
+        style: simple
+      - description: accountID of the Account to validate
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      - description: ID of the Validation
+        explode: false
+        in: path
+        name: validationID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                validationID: b74d7c51
+                strategy: instant
+                vendor: plaid
+                status: completed
+                createdAt: 2020-08-25T13:07:19Z
+                updatedAt: 2020-08-25T13:09:22Z
+              schema:
+                $ref: '#/components/schemas/AccountValidationResponse'
+          description: Account validation information
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to initiate account validation, see error(s)
+      summary: Get Account Validation
+      tags:
+      - Customers
   /customers/{customerID}/accounts/{accountID}/validate:
     post:
       description: |
@@ -1872,6 +1948,43 @@ components:
         vendor_response:
           description: key/value map of vendor specific params
           type: object
+      type: object
+    AccountValidationResponse:
+      example:
+        createdAt: 2016-08-29T09:12:33.001Z
+        validationID: e210a9d6
+        vendor: plaid
+        strategy: instant
+        status: completed
+        updatedAt: 2016-08-29T09:12:33.001Z
+      properties:
+        validationID:
+          description: A unique identifier for the validation
+          example: e210a9d6
+          type: string
+        strategy:
+          description: Validation strategy
+          example: instant
+          type: string
+        vendor:
+          description: Validation vendor
+          example: plaid
+          type: string
+        status:
+          description: Validation status
+          enum:
+          - init
+          - completed
+          example: completed
+          type: string
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        updatedAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
       type: object
     Error:
       properties:
