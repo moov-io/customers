@@ -29,6 +29,12 @@ type Repository interface {
 	UpdateValidation(*Validation) error
 }
 
+func NewRepo(db *sql.DB) Repository {
+	return &sqlRepository{
+		db: db,
+	}
+}
+
 type sqlRepository struct {
 	db *sql.DB
 }

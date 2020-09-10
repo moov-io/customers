@@ -84,16 +84,15 @@ func main() {
 		}
 	}()
 
+	// ASK do we really need to close each repository?
+	// we close db connection above and in all repos we
+	// do the same
 	accountsRepo := accounts.NewRepo(logger, db)
-	defer accountsRepo.Close()
 	customerRepo := &sqlCustomerRepository{db, logger}
-	defer customerRepo.close()
 	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
-	defer customerSSNRepo.close()
 	disclaimerRepo := &sqlDisclaimerRepository{db, logger}
-	defer disclaimerRepo.close()
 	documentRepo := &sqlDocumentRepository{db, logger}
-	defer documentRepo.close()
+	validationsRepo := validator.NewRepo(db)
 
 	// Start Admin server (with Prometheus metrics)
 	adminServer := admin.NewServer(*adminAddr)
@@ -169,7 +168,7 @@ func main() {
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies)
+	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
