@@ -63,6 +63,15 @@ paths:
         schema:
           type: string
         style: simple
+      - description: Optional parameter for searching by customer type
+        example: individual
+        explode: false
+        in: path
+        name: type
+        required: false
+        schema:
+          type: string
+        style: simple
       - description: Optional parameter for searching for customers by skipping over
           an initial group
         example: 10

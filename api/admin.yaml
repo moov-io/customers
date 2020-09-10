@@ -196,7 +196,7 @@ components:
     UpdateAccountStatus:
       properties:
         status:
-          $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/openapi.yaml#/components/schemas/AccountStatus'
+          $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/api/client.yaml#/components/schemas/AccountStatus'
       required:
         - status
     CreateUserDisclaimer:
@@ -218,7 +218,7 @@ components:
           description: Free form text for admin users
           example: User submitted address information
         status:
-          $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/openapi.yaml#/components/schemas/CustomerStatus'
+          $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/api/client.yaml#/components/schemas/CustomerStatus'
       required:
         - status
     UpdateCustomerAddress:

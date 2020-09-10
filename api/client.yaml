@@ -58,6 +58,12 @@ paths:
           example: Verified
           schema:
             type: string
+        - name: type
+          in: path
+          description: Optional parameter for searching by customer type
+          example: individual
+          schema:
+            type: string
         - name: skip
           in: path
           description: Optional parameter for searching for customers by skipping over an initial group

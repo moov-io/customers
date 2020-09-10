@@ -42,7 +42,7 @@ func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error) {
 	return customers, nil
 }
 
-func (scope *Scope) CreateCustomers(count int) []client.Customer {
+func (scope *Scope) CreateCustomers(count int, customerType client.CustomerType) []client.Customer {
 	var customers []client.Customer
 	for i := 0; i < count; i++ {
 		var firstName string
@@ -51,17 +51,18 @@ func (scope *Scope) CreateCustomers(count int) []client.Customer {
 		scope.fuzzer.Fuzz(&firstName)
 		scope.fuzzer.Fuzz(&lastName)
 		scope.fuzzer.Fuzz(&email)
-		customer := scope.CreateCustomer(firstName, lastName, email)
+		customer := scope.CreateCustomer(firstName, lastName, email, customerType)
 		customers = append(customers, customer)
 	}
 	return customers
 }
 
-func (scope *Scope) CreateCustomer(firstName, lastName, email string) client.Customer {
+func (scope *Scope) CreateCustomer(firstName, lastName, email string, customerType client.CustomerType) client.Customer {
 	cust, _, _ := (customerRequest{
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
+		Type:      customerType,
 	}).asCustomer(testCustomerSSNStorage(scope.t))
 	if err := scope.customerRepo.createCustomer(cust); err != nil {
 		scope.t.Error(err)
