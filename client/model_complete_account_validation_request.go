@@ -11,9 +11,6 @@ package client
 
 // CompleteAccountValidationRequest struct for CompleteAccountValidationRequest
 type CompleteAccountValidationRequest struct {
-	// Validation strategy to use for the account.  micro-deposits: Initiate two small credits to the account along with a later balancing debit.  instant: Initiate instant account validation with specified vendor (e.g. Plaid, MX).
-	Strategy string `json:"strategy"`
-	Vendor   string `json:"vendor,omitempty"`
 	// key/value map of vendor specific params
 	VendorRequest map[string]interface{} `json:"vendor_request"`
 }
