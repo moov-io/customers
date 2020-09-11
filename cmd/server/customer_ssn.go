@@ -70,10 +70,6 @@ type sqlCustomerSSNRepository struct {
 	logger log.Logger
 }
 
-func (r *sqlCustomerSSNRepository) close() error {
-	return r.db.Close()
-}
-
 //
 
 func (r *sqlCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {

@@ -212,10 +212,6 @@ type sqlDocumentRepository struct {
 	logger log.Logger
 }
 
-func (r *sqlDocumentRepository) close() error {
-	return r.db.Close()
-}
-
 func (r *sqlDocumentRepository) getCustomerDocuments(customerID string) ([]*client.Document, error) {
 	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ?`
 	stmt, err := r.db.Prepare(query)

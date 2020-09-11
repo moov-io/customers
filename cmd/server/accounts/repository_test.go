@@ -28,7 +28,6 @@ func setupTestAccountRepository(t *testing.T) *testAccountRepository {
 
 	t.Cleanup(func() {
 		db.Close()
-		repo.Close()
 	})
 
 	return &testAccountRepository{Repository: repo, db: db}

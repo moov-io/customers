@@ -38,10 +38,6 @@ type sqlAccountRepository struct {
 	logger log.Logger
 }
 
-func (r *sqlAccountRepository) Close() error {
-	return r.db.Close()
-}
-
 func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
 	query := `select account_id, holder_name, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
