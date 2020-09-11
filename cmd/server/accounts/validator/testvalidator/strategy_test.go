@@ -7,8 +7,8 @@ package testvalidator
 import (
 	"testing"
 
-	"github.com/moov-io/customers/client"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
+	"github.com/moov-io/customers/pkg/client"
 	"github.com/stretchr/testify/require"
 )
 

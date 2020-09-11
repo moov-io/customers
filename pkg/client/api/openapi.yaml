@@ -723,15 +723,33 @@ paths:
               examples:
                 Micro-deposits:
                   value:
+                    validationID: b74d7c51
+                    strategy: micro-deposits
+                    vendor: moov
+                    status: init
+                    createdAt: 2020-08-25T13:07:19Z
+                    updatedAt: 2020-08-25T13:09:22Z
                     vendor_response:
                       result: initiated
                 Plaid:
                   value:
+                    validationID: b74d7c51
+                    strategy: instant
+                    vendor: plaid
+                    status: init
+                    createdAt: 2020-08-25T13:07:19Z
+                    updatedAt: 2020-08-25T13:09:22Z
                     vendor_response:
                       link_token: link-sandbox-32771002-45e1-4f9b-93fd-000000000000
                       expiration: 2020-08-25T13:07:19Z
                 MX:
                   value:
+                    validationID: b74d7c51
+                    strategy: instant
+                    vendor: mx
+                    status: init
+                    createdAt: 2020-08-25T13:07:19Z
+                    updatedAt: 2020-08-25T13:09:22Z
                     vendor_response:
                       connect_widget_url: https://int-widgets.moneydesktop.com/xxxxxx
               schema:
@@ -822,6 +840,12 @@ paths:
           content:
             application/json:
               example:
+                validationID: b74d7c51
+                strategy: micro-deposits
+                vendor: moov
+                status: completed
+                createdAt: 2020-08-25T13:07:19Z
+                updatedAt: 2020-08-25T13:09:22Z
                 vendor_response:
                   result: validated
               schema:

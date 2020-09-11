@@ -4,7 +4,7 @@
 
 package validator
 
-import "github.com/moov-io/customers/client"
+import "github.com/moov-io/customers/pkg/client"
 
 type StrategyKey struct {
 	Strategy string
