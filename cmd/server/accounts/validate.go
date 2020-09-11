@@ -21,23 +21,57 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-func initAccountValidation(logger log.Logger, repo Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
+func getAccountValidation(logger log.Logger, accounts Repository, validations validator.Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		// TODO: discuss
-		// following methods Get...ID have side effect inside: moovhttp.Problem(w, ErrNoCustomerID)
-		// customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
 		vars := mux.Vars(r)
-		userID, customerID, accountID := moovhttp.GetUserID(r), vars["customerID"], vars["accountID"]
+		// ASK do we need userID here and in methods below?
+		// with micro-deposits it's clear that we need to pass it
+		// to paygate. But
+		// userID := moovhttp.GetUserID(r)
 
-		if customerID == "" || accountID == "" {
-			moovhttp.Problem(w, fmt.Errorf("missing customerID: %s and/or accountID: %s", customerID, accountID))
+		customerID := vars["customerID"]
+		accountID := vars["accountID"]
+		validationID := vars["validationID"]
+
+		account, err := accounts.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
 			return
 		}
 
-		// Lookup the account and verify it needs to be validated
-		account, err := repo.getCustomerAccount(customerID, accountID)
+		validation, err := validations.GetValidation(account.AccountID, validationID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		res := client.AccountValidationResponse{
+			ValidationID: validation.ValidationID,
+			Strategy:     validation.Strategy,
+			Vendor:       validation.Vendor,
+			Status:       validation.Status,
+			CreatedAt:    validation.CreatedAt,
+			UpdatedAt:    validation.UpdatedAt,
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(res)
+	}
+}
+
+func initAccountValidation(logger log.Logger, accounts Repository, validations validator.Repository, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+
+		vars := mux.Vars(r)
+		userID := moovhttp.GetUserID(r)
+		customerID := vars["customerID"]
+		accountID := vars["accountID"]
+
+		account, err := accounts.getCustomerAccount(customerID, accountID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -71,6 +105,20 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 			return
 		}
 
+		// TODO I would wrap it into transaction, so if strategy fails
+		// then no validation record is created
+		validation := &validator.Validation{
+			AccountID: accountID,
+			Strategy:  req.Strategy,
+			Vendor:    req.Vendor,
+			Status:    validator.StatusInit,
+		}
+		err = validations.CreateValidation(validation)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
 		// execute strategy and get vendor response
 		vendorResponse, err := strategy.InitAccountValidation(userID, accountID, customerID)
 		if err != nil {
@@ -80,6 +128,12 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 
 		// render validation with vendor response
 		res := client.InitAccountValidationResponse{
+			ValidationID:   validation.ValidationID,
+			Strategy:       validation.Strategy,
+			Vendor:         validation.Vendor,
+			Status:         validation.Status,
+			CreatedAt:      validation.CreatedAt,
+			UpdatedAt:      validation.UpdatedAt,
 			VendorResponse: *vendorResponse,
 		}
 
@@ -89,19 +143,16 @@ func initAccountValidation(logger log.Logger, repo Repository, strategies map[va
 	}
 }
 
-func completeAccountValidation(logger log.Logger, repo Repository, keeper *secrets.StringKeeper, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
+func completeAccountValidation(logger log.Logger, repo Repository, validations validator.Repository, keeper *secrets.StringKeeper, strategies map[validator.StrategyKey]validator.Strategy) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
 		vars := mux.Vars(r)
-		userID, customerID, accountID := moovhttp.GetUserID(r), vars["customerID"], vars["accountID"]
+		userID := moovhttp.GetUserID(r)
+		customerID := vars["customerID"]
+		accountID := vars["accountID"]
+		validationID := vars["validationID"]
 
-		if customerID == "" || accountID == "" {
-			moovhttp.Problem(w, fmt.Errorf("missing customerID: %s and/or accountID: %s", customerID, accountID))
-			return
-		}
-
-		// // check if account is not validated yet
 		account, err := repo.getCustomerAccount(customerID, accountID)
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -119,22 +170,27 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 			return
 		}
 
-		// set default vendor if not specified
-		// if we have Validation record we can get strategy and vendor from it
-		// for now let's keep it as is
-		if req.Vendor == "" {
-			req.Vendor = "moov"
+		validation, err := validations.GetValidation(account.AccountID, validationID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			moovhttp.Problem(w, fmt.Errorf("validation: %s for account: %s was not found", validationID, accountID))
+			return
+		}
+
+		if validation.Status != validator.StatusInit {
+			moovhttp.Problem(w, fmt.Errorf("expected validation: %s status to be '%s', but it is '%s'", validationID, validator.StatusInit, validation.Status))
+			return
 		}
 
 		// find requested strategy
 		strategyKey := validator.StrategyKey{
-			Strategy: req.Strategy,
-			Vendor:   req.Vendor,
+			Strategy: validation.Strategy,
+			Vendor:   validation.Vendor,
 		}
 
 		strategy, found := strategies[strategyKey]
 		if !found {
-			moovhttp.Problem(w, fmt.Errorf("strategy %s for vendor %s was not found", req.Strategy, req.Vendor))
+			moovhttp.Problem(w, fmt.Errorf("strategy %s for vendor %s was not found", strategyKey.Strategy, strategyKey.Vendor))
 			return
 		}
 
@@ -159,6 +215,13 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 			return
 		}
 
+		validation.Status = validator.StatusCompleted
+		err = validations.UpdateValidation(validation)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
 		err = repo.updateAccountStatus(accountID, admin.VALIDATED)
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -167,6 +230,12 @@ func completeAccountValidation(logger log.Logger, repo Repository, keeper *secre
 
 		// render validation with vendor response
 		res := &client.CompleteAccountValidationResponse{
+			ValidationID:   validation.ValidationID,
+			Strategy:       validation.Strategy,
+			Vendor:         validation.Vendor,
+			Status:         validation.Status,
+			CreatedAt:      validation.CreatedAt,
+			UpdatedAt:      validation.UpdatedAt,
 			VendorResponse: *vendorResponse,
 		}
 

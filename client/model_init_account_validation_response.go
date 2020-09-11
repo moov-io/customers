@@ -9,8 +9,22 @@
 
 package client
 
+import (
+	"time"
+)
+
 // InitAccountValidationResponse struct for InitAccountValidationResponse
 type InitAccountValidationResponse struct {
+	// A unique identifier for the validation
+	ValidationID string `json:"validationID,omitempty"`
+	// Validation strategy
+	Strategy string `json:"strategy,omitempty"`
+	// Validation vendor
+	Vendor string `json:"vendor,omitempty"`
+	// Validation status
+	Status    string    `json:"status,omitempty"`
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	UpdatedAt time.Time `json:"updatedAt,omitempty"`
 	// key/value map of vendor specific params
 	VendorResponse map[string]interface{} `json:"vendor_response,omitempty"`
 }
