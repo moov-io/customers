@@ -28,23 +28,23 @@ type Repository interface {
 	getEncryptedAccountNumber(customerID, accountID string) (string, error)
 
 	getLatestAccountOFACSearch(accountID string) (*ofacSearchResult, error)
-	SaveAccountOFACSearch(id string, result ofacSearchResult) error
+	saveAccountOFACSearch(id string, result ofacSearchResult) error
 }
 
-func NewRepo(logger log.Logger, db *sql.DB) *SqlAccountRepository {
-	return &SqlAccountRepository{logger: logger, db: db}
+func NewRepo(logger log.Logger, db *sql.DB) *sqlAccountRepository {
+	return &sqlAccountRepository{logger: logger, db: db}
 }
 
-type SqlAccountRepository struct {
+type sqlAccountRepository struct {
 	db     *sql.DB
 	logger log.Logger
 }
 
-func (r *SqlAccountRepository) Close() error {
+func (r *sqlAccountRepository) Close() error {
 	return r.db.Close()
 }
 
-func (r *SqlAccountRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
+func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
 	query := `select account_id, holder_name, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -60,7 +60,7 @@ func (r *SqlAccountRepository) getCustomerAccount(customerID, accountID string) 
 	return &a, nil
 }
 
-func (r *SqlAccountRepository) getCustomerAccounts(customerID string) ([]*client.Account, error) {
+func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client.Account, error) {
 	query := `select account_id from accounts where customer_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -89,7 +89,7 @@ func (r *SqlAccountRepository) getCustomerAccounts(customerID string) ([]*client
 	return out, nil
 }
 
-func (r *SqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
+func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
 	account := &client.Account{
 		AccountID:           base.ID(),
 		HolderName:          req.HolderName,
@@ -120,7 +120,7 @@ func (r *SqlAccountRepository) createCustomerAccount(customerID, userID string, 
 	return account, nil
 }
 
-func (r *SqlAccountRepository) deactivateCustomerAccount(accountID string) error {
+func (r *sqlAccountRepository) deactivateCustomerAccount(accountID string) error {
 	query := `update accounts set deleted_at = ? where account_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -135,7 +135,7 @@ func (r *SqlAccountRepository) deactivateCustomerAccount(accountID string) error
 	return err
 }
 
-func (r *SqlAccountRepository) updateAccountStatus(accountID string, status admin.AccountStatus) error {
+func (r *sqlAccountRepository) updateAccountStatus(accountID string, status admin.AccountStatus) error {
 	query := `update accounts set status = ? where account_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -147,7 +147,7 @@ func (r *SqlAccountRepository) updateAccountStatus(accountID string, status admi
 	return err
 }
 
-func (r *SqlAccountRepository) getEncryptedAccountNumber(customerID, accountID string) (string, error) {
+func (r *sqlAccountRepository) getEncryptedAccountNumber(customerID, accountID string) (string, error) {
 	query := `select encrypted_account_number from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -165,7 +165,7 @@ func (r *SqlAccountRepository) getEncryptedAccountNumber(customerID, accountID s
 	return encrypted, nil
 }
 
-func (r *SqlAccountRepository) getLatestAccountOFACSearch(accountID string) (*ofacSearchResult, error) {
+func (r *sqlAccountRepository) getLatestAccountOFACSearch(accountID string) (*ofacSearchResult, error) {
 	query := `select entity_id, sdn_name, sdn_type, percentage_match, created_at from account_ofac_searches where account_id = ? order by created_at desc limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -184,11 +184,11 @@ func (r *SqlAccountRepository) getLatestAccountOFACSearch(accountID string) (*of
 	return &res, nil
 }
 
-func (r *SqlAccountRepository) SaveAccountOFACSearch(accountID string, result ofacSearchResult) error {
+func (r *sqlAccountRepository) saveAccountOFACSearch(accountID string, result ofacSearchResult) error {
 	query := `insert into account_ofac_searches (account_id, entity_id, sdn_name, sdn_type, percentage_match, created_at) values (?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("SaveAccountOFACSearch: prepare: %v", err)
+		return fmt.Errorf("saveAccountOFACSearch: prepare: %v", err)
 	}
 	defer stmt.Close()
 
@@ -197,7 +197,7 @@ func (r *SqlAccountRepository) SaveAccountOFACSearch(accountID string, result of
 	}
 
 	if _, err := stmt.Exec(accountID, result.EntityID, result.SDNName, result.SDNType, result.Match, result.CreatedAt); err != nil {
-		return fmt.Errorf("SaveAccountOFACSearch: exec: %v", err)
+		return fmt.Errorf("saveAccountOFACSearch: exec: %v", err)
 	}
 	return nil
 }

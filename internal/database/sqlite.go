@@ -76,10 +76,6 @@ var (
 			`create table if not exists accounts(account_id primary key, customer_id, user_id, encrypted_account_number, hashed_account_number, masked_account_number, routing_number, status, type, created_at datetime, deleted_at datetime);`,
 		),
 		execsql(
-			"create_account_ofac_searches",
-			`create table if not exists account_ofac_searches(account_ofac_search_id varchar(40) primary key, account_id varchar(40), entity_id varchar(40), sdn_name varchar(40), sdn_type integer, percentage_match double precision (5,2), created_at datetime);`,
-		),
-		execsql(
 			"add_customer_type",
 			`alter table customers add column type; update customers set type = 'individual' where type is null;`,
 		),
@@ -116,6 +112,10 @@ PRAGMA foreign_keys=on;`,
 		execsql(
 			"add_holder_name_to_accounts",
 			`alter table accounts add column holder_name default '';`,
+		),
+		execsql(
+			"create_account_ofac_searches",
+			`create table if not exists account_ofac_searches(account_ofac_search_id varchar(40) primary key, account_id varchar(40), entity_id varchar(40), sdn_name varchar(40), sdn_type integer, percentage_match double precision (5,2), created_at datetime);`,
 		),
 	)
 )

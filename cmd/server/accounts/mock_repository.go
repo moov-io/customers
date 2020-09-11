@@ -19,7 +19,7 @@ func (r *mockRepository) getLatestAccountOFACSearch(accountID string) (*ofacSear
 	panic("implement me")
 }
 
-func (r *mockRepository) SaveAccountOFACSearch(id string, result ofacSearchResult) error {
+func (r *mockRepository) saveAccountOFACSearch(id string, result ofacSearchResult) error {
 	panic("implement me")
 }
 

@@ -46,7 +46,7 @@ func (s *AccountOfacSearcher) StoreAccountOFACSearch(account *client.Account, re
 	if err != nil {
 		return fmt.Errorf("AccountOfacSearcher.StoreAccountOFACSearch: name search for account=%s: %v", account.AccountID, err)
 	}
-	err = s.Repo.SaveAccountOFACSearch(account.AccountID, ofacSearchResult{
+	err = s.Repo.saveAccountOFACSearch(account.AccountID, ofacSearchResult{
 		EntityID:  sdn.EntityID,
 		SDNName:   sdn.SdnName,
 		SDNType:   sdn.SdnType,
@@ -54,7 +54,7 @@ func (s *AccountOfacSearcher) StoreAccountOFACSearch(account *client.Account, re
 		CreatedAt: time.Now(),
 	})
 	if err != nil {
-		return fmt.Errorf("AccountOfacSearcher.StoreAccountOFACSearch: SaveAccountOFACSearch account=%s: %v", account.AccountID, err)
+		return fmt.Errorf("AccountOfacSearcher.StoreAccountOFACSearch: saveAccountOFACSearch account=%s: %v", account.AccountID, err)
 	}
 
 	return nil
