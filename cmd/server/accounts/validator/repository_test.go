@@ -10,7 +10,6 @@ import (
 
 func TestRepository(t *testing.T) {
 	repo := createTestRepository(t)
-	defer repo.Close()
 
 	accountID := base.ID()
 
@@ -49,6 +48,7 @@ func TestRepository(t *testing.T) {
 func createTestRepository(t *testing.T) *sqlRepository {
 	t.Helper()
 
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestMySQLDB(t)
+
 	return &sqlRepository{db.DB}
 }
