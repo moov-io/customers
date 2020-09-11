@@ -109,39 +109,39 @@ Please, find more details on the [Plaid Link documentation website](https://plai
 
 ```html
 <html>
-	<body>
-		<button id="link-button">Verify Account with Plaid</button>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-		<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
-		<script type="text/javascript">
-			var handler;
+<body>
+	<button id="link-button">Verify Account with Plaid</button>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+	<script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js"></script>
+	<script type="text/javascript">
+		var handler;
 
-			// 1. send POST request to your app server (e.g., /verify)
-			$.post('/verify', {}, function(data){
-				// 2. Open Plaid Link with link_token from Moov Customers
-				handler = Plaid.create({
-					token: data.link_token,
-					onSuccess: function(public_token) {
-						// 3. send public_token your app server
-						$.ajax({
-							type: "PUT",
-							url: "/verify",
-							data: {
-								public_token: public_token,
-							},
-							success: function(data) {
-								console.log("Verification result: ", data);
-							},
-						});
-					},
-				});
+		// 1. send POST request to your app server (e.g., /verify)
+		$.post('/verify', {}, function (data) {
+			// 2. Open Plaid Link with link_token from Moov Customers
+			handler = Plaid.create({
+				token: data.link_token,
+				onSuccess: function (public_token) {
+					// 3. send public_token your app server
+					$.ajax({
+						type: "PUT",
+						url: "/verify",
+						data: {
+							public_token: public_token,
+						},
+						success: function (data) {
+							console.log("Verification result: ", data);
+						},
+					});
+				},
 			});
+		});
 
-			$('#link-button').on('click', function(e) {
-				handler.open();
-			});
-		</script>
-	</body>
+		$('#link-button').on('click', function (e) {
+			handler.open();
+		});
+	</script>
+</body>
 </html>
 ```
 
@@ -221,46 +221,46 @@ Please, find more details on [how to setup and configure MX Connect](https://atr
 
 ```html
 <html>
-	<body>
-		<button id="link-button">Verify Account with MX</button>
-		<p>Select MX bank and use test_atrium/password or test_atrium/challenge with "correct" as MFA answer</p>
-		<div id="verifyAccount"></div>
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
-		<script src="https://atrium.mx.com/connect.js"></script>
-		<script type="text/javascript">
-			var handler;
+<body>
+	<button id="link-button">Verify Account with MX</button>
+	<p>Select MX bank and use test_atrium/password or test_atrium/challenge with "correct" as MFA answer</p>
+	<div id="verifyAccount"></div>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.3/jquery.min.js"></script>
+	<script src="https://atrium.mx.com/connect.js"></script>
+	<script type="text/javascript">
+		var handler;
 
-			// 1. send POST request to your app server (e.g., /verify)
-			$.post('/verify', {}, function(data){
-				console.log(data, data.connect_widget_url);
+		// 1. send POST request to your app server (e.g., /verify)
+		$.post('/verify', {}, function (data) {
+			console.log(data, data.connect_widget_url);
 
-        // 2.1 Configure MX Connect Widget
-				handler = new MXConnect({
-					config: {
-						is_mobile_webview: false,
-					},
-					id: "verifyAccount",
-					url: data.connect_widget_url,
-					onSuccess: function (data) {
-						// 3. send data including user_guid and memeber_guid to your app server
-            $.ajax({
-							type: "PUT",
-							url: "/verify",
-							data: data,
-							success: function(data) {
-								console.log("Verification result: ", data);
-							},
-						});
-					},
-				});
+			// 2.1 Configure MX Connect Widget
+			handler = new MXConnect({
+				config: {
+					is_mobile_webview: false,
+				},
+				id: "verifyAccount",
+				url: data.connect_widget_url,
+				onSuccess: function (data) {
+					// 3. send data including user_guid and memeber_guid to your app server
+					$.ajax({
+						type: "PUT",
+						url: "/verify",
+						data: data,
+						success: function (data) {
+							console.log("Verification result: ", data);
+						},
+					});
+				},
 			});
+		});
 
-			$('#link-button').on('click', function(e) {
-				// 2.2 Open MX Connect Widget
-        handler.load();
-			});
-		</script>
-	</body>
+		$('#link-button').on('click', function (e) {
+			// 2.2 Open MX Connect Widget
+			handler.load();
+		});
+	</script>
+</body>
 </html>
 ```
 
