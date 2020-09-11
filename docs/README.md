@@ -41,9 +41,9 @@ Moov Customers has several models which are used throughout the HTTP endpoints. 
 
 #### Account Validation
 
-In order to use a new account for ACH transactions, it will need to be validated. Moov Customers supports following strategies that can be used for account validation:
+In order to use an account for ACH transactions, it will need to be validated. This is to ensure access and authorization to the financial instrument. Customers supports following strategies that can be used for account validation:
 
-* micro-deposits - typically two deposits of less than $0.50 are transferred to customer's bank account and then customer providing deposits amounts as verification
+* micro-deposits - two deposits of less than $0.50 (and an optional withdraw) are transferred to customer's bank account and then customer providing deposits amounts as verification
 * instant - some vendors like Plaid, MX, Yodelee provide the ability to verify customer's bank account instantly using their online banking credentials
 
 See more information on [how account validation strategies work](./account-validation.md).
