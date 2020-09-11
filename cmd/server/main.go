@@ -164,7 +164,11 @@ func main() {
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, paygateClient, stringKeeper, transitStringKeeper)
+	accountOfacSeacher := accounts.AccountOfacSearcher{
+		Repo: accountsRepo, WatchmanClient: watchmanClient,
+	}
+	accounts.RegisterRoutes(
+		logger, router, accountsRepo, fedClient, paygateClient, stringKeeper, transitStringKeeper, &accountOfacSeacher)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))

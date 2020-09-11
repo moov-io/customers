@@ -15,6 +15,14 @@ type mockRepository struct {
 	Err           error
 }
 
+func (r *mockRepository) getLatestAccountOFACSearch(accountID string) (*ofacSearchResult, error) {
+	panic("implement me")
+}
+
+func (r *mockRepository) SaveAccountOFACSearch(id string, result ofacSearchResult) error {
+	panic("implement me")
+}
+
 func (r *mockRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
 	if r.Err != nil {
 		return nil, r.Err

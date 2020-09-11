@@ -515,6 +515,52 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/accounts/{accountID}/ofac:
+    get:
+      tags: [ Customers ]
+      summary: Get latest OFAC search
+      description: Get the latest OFAC search for an account
+      operationId: getLatestAccountOFACSearch
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-User-ID
+          in: header
+          description: Unique userID set by an auth proxy or client to identify and isolate objects.
+          example: e3cdf999
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer
+          required: true
+          schema:
+            type: string
+            example: e210a9d6
+        - name: accountID
+          in: path
+          description: accountID of the Account to get latest OFAC search
+          required: true
+          schema:
+            type: string
+            example: e210a9d6
+      responses:
+        '200':
+          description: OFAC search did not block account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OFACSearch'
+        '400':
+          description: An error occurred when refreshing OFAC data, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]

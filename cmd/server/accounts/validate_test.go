@@ -35,7 +35,7 @@ func TestRouter__ValidateAccounts(t *testing.T) {
 	}
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, paygateClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, paygateClient, keeper, keeper, nil)
 
 	// create account
 	acct, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{

@@ -15,12 +15,22 @@ import (
 
 var (
 	ErrNoCustomerID = errors.New("no Customer ID found")
+	ErrNoAccountID  = errors.New("no Account ID found")
 )
 
 func GetCustomerID(w http.ResponseWriter, r *http.Request) string {
 	v, ok := mux.Vars(r)["customerID"]
 	if !ok || v == "" {
 		moovhttp.Problem(w, ErrNoCustomerID)
+		return ""
+	}
+	return v
+}
+
+func GetAccountID(w http.ResponseWriter, r *http.Request) string {
+	v, ok := mux.Vars(r)["accountID"]
+	if !ok || v == "" {
+		moovhttp.Problem(w, ErrNoAccountID)
 		return ""
 	}
 	return v

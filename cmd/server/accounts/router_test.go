@@ -9,6 +9,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	watchman "github.com/moov-io/watchman/client"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -29,13 +30,48 @@ var (
 	testPayGateClient = &paygate.MockClient{}
 )
 
+type testWatchmanClient struct {
+	// error to be returned instead of field from above
+	err error
+}
+
+func (c *testWatchmanClient) Ping() error {
+	return c.err
+}
+
+func (c *testWatchmanClient) Search(_ context.Context, name string, _ string) (*watchman.OfacSdn, error) {
+	if c.err != nil {
+		return nil, c.err
+	}
+	return &watchman.OfacSdn{
+		EntityID: "123",
+		SdnName:  "dummy_sdn",
+		SdnType:  "dummy_sdn_type",
+		Programs: nil,
+		Title:    "dummy_title",
+		Remarks:  "dummy_remarks",
+		Match:    10.2,
+	}, nil
+}
+
+func createTestOFACSearcher(repo Repository, watchmanClient WatchmanClient) *AccountOfacSearcher {
+	if repo == nil {
+		repo = &testAccountRepository{}
+	}
+	if watchmanClient == nil {
+		watchmanClient = &testWatchmanClient{}
+	}
+	return &AccountOfacSearcher{Repo: repo, WatchmanClient: watchmanClient}
+}
+
 func TestAccountRoutes(t *testing.T) {
 	customerID := base.ID()
 	repo := setupTestAccountRepository(t)
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	RegisterRoutes(
+		log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper, createTestOFACSearcher(repo, nil))
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -63,6 +99,33 @@ func TestAccountRoutes(t *testing.T) {
 	}
 }
 
+func TestCreateAccountAndCheckAccountOfacSearch(t *testing.T) {
+	customerID := base.ID()
+	repo := setupTestAccountRepository(t)
+	keeper := secrets.TestStringKeeper(t)
+
+	handler := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper, createTestOFACSearcher(repo, nil))
+
+	// first read, expect no accounts
+	accounts := httpReadAccounts(t, handler, customerID)
+	if len(accounts) != 0 {
+		t.Errorf("got accounts: %v", accounts)
+	}
+
+	// create an account
+	account := httpCreateAccount(t, handler, customerID)
+	if account.MaskedAccountNumber != "*8749" {
+		t.Errorf("masked account number: %q", account.MaskedAccountNumber)
+	}
+
+	// Check for ofac search after creating
+	accountOfacSearch := httpReadAccountOfacSearch(t, handler, customerID, account.AccountID)
+	if accountOfacSearch == nil {
+		t.Errorf("got account ofac search: %v", accountOfacSearch)
+	}
+}
+
 func TestAccountCreationRequest(t *testing.T) {
 	req := &createAccountRequest{}
 	if err := req.validate(); err == nil {
@@ -85,7 +148,7 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper, createTestOFACSearcher(repo, nil))
 
 	client := testclient.New(t, handler)
 
@@ -121,7 +184,7 @@ func TestRoutes__EmptyAccounts(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper, nil)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)
@@ -193,4 +256,21 @@ func httpDeleteAccount(t *testing.T, handler *mux.Router, customerID, accountID 
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
 	}
+}
+
+func httpReadAccountOfacSearch(t *testing.T, handler *mux.Router, customerID, accountID string) *client.OfacSearch {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s/ofac", customerID, accountID), nil)
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	var ofacSearch client.OfacSearch
+	if err := json.NewDecoder(w.Body).Decode(&ofacSearch); err != nil {
+		t.Fatal(err)
+	}
+	return &ofacSearch
 }

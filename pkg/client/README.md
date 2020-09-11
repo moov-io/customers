@@ -49,6 +49,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 *CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 *CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get customer documents
+*CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Get latest OFAC search
 *CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers
 *CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search

@@ -141,7 +141,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 func TestRepositoryUnique(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
-	check := func(t *testing.T, repo *sqlAccountRepository) {
+	check := func(t *testing.T, repo *SqlAccountRepository) {
 		customerID, userID := base.ID(), base.ID()
 		req := &createAccountRequest{
 			AccountNumber: "156421",
