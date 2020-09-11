@@ -173,7 +173,6 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 		validation, err := validations.GetValidation(account.AccountID, validationID)
 		if err != nil {
 			moovhttp.Problem(w, err)
-			moovhttp.Problem(w, fmt.Errorf("validation: %s for account: %s was not found", validationID, accountID))
 			return
 		}
 

@@ -84,9 +84,6 @@ func main() {
 		}
 	}()
 
-	// ASK do we really need to close each repository?
-	// we close db connection above and in all repos we
-	// do the same
 	accountsRepo := accounts.NewRepo(logger, db)
 	customerRepo := &sqlCustomerRepository{db, logger}
 	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}

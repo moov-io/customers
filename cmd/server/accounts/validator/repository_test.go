@@ -45,7 +45,7 @@ func TestRepository(t *testing.T) {
 
 }
 
-func createTestRepository(t *testing.T) *sqlRepository {
+func createTestRepository(t *testing.T) Repository {
 	t.Helper()
 
 	db := database.CreateTestMySQLDB(t)

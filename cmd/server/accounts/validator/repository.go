@@ -152,7 +152,3 @@ func (r *sqlRepository) UpdateValidation(validation *Validation) error {
 	validation.UpdatedAt = now
 	return nil
 }
-
-func (r *sqlRepository) Close() error {
-	return r.db.Close()
-}
