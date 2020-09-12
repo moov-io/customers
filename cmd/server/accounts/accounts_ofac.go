@@ -9,14 +9,6 @@ import (
 	"time"
 )
 
-type ofacSearchResult struct {
-	EntityID  string    `json:"entityID"`
-	SDNName   string    `json:"sdnName"`
-	SDNType   string    `json:"sdnType"`
-	Match     float32   `json:"match"`
-	CreatedAt time.Time `json:"createdAt"`
-}
-
 type AccountOfacSearcher struct {
 	Repo           Repository
 	WatchmanClient WatchmanClient
@@ -46,10 +38,10 @@ func (s *AccountOfacSearcher) StoreAccountOFACSearch(account *client.Account, re
 	if err != nil {
 		return fmt.Errorf("AccountOfacSearcher.StoreAccountOFACSearch: name search for account=%s: %v", account.AccountID, err)
 	}
-	err = s.Repo.saveAccountOFACSearch(account.AccountID, ofacSearchResult{
+	err = s.Repo.saveAccountOFACSearch(account.AccountID, &client.OfacSearch{
 		EntityID:  sdn.EntityID,
-		SDNName:   sdn.SdnName,
-		SDNType:   sdn.SdnType,
+		SdnName:   sdn.SdnName,
+		SdnType:   sdn.SdnType,
 		Match:     sdn.Match,
 		CreatedAt: time.Now(),
 	})

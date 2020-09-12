@@ -15,11 +15,11 @@ type mockRepository struct {
 	Err           error
 }
 
-func (r *mockRepository) getLatestAccountOFACSearch(accountID string) (*ofacSearchResult, error) {
+func (r *mockRepository) getLatestAccountOFACSearch(accountID string) (*client.OfacSearch, error) {
 	panic("implement me")
 }
 
-func (r *mockRepository) saveAccountOFACSearch(id string, result ofacSearchResult) error {
+func (r *mockRepository) saveAccountOFACSearch(id string, result *client.OfacSearch) error {
 	panic("implement me")
 }
 
