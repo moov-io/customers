@@ -26,7 +26,7 @@ require (
 	github.com/moov-io/fed v0.5.1
 	github.com/moov-io/identity v0.2.7
 	github.com/moov-io/paygate v0.8.0
-	github.com/moov-io/watchman v0.14.2
+	github.com/moov-io/watchman v0.15.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/ory/dockertest/v3 v3.6.0
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
