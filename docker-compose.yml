@@ -20,7 +20,7 @@ services:
       FEDACH_DATA_PATH: './data/fed/FedACHdir.txt'
       FEDWIRE_DATA_PATH: './data/fed/fpddir.txt'
   watchman:
-    image: moov/watchman:v0.14.2
+    image: moov/watchman:v0.15.0
     ports:
       - "8084:8084"
       - "9094:9094"
