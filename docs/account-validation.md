@@ -2,8 +2,9 @@
 
 Moov Customers project supports following strategies and vendors to validate accounts:
 
-* micro-deposits validation with Moov [PayGate](https://github.com/moov-io/paygate)
-* instant validation with [Plaid](https://plaid.com/products/auth/)
+* micro-deposits validation with Moov [PayGate](./#micro-deposits-validation-with-moov-paygate)
+* instant validation with [Plaid](./#instant-validation-with-plaid)
+* instant validation with [MX](./#instant-validation-with-mx)
 
 Please, check [API reference](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/accounts/{accountID}/validate) for more details on account validation API.
 
@@ -18,7 +19,7 @@ To use this strategy PayGate should be [configured](../README.md#paygate#paygate
 
 ### Configuration
 
-To use this strategy you have to set `PAYGATE_ENDPOINT` environment variable.
+To use this strategy you have to set `PAYGATE_ENDPOINT` and `PAYGATE_DEBUG_CALLS` environment variable.
 
 ### 1. Initiate Account Validation
 
