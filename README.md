@@ -90,7 +90,7 @@ Following parameters should be set via environment to configure the account vali
 
 * `PLAID_CLIENT_ID`: Client ID
 * `PLAID_SECRET`: API secret (depends on the environent)
-* `PLAID_ENVIRONMENT`: Plaid environment (e.g., sandbox, development or production)
+* `PLAID_ENVIRONMENT`: Plaid environment (e.g., sandbox, development or production | default `sandbox`)
 * `PLAID_CLIENT_NAME`: The app name that should be displayed in Link
 
 [Here](https://plaid.com/docs/#api-keys-and-access) you can find more information on how to get them.

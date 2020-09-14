@@ -265,7 +265,7 @@ func setupValidationStrategies(logger log.Logger, adminServer *admin.Server) (ma
 		options := plaid.StrategyOptions{
 			ClientID:    os.Getenv("PLAID_CLIENT_ID"),
 			Secret:      os.Getenv("PLAID_SECRET"),
-			Environment: os.Getenv("PLAID_ENVIRONMENT"),
+			Environment: util.Or(os.Getenv("PLAID_ENVIRONMENT"), "sandbox"),
 			ClientName:  os.Getenv("PLAID_CLIENT_NAME"),
 		}
 
