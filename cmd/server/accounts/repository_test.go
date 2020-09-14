@@ -12,6 +12,7 @@ import (
 	"github.com/moov-io/customers/pkg/admin"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
+	"github.com/stretchr/testify/require"
 
 	"github.com/go-kit/kit/log"
 )
@@ -36,6 +37,10 @@ func setupTestAccountRepository(t *testing.T) *testAccountRepository {
 func TestRepository(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
 	repo := setupTestAccountRepository(t)
+
+	// look for account that does not exist
+	_, err := repo.getCustomerAccount(customerID, "xxx")
+	require.Error(t, err)
 
 	// initial read, find no accounts
 	accounts, err := repo.getCustomerAccounts(customerID)
