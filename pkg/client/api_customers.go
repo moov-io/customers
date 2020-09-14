@@ -266,7 +266,7 @@ func (a *CustomersApiService) CompleteAccountValidation(ctx _context.Context, cu
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}/validate"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}/validations"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"accountID"+"}", _neturl.QueryEscape(parameterToString(accountID, "")), -1)
@@ -777,7 +777,7 @@ func (a *CustomersApiService) GetAccountValidation(ctx _context.Context, custome
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}/validate/{validationID}"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}/validations/{validationID}"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"accountID"+"}", _neturl.QueryEscape(parameterToString(accountID, "")), -1)
@@ -1501,7 +1501,7 @@ func (a *CustomersApiService) InitAccountValidation(ctx _context.Context, custom
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}/validate"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}/validations"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"accountID"+"}", _neturl.QueryEscape(parameterToString(accountID, "")), -1)

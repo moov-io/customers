@@ -466,7 +466,7 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
-  /customers/{customerID}/accounts/{accountID}/validate/{validationID}:
+  /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
     get:
       tags: [Customers]
       summary: Get Account Validation
@@ -527,7 +527,7 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
-  /customers/{customerID}/accounts/{accountID}/validate:
+  /customers/{customerID}/accounts/{accountID}/validations:
     post:
       tags: [Customers]
       summary: Initiate Account Validation

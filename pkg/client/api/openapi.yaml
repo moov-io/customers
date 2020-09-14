@@ -587,7 +587,7 @@ paths:
       summary: Decrypt Account Number
       tags:
       - Customers
-  /customers/{customerID}/accounts/{accountID}/validate/{validationID}:
+  /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
     get:
       description: |
         Get information about account validation strategy, status, etc.
@@ -663,7 +663,7 @@ paths:
       summary: Get Account Validation
       tags:
       - Customers
-  /customers/{customerID}/accounts/{accountID}/validate:
+  /customers/{customerID}/accounts/{accountID}/validations:
     post:
       description: |
         Initiate account validation with specified strategy and vendor.

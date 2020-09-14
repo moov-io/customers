@@ -185,7 +185,7 @@ func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, ac
 	body := bytes.NewReader(buf.Bytes())
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/validate", customerID, accountID), body)
+	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/validations", customerID, accountID), body)
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
@@ -219,7 +219,7 @@ func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID
 	body := bytes.NewReader(buf.Bytes())
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/validate/%s", customerID, accountID, validationID), body)
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/validations/%s", customerID, accountID, validationID), body)
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
@@ -234,7 +234,7 @@ func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID
 
 func httpGetAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID, validationID string) {
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s/validate/%s", customerID, accountID, validationID), nil)
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s/validations/%s", customerID, accountID, validationID), nil)
 	handler.ServeHTTP(w, req)
 
 	require.Equal(t, http.StatusOK, w.Code)

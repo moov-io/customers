@@ -6,19 +6,19 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 [**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add customer address
-[**CompleteAccountValidation**](CustomersApi.md#CompleteAccountValidation) | **Put** /customers/{customerID}/accounts/{accountID}/validate | Complete Account Validation
+[**CompleteAccountValidation**](CustomersApi.md#CompleteAccountValidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create customer
 [**CreateCustomerAccount**](CustomersApi.md#CreateCustomerAccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
 [**DecryptAccountNumber**](CustomersApi.md#DecryptAccountNumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 [**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
-[**GetAccountValidation**](CustomersApi.md#GetAccountValidation) | **Get** /customers/{customerID}/accounts/{accountID}/validate/{validationID} | Get Account Validation
+[**GetAccountValidation**](CustomersApi.md#GetAccountValidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
 [**GetCustomerAccounts**](CustomersApi.md#GetCustomerAccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
 [**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 [**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
 [**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
-[**InitAccountValidation**](CustomersApi.md#InitAccountValidation) | **Post** /customers/{customerID}/accounts/{accountID}/validate | Initiate Account Validation
+[**InitAccountValidation**](CustomersApi.md#InitAccountValidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
 [**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
