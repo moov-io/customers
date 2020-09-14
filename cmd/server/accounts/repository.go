@@ -6,6 +6,7 @@ package accounts
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -37,10 +38,6 @@ type sqlAccountRepository struct {
 	logger log.Logger
 }
 
-func (r *sqlAccountRepository) Close() error {
-	return r.db.Close()
-}
-
 func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
 	query := `select account_id, holder_name, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
@@ -52,6 +49,9 @@ func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) 
 	var a client.Account
 	row := stmt.QueryRow(customerID, accountID)
 	if err := row.Scan(&a.AccountID, &a.HolderName, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("account: %s for customer: %s was not found", accountID, customerID)
+		}
 		return nil, err
 	}
 	return &a, nil

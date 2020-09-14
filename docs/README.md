@@ -39,6 +39,15 @@ Moov Customers has several models which are used throughout the HTTP endpoints. 
 
 `Account` represents a demand-deposit account at a financial institution. The account number is encrypted. See the [API documentation](https://moov-io.github.io/customers/#post-/customers/{customerID}/accounts) for creating an Account.
 
+#### Account Validation
+
+In order to use an account for ACH transactions, it will need to be validated. This is to ensure access and authorization to the financial instrument. Customers supports following strategies that can be used for account validation:
+
+* micro-deposits - two deposits of less than $0.50 (and an optional withdraw) are transferred to customer's bank account and then customer providing deposits amounts as verification
+* instant - some vendors like Plaid, MX, Yodelee provide the ability to verify customer's bank account instantly using their online banking credentials
+
+See more information on [how account validation strategies work](./account-validation.md).
+
 ## Getting Help
 
  channel | info

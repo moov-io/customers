@@ -6,36 +6,29 @@ package accounts
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/moov-io/customers/cmd/server/accounts/validator"
+	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
 	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/cmd/server/paygate"
-	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
+	"github.com/stretchr/testify/require"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
 
-var (
-	testFedClient     = &fed.MockClient{}
-	testPayGateClient = &paygate.MockClient{}
-)
-
 func TestAccountRoutes(t *testing.T) {
 	customerID := base.ID()
-	repo := setupTestAccountRepository(t)
-	keeper := secrets.TestStringKeeper(t)
 
-	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	handler := setupRouter(t)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -54,6 +47,11 @@ func TestAccountRoutes(t *testing.T) {
 	if len(accounts) != 1 || accounts[0].AccountID != account.AccountID {
 		t.Errorf("got accounts: %v", accounts)
 	}
+
+	// validate account
+	validationID := httpInitAccountValidation(t, handler, customerID, account.AccountID)
+	httpCompleteAccountValidation(t, handler, customerID, account.AccountID, validationID)
+	httpGetAccountValidation(t, handler, customerID, account.AccountID, validationID)
 
 	// delete and expect no accounts
 	httpDeleteAccount(t, handler, customerID, account.AccountID)
@@ -81,13 +79,8 @@ func TestAccountCreationRequest(t *testing.T) {
 
 func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	customerID := base.ID()
-	repo := setupTestAccountRepository(t)
-	keeper := secrets.TestStringKeeper(t)
 
-	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
-
-	client := testclient.New(t, handler)
+	handler := setupRouter(t)
 
 	// create an account
 	account := httpCreateAccount(t, handler, customerID)
@@ -95,33 +88,13 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 		t.Fatal("missing account")
 	}
 
-	transit, resp, err := client.CustomersApi.DecryptAccountNumber(context.TODO(), customerID, account.AccountID, nil)
-	if resp != nil && resp.Body != nil {
-		resp.Body.Close()
-	}
-	if err != nil {
-		t.Error(err)
-	}
-	if transit.AccountNumber == "" {
-		t.Error("missing transit AccountNumber")
-	}
-
-	decrypted, err := keeper.DecryptString(transit.AccountNumber)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if decrypted != "18749" {
-		t.Errorf("decrypted=%q", decrypted)
-	}
+	httpDecryptAccountNumber(t, handler, customerID, account.AccountID)
 }
 
 func TestRoutes__EmptyAccounts(t *testing.T) {
 	customerID := base.ID()
-	repo := setupTestAccountRepository(t)
-	keeper := secrets.TestStringKeeper(t)
 
-	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, testFedClient, testPayGateClient, keeper, keeper)
+	handler := setupRouter(t)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)
@@ -135,6 +108,22 @@ func TestRoutes__EmptyAccounts(t *testing.T) {
 	if body := w.Body.String(); body != "[]\n" {
 		t.Errorf("unexpected response body: %q", body)
 	}
+}
+
+func setupRouter(t *testing.T) *mux.Router {
+	handler := mux.NewRouter()
+
+	testFedClient := &fed.MockClient{}
+	accounts := setupTestAccountRepository(t)
+	validations := &validator.MockRepository{}
+	keeper := secrets.TestStringKeeper(t)
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{
+		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
+	}
+
+	RegisterRoutes(log.NewNopLogger(), handler, accounts, validations, testFedClient, keeper, keeper, validationStrategies)
+
+	return handler
 }
 
 func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*client.Account {
@@ -184,6 +173,77 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 	return &account
 }
 
+func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID string) (validationID string) {
+	params := &client.InitAccountValidationRequest{
+		Strategy: "test",
+	}
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(params); err != nil {
+		t.Fatal(err)
+	}
+	body := bytes.NewReader(buf.Bytes())
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/validations", customerID, accountID), body)
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	var response client.CompleteAccountValidationResponse
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+
+	if !strings.Contains(response.VendorResponse["result"].(string), "initiated") {
+		t.Errorf("expected successful response: %v", w.Body.String())
+	}
+
+	return response.ValidationID
+}
+
+func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID, validationID string) {
+	params := &client.CompleteAccountValidationRequest{
+		VendorRequest: validator.VendorRequest{
+			"result": "success",
+		},
+	}
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(params); err != nil {
+		t.Fatal(err)
+	}
+	body := bytes.NewReader(buf.Bytes())
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/validations/%s", customerID, accountID, validationID), body)
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	if !strings.Contains(w.Body.String(), "validated") {
+		t.Errorf("expected successful response: %v", w.Body.String())
+	}
+}
+
+func httpGetAccountValidation(t *testing.T, handler *mux.Router, customerID, accountID, validationID string) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s/validations/%s", customerID, accountID, validationID), nil)
+	handler.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var response client.AccountValidationResponse
+	err := json.NewDecoder(w.Body).Decode(&response)
+	require.NoError(t, err)
+}
+
 func httpDeleteAccount(t *testing.T, handler *mux.Router, customerID, accountID string) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("DELETE", fmt.Sprintf("/customers/%s/accounts/%s", customerID, accountID), nil)
@@ -193,4 +253,19 @@ func httpDeleteAccount(t *testing.T, handler *mux.Router, customerID, accountID 
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
 	}
+}
+
+func httpDecryptAccountNumber(t *testing.T, handler *mux.Router, customerID, accountID string) {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/decrypt", customerID, accountID), nil)
+	handler.ServeHTTP(w, req)
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	// check if response body contains accountNumber.
+	// Example:
+	//   {"accountNumber":"XueflKMjfidC2Ifommst9iSK+xF/sn2x+pK/K"}
+	require.Contains(t, w.Body.String(), `"accountNumber":`)
 }

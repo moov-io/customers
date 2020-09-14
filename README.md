@@ -82,6 +82,29 @@ Customers has an endpoint which encrypts an account number for transit to anothe
 - `TRANSIT_LOCAL_BASE64_KEY`: A URI used to temporarily encrypt account numbers for transit over the network. This value needs to look like `base64key://value` where `value` is a base64 encoded 32 byte random key. Callers of endpoints that respond with encrypted values need this same key to decrypt.
   - Generate this key by running `./cmd/genkey/` and copying the `base64key://...` value
 
+#### Account Verification
+
+##### Plaid
+
+Following parameters should be set via environment to configure the account validation strategy with Plaid:
+
+* `PLAID_CLIENT_ID`: Client ID
+* `PLAID_SECRET`: API secret (depends on the environent)
+* `PLAID_ENVIRONMENT`: Plaid environment (e.g., sandbox, development or production)
+* `PLAID_CLIENT_NAME`: The app name that should be displayed in Link
+
+[Here](https://plaid.com/docs/#api-keys-and-access) you can find more information on how to get them.
+
+##### MX
+
+Following parameters should be set via environment to configure the account validation strategy with MX:
+
+* `ATRIUM_CLIENT_ID`: Client ID
+* `ATRIUM_API_KEY`: API Key
+
+[Here](https://atrium.mx.com/docs#authentication-and-security) you can find more information on how to get them.
+
+
 #### Storage
 
 Based on `DATABASE_TYPE` the following environment variables will be read to configure connections for a specific database.

@@ -103,6 +103,19 @@ var (
 			"add_holder_name_to_accounts",
 			`alter table accounts add column holder_name varchar(60) default '';`,
 		),
+		execsql(
+			"create_validations",
+			`create table if not exists validations(
+				validation_id  varchar(40) primary key,
+				account_id varchar(40),
+				status varchar(20),
+				strategy varchar(20),
+				vendor varchar(20),
+				created_at datetime,
+				updated_at datetime,
+				INDEX idx_validations_validation_account_ids (validation_id, account_id)
+			);`,
+		),
 	)
 )
 
@@ -231,6 +244,10 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	t.Cleanup(func() {
+		pool.Purge(resource)
+	})
 	return &TestMySQLDB{db, resource}
 }
 

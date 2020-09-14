@@ -40,23 +40,25 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add customer address
+*CustomersApi* | [**CompleteAccountValidation**](docs/CustomersApi.md#completeaccountvalidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create customer
 *CustomersApi* | [**CreateCustomerAccount**](docs/CustomersApi.md#createcustomeraccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
 *CustomersApi* | [**DecryptAccountNumber**](docs/CustomersApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 *CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
+*CustomersApi* | [**GetAccountValidation**](docs/CustomersApi.md#getaccountvalidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer
 *CustomersApi* | [**GetCustomerAccounts**](docs/CustomersApi.md#getcustomeraccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
 *CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 *CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 *CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get customer documents
 *CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
+*CustomersApi* | [**InitAccountValidation**](docs/CustomersApi.md#initaccountvalidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers
 *CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 *CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Get customers
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update customer status
 *CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload document
-*CustomersApi* | [**ValidateAccount**](docs/CustomersApi.md#validateaccount) | **Post** /customers/{customerID}/accounts/{accountID}/validate | Validate Account
 
 
 ## Documentation For Models
@@ -64,6 +66,9 @@ Class | Method | HTTP request | Description
  - [Account](docs/Account.md)
  - [AccountStatus](docs/AccountStatus.md)
  - [AccountType](docs/AccountType.md)
+ - [AccountValidationResponse](docs/AccountValidationResponse.md)
+ - [CompleteAccountValidationRequest](docs/CompleteAccountValidationRequest.md)
+ - [CompleteAccountValidationResponse](docs/CompleteAccountValidationResponse.md)
  - [CreateAccount](docs/CreateAccount.md)
  - [CreateCustomer](docs/CreateCustomer.md)
  - [CreateCustomerAddress](docs/CreateCustomerAddress.md)
@@ -76,6 +81,8 @@ Class | Method | HTTP request | Description
  - [Disclaimer](docs/Disclaimer.md)
  - [Document](docs/Document.md)
  - [Error](docs/Error.md)
+ - [InitAccountValidationRequest](docs/InitAccountValidationRequest.md)
+ - [InitAccountValidationResponse](docs/InitAccountValidationResponse.md)
  - [InstitutionAddress](docs/InstitutionAddress.md)
  - [InstitutionDetails](docs/InstitutionDetails.md)
  - [OfacSearch](docs/OfacSearch.md)

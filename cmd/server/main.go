@@ -21,6 +21,10 @@ import (
 	"github.com/moov-io/base/http/bind"
 	"github.com/moov-io/customers"
 	"github.com/moov-io/customers/cmd/server/accounts"
+	"github.com/moov-io/customers/cmd/server/accounts/validator"
+	"github.com/moov-io/customers/cmd/server/accounts/validator/microdeposits"
+	"github.com/moov-io/customers/cmd/server/accounts/validator/mx"
+	"github.com/moov-io/customers/cmd/server/accounts/validator/plaid"
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/internal/database"
@@ -81,15 +85,11 @@ func main() {
 	}()
 
 	accountsRepo := accounts.NewRepo(logger, db)
-	defer accountsRepo.Close()
 	customerRepo := &sqlCustomerRepository{db, logger}
-	defer customerRepo.close()
 	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
-	defer customerSSNRepo.close()
 	disclaimerRepo := &sqlDisclaimerRepository{db, logger}
-	defer disclaimerRepo.close()
 	documentRepo := &sqlDocumentRepository{db, logger}
-	defer documentRepo.close()
+	validationsRepo := validator.NewRepo(db)
 
 	// Start Admin server (with Prometheus metrics)
 	adminServer := admin.NewServer(*adminAddr)
@@ -156,15 +156,16 @@ func main() {
 	fedClient := fed.Cache(logger, os.Getenv("FED_ENDPOINT"), util.Yes(debugFedCalls))
 	adminServer.AddLivenessCheck("fed", fedClient.Ping)
 
-	debugPayGateCalls := util.Or(os.Getenv("PAYGATE_DEBUG_CALLS"), "false")
-	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"), util.Yes(debugPayGateCalls))
-	adminServer.AddLivenessCheck("paygate", paygateClient.Ping)
+	validationStrategies, err := setupValidationStrategies(logger, adminServer)
+	if err != nil {
+		panic(err)
+	}
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, fedClient, paygateClient, stringKeeper, transitStringKeeper)
+	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies)
 	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	addDisclaimerRoutes(logger, router, disclaimerRepo)
 	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
@@ -247,4 +248,43 @@ func setupStorageBucket(logger log.Logger, bucketName, cloudProvider string) *fi
 		return signer
 	}
 	return nil
+}
+
+func setupValidationStrategies(logger log.Logger, adminServer *admin.Server) (map[validator.StrategyKey]validator.Strategy, error) {
+	strategies := map[validator.StrategyKey]validator.Strategy{}
+
+	// setup microdeposits strategy with moov/paygate
+	// we can make paygate optional for customers, but we need a flag for this
+	debugPayGateCalls := util.Or(os.Getenv("PAYGATE_DEBUG_CALLS"), "false")
+	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"), util.Yes(debugPayGateCalls))
+	adminServer.AddLivenessCheck("paygate", paygateClient.Ping)
+	strategies[validator.StrategyKey{Strategy: "micro-deposits", Vendor: "moov"}] = microdeposits.NewStrategy(paygateClient)
+
+	// setup Plaid instant account verification
+	if os.Getenv("PLAID_CLIENT_ID") != "" {
+		options := plaid.StrategyOptions{
+			ClientID:    os.Getenv("PLAID_CLIENT_ID"),
+			Secret:      os.Getenv("PLAID_SECRET"),
+			Environment: os.Getenv("PLAID_ENVIRONMENT"),
+			ClientName:  os.Getenv("PLAID_CLIENT_NAME"),
+		}
+
+		strategy, err := plaid.NewStrategy(options)
+		if err != nil {
+			return nil, err
+		}
+
+		strategies[validator.StrategyKey{Strategy: "instant", Vendor: "plaid"}] = strategy
+	}
+
+	if os.Getenv("ATRIUM_CLIENT_ID") != "" {
+		options := mx.StrategyOptions{
+			ClientID: os.Getenv("ATRIUM_CLIENT_ID"),
+			APIKey:   os.Getenv("ATRIUM_API_KEY"),
+		}
+		strategy := mx.NewStrategy(options)
+		strategies[validator.StrategyKey{Strategy: "instant", Vendor: "mx"}] = strategy
+	}
+
+	return strategies, nil
 }

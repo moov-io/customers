@@ -33,6 +33,13 @@ jobs:
 
     - name: Check
       run: make check
+      env:
+        ATRIUM_API_KEY: ${{ secrets.ATRIUM_API_KEY }}
+        ATRIUM_CLIENT_ID: ${{ secrets.ATRIUM_CLIENT_ID }}
+        PLAID_CLIENT_ID: ${{ secrets.PLAID_CLIENT_ID }}
+        PLAID_SECRET: ${{ secrets.PLAID_SECRET }}
+        PLAID_ENVIRONMENT: "sandbox"
+        PLAID_CLIENT_NAME: "test"
 
     - name: Upload Code Coverage
       if: runner.os == 'Linux'
