@@ -41,7 +41,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-namespace", "test")
 	req.Header.Set("x-request-id", "test")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -155,7 +155,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("x-user-id", "test")
+	req.Header.Set("x-namespace", "test")
 	req.Header.Set("x-request-id", "test")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -222,7 +222,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 			},
 		},
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust); err != nil {
+	if err := repo.createCustomer(cust, "namespace"); err != nil {
 		t.Fatal(err)
 	}
 
