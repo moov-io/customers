@@ -35,7 +35,7 @@ var environments = map[string]plaid.Environment{
 func NewStrategy(options StrategyOptions) (validator.Strategy, error) {
 	env, found := environments[options.Environment]
 	if !found {
-		return nil, fmt.Errorf("unsupported environment %s is specified for Plaid", options.Environment)
+		return nil, fmt.Errorf("unsupported environment %q is specified for Plaid", options.Environment)
 	}
 
 	plaidOptions := plaid.ClientOptions{
