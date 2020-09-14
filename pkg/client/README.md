@@ -51,6 +51,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 *CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 *CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get customer documents
+*CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Get latest OFAC search
 *CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
 *CustomersApi* | [**InitAccountValidation**](docs/CustomersApi.md#initaccountvalidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers

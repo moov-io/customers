@@ -27,6 +27,9 @@ type Repository interface {
 	updateAccountStatus(accountID string, status admin.AccountStatus) error
 
 	getEncryptedAccountNumber(customerID, accountID string) (string, error)
+
+	getLatestAccountOFACSearch(accountID string) (*client.OfacSearch, error)
+	saveAccountOFACSearch(id string, result *client.OfacSearch) error
 }
 
 func NewRepo(logger log.Logger, db *sql.DB) *sqlAccountRepository {
@@ -89,6 +92,7 @@ func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client
 func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
 	account := &client.Account{
 		AccountID:           base.ID(),
+		HolderName:          req.HolderName,
 		MaskedAccountNumber: req.maskedAccountNumber,
 		RoutingNumber:       req.RoutingNumber,
 		Status:              client.NONE,
@@ -159,4 +163,41 @@ func (r *sqlAccountRepository) getEncryptedAccountNumber(customerID, accountID s
 		return "", err
 	}
 	return encrypted, nil
+}
+
+func (r *sqlAccountRepository) getLatestAccountOFACSearch(accountID string) (*client.OfacSearch, error) {
+	query := `select entity_id, sdn_name, sdn_type, percentage_match, created_at from account_ofac_searches where account_id = ? order by created_at desc limit 1;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("getLatestAccountOFACSearch: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(accountID)
+	var res client.OfacSearch
+	if err := row.Scan(&res.EntityID, &res.SdnType, &res.SdnType, &res.Match, &res.CreatedAt); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil // nothing found
+		}
+		return nil, fmt.Errorf("getLatestAccountOFACSearch: scan: %v", err)
+	}
+	return &res, nil
+}
+
+func (r *sqlAccountRepository) saveAccountOFACSearch(accountID string, result *client.OfacSearch) error {
+	query := `insert into account_ofac_searches (account_id, entity_id, sdn_name, sdn_type, percentage_match, created_at) values (?, ?, ?, ?, ?, ?);`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("saveAccountOFACSearch: prepare: %v", err)
+	}
+	defer stmt.Close()
+
+	if result.CreatedAt.IsZero() {
+		result.CreatedAt = time.Now()
+	}
+
+	if _, err := stmt.Exec(accountID, result.EntityID, result.SdnName, result.SdnType, result.Match, result.CreatedAt); err != nil {
+		return fmt.Errorf("saveAccountOFACSearch: exec: %v", err)
+	}
+	return nil
 }

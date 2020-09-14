@@ -25,11 +25,13 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, validations validator.Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy) {
+func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, validations validator.Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy, ofac *AccountOfacSearcher) {
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, accounts, fedClient))
-	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, accounts, fedClient, keeper))
+	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, accounts, fedClient, keeper, ofac))
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, accounts, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, accounts))
+
+	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/ofac").HandlerFunc(getAccountOfacSearch(logger, accounts))
 
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/validations").HandlerFunc(initAccountValidation(logger, accounts, validations, validationStrategies))
 	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/validations/{validationID}").HandlerFunc(getAccountValidation(logger, accounts, validations))
@@ -111,9 +113,11 @@ func (req *createAccountRequest) disfigure(keeper *secrets.StringKeeper) error {
 	return nil
 }
 
-func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Client, keeper *secrets.StringKeeper) http.HandlerFunc {
+func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Client, keeper *secrets.StringKeeper, ofac *AccountOfacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
+
+		requestID := moovhttp.GetRequestID(r)
 
 		var request createAccountRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
@@ -143,6 +147,11 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 			logger.Log("accounts", fmt.Sprintf("problem saving account: %v", err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)
 			return
+		}
+
+		// Perform an OFAC search with the Customer information
+		if err := ofac.StoreAccountOFACSearch(account, requestID); err != nil {
+			logger.Log("accounts", fmt.Sprintf("error with OFAC search for account=%s: %v", account.AccountID, err), "requestID", requestID)
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -208,5 +217,26 @@ func removeCustomerAccount(logger log.Logger, repo Repository) http.HandlerFunc 
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func getAccountOfacSearch(logger log.Logger, repo Repository) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		accountID := getAccountID(w, r)
+		if accountID == "" {
+			return
+		}
+
+		result, err := repo.getLatestAccountOFACSearch(accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(result)
 	}
 }

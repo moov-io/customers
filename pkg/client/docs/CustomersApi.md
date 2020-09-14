@@ -17,6 +17,7 @@ Method | HTTP request | Description
 [**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 [**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
+[**GetLatestAccountOFACSearch**](CustomersApi.md#GetLatestAccountOFACSearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Get latest OFAC search
 [**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
 [**InitAccountValidation**](CustomersApi.md#InitAccountValidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
@@ -629,6 +630,54 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**[]Document**](Document.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetLatestAccountOFACSearch
+
+> OfacSearch GetLatestAccountOFACSearch(ctx, customerID, accountID, optional)
+
+Get latest OFAC search
+
+Get the latest OFAC search for an account
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID of the Customer | 
+**accountID** | **string**| accountID of the Account to get latest OFAC search | 
+ **optional** | ***GetLatestAccountOFACSearchOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a GetLatestAccountOFACSearchOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+
+### Return type
+
+[**OfacSearch**](OFACSearch.md)
 
 ### Authorization
 

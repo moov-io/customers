@@ -56,3 +56,11 @@ func (r *mockRepository) getEncryptedAccountNumber(customerID, accountID string)
 	}
 	return r.AccountNumber, nil
 }
+
+func (r *mockRepository) getLatestAccountOFACSearch(accountID string) (*client.OfacSearch, error) {
+	panic("implement me")
+}
+
+func (r *mockRepository) saveAccountOFACSearch(id string, result *client.OfacSearch) error {
+	return nil
+}
