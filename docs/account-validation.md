@@ -2,9 +2,9 @@
 
 Moov Customers project supports following strategies and vendors to validate accounts:
 
-* micro-deposits validation with Moov [PayGate](./#micro-deposits-validation-with-moov-paygate)
-* instant validation with [Plaid](./#instant-validation-with-plaid)
-* instant validation with [MX](./#instant-validation-with-mx)
+* micro-deposits validation with Moov [PayGate](./account-validation.md#micro-deposits-validation-with-moov-paygate)
+* instant validation with [Plaid](./account-validation.md#instant-validation-with-plaid)
+* instant validation with [MX](./account-validation.md#instant-validation-with-mx)
 
 Please, check [API reference](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/accounts/{accountID}/validate) for more details on account validation API.
 
