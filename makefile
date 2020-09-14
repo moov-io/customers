@@ -45,7 +45,7 @@ client:
 clean:
 	@rm -rf ./bin/ cover.out coverage.txt openapi-generator-cli-*.jar misspell* staticcheck* lint-project.sh
 
-dist: clean admin client build
+dist: clean
 ifeq ($(OS),Windows_NT)
 	CGO_ENABLED=1 GOOS=windows go build -o bin/customers.exe github.com/moov-io/customers/cmd/server
 else
