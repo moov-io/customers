@@ -174,14 +174,14 @@ func (r *sqlAccountRepository) getLatestAccountOFACSearch(accountID string) (*cl
 	defer stmt.Close()
 
 	row := stmt.QueryRow(accountID)
-	var res *client.OfacSearch
+	var res client.OfacSearch
 	if err := row.Scan(&res.EntityID, &res.SdnType, &res.SdnType, &res.Match, &res.CreatedAt); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // nothing found
 		}
 		return nil, fmt.Errorf("getLatestAccountOFACSearch: scan: %v", err)
 	}
-	return res, nil
+	return &res, nil
 }
 
 func (r *sqlAccountRepository) saveAccountOFACSearch(accountID string, result *client.OfacSearch) error {
