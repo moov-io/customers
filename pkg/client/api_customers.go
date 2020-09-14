@@ -30,7 +30,7 @@ type CustomersApiService service
 // AcceptDisclaimerOpts Optional parameters for the method 'AcceptDisclaimer'
 type AcceptDisclaimerOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -41,7 +41,7 @@ Accept a disclaimer for the given customer which could include a document also
  * @param disclaimerID disclaimerID of the Disclaimer to accept
  * @param optional nil or *AcceptDisclaimerOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Disclaimer
 */
 func (a *CustomersApiService) AcceptDisclaimer(ctx _context.Context, customerID string, disclaimerID string, localVarOptionals *AcceptDisclaimerOpts) (Disclaimer, *_nethttp.Response, error) {
@@ -84,8 +84,8 @@ func (a *CustomersApiService) AcceptDisclaimer(ctx _context.Context, customerID 
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -135,7 +135,7 @@ func (a *CustomersApiService) AcceptDisclaimer(ctx _context.Context, customerID 
 // AddCustomerAddressOpts Optional parameters for the method 'AddCustomerAddress'
 type AddCustomerAddressOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -146,7 +146,7 @@ Add an Address onto an existing Customer record
  * @param createCustomerAddress
  * @param optional nil or *AddCustomerAddressOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
 func (a *CustomersApiService) AddCustomerAddress(ctx _context.Context, customerID string, createCustomerAddress CreateCustomerAddress, localVarOptionals *AddCustomerAddressOpts) (Customer, *_nethttp.Response, error) {
@@ -187,8 +187,8 @@ func (a *CustomersApiService) AddCustomerAddress(ctx _context.Context, customerI
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	// body params
 	localVarPostBody = &createCustomerAddress
@@ -240,7 +240,7 @@ func (a *CustomersApiService) AddCustomerAddress(ctx _context.Context, customerI
 // CompleteAccountValidationOpts Optional parameters for the method 'CompleteAccountValidation'
 type CompleteAccountValidationOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -252,7 +252,7 @@ Complete account validation with specified strategy and vendor.
  * @param completeAccountValidationRequest
  * @param optional nil or *CompleteAccountValidationOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return CompleteAccountValidationResponse
 */
 func (a *CustomersApiService) CompleteAccountValidation(ctx _context.Context, customerID string, accountID string, completeAccountValidationRequest CompleteAccountValidationRequest, localVarOptionals *CompleteAccountValidationOpts) (CompleteAccountValidationResponse, *_nethttp.Response, error) {
@@ -295,8 +295,8 @@ func (a *CustomersApiService) CompleteAccountValidation(ctx _context.Context, cu
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	// body params
 	localVarPostBody = &completeAccountValidationRequest
@@ -348,7 +348,7 @@ func (a *CustomersApiService) CompleteAccountValidation(ctx _context.Context, cu
 // CreateCustomerOpts Optional parameters for the method 'CreateCustomer'
 type CreateCustomerOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -358,7 +358,7 @@ Create a Customer object from the given details of a human or business
  * @param createCustomer
  * @param optional nil or *CreateCustomerOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
 func (a *CustomersApiService) CreateCustomer(ctx _context.Context, createCustomer CreateCustomer, localVarOptionals *CreateCustomerOpts) (Customer, *_nethttp.Response, error) {
@@ -397,8 +397,8 @@ func (a *CustomersApiService) CreateCustomer(ctx _context.Context, createCustome
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	// body params
 	localVarPostBody = &createCustomer
@@ -450,7 +450,7 @@ func (a *CustomersApiService) CreateCustomer(ctx _context.Context, createCustome
 // CreateCustomerAccountOpts Optional parameters for the method 'CreateCustomerAccount'
 type CreateCustomerAccountOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -461,7 +461,7 @@ Create an account for the given customer
  * @param createAccount
  * @param optional nil or *CreateCustomerAccountOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Account
 */
 func (a *CustomersApiService) CreateCustomerAccount(ctx _context.Context, customerID string, createAccount CreateAccount, localVarOptionals *CreateCustomerAccountOpts) (Account, *_nethttp.Response, error) {
@@ -502,8 +502,8 @@ func (a *CustomersApiService) CreateCustomerAccount(ctx _context.Context, custom
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	// body params
 	localVarPostBody = &createAccount
@@ -555,7 +555,7 @@ func (a *CustomersApiService) CreateCustomerAccount(ctx _context.Context, custom
 // DecryptAccountNumberOpts Optional parameters for the method 'DecryptAccountNumber'
 type DecryptAccountNumberOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -566,7 +566,7 @@ Return the account number encrypted with a shared secret for application request
  * @param accountID accountID of the Account to get decrypted account number
  * @param optional nil or *DecryptAccountNumberOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return TransitAccountNumber
 */
 func (a *CustomersApiService) DecryptAccountNumber(ctx _context.Context, customerID string, accountID string, localVarOptionals *DecryptAccountNumberOpts) (TransitAccountNumber, *_nethttp.Response, error) {
@@ -609,8 +609,8 @@ func (a *CustomersApiService) DecryptAccountNumber(ctx _context.Context, custome
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -660,7 +660,7 @@ func (a *CustomersApiService) DecryptAccountNumber(ctx _context.Context, custome
 // DeleteCustomerAccountOpts Optional parameters for the method 'DeleteCustomerAccount'
 type DeleteCustomerAccountOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -670,7 +670,7 @@ Remove an account from the given Customer
  * @param customerID customerID of the Customer to remove an Account
  * @param optional nil or *DeleteCustomerAccountOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 */
 func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, customerID string, localVarOptionals *DeleteCustomerAccountOpts) (*_nethttp.Response, error) {
 	var (
@@ -709,8 +709,8 @@ func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, custom
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -751,7 +751,7 @@ func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, custom
 // GetAccountValidationOpts Optional parameters for the method 'GetAccountValidation'
 type GetAccountValidationOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -763,7 +763,7 @@ Get information about account validation strategy, status, etc.
  * @param validationID ID of the Validation
  * @param optional nil or *GetAccountValidationOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return AccountValidationResponse
 */
 func (a *CustomersApiService) GetAccountValidation(ctx _context.Context, customerID string, accountID string, validationID string, localVarOptionals *GetAccountValidationOpts) (AccountValidationResponse, *_nethttp.Response, error) {
@@ -808,8 +808,8 @@ func (a *CustomersApiService) GetAccountValidation(ctx _context.Context, custome
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -859,7 +859,7 @@ func (a *CustomersApiService) GetAccountValidation(ctx _context.Context, custome
 // GetCustomerOpts Optional parameters for the method 'GetCustomer'
 type GetCustomerOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -869,7 +869,7 @@ Get the Customer object and metadata for the customerID.
  * @param customerID customerID that identifies this Customer
  * @param optional nil or *GetCustomerOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
 func (a *CustomersApiService) GetCustomer(ctx _context.Context, customerID string, localVarOptionals *GetCustomerOpts) (Customer, *_nethttp.Response, error) {
@@ -910,8 +910,8 @@ func (a *CustomersApiService) GetCustomer(ctx _context.Context, customerID strin
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -962,7 +962,7 @@ func (a *CustomersApiService) GetCustomer(ctx _context.Context, customerID strin
 // GetCustomerAccountsOpts Optional parameters for the method 'GetCustomerAccounts'
 type GetCustomerAccountsOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -972,7 +972,7 @@ Retrieve all accounts for the given customer.
  * @param customerID customerID of the Customer to get Accounts for
  * @param optional nil or *GetCustomerAccountsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return []Account
 */
 func (a *CustomersApiService) GetCustomerAccounts(ctx _context.Context, customerID string, localVarOptionals *GetCustomerAccountsOpts) ([]Account, *_nethttp.Response, error) {
@@ -1013,8 +1013,8 @@ func (a *CustomersApiService) GetCustomerAccounts(ctx _context.Context, customer
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -1064,7 +1064,7 @@ func (a *CustomersApiService) GetCustomerAccounts(ctx _context.Context, customer
 // GetCustomerDisclaimersOpts Optional parameters for the method 'GetCustomerDisclaimers'
 type GetCustomerDisclaimersOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1074,7 +1074,7 @@ Get active disclaimers for the given customer
  * @param customerID customerID of the Customer to get disclaimers
  * @param optional nil or *GetCustomerDisclaimersOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return []Disclaimer
 */
 func (a *CustomersApiService) GetCustomerDisclaimers(ctx _context.Context, customerID string, localVarOptionals *GetCustomerDisclaimersOpts) ([]Disclaimer, *_nethttp.Response, error) {
@@ -1115,8 +1115,8 @@ func (a *CustomersApiService) GetCustomerDisclaimers(ctx _context.Context, custo
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -1166,7 +1166,7 @@ func (a *CustomersApiService) GetCustomerDisclaimers(ctx _context.Context, custo
 // GetCustomerDocumentContentsOpts Optional parameters for the method 'GetCustomerDocumentContents'
 type GetCustomerDocumentContentsOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1177,7 +1177,7 @@ Retrieve the referenced document
  * @param documentID documentID to identify a Document
  * @param optional nil or *GetCustomerDocumentContentsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return *os.File
 */
 func (a *CustomersApiService) GetCustomerDocumentContents(ctx _context.Context, customerID string, documentID string, localVarOptionals *GetCustomerDocumentContentsOpts) (*os.File, *_nethttp.Response, error) {
@@ -1220,8 +1220,8 @@ func (a *CustomersApiService) GetCustomerDocumentContents(ctx _context.Context, 
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -1271,7 +1271,7 @@ func (a *CustomersApiService) GetCustomerDocumentContents(ctx _context.Context, 
 // GetCustomerDocumentsOpts Optional parameters for the method 'GetCustomerDocuments'
 type GetCustomerDocumentsOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1281,7 +1281,7 @@ Get documents for a customer
  * @param customerID customerID of the Customer to get all Documents
  * @param optional nil or *GetCustomerDocumentsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return []Document
 */
 func (a *CustomersApiService) GetCustomerDocuments(ctx _context.Context, customerID string, localVarOptionals *GetCustomerDocumentsOpts) ([]Document, *_nethttp.Response, error) {
@@ -1322,8 +1322,8 @@ func (a *CustomersApiService) GetCustomerDocuments(ctx _context.Context, custome
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -1427,8 +1427,8 @@ func (a *CustomersApiService) GetLatestAccountOFACSearch(ctx _context.Context, c
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -1478,7 +1478,7 @@ func (a *CustomersApiService) GetLatestAccountOFACSearch(ctx _context.Context, c
 // GetLatestOFACSearchOpts Optional parameters for the method 'GetLatestOFACSearch'
 type GetLatestOFACSearchOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1488,7 +1488,7 @@ Get the latest OFAC search for a Customer
  * @param customerID customerID of the Customer to get latest OFAC search
  * @param optional nil or *GetLatestOFACSearchOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return OfacSearch
 */
 func (a *CustomersApiService) GetLatestOFACSearch(ctx _context.Context, customerID string, localVarOptionals *GetLatestOFACSearchOpts) (OfacSearch, *_nethttp.Response, error) {
@@ -1580,7 +1580,7 @@ func (a *CustomersApiService) GetLatestOFACSearch(ctx _context.Context, customer
 // InitAccountValidationOpts Optional parameters for the method 'InitAccountValidation'
 type InitAccountValidationOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1592,7 +1592,7 @@ Initiate account validation with specified strategy and vendor.
  * @param initAccountValidationRequest
  * @param optional nil or *InitAccountValidationOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return InitAccountValidationResponse
 */
 func (a *CustomersApiService) InitAccountValidation(ctx _context.Context, customerID string, accountID string, initAccountValidationRequest InitAccountValidationRequest, localVarOptionals *InitAccountValidationOpts) (InitAccountValidationResponse, *_nethttp.Response, error) {
@@ -1635,8 +1635,8 @@ func (a *CustomersApiService) InitAccountValidation(ctx _context.Context, custom
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	// body params
 	localVarPostBody = &initAccountValidationRequest
@@ -1806,8 +1806,8 @@ func (a *CustomersApiService) RefreshAccountOFACSearch(ctx _context.Context, cus
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -1857,7 +1857,7 @@ func (a *CustomersApiService) RefreshAccountOFACSearch(ctx _context.Context, cus
 // RefreshOFACSearchOpts Optional parameters for the method 'RefreshOFACSearch'
 type RefreshOFACSearchOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1867,7 +1867,7 @@ Refresh OFAC search for a given Customer
  * @param customerID customerID of the Customer to refresh OFAC search
  * @param optional nil or *RefreshOFACSearchOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return OfacSearch
 */
 func (a *CustomersApiService) RefreshOFACSearch(ctx _context.Context, customerID string, localVarOptionals *RefreshOFACSearchOpts) (OfacSearch, *_nethttp.Response, error) {
@@ -1959,7 +1959,7 @@ func (a *CustomersApiService) RefreshOFACSearch(ctx _context.Context, customerID
 // ReplaceCustomerMetadataOpts Optional parameters for the method 'ReplaceCustomerMetadata'
 type ReplaceCustomerMetadataOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1970,7 +1970,7 @@ Replace the metadata object for a customer. Metadata is a map of unique keys ass
  * @param customerMetadata
  * @param optional nil or *ReplaceCustomerMetadataOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
 func (a *CustomersApiService) ReplaceCustomerMetadata(ctx _context.Context, customerID string, customerMetadata CustomerMetadata, localVarOptionals *ReplaceCustomerMetadataOpts) (Customer, *_nethttp.Response, error) {
@@ -2011,8 +2011,8 @@ func (a *CustomersApiService) ReplaceCustomerMetadata(ctx _context.Context, cust
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	// body params
 	localVarPostBody = &customerMetadata
@@ -2276,7 +2276,7 @@ func (a *CustomersApiService) UpdateAccountStatus(ctx _context.Context, customer
 // UpdateCustomerStatusOpts Optional parameters for the method 'UpdateCustomerStatus'
 type UpdateCustomerStatusOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -2287,7 +2287,7 @@ Update the status for a customer, which can only be updated by authenticated use
  * @param updateCustomerStatus
  * @param optional nil or *UpdateCustomerStatusOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
 func (a *CustomersApiService) UpdateCustomerStatus(ctx _context.Context, customerID string, updateCustomerStatus UpdateCustomerStatus, localVarOptionals *UpdateCustomerStatusOpts) (Customer, *_nethttp.Response, error) {
@@ -2328,8 +2328,8 @@ func (a *CustomersApiService) UpdateCustomerStatus(ctx _context.Context, custome
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	// body params
 	localVarPostBody = &updateCustomerStatus
@@ -2381,7 +2381,7 @@ func (a *CustomersApiService) UpdateCustomerStatus(ctx _context.Context, custome
 // UploadCustomerDocumentOpts Optional parameters for the method 'UploadCustomerDocument'
 type UploadCustomerDocumentOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -2393,7 +2393,7 @@ Upload a document for the given customer
  * @param file Document to be uploaded
  * @param optional nil or *UploadCustomerDocumentOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return Document
 */
 func (a *CustomersApiService) UploadCustomerDocument(ctx _context.Context, customerID string, type_ string, file *os.File, localVarOptionals *UploadCustomerDocumentOpts) (Document, *_nethttp.Response, error) {
@@ -2435,8 +2435,8 @@ func (a *CustomersApiService) UploadCustomerDocument(ctx _context.Context, custo
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	localVarFormFileName = "file"
 	localVarFile := file

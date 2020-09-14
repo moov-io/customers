@@ -122,12 +122,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -169,12 +168,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -221,12 +219,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -279,12 +276,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -336,12 +332,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -392,12 +387,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -437,12 +431,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -486,12 +479,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -543,12 +535,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -603,12 +594,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -678,12 +668,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -842,12 +831,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -942,12 +930,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -1038,12 +1025,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -1089,12 +1075,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -1148,12 +1133,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -1197,12 +1181,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -1267,12 +1250,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
@@ -1331,12 +1313,11 @@ paths:
         schema:
           type: string
         style: simple
-      - description: Unique userID set by an auth proxy or client to identify and
-          isolate objects.
-        example: e3cdf999
+      - description: Value used to separate and identify models
+        example: org342
         explode: false
         in: header
-        name: X-User-ID
+        name: X-Namespace
         required: false
         schema:
           type: string
