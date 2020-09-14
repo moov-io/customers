@@ -214,7 +214,7 @@ components:
           type: string
     UpdateAccountStatus:
       example:
-        status: microdeposits
+        status: validated
       properties:
         status:
           $ref: '#/components/schemas/AccountStatus'
@@ -276,7 +276,7 @@ components:
       enum:
       - none
       - validated
-      example: microdeposits
+      example: validated
       type: string
     CustomerStatus:
       description: State of the customer
