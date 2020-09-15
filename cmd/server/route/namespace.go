@@ -5,19 +5,21 @@
 package route
 
 import (
-	"errors"
+	"fmt"
 	"net/http"
+	"os"
 
 	moovhttp "github.com/moov-io/base/http"
+	"github.com/moov-io/customers/internal/util"
 )
 
 var (
-	ErrNoNamespace = errors.New("no Namespace found")
+	namespaceHeaderKey = util.Or(os.Getenv("NAMESPACE_HEADER"), "X-Namespace")
 )
 
 func GetNamespace(w http.ResponseWriter, r *http.Request) string {
-	if ns := r.Header.Get("X-Namespace"); ns == "" {
-		moovhttp.Problem(w, ErrNoNamespace)
+	if ns := r.Header.Get(namespaceHeaderKey); ns == "" {
+		moovhttp.Problem(w, fmt.Errorf("missing %s header", namespaceHeaderKey))
 		return ""
 	} else {
 		return ns
