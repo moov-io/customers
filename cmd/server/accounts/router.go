@@ -32,6 +32,7 @@ func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, valid
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, accounts))
 
 	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/ofac").HandlerFunc(getAccountOfacSearch(logger, accounts))
+	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/refresh/ofac").HandlerFunc(refreshAccountOfac(logger, accounts, ofac))
 
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/validations").HandlerFunc(initAccountValidation(logger, accounts, validations, validationStrategies))
 	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/validations/{validationID}").HandlerFunc(getAccountValidation(logger, accounts, validations))
@@ -235,6 +236,33 @@ func getAccountOfacSearch(logger log.Logger, repo Repository) func(http.Response
 			moovhttp.Problem(w, err)
 			return
 		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(result)
+	}
+}
+
+func refreshAccountOfac(logger log.Logger, repo Repository, ofac *AccountOfacSearcher) func(http.ResponseWriter, *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		requestID := moovhttp.GetRequestID(r)
+		customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
+		if customerID == "" || accountID == "" {
+			return
+		}
+		account, err := repo.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		err = ofac.StoreAccountOFACSearch(account, requestID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		result, err := repo.getLatestAccountOFACSearch(accountID)
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
