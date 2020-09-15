@@ -21,7 +21,7 @@ type WatchmanClient interface {
 }
 
 // StoreAccountOFACSearch performs OFAC searches against the Account's HolderName and nickname if populated.
-// The search result is stored in s.customerRepository for use later (in approvals)
+// The search result is stored in s.Repo for use later (in approvals)
 func (s *AccountOfacSearcher) StoreAccountOFACSearch(account *client.Account, requestID string) error {
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
