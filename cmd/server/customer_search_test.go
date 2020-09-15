@@ -93,7 +93,7 @@ func TestCustomerSearch__query(t *testing.T) {
 		Query: "jane doe",
 		Count: 100,
 	})
-	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at asc limit ?;" {
+	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
 	if err := prepare(sqliteDB.DB, query); err != nil {
@@ -110,7 +110,7 @@ func TestCustomerSearch__query(t *testing.T) {
 	query, args = buildSearchQuery(searchParams{
 		Email: "jane.doe@moov.io",
 	})
-	if query != "select customer_id from customers where deleted_at is null and lower(email) like ? order by created_at asc limit ?;" {
+	if query != "select customer_id from customers where deleted_at is null and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
 	if err := prepare(sqliteDB.DB, query); err != nil {
@@ -129,7 +129,7 @@ func TestCustomerSearch__query(t *testing.T) {
 		Email: "jane.doe@moov.io",
 		Count: 25,
 	})
-	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at asc limit ?;" {
+	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
 	if err := prepare(sqliteDB.DB, query); err != nil {

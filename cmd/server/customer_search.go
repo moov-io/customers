@@ -119,7 +119,7 @@ func buildSearchQuery(params searchParams) (string, []interface{}) {
 		query += " and type like ?"
 		args = append(args, "%"+params.Type)
 	}
-	query += " order by created_at asc limit ?"
+	query += " order by created_at desc limit ?"
 	args = append(args, fmt.Sprintf("%d", params.Count))
 
 	if params.Skip > 0 {
