@@ -121,6 +121,36 @@ func TestCreateAccountAndCheckAccountOfacSearch(t *testing.T) {
 	}
 }
 
+func TestRefreshAccountAndCheckAccountOfacSearch(t *testing.T) {
+	customerID := base.ID()
+
+	handler := setupRouter(t)
+
+	// first read, expect no accounts
+	accounts := httpReadAccounts(t, handler, customerID)
+	if len(accounts) != 0 {
+		t.Errorf("got accounts: %v", accounts)
+	}
+
+	// create an account
+	account := httpCreateAccount(t, handler, customerID)
+	if account.MaskedAccountNumber != "*8749" {
+		t.Errorf("masked account number: %q", account.MaskedAccountNumber)
+	}
+
+	// Check for ofac search after creating
+	accountOfacSearch := httpReadAccountOfacSearch(t, handler, customerID, account.AccountID)
+	if accountOfacSearch == nil {
+		t.Errorf("got account ofac search: %v", accountOfacSearch)
+	}
+
+	// Refresh account ofac
+	accountOfacRefresh := httpRefreshAccountOfac(t, handler, customerID, account.AccountID)
+	if accountOfacRefresh == nil {
+		t.Errorf("got account ofac search: %v", accountOfacRefresh)
+	}
+}
+
 func TestAccountCreationRequest(t *testing.T) {
 	req := &createAccountRequest{}
 	if err := req.validate(); err == nil {
@@ -333,6 +363,23 @@ func httpDecryptAccountNumber(t *testing.T, handler *mux.Router, customerID, acc
 func httpReadAccountOfacSearch(t *testing.T, handler *mux.Router, customerID, accountID string) *client.OfacSearch {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s/ofac", customerID, accountID), nil)
+	handler.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus HTTP status %d: %v", w.Code, w.Body.String())
+	}
+
+	var ofacSearch client.OfacSearch
+	if err := json.NewDecoder(w.Body).Decode(&ofacSearch); err != nil {
+		t.Fatal(err)
+	}
+	return &ofacSearch
+}
+
+func httpRefreshAccountOfac(t *testing.T, handler *mux.Router, customerID, accountID string) *client.OfacSearch {
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/refresh/ofac", customerID, accountID), nil)
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
