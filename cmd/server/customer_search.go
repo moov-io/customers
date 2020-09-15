@@ -76,24 +76,27 @@ func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.
 	defer stmt.Close()
 
 	var customerIDs []string
+	customers := make([]*client.Customer, 0)
+
+	// grab customerIDs
 	rows, err := stmt.Query(args...)
 	if err != nil {
-		return nil, err
+		return customers, err
 	}
 	for rows.Next() {
 		var customerID string
 		if err := rows.Scan(&customerID); err == nil {
 			customerIDs = append(customerIDs, customerID)
 		} else {
-			return nil, err
+			return customers, err
 		}
 	}
 
-	customers := make([]*client.Customer, 0)
+	// Read each Customer
 	for i := range customerIDs {
 		cust, err := r.getCustomer(customerIDs[i])
 		if err != nil {
-			return nil, fmt.Errorf("search: customerID=%s error=%v", customerIDs[i], err)
+			return customers, fmt.Errorf("search: customerID=%s error=%v", customerIDs[i], err)
 		}
 		customers = append(customers, cust)
 	}
