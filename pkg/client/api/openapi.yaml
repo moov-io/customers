@@ -781,6 +781,51 @@ paths:
       summary: Refresh Account OFAC search
       tags:
       - Customers
+  /customers/{customerID}/accounts/{accountID}/status:
+    put:
+      description: Update the status for the specified accountID
+      operationId: updateAccountStatus
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: accountID of the Account to validate
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountStatus'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: Account status updated
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Update Account Status
+      tags:
+      - Customers
   /customers/{customerID}/accounts/{accountID}/validations:
     post:
       description: |
@@ -2208,6 +2253,14 @@ components:
           format: date-time
           type: string
       type: object
+    UpdateAccountStatus:
+      example:
+        status: validated
+      properties:
+        status:
+          $ref: '#/components/schemas/AccountStatus'
+      required:
+      - status
     Error:
       properties:
         error:

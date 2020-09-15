@@ -59,6 +59,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 *CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Get customers
+*CustomersApi* | [**UpdateAccountStatus**](docs/CustomersApi.md#updateaccountstatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update customer status
 *CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload document
 
@@ -90,6 +91,7 @@ Class | Method | HTTP request | Description
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
  - [TransitAccountNumber](docs/TransitAccountNumber.md)
+ - [UpdateAccountStatus](docs/UpdateAccountStatus.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
  - [UpdateValidation](docs/UpdateValidation.md)
 

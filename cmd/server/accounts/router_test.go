@@ -8,8 +8,11 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/moov-io/customers/internal/testclient"
 	watchman "github.com/moov-io/watchman/client"
+	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -200,6 +203,52 @@ func TestRoutes__EmptyAccounts(t *testing.T) {
 	}
 }
 
+func TestUpdateAccountStatus(t *testing.T) {
+	customerID := base.ID()
+	accountID := base.ID()
+
+	repo := &mockRepository{
+		Accounts: []*client.Account{
+			{
+				AccountID: accountID,
+			},
+		},
+	}
+
+	router := setupRouterWithRepo(t, repo)
+	c := testclient.New(t, router)
+
+	req := client.UpdateAccountStatus{
+		Status: client.VALIDATED,
+	}
+	account, resp, err := c.CustomersApi.UpdateAccountStatus(context.TODO(), customerID, accountID, req)
+	if resp != nil && resp.Body != nil {
+		resp.Body.Close()
+	}
+	assert.NotNil(t, account)
+	if resp != nil {
+		if resp.StatusCode != http.StatusOK || err != nil {
+			t.Errorf("bogus HTTP status: %d", resp.StatusCode)
+			t.Fatal(err)
+		}
+	}
+
+	// retry, but expect an error
+	repo.Err = errors.New("bad error")
+	router = setupRouterWithRepo(t, repo)
+	c = testclient.New(t, router)
+
+	_, resp, err = c.CustomersApi.UpdateAccountStatus(context.TODO(), customerID, accountID, req)
+	if resp != nil && resp.Body != nil {
+		resp.Body.Close()
+	}
+	if resp != nil && err != nil {
+		if resp.StatusCode != http.StatusBadRequest {
+			t.Errorf("bogus HTTP status: %d", resp.StatusCode)
+		}
+	}
+}
+
 func setupRouter(t *testing.T) *mux.Router {
 	handler := mux.NewRouter()
 
@@ -212,6 +261,21 @@ func setupRouter(t *testing.T) *mux.Router {
 	}
 
 	RegisterRoutes(log.NewNopLogger(), handler, accounts, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(accounts, nil))
+
+	return handler
+}
+
+func setupRouterWithRepo(t *testing.T, repo *mockRepository) *mux.Router {
+	handler := mux.NewRouter()
+
+	testFedClient := &fed.MockClient{}
+	validations := &validator.MockRepository{}
+	keeper := secrets.TestStringKeeper(t)
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{
+		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
+	}
+
+	RegisterRoutes(log.NewNopLogger(), handler, repo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(repo, nil))
 
 	return handler
 }

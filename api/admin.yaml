@@ -54,42 +54,6 @@ paths:
               schema:
                 type: string
                 example: v0.4.0
-  /customers/{customerID}/accounts/{accountID}/status:
-    put:
-      tags: [Customers]
-      summary: Update Account Status
-      description: Update the status for the specified accountID
-      operationId: updateAccountStatus
-      parameters:
-        - name: customerID
-          in: path
-          description: Customer ID
-          required: true
-          schema:
-            type: string
-            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-        - name: accountID
-          in: path
-          description: accountID of the Account to validate
-          required: true
-          schema:
-            type: string
-            example: b74d7c51
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateAccountStatus'
-      responses:
-        '200':
-          description: Account status updated
-        '400':
-          description: See error message
-          content:
-            application/json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     post:
       tags: [Customers]
@@ -193,12 +157,6 @@ components:
           type: string
           description: Either an error from checking Customers or good as a string.
           example: good
-    UpdateAccountStatus:
-      properties:
-        status:
-          $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/api/client.yaml#/components/schemas/AccountStatus'
-      required:
-        - status
     CreateUserDisclaimer:
       properties:
         documentId:

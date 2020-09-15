@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/pkg/admin"
 	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/go-kit/kit/log"
@@ -24,7 +23,7 @@ type Repository interface {
 	createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error)
 	deactivateCustomerAccount(accountID string) error
 
-	updateAccountStatus(accountID string, status admin.AccountStatus) error
+	updateAccountStatus(accountID string, status client.AccountStatus) error
 
 	getEncryptedAccountNumber(customerID, accountID string) (string, error)
 
@@ -135,7 +134,7 @@ func (r *sqlAccountRepository) deactivateCustomerAccount(accountID string) error
 	return err
 }
 
-func (r *sqlAccountRepository) updateAccountStatus(accountID string, status admin.AccountStatus) error {
+func (r *sqlAccountRepository) updateAccountStatus(accountID string, status client.AccountStatus) error {
 	query := `update accounts set status = ? where account_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

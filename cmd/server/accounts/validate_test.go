@@ -18,7 +18,6 @@ import (
 	"github.com/moov-io/customers/cmd/server/accounts/validator/microdeposits"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
 	"github.com/moov-io/customers/cmd/server/paygate"
-	"github.com/moov-io/customers/pkg/admin"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
 	payclient "github.com/moov-io/paygate/pkg/client"
@@ -119,7 +118,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		err = accounts.updateAccountStatus(acc.AccountID, admin.VALIDATED)
+		err = accounts.updateAccountStatus(acc.AccountID, client.VALIDATED)
 		require.NoError(t, err)
 
 		params := map[string]string{
@@ -268,7 +267,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		err = repo.updateAccountStatus(acc.AccountID, admin.VALIDATED)
+		err = repo.updateAccountStatus(acc.AccountID, client.VALIDATED)
 		require.NoError(t, err)
 
 		// build request for test strategy
