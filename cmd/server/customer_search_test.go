@@ -143,6 +143,14 @@ func TestCustomerSearch__query(t *testing.T) {
 	}
 }
 
+func TestCustomerSearchEmpty(t *testing.T) {
+	scope := Setup(t)
+	customers, _ := scope.GetCustomers("")
+	if customers == nil {
+		t.Fatalf("expected allocated array:\n  %T %#v", customers, customers)
+	}
+}
+
 func TestGet20MostRecentlyCreatedCustomersByDefault(t *testing.T) {
 	scope := Setup(t)
 	scope.CreateCustomers(100, client.INDIVIDUAL)
