@@ -1373,7 +1373,7 @@ func (a *CustomersApiService) GetCustomerDocuments(ctx _context.Context, custome
 // GetLatestAccountOFACSearchOpts Optional parameters for the method 'GetLatestAccountOFACSearch'
 type GetLatestAccountOFACSearchOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1384,7 +1384,7 @@ Get the latest OFAC search for an Account
  * @param accountID accountID of the Account to get latest OFAC search
  * @param optional nil or *GetLatestAccountOFACSearchOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return OfacSearch
 */
 func (a *CustomersApiService) GetLatestAccountOFACSearch(ctx _context.Context, customerID string, accountID string, localVarOptionals *GetLatestAccountOFACSearchOpts) (OfacSearch, *_nethttp.Response, error) {
@@ -1529,8 +1529,8 @@ func (a *CustomersApiService) GetLatestOFACSearch(ctx _context.Context, customer
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -1752,7 +1752,7 @@ func (a *CustomersApiService) Ping(ctx _context.Context) (*_nethttp.Response, er
 // RefreshAccountOFACSearchOpts Optional parameters for the method 'RefreshAccountOFACSearch'
 type RefreshAccountOFACSearchOpts struct {
 	XRequestID optional.String
-	XUserID    optional.String
+	XNamespace optional.String
 }
 
 /*
@@ -1763,7 +1763,7 @@ Refresh OFAC search for a given Account
  * @param accountID accountID of the Account to get latest OFAC search
  * @param optional nil or *RefreshAccountOFACSearchOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XUserID" (optional.String) -  Unique userID set by an auth proxy or client to identify and isolate objects.
+ * @param "XNamespace" (optional.String) -  Value used to separate and identify models
 @return OfacSearch
 */
 func (a *CustomersApiService) RefreshAccountOFACSearch(ctx _context.Context, customerID string, accountID string, localVarOptionals *RefreshAccountOFACSearchOpts) (OfacSearch, *_nethttp.Response, error) {
@@ -1908,8 +1908,8 @@ func (a *CustomersApiService) RefreshOFACSearch(ctx _context.Context, customerID
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XUserID.IsSet() {
-		localVarHeaderParams["X-User-ID"] = parameterToString(localVarOptionals.XUserID.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
+		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {

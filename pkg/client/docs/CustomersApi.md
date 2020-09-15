@@ -771,7 +771,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+ **xNamespace** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -1125,7 +1125,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xUserID** | **optional.String**| Unique userID set by an auth proxy or client to identify and isolate objects. | 
+ **xNamespace** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
