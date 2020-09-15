@@ -263,7 +263,10 @@ func refreshAccountOfac(logger log.Logger, repo Repository, ofac *AccountOfacSea
 			return
 		}
 		result, err := repo.getLatestAccountOFACSearch(accountID)
-
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
 	}
