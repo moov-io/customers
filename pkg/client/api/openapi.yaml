@@ -722,6 +722,65 @@ paths:
       summary: Get latest OFAC search
       tags:
       - Customers
+  /customers/{customerID}/accounts/{accountID}/refresh/ofac:
+    put:
+      description: Refresh OFAC search for a given Account
+      operationId: refreshAccountOFACSearch
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Unique userID set by an auth proxy or client to identify and
+          isolate objects.
+        example: e3cdf999
+        explode: false
+        in: header
+        name: X-User-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer to refresh OFAC search
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6
+          type: string
+        style: simple
+      - description: accountID of the Account to get latest OFAC search
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: e210a9d6
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OFACSearch'
+          description: OFAC search did not block Account
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: An error occurred when refreshing OFAC data, see error(s)
+      summary: Refresh Account OFAC search
+      tags:
+      - Customers
   /customers/{customerID}/accounts/{accountID}/validations:
     post:
       description: |
