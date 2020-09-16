@@ -530,8 +530,8 @@ paths:
   /customers/{customerID}/accounts/{accountID}/ofac:
     get:
       tags: [ Customers ]
-      summary: Get latest OFAC search
-      description: Get the latest OFAC search for an account
+      summary: Latest Account OFAC search
+      description: Get the latest OFAC search for an Account
       operationId: getLatestAccountOFACSearch
       parameters:
         - name: X-Request-ID
@@ -1024,8 +1024,8 @@ paths:
   /customers/{customerID}/ofac:
     get:
       tags: [Customers]
-      summary: Get latest OFAC search
-      description: Get the latest OFAC search for a customer
+      summary: Latest Customer OFAC search
+      description: Get the latest OFAC search for a Customer
       operationId: getLatestOFACSearch
       parameters:
         - name: X-Request-ID
@@ -1063,7 +1063,7 @@ paths:
   /customers/{customerID}/refresh/ofac:
     put:
       tags: [Customers]
-      summary: Refresh customer OFAC search
+      summary: Refresh Customer OFAC search
       description: Refresh OFAC search for a given Customer
       operationId: refreshOFACSearch
       parameters:
