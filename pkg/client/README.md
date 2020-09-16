@@ -51,12 +51,12 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 *CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 *CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get customer documents
-*CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Get latest OFAC search
-*CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
+*CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC search
+*CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
 *CustomersApi* | [**InitAccountValidation**](docs/CustomersApi.md#initaccountvalidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers
 *CustomersApi* | [**RefreshAccountOFACSearch**](docs/CustomersApi.md#refreshaccountofacsearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC search
-*CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
+*CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 *CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Get customers
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update customer status

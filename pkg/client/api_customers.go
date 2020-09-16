@@ -1377,8 +1377,8 @@ type GetLatestAccountOFACSearchOpts struct {
 }
 
 /*
-GetLatestAccountOFACSearch Get latest OFAC search
-Get the latest OFAC search for an account
+GetLatestAccountOFACSearch Latest Account OFAC search
+Get the latest OFAC search for an Account
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer
  * @param accountID accountID of the Account to get latest OFAC search
@@ -1482,8 +1482,8 @@ type GetLatestOFACSearchOpts struct {
 }
 
 /*
-GetLatestOFACSearch Get latest OFAC search
-Get the latest OFAC search for a customer
+GetLatestOFACSearch Latest Customer OFAC search
+Get the latest OFAC search for a Customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to get latest OFAC search
  * @param optional nil or *GetLatestOFACSearchOpts - Optional Parameters:
@@ -1861,7 +1861,7 @@ type RefreshOFACSearchOpts struct {
 }
 
 /*
-RefreshOFACSearch Refresh customer OFAC search
+RefreshOFACSearch Refresh Customer OFAC search
 Refresh OFAC search for a given Customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to refresh OFAC search

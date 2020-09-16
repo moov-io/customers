@@ -17,12 +17,12 @@ Method | HTTP request | Description
 [**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
 [**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
-[**GetLatestAccountOFACSearch**](CustomersApi.md#GetLatestAccountOFACSearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Get latest OFAC search
-[**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Get latest OFAC search
+[**GetLatestAccountOFACSearch**](CustomersApi.md#GetLatestAccountOFACSearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC search
+[**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
 [**InitAccountValidation**](CustomersApi.md#InitAccountValidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
 [**RefreshAccountOFACSearch**](CustomersApi.md#RefreshAccountOFACSearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC search
-[**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh customer OFAC search
+[**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 [**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Get customers
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
@@ -650,9 +650,9 @@ No authorization required
 
 > OfacSearch GetLatestAccountOFACSearch(ctx, customerID, accountID, optional)
 
-Get latest OFAC search
+Latest Account OFAC search
 
-Get the latest OFAC search for an account
+Get the latest OFAC search for an Account
 
 ### Required Parameters
 
@@ -698,9 +698,9 @@ No authorization required
 
 > OfacSearch GetLatestOFACSearch(ctx, customerID, optional)
 
-Get latest OFAC search
+Latest Customer OFAC search
 
-Get the latest OFAC search for a customer
+Get the latest OFAC search for a Customer
 
 ### Required Parameters
 
@@ -872,7 +872,7 @@ No authorization required
 
 > OfacSearch RefreshOFACSearch(ctx, customerID, optional)
 
-Refresh customer OFAC search
+Refresh Customer OFAC search
 
 Refresh OFAC search for a given Customer
 
