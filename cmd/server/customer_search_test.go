@@ -182,30 +182,24 @@ func TestGet100MostRecentlyCreatedCustomersWhenSpecifyingMoreThanAvailable(t *te
 func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 	// Create two customers. 1 with Unknown STATUS and 1 with Verified
 	scope := Setup(t)
-	scope.CreateCustomers(2, client.INDIVIDUAL)
-	customers, _ := scope.GetCustomers("?count=120")
-	scope.assert.Equal(2, len(customers))
-	for i := 0; i < len(customers); i++ {
-		if i%2 == 0 {
-			// update status
-			if err := scope.customerRepo.updateCustomerStatus(customers[i].CustomerID, client.VERIFIED, "test comment"); err != nil {
-				print(err)
-			}
-		}
+	customer := scope.CreateCustomer("John", "Doe", "john.doe@email.com", client.INDIVIDUAL)
+	if err := scope.customerRepo.updateCustomerStatus(customer.CustomerID, client.VERIFIED, "test comment"); err != nil {
+		print(err)
 	}
+	scope.CreateCustomer("Jane", "Doe", "jane.doe@email.com", client.INDIVIDUAL)
 
 	// Should have 1 Verified Status
-	customers, _ = scope.GetCustomers("?status=Verified&count=20")
-	scope.assert.Equal(1, len(customers))
-	for i := 0; i < len(customers); i++ {
-		scope.assert.Equal("Verified", string(customers[i].Status))
+	verifiedCustomers, _ := scope.GetCustomers("?status=Verified&count=20")
+	scope.assert.Equal(1, len(verifiedCustomers))
+	for i := 0; i < len(verifiedCustomers); i++ {
+		scope.assert.Equal("Verified", string(verifiedCustomers[i].Status))
 	}
 
 	// Should have 1 Unknown Status
-	customers, _ = scope.GetCustomers("?status=Unknown&count=20")
-	scope.assert.Equal(1, len(customers))
-	for i := 0; i < len(customers); i++ {
-		scope.assert.Equal("Unknown", string(customers[i].Status))
+	unknownStatusCustomers, _ := scope.GetCustomers("?status=Unknown&count=20")
+	scope.assert.Equal(1, len(unknownStatusCustomers))
+	for i := 0; i < len(unknownStatusCustomers); i++ {
+		scope.assert.Equal("Unknown", string(unknownStatusCustomers[i].Status))
 	}
 }
 
