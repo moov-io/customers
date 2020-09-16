@@ -25,6 +25,7 @@ Method | HTTP request | Description
 [**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 [**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Get customers
+[**UpdateAccountStatus**](CustomersApi.md#UpdateAccountStatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
 
@@ -1003,6 +1004,42 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateAccountStatus
+
+> Account UpdateAccountStatus(ctx, customerID, accountID, updateAccountStatus)
+
+Update Account Status
+
+Update the status for the specified accountID
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+**accountID** | **string**| accountID of the Account to validate | 
+**updateAccountStatus** | [**UpdateAccountStatus**](UpdateAccountStatus.md)|  | 
+
+### Return type
+
+[**Account**](Account.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)

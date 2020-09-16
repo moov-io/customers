@@ -5,7 +5,6 @@
 package accounts
 
 import (
-	"github.com/moov-io/customers/pkg/admin"
 	"github.com/moov-io/customers/pkg/client"
 )
 
@@ -46,7 +45,7 @@ func (r *mockRepository) deactivateCustomerAccount(accountID string) error {
 	return r.Err
 }
 
-func (r *mockRepository) updateAccountStatus(accountID string, status admin.AccountStatus) error {
+func (r *mockRepository) updateAccountStatus(accountID string, status client.AccountStatus) error {
 	return r.Err
 }
 

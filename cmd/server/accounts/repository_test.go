@@ -9,7 +9,6 @@ import (
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/internal/database"
-	"github.com/moov-io/customers/pkg/admin"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/stretchr/testify/require"
@@ -128,7 +127,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 	}
 
 	// update status
-	if err := repo.updateAccountStatus(acct.AccountID, admin.VALIDATED); err != nil {
+	if err := repo.updateAccountStatus(acct.AccountID, client.VALIDATED); err != nil {
 		t.Fatal(err)
 	}
 

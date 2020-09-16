@@ -34,6 +34,8 @@ func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, valid
 	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/ofac").HandlerFunc(getAccountOfacSearch(logger, accounts))
 	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/refresh/ofac").HandlerFunc(refreshAccountOfac(logger, accounts, ofac))
 
+	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/status").HandlerFunc(updateAccountStatus(logger, accounts))
+
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/validations").HandlerFunc(initAccountValidation(logger, accounts, validations, validationStrategies))
 	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/validations/{validationID}").HandlerFunc(getAccountValidation(logger, accounts, validations))
 	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/validations/{validationID}").HandlerFunc(completeAccountValidation(logger, accounts, validations, keeper, validationStrategies))
@@ -250,6 +252,7 @@ func refreshAccountOfac(logger log.Logger, repo Repository, ofac *AccountOfacSea
 		requestID := moovhttp.GetRequestID(r)
 		customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
 		if customerID == "" || accountID == "" {
+			moovhttp.Problem(w, errors.New("customerID and accountID required"))
 			return
 		}
 		account, err := repo.getCustomerAccount(customerID, accountID)
@@ -269,5 +272,45 @@ func refreshAccountOfac(logger log.Logger, repo Repository, ofac *AccountOfacSea
 		}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
+	}
+}
+
+func updateAccountStatus(logger log.Logger, repo Repository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+
+		customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
+		if customerID == "" || accountID == "" {
+			moovhttp.Problem(w, errors.New("customerID and accountID required"))
+			return
+		}
+
+		var req client.UpdateAccountStatus
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		switch req.Status {
+		case client.NONE, client.VALIDATED:
+			// do nothing
+		default:
+			moovhttp.Problem(w, fmt.Errorf("invalid status: %s", req.Status))
+			return
+		}
+
+		if err := repo.updateAccountStatus(accountID, req.Status); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		account, err := repo.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, errors.New("there was an error getting the account"))
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(account)
 	}
 }

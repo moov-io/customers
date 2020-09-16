@@ -14,7 +14,6 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/route"
-	"github.com/moov-io/customers/pkg/admin"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
 
@@ -221,7 +220,7 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 			return
 		}
 
-		err = repo.updateAccountStatus(accountID, admin.VALIDATED)
+		err = repo.updateAccountStatus(accountID, client.VALIDATED)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
