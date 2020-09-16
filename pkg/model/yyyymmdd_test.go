@@ -26,3 +26,12 @@ func TestYYYYMMDD(t *testing.T) {
 		t.Errorf("got %q", v)
 	}
 }
+
+func TestYYYYMMDD_Error(t *testing.T) {
+	in := strings.NewReader(`{"birthDate": "1989-11-INVALID"}`)
+
+	var resp response
+	if err := json.NewDecoder(in).Decode(&resp); err == nil {
+		t.Fatalf("expcted error, got %#v", resp)
+	}
+}
