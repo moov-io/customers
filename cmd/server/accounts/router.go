@@ -280,11 +280,6 @@ func updateAccountStatus(logger log.Logger, repo Repository) http.HandlerFunc {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		if r.Method != "PUT" {
-			moovhttp.Problem(w, fmt.Errorf("unsupported HTTP verb %s", r.Method))
-			return
-		}
-
 		customerID, accountID := route.GetCustomerID(w, r), getAccountID(w, r)
 		if customerID == "" || accountID == "" {
 			moovhttp.Problem(w, errors.New("customerID and accountID required"))
