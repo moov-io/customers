@@ -9,10 +9,6 @@
 
 package client
 
-import (
-	"time"
-)
-
 // CreateCustomer struct for CreateCustomer
 type CreateCustomer struct {
 	// Given Name or First Name
@@ -25,15 +21,15 @@ type CreateCustomer struct {
 	NickName string `json:"nickName,omitempty"`
 	// Customers name suffix. \"Jr\", \"PH.D.\"
 	Suffix string       `json:"suffix,omitempty"`
-	Type   CustomerType `json:"type,omitempty"`
+	Type   CustomerType `json:"type"`
 	// Legal date of birth
-	BirthDate *time.Time `json:"birthDate"`
+	BirthDate string `json:"birthDate,omitempty"`
 	// Primary email address of customer name@domain.com
 	Email string `json:"email"`
 	// Customer Social Security Number (SSN)
 	SSN       string                  `json:"SSN,omitempty"`
 	Phones    []CreatePhone           `json:"phones,omitempty"`
-	Addresses []CreateCustomerAddress `json:"addresses"`
+	Addresses []CreateCustomerAddress `json:"addresses,omitempty"`
 	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 	Metadata map[string]string `json:"metadata,omitempty"`
 }
