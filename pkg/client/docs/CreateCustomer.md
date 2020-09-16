@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **Type** | [**CustomerType**](CustomerType.md) |  | [optional] 
 **BirthDate** | Pointer to [**time.Time**](time.Time.md) | Legal date of birth | 
 **Email** | **string** | Primary email address of customer name@domain.com | 
-**SSN** | **string** | Customer Social Security Number (SSN) | 
+**SSN** | **string** | Customer Social Security Number (SSN) | [optional] 
 **Phones** | [**[]CreatePhone**](CreatePhone.md) |  | [optional] 
 **Addresses** | [**[]CreateCustomerAddress**](CreateCustomerAddress.md) |  | 
 **Metadata** | **map[string]string** | Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer. | [optional] 

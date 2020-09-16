@@ -31,7 +31,7 @@ type CreateCustomer struct {
 	// Primary email address of customer name@domain.com
 	Email string `json:"email"`
 	// Customer Social Security Number (SSN)
-	SSN       string                  `json:"SSN"`
+	SSN       string                  `json:"SSN,omitempty"`
 	Phones    []CreatePhone           `json:"phones,omitempty"`
 	Addresses []CreateCustomerAddress `json:"addresses"`
 	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
