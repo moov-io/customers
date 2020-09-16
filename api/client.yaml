@@ -1130,10 +1130,8 @@ components:
           $ref: '#/components/schemas/CustomerType'
         birthDate:
           type: string
-          format: date-time
           description: Legal date of birth
-          example: '2016-08-29T09:12:33.001Z'
-          nullable: true
+          example: '2016-08-29'
         email:
           type: string
           maximum: 500
@@ -1161,9 +1159,8 @@ components:
       required:
         - firstName
         - lastName
-        - birthDate
+        - type
         - email
-        - addresses
     Customer:
       type: object
       properties:
@@ -1196,10 +1193,8 @@ components:
           $ref: '#/components/schemas/CustomerType'
         birthDate:
           type: string
-          format: date-time
           description: Legal date of birth
-          example: '2016-08-29T09:12:33.001Z'
-          nullable: true
+          example: '2016-08-29'
         status:
           $ref: '#/components/schemas/CustomerStatus'
         email:
@@ -1235,7 +1230,6 @@ components:
         - firstName
         - lastName
         - type
-        - birthDate
         - status
         - email
         - createdAt

@@ -19,6 +19,7 @@ import (
 	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/internal/usstates"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/model"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -89,7 +90,7 @@ type customerRequest struct {
 	NickName   string              `json:"nickName"`
 	Suffix     string              `json:"suffix"`
 	Type       client.CustomerType `json:"type"`
-	BirthDate  *time.Time          `json:"birthDate"`
+	BirthDate  model.YYYYMMDD      `json:"birthDate"`
 	Email      string              `json:"email"`
 	SSN        string              `json:"SSN"`
 	Phones     []phone             `json:"phones"`
@@ -169,7 +170,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		NickName:   req.NickName,
 		Suffix:     req.Suffix,
 		Type:       req.Type,
-		BirthDate:  req.BirthDate,
+		BirthDate:  string(req.BirthDate),
 		Email:      req.Email,
 		Status:     client.UNKNOWN,
 		Metadata:   req.Metadata,

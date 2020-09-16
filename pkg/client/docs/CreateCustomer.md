@@ -9,12 +9,12 @@ Name | Type | Description | Notes
 **LastName** | **string** | Surname or Last Name | 
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
-**Type** | [**CustomerType**](CustomerType.md) |  | [optional] 
-**BirthDate** | Pointer to [**time.Time**](time.Time.md) | Legal date of birth | 
+**Type** | [**CustomerType**](CustomerType.md) |  | 
+**BirthDate** | **string** | Legal date of birth | [optional] 
 **Email** | **string** | Primary email address of customer name@domain.com | 
 **SSN** | **string** | Customer Social Security Number (SSN) | [optional] 
 **Phones** | [**[]CreatePhone**](CreatePhone.md) |  | [optional] 
-**Addresses** | [**[]CreateCustomerAddress**](CreateCustomerAddress.md) |  | 
+**Addresses** | [**[]CreateCustomerAddress**](CreateCustomerAddress.md) |  | [optional] 
 **Metadata** | **map[string]string** | Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

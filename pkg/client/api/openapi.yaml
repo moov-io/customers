@@ -1402,7 +1402,7 @@ components:
           type: Home
         middleName: Flex
         suffix: suffix
-        birthDate: 2016-08-29T09:12:33.001Z
+        birthDate: 2016-08-29
         email: email
         SSN: 111-11-1111
       properties:
@@ -1431,9 +1431,7 @@ components:
           $ref: '#/components/schemas/CustomerType'
         birthDate:
           description: Legal date of birth
-          example: 2016-08-29T09:12:33.001Z
-          format: date-time
-          nullable: true
+          example: 2016-08-29
           type: string
         email:
           description: Primary email address of customer name@domain.com
@@ -1461,11 +1459,10 @@ components:
             paygateID: 23beb5fd
           type: object
       required:
-      - addresses
-      - birthDate
       - email
       - firstName
       - lastName
+      - type
       type: object
     Customer:
       example:
@@ -1500,7 +1497,7 @@ components:
           number: +1.818.555.1212
           type: Home
         suffix: suffix
-        birthDate: 2016-08-29T09:12:33.001Z
+        birthDate: 2016-08-29
         firstName: Robert
         createdAt: 2016-08-29T09:12:33.001Z
         customerID: e210a9d6
@@ -1537,9 +1534,7 @@ components:
           $ref: '#/components/schemas/CustomerType'
         birthDate:
           description: Legal date of birth
-          example: 2016-08-29T09:12:33.001Z
-          format: date-time
-          nullable: true
+          example: 2016-08-29
           type: string
         status:
           $ref: '#/components/schemas/CustomerStatus'
@@ -1573,7 +1568,6 @@ components:
           format: date-time
           type: string
       required:
-      - birthDate
       - createdAt
       - customerID
       - email
