@@ -1461,7 +1461,6 @@ components:
             paygateID: 23beb5fd
           type: object
       required:
-      - SSN
       - addresses
       - birthDate
       - email

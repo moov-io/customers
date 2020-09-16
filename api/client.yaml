@@ -1164,7 +1164,6 @@ components:
         - birthDate
         - email
         - addresses
-        - SSN
     Customer:
       type: object
       properties:
