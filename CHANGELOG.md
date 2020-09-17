@@ -20,6 +20,7 @@ ADDITIONS
 
 IMPROVEMENTS
 
+- accounts: return updated model after updating status
 - customers: accept yyyy-mm-dd formatted birthDates
 - customers: using base http GetSkipAndCount() to get skip and count from request
 - customers: perform the OFAC search inline of creation flow
