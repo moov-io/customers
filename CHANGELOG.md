@@ -1,13 +1,28 @@
 ## v0.5.0 (Unreleased)
 
+Customers v0.5.0 comes with several new features including Customer searching/filtering, additional Instant Account Validation strategies, and a reformed model for separating models.
+
+**BREAKING CHANGES**
+
+We now require the `X-Namespace` HTTP header (can be changed with `NAMESPACE_HEADER`) on requests. This is to enforce isolation of models for multi-tenant installs. The value can be a free-form string so a UUID, random string, or other identifier can be supplied.
+
+- Accounts require HolderName (legal name on the financial account)
+- ./pkg/client and ./pkg/admin package move
+
 ADDITIONS
 
+- accounts: `instant` validation can be performed with Plaid or MX.
 - api,client: expose institution details on accounts
 - accounts: return InstitutionDetails next to routing number
 - cmd/server: add an endpoint for searching customers
+- customers: added search filter params `status`, `type` and pagination with `skip` and `count`
+- accounts: perform OFAC search of HolderName
 
 IMPROVEMENTS
 
+- customers: accept yyyy-mm-dd formatted birthDates
+- customers: using base http GetSkipAndCount() to get skip and count from request
+- customers: perform the OFAC search inline of creation flow
 - accounts: reject duplicate accounts for a customer
 - cmd/server: read OFAC_ENDPOINT or WATCHMAN_ENDPOINT
 - customers: send back an array of search results, not null
@@ -16,9 +31,11 @@ IMPROVEMENTS
 - fed: support debugging API calls
 - paygate: support debugging API calls
 - watchman: support debugging API calls
+- api,client: mark SSN as optional on CreateCustomer
 
 BUG FIXEs
 
+- search: always return an allocated array for JSON marshal
 - accounts: return an empty array if no accounts are found
 - cmd/server: return 404 if customer isn't found
 - customers: render nil birthDate as null instead of time.Zero
@@ -29,7 +46,10 @@ BUG FIXEs
 
 BUILD
 
-- Update module aws/aws-sdk-go to v1.33.7
+- build: upgrade github.com/moov-io/watchman to v0.15.0
+- build: mount sqlite path as volume
+- chore(deps): update module aws/aws-sdk-go to v1.34.9
+- chore(deps): update golang docker tag to v1.15
 
 ## v0.4.1 (Released 2020-07-16)
 
