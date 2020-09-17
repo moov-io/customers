@@ -26,6 +26,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers?query=jane+doe", nil)
+	req.Header.Set("X-Namespace", "namespace")
 	router.ServeHTTP(w, req)
 
 	// verify with zero results we don't return null
@@ -42,13 +43,14 @@ func TestCustomersSearchRouter(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust); err != nil {
+	if err := repo.createCustomer(cust, "namespace"); err != nil {
 		t.Error(err)
 	}
 
 	// find a customer from their partial name
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("GET", "/customers?query=jane", nil)
+	req.Header.Set("X-Namespace", "namespace")
 	router.ServeHTTP(w, req)
 
 	var resp []*client.Customer
@@ -62,6 +64,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 	// find a customer from full name
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("GET", "/customers?query=jane+doe", nil)
+	req.Header.Set("X-Namespace", "namespace")
 	router.ServeHTTP(w, req)
 
 	var resp2 []*client.Customer
@@ -90,46 +93,11 @@ func TestCustomerSearch__query(t *testing.T) {
 
 	// Query search
 	query, args := buildSearchQuery(searchParams{
-		Query: "jane doe",
-		Count: 100,
+		Namespace: "foo",
+		Query:     "jane doe",
+		Count:     100,
 	})
-	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
-		t.Errorf("unexpected query: %q", query)
-	}
-	if err := prepare(sqliteDB.DB, query); err != nil {
-		t.Errorf("sqlite: %v", err)
-	}
-	if err := prepare(mysqlDB.DB, query); err != nil {
-		t.Errorf("mysql: %v", err)
-	}
-	if len(args) != 2 {
-		t.Errorf("unexpected args: %#v", args)
-	}
-
-	// Eamil search
-	query, args = buildSearchQuery(searchParams{
-		Email: "jane.doe@moov.io",
-	})
-	if query != "select customer_id from customers where deleted_at is null and lower(email) like ? order by created_at desc limit ?;" {
-		t.Errorf("unexpected query: %q", query)
-	}
-	if err := prepare(sqliteDB.DB, query); err != nil {
-		t.Errorf("sqlite: %v", err)
-	}
-	if err := prepare(mysqlDB.DB, query); err != nil {
-		t.Errorf("mysql: %v", err)
-	}
-	if len(args) != 2 {
-		t.Errorf("unexpected args: %#v", args)
-	}
-
-	// Query and Eamil saerch
-	query, args = buildSearchQuery(searchParams{
-		Query: "jane doe",
-		Email: "jane.doe@moov.io",
-		Count: 25,
-	})
-	if query != "select customer_id from customers where deleted_at is null and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
+	if query != "select customer_id from customers where deleted_at is null and namespace = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
 	if err := prepare(sqliteDB.DB, query); err != nil {
@@ -139,6 +107,44 @@ func TestCustomerSearch__query(t *testing.T) {
 		t.Errorf("mysql: %v", err)
 	}
 	if len(args) != 3 {
+		t.Errorf("unexpected args: %#v", args)
+	}
+
+	// Eamil search
+	query, args = buildSearchQuery(searchParams{
+		Namespace: "foo",
+		Email:     "jane.doe@moov.io",
+	})
+	if query != "select customer_id from customers where deleted_at is null and namespace = ? and lower(email) like ? order by created_at desc limit ?;" {
+		t.Errorf("unexpected query: %q", query)
+	}
+	if err := prepare(sqliteDB.DB, query); err != nil {
+		t.Errorf("sqlite: %v", err)
+	}
+	if err := prepare(mysqlDB.DB, query); err != nil {
+		t.Errorf("mysql: %v", err)
+	}
+	if len(args) != 3 {
+		t.Errorf("unexpected args: %#v", args)
+	}
+
+	// Query and Eamil saerch
+	query, args = buildSearchQuery(searchParams{
+		Namespace: "foo",
+		Query:     "jane doe",
+		Email:     "jane.doe@moov.io",
+		Count:     25,
+	})
+	if query != "select customer_id from customers where deleted_at is null and namespace = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
+		t.Errorf("unexpected query: %q", query)
+	}
+	if err := prepare(sqliteDB.DB, query); err != nil {
+		t.Errorf("sqlite: %v", err)
+	}
+	if err := prepare(mysqlDB.DB, query); err != nil {
+		t.Errorf("mysql: %v", err)
+	}
+	if len(args) != 4 {
 		t.Errorf("unexpected args: %#v", args)
 	}
 }

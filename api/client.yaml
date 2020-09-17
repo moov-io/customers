@@ -101,10 +101,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
       requestBody:
@@ -139,10 +139,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -180,10 +180,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -225,10 +225,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -270,10 +270,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -315,10 +315,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -353,10 +353,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -397,10 +397,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -433,10 +433,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -480,10 +480,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -540,10 +540,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -586,10 +586,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -673,10 +673,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -760,10 +760,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -843,10 +843,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -882,10 +882,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -928,10 +928,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -984,10 +984,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -1023,10 +1023,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -1074,10 +1074,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID
@@ -1113,10 +1113,10 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-User-ID
+        - name: X-Namespace
           in: header
-          description: Unique userID set by an auth proxy or client to identify and isolate objects.
-          example: e3cdf999
+          description: Value used to separate and identify models
+          example: org342
           schema:
             type: string
         - name: customerID

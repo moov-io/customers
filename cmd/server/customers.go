@@ -204,7 +204,10 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		requestID := moovhttp.GetRequestID(r)
+		requestID, namespace := moovhttp.GetRequestID(r), route.GetNamespace(w, r)
+		if namespace == "" {
+			return
+		}
 
 		var req customerRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -231,10 +234,8 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 				return
 			}
 		}
-		if err := repo.createCustomer(cust); err != nil {
-			if requestID != "" {
-				logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestID", requestID)
-			}
+		if err := repo.createCustomer(cust, namespace); err != nil {
+			logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -316,7 +317,7 @@ func addCustomerAddress(logger log.Logger, repo customerRepository) http.Handler
 
 type customerRepository interface {
 	getCustomer(customerID string) (*client.Customer, error)
-	createCustomer(c *client.Customer) error
+	createCustomer(c *client.Customer, namespace string) error
 	updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error
 
 	searchCustomers(params searchParams) ([]*client.Customer, error)
@@ -340,15 +341,15 @@ func (r *sqlCustomerRepository) close() error {
 	return r.db.Close()
 }
 
-func (r *sqlCustomerRepository) createCustomer(c *client.Customer) error {
+func (r *sqlCustomerRepository) createCustomer(c *client.Customer, namespace string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
 	}
 
 	// Insert customer record
-	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified)
-values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified, namespace)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -356,7 +357,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	defer stmt.Close()
 
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BirthDate, c.Status, c.Email, now, now)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BirthDate, c.Status, c.Email, now, now, namespace)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
