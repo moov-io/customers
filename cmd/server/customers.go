@@ -235,9 +235,7 @@ func createCustomer(logger log.Logger, repo customerRepository, customerSSNStora
 			}
 		}
 		if err := repo.createCustomer(cust, namespace); err != nil {
-			if requestID != "" {
-				logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestID", requestID)
-			}
+			logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
