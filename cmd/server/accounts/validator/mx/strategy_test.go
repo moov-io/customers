@@ -5,18 +5,19 @@
 package mx
 
 import (
+	"context"
 	"os"
 	"testing"
 
+	"github.com/antihax/optional"
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/mxenabled/atrium-go"
 	"github.com/stretchr/testify/require"
 )
 
 func TestStrategy(t *testing.T) {
-	t.Skip("MX has limits for development API keys that’s why let’s skip for now")
-
 	if os.Getenv("ATRIUM_API_KEY") == "" {
 		t.Skip("No configuration found for MX")
 	}
@@ -29,6 +30,27 @@ func TestStrategy(t *testing.T) {
 	strategy := NewStrategy(options)
 
 	customerID, userID, accountID := base.ID(), base.ID(), base.ID()
+
+	t.Cleanup(func() {
+		client := atrium.AtriumClient(options.APIKey, options.ClientID)
+
+		// list users
+		ctx := context.Background()
+		opts := &atrium.ListUsersOpts{
+			Page:           optional.NewInt32(1),
+			RecordsPerPage: optional.NewInt32(20),
+		}
+
+		response, _, err := client.Users.ListUsers(ctx, opts)
+		require.NoError(t, err)
+
+		// delete all users
+		for _, user := range response.Users {
+			ctx = context.Background()
+			_, err := client.Users.DeleteUser(ctx, user.GUID)
+			require.NoError(t, err)
+		}
+	})
 
 	t.Run("Test InitAccountValidation", func(t *testing.T) {
 		initResponse, err := strategy.InitAccountValidation(userID, accountID, customerID)
