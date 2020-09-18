@@ -17,6 +17,8 @@ servers:
 - description: Local development
   url: http://localhost:8087
 tags:
+- description: Endpoints for retrieving and updating configuration for a namespace.
+  name: Configuration
 - description: Endpoints for searching, creating, and verifying individuals according
     to US government criteria for money movement within the country.
   name: Customers
@@ -31,6 +33,65 @@ paths:
       summary: Ping Customers
       tags:
       - Customers
+  /configuration/customers:
+    get:
+      description: Retrieve current configuration for the provided namespace.
+      operationId: getConfiguration
+      parameters:
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Namespace
+        required: false
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamespaceConfiguration'
+          description: Configuration was successfully updated
+      summary: Get Configuration
+      tags:
+      - Configuration
+    put:
+      description: Update the configuration for the provided namespace.
+      operationId: updateConfiguration
+      parameters:
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Namespace
+        required: false
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NamespaceConfiguration'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamespaceConfiguration'
+          description: Configuration was successfully updated
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Configuration was not updated, see error(s)
+      summary: Update Configuration
+      tags:
+      - Configuration
   /customers:
     get:
       description: Search for customers using different filter parameters
@@ -1397,6 +1458,22 @@ paths:
       - Customers
 components:
   schemas:
+    NamespaceConfiguration:
+      example:
+        primaryAccount: f6eddffd
+        legalEntity: 5c20933f
+      properties:
+        legalEntity:
+          description: customerID of legal entity for this Namespace
+          example: 5c20933f
+          type: string
+        primaryAccount:
+          description: accountID of funding/source account for this Namespace
+          example: f6eddffd
+          type: string
+      required:
+      - legalEntity
+      - primaryAccount
     CreateCustomer:
       example:
         firstName: Robert

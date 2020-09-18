@@ -38,6 +38,8 @@ All URIs are relative to *http://localhost:8087*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*ConfigurationApi* | [**GetConfiguration**](docs/ConfigurationApi.md#getconfiguration) | **Get** /configuration/customers | Get Configuration
+*ConfigurationApi* | [**UpdateConfiguration**](docs/ConfigurationApi.md#updateconfiguration) | **Put** /configuration/customers | Update Configuration
 *CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add customer address
 *CustomersApi* | [**CompleteAccountValidation**](docs/CustomersApi.md#completeaccountvalidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
@@ -88,6 +90,7 @@ Class | Method | HTTP request | Description
  - [InitAccountValidationResponse](docs/InitAccountValidationResponse.md)
  - [InstitutionAddress](docs/InstitutionAddress.md)
  - [InstitutionDetails](docs/InstitutionDetails.md)
+ - [NamespaceConfiguration](docs/NamespaceConfiguration.md)
  - [OfacSearch](docs/OfacSearch.md)
  - [Phone](docs/Phone.md)
  - [TransitAccountNumber](docs/TransitAccountNumber.md)

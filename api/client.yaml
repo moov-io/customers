@@ -19,6 +19,8 @@ servers:
     description: Local development
 
 tags:
+  - name: Configuration
+    description: Endpoints for retrieving and updating configuration for a namespace.
   - name: Customers
     description: Endpoints for searching, creating, and verifying individuals according to US government criteria for money movement within the country.
 
@@ -32,6 +34,58 @@ paths:
       responses:
         '200':
           description: Service is running properly
+
+  /configuration/customers:
+    get:
+      tags: [Configuration]
+      summary: Get Configuration
+      description: Retrieve current configuration for the provided namespace.
+      operationId: getConfiguration
+      parameters:
+        - name: X-Namespace
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Configuration was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamespaceConfiguration'
+    put:
+      tags: [Configuration]
+      summary: Update Configuration
+      description: Update the configuration for the provided namespace.
+      operationId: updateConfiguration
+      parameters:
+        - name: X-Namespace
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NamespaceConfiguration'
+      responses:
+        '200':
+          description: Configuration was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NamespaceConfiguration'
+        '400':
+          description: Configuration was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers:
     get:
       tags: [Customers]
@@ -1142,6 +1196,19 @@ paths:
 
 components:
   schemas:
+    NamespaceConfiguration:
+      properties:
+        legalEntity:
+          type: string
+          example: 5c20933f
+          description: customerID of legal entity for this Namespace
+        primaryAccount:
+          type: string
+          example: f6eddffd
+          description: accountID of funding/source account for this Namespace
+      required:
+        - legalEntity
+        - primaryAccount
     CreateCustomer:
       type: object
       properties:
