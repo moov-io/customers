@@ -8,6 +8,8 @@ Moov Customers project supports following strategies and vendors to validate acc
 
 Please, check [API reference](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/accounts/{accountID}/validate) for more details on account validation API.
 
+[What is Instant Account Validation: MX.com](https://www.mx.com/moneysummit/what-is-instant-account-verification)
+
 ## Micro-deposits Validation with Moov PayGate
 
 In order to validate Account two micro-depoists under $0.50 will be created with a balanced withdraw. Account validation with micro-deposits strategy consists of two steps:
@@ -75,7 +77,7 @@ The diagram below shows how account verification with Plaid works:
 
 1. Make a request to Initiate Account Validation and get `link_token` for Plaid Link from the response
 2. Open Plaid Link with link_token for your customer.
-3. Make request to Complete Account Validation by providing `public_token` received from Plaid Link in the onSuccess callback. 
+3. Make request to Complete Account Validation by providing `public_token` received from Plaid Link in the onSuccess callback.
 
 ### 1. Initiate Account Validation
 
@@ -188,7 +190,7 @@ The diagram below shows how account verification with MX works:
 
 1. Make a request to Initiate Account Validation and get `connect_widget_url` for MX Connect widget from the response
 2. Open MX Connect for your customer.
-3. Make request to Complete Account Validation by providing `user_guid` and `member_guid` received from MX Connect in the onSuccess callback. 
+3. Make request to Complete Account Validation by providing `user_guid` and `member_guid` received from MX Connect in the onSuccess callback.
 
 ### 1. Initiate Account Validation
 
