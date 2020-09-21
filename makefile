@@ -98,5 +98,6 @@ AUTHORS:
 
 .PHONY: setup_test_db
 setup_test_db:
-	DATABASE_TYPE=mysql MYSQL_ROOT_PASSWORD=secret MYSQL_USER=moov MYSQL_PASSWORD=secret MYSQL_ADDRESS="tcp(localhost:3306)" MYSQL_DATABASE=paygate_test go run cmd/migrate/main.go
+	CGO_ENABLED=1 go build -o ./bin/db github.com/moov-io/customers/cmd/db
+	MYSQL_ROOT_PASSWORD=secret MYSQL_USER=moov MYSQL_PASSWORD=secret MYSQL_ADDRESS="tcp(localhost:3306)" MYSQL_DATABASE=paygate_test ./bin/db setup
 

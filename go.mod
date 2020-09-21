@@ -20,6 +20,7 @@ require (
 	github.com/hashicorp/go-rootcerts v1.0.2 // indirect
 	github.com/hashicorp/golang-lru v0.5.4
 	github.com/hashicorp/vault/api v1.0.4
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/lopezator/migrator v0.3.0
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mitchellh/mapstructure v1.3.3
@@ -37,6 +38,7 @@ require (
 	github.com/plaid/plaid-go v0.0.0-20200805000941-b566963d2892
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/common v0.13.0 // indirect
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
 	gocloud.dev v0.20.0
 	gocloud.dev/secrets/hashivault v0.20.0

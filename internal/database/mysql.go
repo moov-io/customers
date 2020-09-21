@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -177,6 +178,17 @@ func (my *mysql) Connect() (*sql.DB, error) {
 	return db, nil
 }
 
+type MySQLConfig struct {
+	User     string
+	Password string
+	Address  string
+	Database string
+}
+
+func NewMySQL(logger log.Logger, config *MySQLConfig) (*sql.DB, error) {
+	return mysqlConnection(logger, config.User, config.Password, config.Address, config.Database).Connect()
+}
+
 func mysqlConnection(logger log.Logger, user, pass string, address string, database string) *mysql {
 	timeout := "30s"
 	if v := os.Getenv("MYSQL_TIMEOUT"); v != "" {
@@ -219,7 +231,6 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 	if os.Getenv("MYSQL_TEST") != "" {
 		params := "timeout=30s&charset=utf8mb4&parseTime=true&sql_mode=ALLOW_INVALID_DATES"
 		dsn := fmt.Sprintf("%s:%s@%s/%s?%s", "moov", "secret", "tcp(localhost:3306)", "paygate_test", params)
-
 		db, err := TestConnect(dsn)
 		if err != nil {
 			t.Fatal(err)
@@ -286,11 +297,13 @@ func MySQLUniqueViolation(err error) bool {
 	return match
 }
 
-func init() {
-	txdb.Register("txdb", "mysql", "moov:secret@tcp(localhost:3306)/paygate_test?timeout=30s&charset=utf8mb4&parseTime=true&sql_mode=ALLOW_INVALID_DATES")
-}
+var initTestDbOnce sync.Once
 
 func TestConnect(dsn string) (*sql.DB, error) {
+	initTestDbOnce.Do(func() {
+		txdb.Register("txdb", "mysql", dsn)
+	})
+
 	db, err := sql.Open("txdb", "identifier")
 	if err != nil {
 		return nil, err
