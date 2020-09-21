@@ -24,6 +24,14 @@ services:
     ports:
       - "8084:8084"
       - "9094:9094"
+
+  paygate:
+    image: moov/paygate:v0.8.0-dev
+    command: -config=/conf/config.yaml
+    volumes:
+      - "./testdata/paygate/config.yml:/conf/config.yaml"
+    ports:
+      - "8082:8082"
   db:
     image: mysql:8
     environment:

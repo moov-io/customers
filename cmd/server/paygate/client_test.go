@@ -30,6 +30,10 @@ type deployment struct {
 }
 
 func (d *deployment) close(t *testing.T) {
+	if d.res == nil {
+		return
+	}
+
 	if err := d.res.Close(); err != nil {
 		t.Error(err)
 	}
@@ -41,6 +45,12 @@ func spawnPayGate(t *testing.T) *deployment {
 	if testing.Short() {
 		t.Skip("-short flag enabled")
 	}
+
+	if os.Getenv("PAYGATE_ENDPOINT") != "" {
+		client := NewClient(log.NewNopLogger(), os.Getenv("PAYGATE_ENDPOINT"), false)
+		return &deployment{client: client}
+	}
+
 	if !docker.Enabled() {
 		t.Skip("Docker not enabled")
 	}
@@ -53,6 +63,7 @@ func spawnPayGate(t *testing.T) *deployment {
 	}
 	t.Cleanup(func() { os.RemoveAll(dir) })
 
+	fmt.Println("one")
 	paygateTag := "v0.8.0-dev"
 	writePayGateConfig(t, dir, paygateTag)
 
@@ -61,6 +72,7 @@ func spawnPayGate(t *testing.T) *deployment {
 	if err != nil {
 		t.Fatal(err)
 	}
+	fmt.Println("two")
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "moov/paygate",
 		Tag:        paygateTag,
@@ -72,12 +84,16 @@ func spawnPayGate(t *testing.T) *deployment {
 	}
 
 	client := NewClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")), false)
+
+	fmt.Println("three")
 	err = pool.Retry(func() error {
 		return client.Ping()
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fmt.Println("four")
 	return &deployment{resource, client}
 }
 
