@@ -13,13 +13,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-
-    services:
-      db:
-        image: mysql:8
-        env:
-          MYSQL_ROOT_PASSWORD: secret
-
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
