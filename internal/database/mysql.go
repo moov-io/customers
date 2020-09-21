@@ -231,7 +231,7 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 	if os.Getenv("MYSQL_TEST") != "" {
 		params := "timeout=30s&charset=utf8mb4&parseTime=true&sql_mode=ALLOW_INVALID_DATES"
 		dsn := fmt.Sprintf("%s:%s@%s/%s?%s", "moov", "secret", "tcp(localhost:3306)", "paygate_test", params)
-		db, err := TestConnect(dsn)
+		db, err := txDbConnect(dsn)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -299,7 +299,7 @@ func MySQLUniqueViolation(err error) bool {
 
 var initTestDbOnce sync.Once
 
-func TestConnect(dsn string) (*sql.DB, error) {
+func txDbConnect(dsn string) (*sql.DB, error) {
 	initTestDbOnce.Do(func() {
 		txdb.Register("txdb", "mysql", dsn)
 	})

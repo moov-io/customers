@@ -6,9 +6,11 @@ package database
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/go-kit/kit/log"
+	"github.com/stretchr/testify/require"
 )
 
 func TestMySQL__basic(t *testing.T) {
@@ -31,6 +33,10 @@ func TestMySQL__basic(t *testing.T) {
 	if conn != nil || err == nil {
 		t.Fatalf("conn=%#v expected error", conn)
 	}
+
+	fmt.Println("Hello")
+	_, err = txDbConnect("user:pass@tcp(localhost:1234)/db?timeout=1s")
+	require.Error(t, err)
 }
 
 func TestMySQLUniqueViolation(t *testing.T) {
