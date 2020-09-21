@@ -16,7 +16,6 @@ check:
 ifeq ($(OS),Windows_NT)
 	@echo "Skipping checks on Windows, currently unsupported."
 else
-	COMPOSE_FILE=docker-compose.dev.yml docker-compose up -d
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
 	WATCHMAN_ENDPOINT=http://localhost:8084 \
