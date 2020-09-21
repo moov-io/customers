@@ -63,7 +63,6 @@ func spawnPayGate(t *testing.T) *deployment {
 	}
 	t.Cleanup(func() { os.RemoveAll(dir) })
 
-	fmt.Println("one")
 	paygateTag := "v0.8.0-dev"
 	writePayGateConfig(t, dir, paygateTag)
 
@@ -72,7 +71,6 @@ func spawnPayGate(t *testing.T) *deployment {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fmt.Println("two")
 	resource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "moov/paygate",
 		Tag:        paygateTag,
@@ -85,7 +83,6 @@ func spawnPayGate(t *testing.T) *deployment {
 
 	client := NewClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")), false)
 
-	fmt.Println("three")
 	err = pool.Retry(func() error {
 		return client.Ping()
 	})
@@ -93,7 +90,6 @@ func spawnPayGate(t *testing.T) *deployment {
 		t.Fatal(err)
 	}
 
-	fmt.Println("four")
 	return &deployment{resource, client}
 }
 
