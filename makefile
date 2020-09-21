@@ -94,3 +94,9 @@ AUTHORS:
 	@$(file >$@,# This file lists all individuals having contributed content to the repository.)
 	@$(file >>$@,# For how it is generated, see `make AUTHORS`.)
 	@echo "$(shell git log --format='\n%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)" >> $@
+
+
+.PHONY: setup_test_db
+setup_test_db:
+	DATABASE_TYPE=mysql MYSQL_ROOT_PASSWORD=secret MYSQL_USER=moov MYSQL_PASSWORD=secret MYSQL_ADDRESS="tcp(localhost:3306)" MYSQL_DATABASE=paygate_test go run cmd/migrate/main.go
+

@@ -24,3 +24,9 @@ services:
     ports:
       - "8084:8084"
       - "9094:9094"
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "3306:3306"

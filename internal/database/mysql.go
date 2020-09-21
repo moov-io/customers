@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/DATA-DOG/go-txdb"
 	"github.com/moov-io/base/docker"
 
 	"github.com/go-kit/kit/log"
@@ -199,7 +200,10 @@ type TestMySQLDB struct {
 }
 
 func (r *TestMySQLDB) Close() error {
-	r.container.Close()
+	if r.container != nil {
+		r.container.Close()
+	}
+
 	return r.DB.Close()
 }
 
@@ -211,6 +215,19 @@ func CreateTestMySQLDB(t *testing.T) *TestMySQLDB {
 	if testing.Short() {
 		t.Skip("-short flag enabled")
 	}
+
+	if os.Getenv("MYSQL_TEST") != "" {
+		params := "timeout=30s&charset=utf8mb4&parseTime=true&sql_mode=ALLOW_INVALID_DATES"
+		dsn := fmt.Sprintf("%s:%s@%s/%s?%s", "moov", "secret", "tcp(localhost:3306)", "paygate_test", params)
+
+		db, err := TestConnect(dsn)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		return &TestMySQLDB{DB: db}
+	}
+
 	if !docker.Enabled() {
 		t.Skip("Docker not enabled")
 	}
@@ -267,4 +284,22 @@ func MySQLUniqueViolation(err error) bool {
 		return match || e.Number == mySQLErrDuplicateKey
 	}
 	return match
+}
+
+func init() {
+	txdb.Register("txdb", "mysql", "moov:secret@tcp(localhost:3306)/paygate_test?timeout=30s&charset=utf8mb4&parseTime=true&sql_mode=ALLOW_INVALID_DATES")
+}
+
+func TestConnect(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("txdb", "identifier")
+	if err != nil {
+		return nil, err
+	}
+
+	// Check out DB is up and working
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }

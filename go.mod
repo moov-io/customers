@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	cloud.google.com/go v0.64.0 // indirect
+	github.com/DATA-DOG/go-txdb v0.1.3
 	github.com/PuerkitoBio/goquery v1.5.1 // indirect
 	github.com/antihax/optional v1.0.0
 	github.com/aws/aws-sdk-go v1.34.9
