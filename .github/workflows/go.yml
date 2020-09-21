@@ -24,6 +24,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Run services
+      if: runner.os == 'Linux'
       run: COMPOSE_FILE=docker-compose.dev.yml docker-compose up -d
 
     - name: Install make (Windows)
