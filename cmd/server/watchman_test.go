@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"os"
 	"strings"
 	"testing"
 
@@ -44,6 +45,9 @@ type watchmanDeployment struct {
 }
 
 func (d *watchmanDeployment) close(t *testing.T) {
+	if d.res == nil {
+		return
+	}
 	if err := d.res.Close(); err != nil {
 		t.Error(err)
 	}
@@ -55,6 +59,12 @@ func spawnWatchman(t *testing.T) *watchmanDeployment {
 	if testing.Short() {
 		t.Skip("-short flag enabled")
 	}
+
+	if os.Getenv("WATCHMAN_ENDPOINT") != "" {
+		client := newWatchmanClient(log.NewNopLogger(), os.Getenv("WATCHMAN_ENDPOINT"), false)
+		return &watchmanDeployment{client: client}
+	}
+
 	if !docker.Enabled() {
 		t.Skip("Docker not enabled")
 	}
