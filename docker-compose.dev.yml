@@ -1,16 +1,5 @@
 version: '3'
 services:
-  customers:
-    image: moov/customers:latest
-    ports:
-      - "8087:8087"
-      - "9097:9097"
-    environment:
-      FED_ENDPOINT: 'http://fed:8086'
-      WATCHMAN_ENDPOINT: 'http://watchman:8084'
-    depends_on:
-      - fed
-      - watchman
   fed:
     image: moov/fed:v0.5.1
     ports:
@@ -24,3 +13,16 @@ services:
     ports:
       - "8084:8084"
       - "9094:9094"
+  paygate:
+    image: moov/paygate:v0.8.0-dev
+    command: -config=/conf/config.yaml
+    volumes:
+      - "./testdata/paygate/config.yml:/conf/config.yaml"
+    ports:
+      - "8082:8082"
+  db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "3306:3306"
