@@ -13,6 +13,13 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
+
+    services:
+      db:
+        image: mysql:8
+        environment:
+          MYSQL_ROOT_PASSWORD: secret
+
     steps:
     - name: Set up Go 1.x
       uses: actions/setup-go@v2
@@ -22,10 +29,6 @@ jobs:
 
     - name: Check out code into the Go module directory
       uses: actions/checkout@v2
-
-    - name: Run services
-      if: runner.os == 'Linux'
-      run: COMPOSE_FILE=docker-compose.dev.yml docker-compose up -d
 
     - name: Install make (Windows)
       if: runner.os == 'Windows'

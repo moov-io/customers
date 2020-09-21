@@ -18,10 +18,8 @@ ifeq ($(OS),Windows_NT)
 else
 	@wget -O lint-project.sh https://raw.githubusercontent.com/moov-io/infra/master/go/lint-project.sh
 	@chmod +x ./lint-project.sh
-	WATCHMAN_ENDPOINT=http://localhost:8084 \
-			  PAYGATE_ENDPOINT=http://localhost:8082 \
-			  MYSQL_TEST=1 \
-			  GOCYCLO_LIMIT=27  ./lint-project.sh
+	MYSQL_TEST=1 \
+		   GOCYCLO_LIMIT=27  ./lint-project.sh
 endif
 
 .PHONY: admin
