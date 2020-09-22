@@ -167,6 +167,43 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
         '404':
           description: No Customer with the specified customerID was found
+    delete:
+      description: Remove a given Customer
+      operationId: deleteCustomer
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Namespace
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
+        - description: customerID of the Customer to be deleted
+          explode: false
+          in: path
+          name: customerID
+          required: true
+          schema:
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+            type: string
+          style: simple
+      responses:
+        "200":
+          description: Customer removed from customers
+        '400':
+          description: Failed to delete customer, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+      summary: Delete Customer by ID
+      tags:
+        - Customers
   /customers/{customerID}/address:
     post:
       tags: [Customers]
@@ -513,7 +550,7 @@ paths:
           content:
             application/json:
               schema:
-                    $ref: '#/components/schemas/AccountValidationResponse'
+                $ref: '#/components/schemas/AccountValidationResponse'
               example:
                 validationID: b74d7c51
                 strategy: instant
@@ -698,7 +735,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/InitAccountValidationRequest'
+              $ref: '#/components/schemas/InitAccountValidationRequest'
             example:
               strategy: micro-deposits
               vendor: moov
@@ -708,7 +745,7 @@ paths:
           content:
             application/json:
               schema:
-                    $ref: '#/components/schemas/InitAccountValidationResponse'
+                $ref: '#/components/schemas/InitAccountValidationResponse'
               examples:
                 Micro-deposits:
                   value:
@@ -785,7 +822,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/CompleteAccountValidationRequest'
+              $ref: '#/components/schemas/CompleteAccountValidationRequest'
             examples:
               Micro-deposits:
                 value:
@@ -814,7 +851,7 @@ paths:
           content:
             application/json:
               schema:
-                    $ref: '#/components/schemas/CompleteAccountValidationResponse'
+                $ref: '#/components/schemas/CompleteAccountValidationResponse'
               example:
                 validationID: b74d7c51
                 strategy: micro-deposits
@@ -1446,7 +1483,7 @@ components:
         accountNumber:
           type: string
           description: |
-              The base64 encoded encrypted account number for the bank account for transit across services. The symmetric key used is configured from TRANSIT_LOCAL_BASE64_KEY and callers of endpoints that respond with encrypted values need this same key to decrypt.
+            The base64 encoded encrypted account number for the bank account for transit across services. The symmetric key used is configured from TRANSIT_LOCAL_BASE64_KEY and callers of endpoints that respond with encrypted values need this same key to decrypt.
           example: MKtcJkzlxUlGcW7Nf5xm5cg==
     CreateAccount:
       properties:
