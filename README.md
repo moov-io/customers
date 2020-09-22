@@ -19,6 +19,23 @@ Moov Customers is under active development, so please star the project if you ar
 
 ## Getting Started
 
+Customers has a [Docker Compose](https://docs.docker.com/compose/gettingstarted/) setup which you can run locally. This uses the latest releases of Customers and Watchman.
+
+```
+$ docker-compose up
+Creating customers_watchman_1 ... done
+Creating customers_customers_1 ... done
+...
+customers_1  | ts=2020-03-06T22:56:24.2184402Z caller=main.go:50 startup="Starting moov-io/customers server version v0.4.0-rc1"
+customers_1  | ts=2020-03-06T22:56:24.393462Z caller=watchman.go:102 watchman="using http://watchman:8084 for Watchman address"
+customers_1  | ts=2020-03-06T22:56:24.3951132Z caller=main.go:171 startup="binding to :8087 for HTTP server"
+```
+
+Once the systems start you can access Customers via `http://localhost:8087` and Watchman's [web interface or api](http://localhost:8084):
+
+1. [API Endpoints](https://moov-io.github.io/customers/api/)
+1. [Admin Endpoints](https://moov-io.github.io/customers/admin/)
+
 Read through the [project docs](docs/README.md) over here to get an understanding of the purpose of this project and how to run it.
 
 ## Getting Help
