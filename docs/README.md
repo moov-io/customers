@@ -41,5 +41,14 @@ In order to use an account for ACH transactions, it will need to be validated. T
 
 See more information on [how account validation strategies work](./account-validation.md).
 
+## Getting Help
+
+ channel | info
+ ------- | -------
+[Project Documentation](https://docs.moov.io/) | Our project documentation available online.
+Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
+[GitHub Issue](https://github.com/moov-io/customers/issues) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
+[moov-io slack](https://slack.moov.io/) | Join our slack channel to have an interactive discussion about the development of the project.
+
 ---
 **[Next - Configuration](CONFIGURATION.md)**
