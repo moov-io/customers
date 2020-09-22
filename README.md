@@ -11,7 +11,7 @@ The Customers project focuses on solving authentic identification of humans who 
 
 [FFIEC Bank Secrecy Act - Customer Identification Program](https://www.fdic.gov/regulations/examinations/bsa/ffiec_cip.pdf)
 
-Docs: [docs](docs/README.md) | [API Endpoints](https://moov-io.github.io/customers/api/) | [Admin API Endpoints](https://moov-io.github.io/customers/admin/)
+Docs: [docs](https://moov-io.github.io/customers/) | [API Endpoints](https://moov-io.github.io/customers/api/) | [Admin API Endpoints](https://moov-io.github.io/customers/admin/)
 
 ## Project Status
 
