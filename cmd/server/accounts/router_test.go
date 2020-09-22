@@ -10,21 +10,25 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/moov-io/customers/internal/testclient"
-	watchman "github.com/moov-io/watchman/client"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	watchman "github.com/moov-io/watchman/client"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/moov-io/customers/internal/testclient"
+
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
+
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
+
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
-	"github.com/stretchr/testify/require"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -167,6 +171,49 @@ func TestAccountCreationRequest(t *testing.T) {
 
 	if err := req.validate(); err != nil {
 		t.Error(err)
+	}
+}
+
+func TestGetAccountByID(t *testing.T) {
+	testFedClient := &fed.MockClient{}
+	repo := setupTestAccountRepository(t)
+	validations := &validator.MockRepository{}
+	keeper := secrets.TestStringKeeper(t)
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{
+		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
+	}
+
+	handler := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), handler, repo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(repo, nil))
+
+	type account struct { // wrapper to associate an account with its customerID
+		customerID string
+		*client.Account
+	}
+
+	var accounts []*account
+	var err error
+	for i := 0; i < 5; i++ {
+		accounts = append(accounts, &account{customerID: base.ID()})
+		accounts[i].Account, err = repo.createCustomerAccount(accounts[i].customerID, base.ID(), &createAccountRequest{
+			AccountNumber: fmt.Sprintf("%d", i),
+			RoutingNumber: "987654320",
+			Type:          client.CHECKING,
+		})
+		require.NoError(t, err)
+	}
+
+	for _, acct := range accounts {
+		res := httptest.NewRecorder()
+		req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s", acct.customerID, acct.AccountID), nil)
+		handler.ServeHTTP(res, req)
+		res.Flush()
+
+		require.Equal(t, http.StatusOK, res.Code, res.Body.String())
+
+		var got *client.Account
+		require.NoError(t, json.NewDecoder(res.Body).Decode(&got))
+		require.Equal(t, got, acct.Account)
 	}
 }
 
