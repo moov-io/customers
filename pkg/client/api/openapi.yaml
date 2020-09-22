@@ -563,6 +563,64 @@ paths:
       summary: Create Customer Account
       tags:
       - Customers
+  /customers/{customerID}/accounts/{accountID}:
+    get:
+      description: Retrieve an account by ID for the given customer.
+      operationId: getCustomerAccountByID
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Namespace
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer to get an Account for
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: accountID of the Account
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+          description: An active account for the customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      summary: Get Customer Account by ID
+      tags:
+      - Customers
   /customers/{customerID}/accounts/{accountID}/decrypt:
     post:
       description: |

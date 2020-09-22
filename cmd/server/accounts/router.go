@@ -13,7 +13,9 @@ import (
 
 	"github.com/moov-io/ach"
 	moovhttp "github.com/moov-io/base/http"
+
 	"github.com/moov-io/customers/cmd/server/accounts/validator"
+
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/pkg/client"
@@ -31,6 +33,7 @@ func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, valid
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, accounts, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, accounts))
 
+	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(getCustomerAccountByID(logger, accounts, fedClient))
 	r.Methods("GET").Path("/customers/{customerID}/accounts/{accountID}/ofac").HandlerFunc(getAccountOfacSearch(logger, accounts))
 	r.Methods("PUT").Path("/customers/{customerID}/accounts/{accountID}/refresh/ofac").HandlerFunc(refreshAccountOfac(logger, accounts, ofac))
 
@@ -155,6 +158,39 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 		// Perform an OFAC search with the Customer information
 		if err := ofac.StoreAccountOFACSearch(account, requestID); err != nil {
 			logger.Log("accounts", fmt.Sprintf("error with OFAC search for account=%s: %v", account.AccountID, err), "requestID", requestID)
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(account)
+	}
+}
+
+func getCustomerAccountByID(logger log.Logger, repo Repository, fedClient fed.Client) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+		customerID := route.GetCustomerID(w, r)
+		accountID := getAccountID(w, r)
+
+		account, err := repo.getCustomerAccount(customerID, accountID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		if account == nil {
+			moovhttp.Problem(w, fmt.Errorf("account with customerID=%s and accountID=%s not found", customerID, accountID))
+			return
+		}
+
+		details, err := fedClient.LookupInstitution(account.RoutingNumber)
+		if err != nil {
+			moovhttp.Problem(w, fmt.Errorf("looking up institution details: %v", err))
+			return
+		}
+
+		if details != nil {
+			account.Institution = *details
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
