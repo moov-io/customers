@@ -5,6 +5,7 @@
 package configuration
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -15,7 +16,7 @@ import (
 func TestRepository(t *testing.T) {
 	t.Parallel()
 
-	check := func(t *testing.T, repo Repository) {
+	check := func(t *testing.T, repo *sqlRepo) {
 		namespace := base.ID()
 
 		cfg, err := repo.Get(namespace)
@@ -27,12 +28,13 @@ func TestRepository(t *testing.T) {
 			t.Errorf("unexpected primary account: %q", cfg.PrimaryAccount)
 		}
 
-		// TODO(adam): write customer and account
+		customerID, accountID := base.ID(), base.ID()
+		writeCustomerAndAccount(t, repo.db, namespace, customerID, accountID)
 
 		// write config
 		cfg = &client.NamespaceConfiguration{
-			LegalEntity:    base.ID(),
-			PrimaryAccount: base.ID(),
+			LegalEntity:    customerID,
+			PrimaryAccount: accountID,
 		}
 		if _, err := repo.Update(namespace, cfg); err != nil {
 			t.Fatal(err)
@@ -50,23 +52,36 @@ func TestRepository(t *testing.T) {
 	}
 
 	check(t, sqliteRepo(t))
-	check(t, mysqlRepo(t))
 }
 
-func sqliteRepo(t *testing.T) Repository {
+func sqliteRepo(t *testing.T) *sqlRepo {
 	db := database.CreateTestSqliteDB(t)
-	repo := NewRepository(db.DB)
 	t.Cleanup(func() {
 		db.Close()
 	})
-	return repo
+	return &sqlRepo{db: db.DB}
 }
 
-func mysqlRepo(t *testing.T) Repository {
-	db := database.CreateTestMySQLDB(t)
-	repo := NewRepository(db.DB)
-	t.Cleanup(func() {
-		db.Close()
-	})
-	return repo
+func writeCustomerAndAccount(t *testing.T, db *sql.DB, namespace string, customerID, accountID string) {
+	// TODO(adam): replace after customers/acconts Repository are moved to ./pkg/
+	query := `insert into customers (customer_id, namespace, first_name, last_name) values (?, ?, ?, ?);`
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stmt.Close()
+	if _, err := stmt.Exec(customerID, namespace, "jane", "doe"); err != nil {
+		t.Fatal(err)
+	}
+
+	// insert account
+	query = `insert into accounts (account_id, customer_id, masked_account_number) values (?, ?, ?);`
+	stmt, err = db.Prepare(query)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer stmt.Close()
+	if _, err := stmt.Exec(accountID, customerID, "XXX456"); err != nil {
+		t.Fatal(err)
+	}
 }
