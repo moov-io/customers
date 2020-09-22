@@ -645,7 +645,7 @@ func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID stri
 }
 
 func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*ofacSearchResult, error) {
-	query := `select entity_id, sdn_name, sdn_type, match, created_at from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
+	query := `select entity_id, sdn_name, sdn_type, percentage_match, created_at from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("getLatestCustomerOFACSearch: prepare: %v", err)
@@ -664,7 +664,7 @@ func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID string) (
 }
 
 func (r *sqlCustomerRepository) saveCustomerOFACSearch(customerID string, result ofacSearchResult) error {
-	query := `insert into customer_ofac_searches (customer_id, entity_id, sdn_name, sdn_type, match, created_at) values (?, ?, ?, ?, ?, ?);`
+	query := `insert into customer_ofac_searches (customer_id, entity_id, sdn_name, sdn_type, percentage_match, created_at) values (?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("saveCustomerOFACSearch: prepare: %v", err)
