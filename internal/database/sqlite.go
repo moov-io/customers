@@ -53,7 +53,7 @@ var (
 		),
 		execsql(
 			"create_customer_ofac_searches",
-			`create table if not exists customer_ofac_searches(customer_id, entity_id, sdn_name, sdn_type, match, created_at datetime);`,
+			`create table if not exists customer_ofac_searches(customer_id, entity_id, sdn_name, sdn_type, percentage_match, created_at datetime);`,
 		),
 		execsql(
 			"create_customer_ssn",
