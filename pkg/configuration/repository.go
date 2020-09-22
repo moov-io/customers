@@ -45,10 +45,9 @@ where namespace = ? limit 1;`
 }
 
 func (r *sqlRepo) Update(namespace string, cfg *client.NamespaceConfiguration) (*client.NamespaceConfiguration, error) {
-	// TODO(adam): need to break out repositories to properly test and include this check
-	// if err := r.verifyCustomerInfo(namespace, cfg); err != nil {
-	// 	return nil, errors.New("namespace: customerID or accountID does not belong")
-	// }
+	if err := r.verifyCustomerInfo(namespace, cfg); err != nil {
+		return nil, errors.New("namespace: customerID or accountID does not belong")
+	}
 
 	query := `replace into namespace_configuration (namespace, legal_entity, primary_account) values (?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
