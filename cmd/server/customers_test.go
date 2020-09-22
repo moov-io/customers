@@ -15,9 +15,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/moov-io/customers/internal/database"
 
 	"github.com/moov-io/base"
+
 	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/go-kit/kit/log"
@@ -43,6 +46,11 @@ func (r *testCustomerRepository) getCustomer(customerID string) (*client.Custome
 
 func (r *testCustomerRepository) createCustomer(c *client.Customer, namespace string) error {
 	r.createdCustomer = c
+	return r.err
+}
+
+func (r *testCustomerRepository) deleteCustomer(customerID string) error {
+	r.customer = nil
 	return r.err
 }
 
@@ -171,6 +179,39 @@ func TestCustomers__GetCustomerEmpty(t *testing.T) {
 	if w.Code != http.StatusNotFound {
 		t.Errorf("bogus status code: %d", w.Code)
 	}
+}
+
+func TestCustomers__DeleteCustomer(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	cr := &customerRequest{
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Email:     "jane@example.com",
+	}
+	customer, _, _ := cr.asCustomer(testCustomerSSNStorage(t))
+	require.NoError(t,
+		repo.createCustomer(customer, "namespace"),
+	)
+
+	got, err := repo.getCustomer(customer.CustomerID)
+	require.NoError(t, err)
+	require.NotNil(t, got)
+
+	router := mux.NewRouter()
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("DELETE", fmt.Sprintf("/customers/%s", customer.CustomerID), nil)
+
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusNoContent, w.Code)
+	require.Empty(t, w.Body)
+	got, err = repo.getCustomer(customer.CustomerID)
+	require.NoError(t, err)
+	require.Nil(t, got)
 }
 
 func TestCustomerRepository__createCustomer(t *testing.T) {
@@ -404,6 +445,63 @@ func TestCustomers__repository(t *testing.T) {
 	}
 	if len(cust.Phones) != 1 || len(cust.Addresses) != 1 {
 		t.Errorf("len(cust.Phones)=%d and len(cust.Addresses)=%d", len(cust.Phones), len(cust.Addresses))
+	}
+}
+
+func TestCustomerRepository__delete(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	type customer struct {
+		*client.Customer
+		deleted bool
+	}
+	customers := make([]*customer, 10)
+
+	for i := 0; i < len(customers); i++ {
+		cr := &customerRequest{
+			FirstName: "Jane",
+			LastName:  "Doe",
+			Email:     "jane@example.com",
+		}
+		cust, _, _ := cr.asCustomer(testCustomerSSNStorage(t))
+		require.NoError(t,
+			repo.createCustomer(cust, "namespace"),
+		)
+
+		customers[i] = &customer{
+			Customer: cust,
+		}
+	}
+
+	// mark customers to be deleted
+	indexesToDelete := []int{1, 2, 5, 8}
+	for _, idx := range indexesToDelete {
+		require.Less(t, idx, len(customers))
+		customers[idx].deleted = true
+		require.NoError(t,
+			repo.deleteCustomer(customers[idx].CustomerID),
+		)
+	}
+
+	deletedCustomerIds := make(map[string]bool)
+	// query all customers that have been marked as deleted
+	query := `select customer_id from customers where deleted_at is not null;`
+	stmt, err := repo.db.Prepare(query)
+	require.NoError(t, err)
+
+	rows, err := stmt.Query()
+	require.NoError(t, err)
+
+	for rows.Next() {
+		var customerID *string
+		require.NoError(t, rows.Scan(&customerID))
+		deletedCustomerIds[*customerID] = true
+	}
+
+	for _, cust := range customers {
+		_, ok := deletedCustomerIds[cust.CustomerID]
+		require.Equal(t, cust.deleted, ok)
 	}
 }
 
