@@ -142,6 +142,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 			ContentType:        contentType,
 		})
 		if err != nil {
+			logger.Log("documents", fmt.Sprintf("problem uploading document=%s: %v", doc.DocumentID, err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
