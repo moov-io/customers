@@ -33,7 +33,6 @@ func AddCustomerRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository
 	r.Methods("DELETE").Path("/customers/{customerID}").HandlerFunc(deleteCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
 	r.Methods("PUT").Path("/customers/{customerID}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
-	r.Methods("POST").Path("/customers/{customerID}/address").HandlerFunc(addCustomerAddress(logger, repo))
 }
 
 // formatCustomerName returns a Customer's name joined as one string. It accounts for
@@ -128,6 +127,7 @@ type phone struct {
 }
 
 type address struct {
+	Type       string `json:"type"`
 	Address1   string `json:"address1"`
 	Address2   string `json:"address2,omitempty"`
 	City       string `json:"city"`
@@ -388,30 +388,6 @@ func replaceCustomerMetadata(logger log.Logger, repo CustomerRepository) http.Ha
 	}
 }
 
-func addCustomerAddress(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
-		if customerID == "" {
-			return
-		}
-
-		var req address
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-
-		if err := repo.addCustomerAddress(customerID, req); err != nil {
-			moovhttp.Problem(w, err)
-			return
-		}
-
-		logger.Log("customers", fmt.Sprintf("added address for customer=%s", customerID), "requestID", requestID)
-
-		respondWithCustomer(logger, w, customerID, requestID, repo)
-	}
-}
-
 type CustomerRepository interface {
 	getCustomer(customerID string) (*client.Customer, error)
 	createCustomer(c *client.Customer, namespace string) error
@@ -425,7 +401,8 @@ type CustomerRepository interface {
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
 
 	addCustomerAddress(customerID string, address address) error
-	updateCustomerAddress(customerID, addressID string, _type string, validated bool) error
+	updateCustomerAddress(customerID, addressID string, req updateCustomerAddressRequest) error
+	deleteCustomerAddress(customerID string, addressID string) error
 
 	getLatestCustomerOFACSearch(customerID string) (*ofacSearchResult, error)
 	saveCustomerOFACSearch(customerID string, result ofacSearchResult) error
@@ -651,7 +628,7 @@ func (r *sqlCustomerRepository) readPhones(customerID string) ([]client.Phone, e
 }
 
 func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.CustomerAddress, error) {
-	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated from customers_addresses where customer_id = ?;`
+	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated from customers_addresses where customer_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("readAddresses: prepare customers_addresses: err=%v", err)
@@ -772,28 +749,52 @@ func (r *sqlCustomerRepository) addCustomerAddress(customerID string, req addres
 	query := `insert into customers_addresses (address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("addCustomerAddress: prepare: %v", err)
+		return fmt.Errorf("createCustomerAddress: prepare: %v", err)
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(base.ID(), customerID, "Secondary", req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false); err != nil {
-		return fmt.Errorf("addCustomerAddress: exec: %v", err)
+	if _, err := stmt.Exec(base.ID(), customerID, req.Type, req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false); err != nil {
+		return fmt.Errorf("createCustomerAddress: exec: %v", err)
 	}
 	return nil
 }
 
-func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID string, _type string, validated bool) error {
-	query := `update customers_addresses set type = ?, validated = ? where customer_id = ? and address_id = ?;`
+func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID string, req updateCustomerAddressRequest) error {
+	query := `update customers_addresses set type = ?, address1 = ?, address2 = ?, city = ?, state = ?, postal_code = ?, country = ?, 
+	validated = ? where customer_id = ? and address_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("updateCustomerAddress: prepare: %v", err)
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(_type, validated, customerID, addressID); err != nil {
+	_, err = stmt.Exec(
+		req.Type,
+		req.Address1,
+		req.Address2,
+		req.City,
+		req.State,
+		req.PostalCode,
+		req.Country,
+		req.Validated,
+		customerID,
+		addressID)
+	if err != nil {
 		return fmt.Errorf("updateCustomerAddress: exec: %v", err)
 	}
 	return nil
+}
+
+func (r *sqlCustomerRepository) deleteCustomerAddress(customerID string, addressID string) error {
+	query := `update customers_addresses set deleted_at = ? where customer_id = ? and address_id = ? and deleted_at is null;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(time.Now(), customerID, addressID)
+	return err
 }
 
 func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*ofacSearchResult, error) {

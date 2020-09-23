@@ -414,6 +414,81 @@ paths:
       summary: Add customer address
       tags:
       - Customers
+  /customers/{customerID}/addresses/{addressID}:
+    delete:
+      description: Deletes a customer's address
+      operationId: deleteCustomerAddress
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Address ID
+        explode: false
+        in: path
+        name: addressID
+        required: true
+        schema:
+          example: 1d62e297-9727-4084-a902-1031da932c9e
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Successfully deleted the customer's address
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Delete a customer's address
+      tags:
+      - Customers
+    put:
+      description: Updates the specified customer address
+      operationId: updateCustomerAddress
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Address ID
+        explode: false
+        in: path
+        name: addressID
+        required: true
+        schema:
+          example: 1d62e297-9727-4084-a902-1031da932c9e
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerAddress'
+        required: true
+      responses:
+        "200":
+          description: Updated Customer address
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Update customer's address
+      tags:
+      - Customers
   /customers/{customerID}/metadata:
     put:
       description: Replace the metadata object for a customer. Metadata is a map of
@@ -1920,6 +1995,53 @@ components:
           $ref: '#/components/schemas/CustomerStatus'
       required:
       - status
+    UpdateCustomerAddress:
+      example:
+        country: US
+        validated: false
+        address2: address2
+        city: city
+        address1: address1
+        postalCode: postalCode
+        state: state
+        type: primary
+      properties:
+        type:
+          description: Attribute of address
+          enum:
+          - primary
+          - secondary
+          type: string
+        validated:
+          default: false
+          description: If this address has been confirmed with the Customer
+          type: boolean
+        address1:
+          description: First line of the address
+          type: string
+        address2:
+          description: Second line of the address
+          type: string
+        city:
+          type: string
+        state:
+          description: two charcer code of US state
+          maximum: 2
+          minimum: 2
+          type: string
+        postalCode:
+          type: string
+        country:
+          enum:
+          - US
+          type: string
+      required:
+      - address1
+      - city
+      - country
+      - postalCode
+      - state
+      - type
     CreatePhone:
       example:
         number: +1.818.555.1212

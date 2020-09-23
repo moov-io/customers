@@ -19,6 +19,7 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
+
 	mainPkg "github.com/moov-io/customers"
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/internal/util"
@@ -170,6 +171,7 @@ func main() {
 	addPingRoute(router)
 	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher)
 	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
+	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
 	documents.AddDocumentRoutes(logger, router, documentRepo, storage.GetBucket(bucketName, cloudProvider, signer))
 	customers.AddOFACRoutes(logger, router, customerRepo, ofac)

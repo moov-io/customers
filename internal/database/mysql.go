@@ -132,6 +132,10 @@ var (
 			"add_deleted_at__to__documents",
 			"alter table documents add column deleted_at datetime;",
 		),
+		execsql(
+			"add_deleted_at__to__customers_addresses",
+			`alter table customers_addresses add column deleted_at datetime;`,
+		),
 	)
 )
 

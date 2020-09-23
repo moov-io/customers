@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**DecryptAccountNumber**](CustomersApi.md#DecryptAccountNumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 [**DeleteCustomer**](CustomersApi.md#DeleteCustomer) | **Delete** /customers/{customerID} | Delete Customer by ID
 [**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
+[**DeleteCustomerAddress**](CustomersApi.md#DeleteCustomerAddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete a customer&#39;s address
 [**DeleteCustomerDocument**](CustomersApi.md#DeleteCustomerDocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete a customer&#39;s document
 [**GetAccountValidation**](CustomersApi.md#GetAccountValidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
@@ -30,6 +31,7 @@ Method | HTTP request | Description
 [**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Get customers
 [**UpdateAccountStatus**](CustomersApi.md#UpdateAccountStatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
 [**UpdateCustomer**](CustomersApi.md#UpdateCustomer) | **Put** /customers/{customerID} | Update customer
+[**UpdateCustomerAddress**](CustomersApi.md#UpdateCustomerAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customer&#39;s address
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
 
@@ -396,6 +398,41 @@ Name | Type | Description  | Notes
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
  **xNamespace** | **optional.String**| Value used to separate and identify models | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## DeleteCustomerAddress
+
+> DeleteCustomerAddress(ctx, customerID, addressID)
+
+Delete a customer's address
+
+Deletes a customer's address
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+**addressID** | **string**| Address ID | 
 
 ### Return type
 
@@ -1225,6 +1262,42 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Customer**](Customer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateCustomerAddress
+
+> UpdateCustomerAddress(ctx, customerID, addressID, updateCustomerAddress)
+
+Update customer's address
+
+Updates the specified customer address
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+**addressID** | **string**| Address ID | 
+**updateCustomerAddress** | [**UpdateCustomerAddress**](UpdateCustomerAddress.md)|  | 
+
+### Return type
+
+ (empty response body)
 
 ### Authorization
 

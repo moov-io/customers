@@ -342,6 +342,72 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /customers/{customerID}/addresses/{addressID}:
+    put:
+      tags: [Customers]
+      summary: Update customer's address
+      description: Updates the specified customer address
+      operationId: updateCustomerAddress
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: addressID
+          in: path
+          description: Address ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerAddress'
+      responses:
+        '200':
+          description: Updated Customer address
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+    delete:
+      tags: [Customers]
+      summary: Delete a customer's address
+      description: Deletes a customer's address
+      operationId: deleteCustomerAddress
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: addressID
+          in: path
+          description: Address ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      responses:
+        '204':
+          description: Successfully deleted the customer's address
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+
   /customers/{customerID}/metadata:
     put:
       tags: [Customers]
@@ -1546,6 +1612,44 @@ components:
           $ref: '#/components/schemas/CustomerStatus'
       required:
         - status
+    UpdateCustomerAddress:
+      properties:
+        type:
+          type: string
+          description: Attribute of address
+          enum:
+            - primary
+            - secondary
+        validated:
+          type: boolean
+          default: false
+          description: If this address has been confirmed with the Customer
+        address1:
+          type: string
+          description: First line of the address
+        address2:
+          type: string
+          description: Second line of the address
+        city:
+          type: string
+        state:
+          type: string
+          minimum: 2
+          maximum: 2
+          description: two charcer code of US state
+        postalCode:
+          type: string
+        country:
+          type: string
+          enum:
+            - US
+      required:
+        - type
+        - address1
+        - city
+        - state
+        - postalCode
+        - country
     CreatePhone:
       properties:
         number:

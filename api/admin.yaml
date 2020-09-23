@@ -112,43 +112,6 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
-  /customers/{customerID}/addresses/{addressID}:
-    put:
-      tags: [Customers]
-      summary: Update customers address
-      description: Updates the specified customer address
-      operationId: updateCustomerAddress
-      parameters:
-        - name: customerID
-          in: path
-          description: Customer ID
-          required: true
-          schema:
-            type: string
-            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-        - name: addressID
-          in: path
-          description: Address ID
-          required: true
-          schema:
-            type: string
-            example: 1d62e297-9727-4084-a902-1031da932c9e
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateCustomerAddress'
-      responses:
-        '200':
-          description: Updated Customer address
-        '400':
-          description: See error message
-          content:
-            application/json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
-
 components:
   schemas:
     LivenessProbes:
@@ -179,15 +142,3 @@ components:
           $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/api/client.yaml#/components/schemas/CustomerStatus'
       required:
         - status
-    UpdateCustomerAddress:
-      properties:
-        type:
-          type: string
-          description: Attribute of address
-          enum:
-            - primary
-            - secondary
-        validated:
-          type: boolean
-          default: false
-          description: If this address has been confirmed with the Customer

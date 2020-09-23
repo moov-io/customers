@@ -27,6 +27,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var _ CustomerRepository = (*testCustomerRepository)(nil)
+
 type testCustomerRepository struct {
 	err              error
 	customer         *client.Customer
@@ -87,7 +89,11 @@ func (r *testCustomerRepository) addCustomerAddress(customerID string, address a
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomerAddress(customerID, addressID string, _type string, validated bool) error {
+func (r *testCustomerRepository) updateCustomerAddress(customerID, addressID string, req updateCustomerAddressRequest) error {
+	return r.err
+}
+
+func (r *testCustomerRepository) deleteCustomerAddress(customerID string, addressID string) error {
 	return r.err
 }
 
@@ -681,6 +687,43 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	}
 }
 
+func TestCustomersRepository__addCustomerAddress(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	cust, _, _ := (customerRequest{
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Email:     "jane@example.com",
+	}).asCustomer(testCustomerSSNStorage(t))
+	if err := repo.createCustomer(cust, "namespace"); err != nil {
+		t.Fatal(err)
+	}
+
+	// add an Address
+	if err := repo.addCustomerAddress(cust.CustomerID, address{
+		Address1:   "123 1st st",
+		City:       "fake city",
+		State:      "CA",
+		PostalCode: "90210",
+		Country:    "US",
+	}); err != nil {
+		t.Fatal(err)
+	}
+
+	// re-read
+	cust, err := repo.getCustomer(cust.CustomerID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(cust.Addresses) != 1 {
+		t.Errorf("got %d Addresses", len(cust.Addresses))
+	}
+	if cust.Addresses[0].Address1 != "123 1st st" {
+		t.Errorf("cust.Addresses[0].Address1=%s", cust.Addresses[0].Address1)
+	}
+}
+
 func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
@@ -854,83 +897,6 @@ func TestCustomers__validateMetadata(t *testing.T) {
 	}
 	if err := validateMetadata(meta); err == nil {
 		t.Error("expected error")
-	}
-}
-
-func TestCustomers__addCustomerAddress(t *testing.T) {
-	repo := &testCustomerRepository{
-		customer: &client.Customer{
-			CustomerID: base.ID(),
-		},
-		err: errors.New("bad error"),
-	}
-
-	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
-
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("POST", "/customers/foo/address", strings.NewReader(address))
-	req.Header.Set("x-namespace", "test")
-	req.Header.Set("x-request-id", "test")
-
-	router := mux.NewRouter()
-	AddCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
-	router.ServeHTTP(w, req)
-	w.Flush()
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("bogus HTTP status: %d", w.Code)
-	}
-
-	// remove error and retry
-	repo.err = nil
-
-	req = httptest.NewRequest("POST", "/customers/foo/address", strings.NewReader(address))
-	req.Header.Set("x-namespace", "test")
-	req.Header.Set("x-request-id", "test")
-
-	w = httptest.NewRecorder()
-	router.ServeHTTP(w, req)
-	w.Flush()
-
-	if w.Code != http.StatusOK {
-		t.Errorf("bogus HTTP status: %d: %v", w.Code, w.Body.String())
-	}
-}
-
-func TestCustomersRepository__addCustomerAddress(t *testing.T) {
-	repo := createTestCustomerRepository(t)
-	defer repo.close()
-
-	cust, _, _ := (customerRequest{
-		FirstName: "Jane",
-		LastName:  "Doe",
-		Email:     "jane@example.com",
-	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
-		t.Fatal(err)
-	}
-
-	// add an Address
-	if err := repo.addCustomerAddress(cust.CustomerID, address{
-		Address1:   "123 1st st",
-		City:       "fake city",
-		State:      "CA",
-		PostalCode: "90210",
-		Country:    "US",
-	}); err != nil {
-		t.Fatal(err)
-	}
-
-	// re-read
-	cust, err := repo.getCustomer(cust.CustomerID)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(cust.Addresses) != 1 {
-		t.Errorf("got %d Addresses", len(cust.Addresses))
-	}
-	if cust.Addresses[0].Address1 != "123 1st st" {
-		t.Errorf("cust.Addresses[0].Address1=%s", cust.Addresses[0].Address1)
 	}
 }
 
