@@ -231,7 +231,7 @@ func TestDisclaimersRepository(t *testing.T) {
 }
 
 func TestDisclaimersAdmin__create(t *testing.T) {
-	disclaimRepo := &testDisclaimerRepository{}
+	disclaimerRepo := &testDisclaimerRepository{}
 
 	documentID := base.ID()
 	docRepo := &testDocumentRepository{
@@ -244,7 +244,7 @@ func TestDisclaimersAdmin__create(t *testing.T) {
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimerRepo, docRepo)
 	go svc.Listen()
 
 	body := strings.NewReader(fmt.Sprintf(`{"text": "terms and conditions", "documentId": "%s"}`, documentID))
@@ -276,12 +276,12 @@ func TestDisclaimersAdmin__create(t *testing.T) {
 }
 
 func TestDisclaimersAdmin__createErr(t *testing.T) {
-	disclaimRepo := &testDisclaimerRepository{}
+	disclaimerRepo := &testDisclaimerRepository{}
 	docRepo := &testDocumentRepository{}
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimerRepo, docRepo)
 	go svc.Listen()
 
 	body := strings.NewReader(`{"text": "", "documentId": ""}`)
@@ -304,12 +304,12 @@ func TestDisclaimersAdmin__createErr(t *testing.T) {
 }
 
 func TestDisclaimersAdmin__createMethodErr(t *testing.T) {
-	disclaimRepo := &testDisclaimerRepository{}
+	disclaimerRepo := &testDisclaimerRepository{}
 	docRepo := &testDocumentRepository{}
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimerRepo, docRepo)
 	go svc.Listen()
 
 	req, err := http.NewRequest("PUT", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", nil)
@@ -331,12 +331,12 @@ func TestDisclaimersAdmin__createMethodErr(t *testing.T) {
 }
 
 func TestDisclaimersAdmin__createJSONErr(t *testing.T) {
-	disclaimRepo := &testDisclaimerRepository{}
+	disclaimerRepo := &testDisclaimerRepository{}
 	docRepo := &testDocumentRepository{}
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimerRepo, docRepo)
 	go svc.Listen()
 
 	body := strings.NewReader(`not-valid-json`)
