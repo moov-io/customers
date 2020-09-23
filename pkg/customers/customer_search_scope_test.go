@@ -1,4 +1,4 @@
-package main
+package customers
 
 import (
 	"encoding/json"
