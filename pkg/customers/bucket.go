@@ -24,7 +24,7 @@ import (
 
 type bucketFunc func() (*blob.Bucket, error)
 
-func getBucket(bucketName, cloudProvider string, fileblobSigner *fileblob.URLSignerHMAC) bucketFunc {
+func GetBucket(bucketName, cloudProvider string, fileblobSigner *fileblob.URLSignerHMAC) bucketFunc {
 	return func() (*blob.Bucket, error) {
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()

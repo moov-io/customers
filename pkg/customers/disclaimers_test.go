@@ -116,7 +116,7 @@ func TestDisclaimers__getCustomerDisclaimers(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addDisclaimerRoutes(log.NewNopLogger(), router, repo)
+	AddDisclaimerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -160,7 +160,7 @@ func TestDisclaimers__acceptDisclaimer(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addDisclaimerRoutes(log.NewNopLogger(), router, repo)
+	AddDisclaimerRoutes(log.NewNopLogger(), router, repo)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -244,7 +244,7 @@ func TestDisclaimersAdmin__create(t *testing.T) {
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
 	go svc.Listen()
 
 	body := strings.NewReader(fmt.Sprintf(`{"text": "terms and conditions", "documentId": "%s"}`, documentID))
@@ -281,7 +281,7 @@ func TestDisclaimersAdmin__createErr(t *testing.T) {
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
 	go svc.Listen()
 
 	body := strings.NewReader(`{"text": "", "documentId": ""}`)
@@ -309,7 +309,7 @@ func TestDisclaimersAdmin__createMethodErr(t *testing.T) {
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
 	go svc.Listen()
 
 	req, err := http.NewRequest("PUT", "http://"+svc.BindAddr()+"/customers/adam/disclaimers", nil)
@@ -336,7 +336,7 @@ func TestDisclaimersAdmin__createJSONErr(t *testing.T) {
 
 	svc := admin.NewServer(":0")
 	defer svc.Shutdown()
-	addDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
+	AddDisclaimerAdminRoutes(log.NewNopLogger(), svc, disclaimRepo, docRepo)
 	go svc.Listen()
 
 	body := strings.NewReader(`not-valid-json`)

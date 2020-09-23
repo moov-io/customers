@@ -31,6 +31,13 @@ type ssnStorage struct {
 	repo   CustomerSSNRepository
 }
 
+func NewSSNStorage(keeper *secrets.StringKeeper, repo CustomerSSNRepository) *ssnStorage {
+	return &ssnStorage{
+		keeper: keeper,
+		repo:   repo,
+	}
+}
+
 func (s *ssnStorage) encryptRaw(customerID, raw string) (*SSN, error) {
 	defer func() {
 		raw = ""

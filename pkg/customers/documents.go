@@ -32,7 +32,7 @@ var (
 	maxDocumentSize int64 = 20 * 1024 * 1024 // 20MB
 )
 
-func addDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, bucketFactory bucketFunc) {
+func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, bucketFactory bucketFunc) {
 	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
 	r.Methods("GET").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))

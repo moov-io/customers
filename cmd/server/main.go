@@ -128,8 +128,8 @@ func main() {
 	ofac := customers.NewOFACSearcher(customerRepo, watchmanClient)
 
 	// Register our admin routes
-	addApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
-	addDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
+	customers.AddApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
+	customers.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
 	ctx := context.Background()
@@ -138,10 +138,8 @@ func main() {
 		panic(err)
 	}
 	stringKeeper := secrets.NewStringKeeper(keeper, 10*time.Second)
-	customerSSNStorage := &ssnStorage{
-		keeper: stringKeeper,
-		repo:   customerSSNRepo,
-	}
+
+	customerSSNStorage := customers.NewSSNStorage(stringKeeper, customerSSNRepo)
 
 	// read transit keeper
 	transitKeeper, err := secrets.OpenLocal(os.Getenv("TRANSIT_LOCAL_BASE64_KEY"))
@@ -168,10 +166,10 @@ func main() {
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
 	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher)
-	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
-	addDisclaimerRoutes(logger, router, disclaimerRepo)
-	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
-	addOFACRoutes(logger, router, customerRepo, ofac)
+	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
+	customers.AddDisclaimerRoutes(logger, router, disclaimerRepo)
+	customers.AddDocumentRoutes(logger, router, documentRepo, customers.GetBucket(bucketName, cloudProvider, signer))
+	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)
@@ -180,7 +178,7 @@ func main() {
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
 	if cloudProvider == "file" {
-		addFileblobRoutes(logger, router, signer, getBucket(bucketName, cloudProvider, signer))
+		customers.AddFileblobRoutes(logger, router, signer, customers.GetBucket(bucketName, cloudProvider, signer))
 	}
 
 	// Start business HTTP server

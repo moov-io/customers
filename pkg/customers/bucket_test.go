@@ -41,7 +41,7 @@ func TestBucket__openBucket(t *testing.T) {
 	}
 }
 
-func TestBucket__getBucket(t *testing.T) {
+func TestBucket__GetBucket(t *testing.T) {
 	dir, _ := ioutil.TempDir("", "customers-getBucket")
 
 	signer, err := fileblobSigner("http://localhost:8087", "secret")
@@ -49,7 +49,7 @@ func TestBucket__getBucket(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bucket, err := getBucket(dir, "file", signer)()
+	bucket, err := GetBucket(dir, "file", signer)()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +58,7 @@ func TestBucket__getBucket(t *testing.T) {
 	}
 
 	// error case
-	if _, err := getBucket("", "", nil)(); err == nil {
+	if _, err := GetBucket("", "", nil)(); err == nil {
 		t.Fatal("expected error")
 	}
 }

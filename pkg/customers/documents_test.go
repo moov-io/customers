@@ -65,7 +65,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -148,7 +148,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -195,7 +195,7 @@ func TestDocuments__uploadCustomerDocument(t *testing.T) {
 	req.URL = u // replace query params with invalid values
 
 	router := mux.NewRouter()
-	addDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 

@@ -36,10 +36,10 @@ var (
 	errNoAddressId = errors.New("no Address ID found")
 )
 
-// addApprovalRoutes contains "back office" admin endpoints used to validate (or reject) a Customer
+// AddApprovalRoutes contains "back office" admin endpoints used to validate (or reject) a Customer
 // TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now.
 // What about a header like x-admin-id ??
-func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo CustomerRepository, customerSSNRepo CustomerSSNRepository, ofac *OFACSearcher) {
+func AddApprovalRoutes(logger log.Logger, svc *admin.Server, repo CustomerRepository, customerSSNRepo CustomerSSNRepository, ofac *OFACSearcher) {
 	svc.AddHandler("/customers/{customerID}/status", updateCustomerStatus(logger, repo, customerSSNRepo, ofac))
 	svc.AddHandler("/customers/{customerID}/addresses/{addressId}", updateCustomerAddress(logger, repo))
 }

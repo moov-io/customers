@@ -91,7 +91,7 @@ func TestOFACApproval__getLatest(t *testing.T) {
 		},
 	}
 
-	addOFACRoutes(logger, router, repo, nil)
+	AddOFACRoutes(logger, router, repo, nil)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/ofac", customerID), nil)
@@ -135,7 +135,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 		watchmanClient: testWatchmanClient,
 	}
 
-	addOFACRoutes(logger, router, repo, ofac)
+	AddOFACRoutes(logger, router, repo, ofac)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/refresh/ofac", customerID), nil)
@@ -185,7 +185,7 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 		watchmanClient: testWatchmanClient,
 	}
 
-	addOFACRoutes(logger, router, repo, ofac)
+	AddOFACRoutes(logger, router, repo, ofac)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/refresh/ofac", customerID), nil)

@@ -30,7 +30,7 @@ func Setup(t *testing.T) Scope {
 
 func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error) {
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, scope.customerRepo, nil, nil)
+	AddCustomerRoutes(log.NewNopLogger(), router, scope.customerRepo, nil, nil)
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers"+query, nil)
 	req.Header.Set("X-Namespace", "namespace")

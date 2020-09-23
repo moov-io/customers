@@ -72,7 +72,7 @@ func TestFiles__proxyLocalFile(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/files"+u.String(), nil)
 	router := mux.NewRouter()
-	addFileblobRoutes(log.NewNopLogger(), router, signer, func() (*blob.Bucket, error) { return bucket, nil })
+	AddFileblobRoutes(log.NewNopLogger(), router, signer, func() (*blob.Bucket, error) { return bucket, nil })
 	router.ServeHTTP(w, req)
 	w.Flush()
 

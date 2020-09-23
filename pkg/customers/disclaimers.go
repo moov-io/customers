@@ -26,12 +26,12 @@ var (
 	errNoDisclaimerID = errors.New("no Disclaimer ID found")
 )
 
-func addDisclaimerRoutes(logger log.Logger, r *mux.Router, repo DisclaimerRepository) {
+func AddDisclaimerRoutes(logger log.Logger, r *mux.Router, repo DisclaimerRepository) {
 	r.Methods("GET").Path("/customers/{customerID}/disclaimers").HandlerFunc(getCustomerDisclaimers(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/disclaimers/{disclaimerID}").HandlerFunc(acceptDisclaimer(logger, repo))
 }
 
-func addDisclaimerAdminRoutes(logger log.Logger, svc *admin.Server, disclaimRepo DisclaimerRepository, docRepo DocumentRepository) {
+func AddDisclaimerAdminRoutes(logger log.Logger, svc *admin.Server, disclaimRepo DisclaimerRepository, docRepo DocumentRepository) {
 	svc.AddHandler("/customers/{customerID}/disclaimers", createDisclaimer(logger, disclaimRepo, docRepo))
 }
 
