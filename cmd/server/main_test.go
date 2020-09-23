@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/moov-io/base/admin"
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
+	"github.com/moov-io/customers/pkg/validator"
 	"github.com/stretchr/testify/require"
 )
 

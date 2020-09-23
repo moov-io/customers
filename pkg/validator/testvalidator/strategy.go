@@ -9,8 +9,8 @@ import (
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/validator"
 )
 
 type testStrategy struct{}

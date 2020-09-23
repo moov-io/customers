@@ -11,9 +11,9 @@ import (
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	customersclient "github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/validator"
 	"github.com/moov-io/paygate/pkg/client"
 )
 

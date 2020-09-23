@@ -23,12 +23,12 @@ import (
 	"github.com/moov-io/base"
 	"github.com/stretchr/testify/require"
 
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
-	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
-
 	"github.com/moov-io/customers/cmd/server/fed"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
+
+	"github.com/moov-io/customers/pkg/validator"
+	"github.com/moov-io/customers/pkg/validator/testvalidator"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"

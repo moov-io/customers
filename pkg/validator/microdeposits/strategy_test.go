@@ -8,9 +8,9 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/validator"
 	"github.com/stretchr/testify/require"
 
 	payclient "github.com/moov-io/paygate/pkg/client"
