@@ -87,10 +87,12 @@ func main() {
 	}()
 
 	accountsRepo := accounts.NewRepo(logger, db)
-	customerRepo := customers.NewRepo(logger, db)
-	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
-	disclaimerRepo := &sqlDisclaimerRepository{db, logger}
-	documentRepo := &sqlDocumentRepository{db, logger}
+	customerRepo := customers.NewCustomerRepo(logger, db)
+	customerSSNRepo := customers.NewCustomerSSNRepository(logger, db)
+
+	disclaimerRepo := customers.NewDisclaimerRepo(logger, db)
+	documentRepo := customers.NewDocumentRepo(logger, db)
+
 	validationsRepo := validator.NewRepo(db)
 
 	// Start Admin server (with Prometheus metrics)

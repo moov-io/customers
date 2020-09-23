@@ -28,7 +28,7 @@ func (s *SSN) String() string {
 
 type ssnStorage struct {
 	keeper *secrets.StringKeeper
-	repo   customerSSNRepository
+	repo   CustomerSSNRepository
 }
 
 func (s *ssnStorage) encryptRaw(customerID, raw string) (*SSN, error) {
@@ -60,9 +60,16 @@ func maskSSN(s string) string {
 	}
 }
 
-type customerSSNRepository interface {
+type CustomerSSNRepository interface {
 	saveCustomerSSN(*SSN) error
 	getCustomerSSN(customerID string) (*SSN, error)
+}
+
+func NewCustomerSSNRepository(logger log.Logger, db *sql.DB) CustomerSSNRepository {
+	return &sqlCustomerSSNRepository{
+		db:     db,
+		logger: logger,
+	}
 }
 
 type sqlCustomerSSNRepository struct {

@@ -26,12 +26,12 @@ var (
 	errNoDisclaimerID = errors.New("no Disclaimer ID found")
 )
 
-func addDisclaimerRoutes(logger log.Logger, r *mux.Router, repo disclaimerRepository) {
+func addDisclaimerRoutes(logger log.Logger, r *mux.Router, repo DisclaimerRepository) {
 	r.Methods("GET").Path("/customers/{customerID}/disclaimers").HandlerFunc(getCustomerDisclaimers(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/disclaimers/{disclaimerID}").HandlerFunc(acceptDisclaimer(logger, repo))
 }
 
-func addDisclaimerAdminRoutes(logger log.Logger, svc *admin.Server, disclaimRepo disclaimerRepository, docRepo documentRepository) {
+func addDisclaimerAdminRoutes(logger log.Logger, svc *admin.Server, disclaimRepo DisclaimerRepository, docRepo DocumentRepository) {
 	svc.AddHandler("/customers/{customerID}/disclaimers", createDisclaimer(logger, disclaimRepo, docRepo))
 }
 
@@ -44,7 +44,7 @@ func getDisclaimerID(w http.ResponseWriter, r *http.Request) string {
 	return v
 }
 
-func getCustomerDisclaimers(logger log.Logger, repo disclaimerRepository) http.HandlerFunc {
+func getCustomerDisclaimers(logger log.Logger, repo DisclaimerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -65,7 +65,7 @@ func getCustomerDisclaimers(logger log.Logger, repo disclaimerRepository) http.H
 	}
 }
 
-func acceptDisclaimer(logger log.Logger, repo disclaimerRepository) http.HandlerFunc {
+func acceptDisclaimer(logger log.Logger, repo DisclaimerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -96,7 +96,7 @@ type createDisclaimerRequest struct {
 	Text       string `json:"text"`
 }
 
-func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docRepo documentRepository) http.HandlerFunc {
+func createDisclaimer(logger log.Logger, disclaimRepo DisclaimerRepository, docRepo DocumentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -138,7 +138,7 @@ func createDisclaimer(logger log.Logger, disclaimRepo disclaimerRepository, docR
 	}
 }
 
-func documentExistsForCustomer(customerID string, req createDisclaimerRequest, docRepo documentRepository) error {
+func documentExistsForCustomer(customerID string, req createDisclaimerRequest, docRepo DocumentRepository) error {
 	if req.DocumentID != "" {
 		docs, err := docRepo.getCustomerDocuments(customerID)
 		if err != nil {
@@ -154,7 +154,7 @@ func documentExistsForCustomer(customerID string, req createDisclaimerRequest, d
 	return nil
 }
 
-type disclaimerRepository interface {
+type DisclaimerRepository interface {
 	getCustomerDisclaimer(customerID, disclaimerID string) (*client.Disclaimer, error)
 	getCustomerDisclaimers(customerID string) ([]*client.Disclaimer, error)
 	acceptDisclaimer(customerID, disclaimerID string) error
@@ -164,6 +164,13 @@ type disclaimerRepository interface {
 type sqlDisclaimerRepository struct {
 	db     *sql.DB
 	logger log.Logger
+}
+
+func NewDisclaimerRepo(logger log.Logger, db *sql.DB) DisclaimerRepository {
+	return &sqlDisclaimerRepository{
+		db:     db,
+		logger: logger,
+	}
 }
 
 func (r *sqlDisclaimerRepository) close() error {

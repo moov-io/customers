@@ -353,7 +353,7 @@ type CustomerRepository interface {
 	saveCustomerOFACSearch(customerID string, result ofacSearchResult) error
 }
 
-func NewRepo(logger log.Logger, db *sql.DB) CustomerRepository {
+func NewCustomerRepo(logger log.Logger, db *sql.DB) CustomerRepository {
 	return &sqlCustomerRepository{
 		db:     db,
 		logger: logger,
