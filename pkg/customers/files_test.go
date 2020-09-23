@@ -63,7 +63,7 @@ func TestFiles__proxyLocalFile(t *testing.T) {
 		t.Fatalf("u=%s err=%v", u, err)
 	}
 	u.Scheme, u.Host = "", "" // blank out 'http://' and 'localhost' in below assumption
-	signer, err := fileblobSigner("http://localhost", "secret")
+	signer, err := FileblobSigner("http://localhost", "secret")
 	if err != nil {
 		t.Fatal(err)
 	}
