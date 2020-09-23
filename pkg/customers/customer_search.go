@@ -16,7 +16,7 @@ import (
 	"github.com/moov-io/customers/pkg/route"
 )
 
-func searchCustomers(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 

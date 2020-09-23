@@ -25,7 +25,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func addCustomerRoutes(logger log.Logger, r *mux.Router, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
+func addCustomerRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) {
 	r.Methods("GET").Path("/customers").HandlerFunc(searchCustomers(logger, repo))
 	r.Methods("GET").Path("/customers/{customerID}").HandlerFunc(getCustomer(logger, repo))
 	r.Methods("DELETE").Path("/customers/{customerID}").HandlerFunc(deleteCustomer(logger, repo))
@@ -51,7 +51,7 @@ func formatCustomerName(c *client.Customer) string {
 	return strings.TrimSpace(out)
 }
 
-func getCustomer(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func getCustomer(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -83,7 +83,7 @@ func deleteCustomer(logger log.Logger, repo customerRepository) func(http.Respon
 	}
 }
 
-func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID string, requestID string, repo customerRepository) {
+func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID string, requestID string, repo CustomerRepository) {
 	cust, err := repo.getCustomer(customerID)
 	if err != nil {
 		logger.Log("customers", fmt.Sprintf("getCustomer: lookup: %v", err), "requestID", requestID)
@@ -219,7 +219,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 	return customer, nil, nil
 }
 
-func createCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
+func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -287,7 +287,7 @@ type replaceMetadataRequest struct {
 	Metadata map[string]string `json:"metadata"`
 }
 
-func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func replaceCustomerMetadata(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req replaceMetadataRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -311,7 +311,7 @@ func replaceCustomerMetadata(logger log.Logger, repo customerRepository) http.Ha
 	}
 }
 
-func addCustomerAddress(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func addCustomerAddress(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
@@ -353,10 +353,10 @@ type CustomerRepository interface {
 	saveCustomerOFACSearch(customerID string, result ofacSearchResult) error
 }
 
-func NewRepo(db *sql.DB, logger log.Logger) CustomerRepository {
+func NewRepo(logger log.Logger, db *sql.DB) CustomerRepository {
 	return &sqlCustomerRepository{
 		db:     db,
-		logger: Logger,
+		logger: logger,
 	}
 }
 
