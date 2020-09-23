@@ -19,14 +19,14 @@ import (
 	watchman "github.com/moov-io/watchman/client"
 )
 
-func createTestOFACSearcher(repo CustomerRepository, watchmanClient WatchmanClient) *ofacSearcher {
+func createTestOFACSearcher(repo CustomerRepository, watchmanClient WatchmanClient) *OFACSearcher {
 	if repo == nil {
 		repo = &testCustomerRepository{}
 	}
 	if watchmanClient == nil {
 		watchmanClient = &testWatchmanClient{}
 	}
-	return &ofacSearcher{repo: repo, watchmanClient: watchmanClient}
+	return &OFACSearcher{repo: repo, watchmanClient: watchmanClient}
 }
 
 func TestOFACSearcher__nil(t *testing.T) {
@@ -130,7 +130,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 		},
 	}
 	testWatchmanClient := &testWatchmanClient{}
-	ofac := &ofacSearcher{
+	ofac := &OFACSearcher{
 		repo:           repo,
 		watchmanClient: testWatchmanClient,
 	}
@@ -180,7 +180,7 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 		},
 	}
 	testWatchmanClient := &testWatchmanClient{err: errors.New("bad error")}
-	ofac := &ofacSearcher{
+	ofac := &OFACSearcher{
 		repo:           repo,
 		watchmanClient: testWatchmanClient,
 	}
