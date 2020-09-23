@@ -31,8 +31,8 @@ func AddDisclaimerRoutes(logger log.Logger, r *mux.Router, repo DisclaimerReposi
 	r.Methods("POST").Path("/customers/{customerID}/disclaimers/{disclaimerID}").HandlerFunc(acceptDisclaimer(logger, repo))
 }
 
-func AddDisclaimerAdminRoutes(logger log.Logger, svc *admin.Server, disclaimRepo DisclaimerRepository, docRepo DocumentRepository) {
-	svc.AddHandler("/customers/{customerID}/disclaimers", createDisclaimer(logger, disclaimRepo, docRepo))
+func AddDisclaimerAdminRoutes(logger log.Logger, svc *admin.Server, disclaimerRepo DisclaimerRepository, docRepo DocumentRepository) {
+	svc.AddHandler("/customers/{customerID}/disclaimers", createDisclaimer(logger, disclaimerRepo, docRepo))
 }
 
 func getDisclaimerID(w http.ResponseWriter, r *http.Request) string {
@@ -96,7 +96,7 @@ type createDisclaimerRequest struct {
 	Text       string `json:"text"`
 }
 
-func createDisclaimer(logger log.Logger, disclaimRepo DisclaimerRepository, docRepo DocumentRepository) http.HandlerFunc {
+func createDisclaimer(logger log.Logger, disclaimerRepo DisclaimerRepository, docRepo DocumentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -127,7 +127,7 @@ func createDisclaimer(logger log.Logger, disclaimRepo DisclaimerRepository, docR
 			return
 		}
 
-		disclaimer, err := disclaimRepo.insertDisclaimer(req.Text, req.DocumentID)
+		disclaimer, err := disclaimerRepo.insertDisclaimer(req.Text, req.DocumentID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
