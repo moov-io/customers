@@ -10,8 +10,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/moov-io/customers/cmd/server/paygate"
 	customerClient "github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/paygate"
 	"github.com/moov-io/paygate/pkg/client"
 )
 

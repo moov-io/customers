@@ -13,9 +13,9 @@ import (
 
 	"github.com/moov-io/ach"
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/fed"
+	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/secrets/hash"
 	"github.com/moov-io/customers/pkg/secrets/mask"
