@@ -22,7 +22,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 	defer repo.close()
 
 	router := mux.NewRouter()
-	addCustomerRoutes(log.NewNopLogger(), router, repo, nil, nil)
+	AddCustomerRoutes(log.NewNopLogger(), router, repo, nil, nil)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers?query=jane+doe", nil)

@@ -21,7 +21,7 @@ import (
 	"gocloud.dev/blob/fileblob"
 )
 
-func addFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSignerHMAC, bucketFactory bucketFunc) {
+func AddFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSignerHMAC, bucketFactory bucketFunc) {
 	if v := os.Getenv("FILEBLOB_BASE_URL"); v != "" {
 		u, err := url.Parse(v)
 		if u != nil && err == nil {

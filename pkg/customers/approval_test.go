@@ -33,7 +33,7 @@ func TestCustomers__updateCustomerStatus(t *testing.T) {
 
 	svc := admin.NewServer(":10001")
 	defer svc.Shutdown()
-	addApprovalRoutes(log.NewNopLogger(), svc, repo, ssnRepo, searcher)
+	AddApprovalRoutes(log.NewNopLogger(), svc, repo, ssnRepo, searcher)
 	go svc.Listen()
 
 	body := strings.NewReader(`{"status": "ReceiveOnly", "comment": "test comment"}`)
@@ -147,7 +147,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 
 	svc := admin.NewServer(":10002")
 	defer svc.Shutdown()
-	addApprovalRoutes(log.NewNopLogger(), svc, repo, ssnRepo, searcher)
+	AddApprovalRoutes(log.NewNopLogger(), svc, repo, ssnRepo, searcher)
 	go svc.Listen()
 
 	body := strings.NewReader(`{"type": "primary", "validated": true}`)
