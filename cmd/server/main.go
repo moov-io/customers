@@ -89,10 +89,8 @@ func main() {
 	accountsRepo := accounts.NewRepo(logger, db)
 	customerRepo := customers.NewCustomerRepo(logger, db)
 	customerSSNRepo := customers.NewCustomerSSNRepository(logger, db)
-
 	disclaimerRepo := customers.NewDisclaimerRepo(logger, db)
 	documentRepo := customers.NewDocumentRepo(logger, db)
-
 	validationsRepo := validator.NewRepo(db)
 
 	// Start Admin server (with Prometheus metrics)
@@ -122,7 +120,7 @@ func main() {
 	// Create our Watchman client
 	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
 	watchmanEndpoint := util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT"))
-	watchmanClient := newWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
+	watchmanClient := customers.NewWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
 	if watchmanClient == nil {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}

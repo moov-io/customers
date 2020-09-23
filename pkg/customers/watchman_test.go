@@ -73,7 +73,7 @@ func spawnWatchman(t *testing.T) *watchmanDeployment {
 		t.Fatal(err)
 	}
 
-	client := newWatchmanClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")), false)
+	client := NewWatchmanClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")), false)
 	err = pool.Retry(func() error {
 		return client.Ping()
 	})
@@ -85,7 +85,7 @@ func spawnWatchman(t *testing.T) *watchmanDeployment {
 
 func TestWatchman__client(t *testing.T) {
 	endpoint := ""
-	if client := newWatchmanClient(log.NewNopLogger(), endpoint, false); client == nil {
+	if client := NewWatchmanClient(log.NewNopLogger(), endpoint, false); client == nil {
 		t.Fatal("expected non-nil client")
 	}
 
