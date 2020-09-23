@@ -64,7 +64,7 @@ func getCustomer(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 	}
 }
 
-func deleteCustomer(logger log.Logger, repo customerRepository) func(http.ResponseWriter, *http.Request) {
+func deleteCustomer(logger log.Logger, repo CustomerRepository) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
