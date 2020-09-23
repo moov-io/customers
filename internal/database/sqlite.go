@@ -61,7 +61,7 @@ var (
 		),
 		execsql(
 			"create_documents",
-			`create table if not exists documents(document_id primary key, customer_id, type, content_type, uploaded_at datetime);`,
+			`create table if not exists documents(document_id primary key, customer_id, type, content_type, uploaded_at datetime, deleted_at datetime);`,
 		),
 		execsql(
 			"create_disclaimers",

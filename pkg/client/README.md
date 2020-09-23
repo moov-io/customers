@@ -48,6 +48,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**DecryptAccountNumber**](docs/CustomersApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 *CustomersApi* | [**DeleteCustomer**](docs/CustomersApi.md#deletecustomer) | **Delete** /customers/{customerID} | Delete Customer by ID
 *CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
+*CustomersApi* | [**DeleteCustomerDocument**](docs/CustomersApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete a customer&#39;s document
 *CustomersApi* | [**GetAccountValidation**](docs/CustomersApi.md#getaccountvalidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer
 *CustomersApi* | [**GetCustomerAccountByID**](docs/CustomersApi.md#getcustomeraccountbyid) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account by ID

@@ -18,8 +18,11 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
+
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
 
@@ -43,6 +46,11 @@ func (r *testDocumentRepository) getCustomerDocuments(customerID string) ([]*cli
 
 func (r *testDocumentRepository) writeCustomerDocument(customerID string, doc *client.Document) error {
 	r.written = doc
+	return r.err
+}
+
+func (r *testDocumentRepository) deleteCustomerDocument(customerID string, documentID string) error {
+	r.written = nil
 	return r.err
 }
 
@@ -181,6 +189,35 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	}
 }
 
+func TestDocuments__delete(t *testing.T) {
+	db := database.CreateTestSqliteDB(t)
+	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
+
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+
+	customerID := base.ID()
+	// create document
+	doc := &client.Document{
+		DocumentID:  base.ID(),
+		Type:        "DriversLicense",
+		ContentType: "image/png",
+		UploadedAt:  time.Now(),
+	}
+	err := repo.writeCustomerDocument(customerID, doc)
+	require.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("DELETE", fmt.Sprintf("/customers/%s/documents/%s", customerID, doc.DocumentID), nil)
+	router.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusNoContent, w.Code)
+
+	docs, err := repo.getCustomerDocuments(customerID)
+	require.NoError(t, err)
+	require.Empty(t, docs)
+}
+
 func TestDocuments__uploadCustomerDocument(t *testing.T) {
 	repo := &testDocumentRepository{}
 
@@ -252,4 +289,59 @@ func TestDocumentRepository(t *testing.T) {
 	mysqlDB := database.CreateTestMySQLDB(t)
 	defer mysqlDB.Close()
 	check(t, &sqlDocumentRepository{mysqlDB.DB, log.NewNopLogger()})
+}
+
+func TestDocumentsRepository__Delete(t *testing.T) {
+	db := database.CreateTestSqliteDB(t)
+	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
+
+	type document struct {
+		*client.Document
+		deleted bool
+	}
+
+	customerID := base.ID()
+	docs := make([]*document, 10)
+	for i := 0; i < len(docs); i++ {
+		doc := &client.Document{
+			DocumentID:  base.ID(),
+			Type:        "DriversLicense",
+			ContentType: "image/png",
+		}
+		err := repo.writeCustomerDocument(customerID, doc)
+		require.NoError(t, err)
+		docs[i] = &document{
+			Document: doc,
+		}
+	}
+
+	// mark documents to be deleted
+	indexesToDelete := []int{1, 2, 5, 8}
+	for _, idx := range indexesToDelete {
+		require.Less(t, idx, len(docs))
+		docs[idx].deleted = true
+		require.NoError(t,
+			repo.deleteCustomerDocument(customerID, docs[idx].DocumentID),
+		)
+	}
+
+	deletedDocIDs := make(map[string]bool)
+	// query all documents that have been marked as deleted
+	query := `select document_id from documents where deleted_at is not null;`
+	stmt, err := repo.db.Prepare(query)
+	require.NoError(t, err)
+
+	rows, err := stmt.Query()
+	require.NoError(t, err)
+
+	for rows.Next() {
+		var ID *string
+		require.NoError(t, rows.Scan(&ID))
+		deletedDocIDs[*ID] = true
+	}
+
+	for _, doc := range docs {
+		_, ok := deletedDocIDs[doc.DocumentID]
+		require.Equal(t, doc.deleted, ok)
+	}
 }

@@ -128,6 +128,10 @@ var (
 			"create_namespace_configuration",
 			`create table namespace_configuration(namespace varchar(40) primary key not null, legal_entity varchar(40) not null, primary_account varchar(40) not null);`,
 		),
+		execsql(
+			"add_deleted_at__to__documents",
+			"alter table documents add column deleted_at datetime;",
+		),
 	)
 )
 
