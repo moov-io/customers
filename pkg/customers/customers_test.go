@@ -224,6 +224,14 @@ func TestCustomerRepository__createCustomer(t *testing.T) {
 		if err := repo.createCustomer(cust, "namespace"); err != nil {
 			t.Fatal(err)
 		}
+
+		cust, err := repo.getCustomer(cust.CustomerID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if cust == nil {
+			t.Error("got nil Customer")
+		}
 	}
 
 	// SQLite tests

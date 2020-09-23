@@ -447,15 +447,20 @@ func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer
 
 	row := stmt.QueryRow(customerID)
 
+	var birthDate *string
+
 	var cust client.Customer
 	cust.CustomerID = customerID
-	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.Type, &cust.BirthDate, &cust.Status, &cust.Email, &cust.CreatedAt, &cust.LastModified)
+	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.Type, &birthDate, &cust.Status, &cust.Email, &cust.CreatedAt, &cust.LastModified)
 	stmt.Close()
 	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
 		return nil, fmt.Errorf("getCustomer: %v", err)
 	}
 	if cust.FirstName == "" {
 		return nil, nil // not found
+	}
+	if birthDate != nil {
+		cust.BirthDate = *birthDate
 	}
 
 	phones, err := r.readPhones(customerID)
