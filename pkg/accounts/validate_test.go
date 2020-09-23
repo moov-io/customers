@@ -14,8 +14,8 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/paygate"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/validator"
 	"github.com/moov-io/customers/pkg/validator/microdeposits"

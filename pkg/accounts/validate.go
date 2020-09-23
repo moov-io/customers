@@ -12,8 +12,8 @@ import (
 
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/validator"
 
