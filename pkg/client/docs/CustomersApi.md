@@ -28,6 +28,7 @@ Method | HTTP request | Description
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
 [**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Get customers
 [**UpdateAccountStatus**](CustomersApi.md#UpdateAccountStatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
+[**UpdateCustomer**](CustomersApi.md#UpdateCustomer) | **Put** /customers/{customerID} | Update customer
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
 
@@ -360,7 +361,7 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: Not defined
-- **Accept**: application/json
+- **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
@@ -1128,6 +1129,54 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Account**](Account.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateCustomer
+
+> Customer UpdateCustomer(ctx, customerID, createCustomer, optional)
+
+Update customer
+
+Update a Customer object
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| customerID that identifies this Customer | 
+**createCustomer** | [**CreateCustomer**](CreateCustomer.md)|  | 
+ **optional** | ***UpdateCustomerOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a UpdateCustomerOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xNamespace** | **optional.String**| Value used to separate and identify models | 
+
+### Return type
+
+[**Customer**](Customer.md)
 
 ### Authorization
 
