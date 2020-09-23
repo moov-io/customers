@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package main
+package customers
 
 import (
 	"database/sql"
@@ -335,7 +335,7 @@ func addCustomerAddress(logger log.Logger, repo customerRepository) http.Handler
 	}
 }
 
-type customerRepository interface {
+type CustomerRepository interface {
 	getCustomer(customerID string) (*client.Customer, error)
 	createCustomer(c *client.Customer, namespace string) error
 	updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error
@@ -351,6 +351,13 @@ type customerRepository interface {
 
 	getLatestCustomerOFACSearch(customerID string) (*ofacSearchResult, error)
 	saveCustomerOFACSearch(customerID string, result ofacSearchResult) error
+}
+
+func NewRepo(db *sql.DB, logger log.Logger) CustomerRepository {
+	return &sqlCustomerRepository{
+		db:     db,
+		logger: Logger,
+	}
 }
 
 type sqlCustomerRepository struct {
