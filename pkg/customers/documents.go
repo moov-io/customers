@@ -32,7 +32,7 @@ var (
 	maxDocumentSize int64 = 20 * 1024 * 1024 // 20MB
 )
 
-func addDocumentRoutes(logger log.Logger, r *mux.Router, repo documentRepository, bucketFactory bucketFunc) {
+func addDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, bucketFactory bucketFunc) {
 	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
 	r.Methods("GET").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
@@ -47,7 +47,7 @@ func getDocumentID(w http.ResponseWriter, r *http.Request) string {
 	return v
 }
 
-func getCustomerDocuments(logger log.Logger, repo documentRepository) http.HandlerFunc {
+func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -80,7 +80,7 @@ func readDocumentType(v string) (string, error) {
 	return "", fmt.Errorf("unknown Document type: %s", orig)
 }
 
-func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
+func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		// TODO(adam): should we store x-namespace along with the Document?
@@ -160,7 +160,7 @@ func uploadCustomerDocument(logger log.Logger, repo documentRepository, bucketFa
 	}
 }
 
-func retrieveRawDocument(logger log.Logger, repo documentRepository, bucketFactory bucketFunc) http.HandlerFunc {
+func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFactory bucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -202,7 +202,7 @@ func makeDocumentKey(customerID, documentId string) string {
 	return fmt.Sprintf("customer-%s-document-%s", customerID, documentId)
 }
 
-type documentRepository interface {
+type DocumentRepository interface {
 	getCustomerDocuments(customerID string) ([]*client.Document, error)
 	writeCustomerDocument(customerID string, doc *client.Document) error
 }
@@ -212,6 +212,12 @@ type sqlDocumentRepository struct {
 	logger log.Logger
 }
 
+func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
+	return &sqlDocumentRepository{
+		db:     db,
+		logger: logger,
+	}
+}
 func (r *sqlDocumentRepository) getCustomerDocuments(customerID string) ([]*client.Document, error) {
 	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ?`
 	stmt, err := r.db.Prepare(query)
