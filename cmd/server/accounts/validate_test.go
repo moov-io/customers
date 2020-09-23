@@ -14,12 +14,12 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
-	"github.com/moov-io/customers/cmd/server/accounts/validator/microdeposits"
-	"github.com/moov-io/customers/cmd/server/accounts/validator/testvalidator"
 	"github.com/moov-io/customers/cmd/server/paygate"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
+	"github.com/moov-io/customers/pkg/validator"
+	"github.com/moov-io/customers/pkg/validator/microdeposits"
+	"github.com/moov-io/customers/pkg/validator/testvalidator"
 	payclient "github.com/moov-io/paygate/pkg/client"
 	"github.com/stretchr/testify/require"
 

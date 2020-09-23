@@ -11,8 +11,8 @@ import (
 
 	"github.com/antihax/optional"
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/validator"
 	"github.com/mxenabled/atrium-go"
 	"github.com/stretchr/testify/require"
 )
