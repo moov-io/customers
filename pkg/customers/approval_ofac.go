@@ -30,7 +30,7 @@ type ofacSearchResult struct {
 }
 
 type ofacSearcher struct {
-	repo           customerRepository
+	repo           CustomerRepository
 	watchmanClient WatchmanClient
 }
 
@@ -80,12 +80,12 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	return nil
 }
 
-func addOFACRoutes(logger log.Logger, r *mux.Router, repo customerRepository, ofac *ofacSearcher) {
+func addOFACRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, ofac *ofacSearcher) {
 	r.Methods("GET").Path("/customers/{customerID}/ofac").HandlerFunc(getLatestCustomerOFACSearch(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/refresh/ofac").HandlerFunc(refreshOFACSearch(logger, repo, ofac))
 }
 
-func getLatestCustomerOFACSearch(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func getLatestCustomerOFACSearch(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -106,7 +106,7 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo customerRepository) htt
 	}
 }
 
-func refreshOFACSearch(logger log.Logger, repo customerRepository, ofac *ofacSearcher) http.HandlerFunc {
+func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")

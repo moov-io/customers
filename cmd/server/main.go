@@ -19,11 +19,12 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
-	"github.com/moov-io/customers"
+	mainPkg "github.com/moov-io/customers"
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/internal/util"
 	"github.com/moov-io/customers/pkg/accounts"
 	"github.com/moov-io/customers/pkg/configuration"
+	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/fed"
 	"github.com/moov-io/customers/pkg/paygate"
 	"github.com/moov-io/customers/pkg/secrets"
@@ -57,7 +58,7 @@ func main() {
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 	logger = log.With(logger, "caller", log.DefaultCaller)
 
-	logger.Log("startup", fmt.Sprintf("Starting moov-io/customers server version %s", customers.Version))
+	logger.Log("startup", fmt.Sprintf("Starting moov-io/customers server version %s", mainPkg.Version))
 
 	// Channel for errors
 	errs := make(chan error)
@@ -86,7 +87,7 @@ func main() {
 	}()
 
 	accountsRepo := accounts.NewRepo(logger, db)
-	customerRepo := &sqlCustomerRepository{db, logger}
+	customerRepo := customers.NewRepo(logger, db)
 	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
 	disclaimerRepo := &sqlDisclaimerRepository{db, logger}
 	documentRepo := &sqlDocumentRepository{db, logger}
@@ -94,7 +95,7 @@ func main() {
 
 	// Start Admin server (with Prometheus metrics)
 	adminServer := admin.NewServer(*adminAddr)
-	adminServer.AddVersionHandler(customers.Version) // Setup 'GET /version'
+	adminServer.AddVersionHandler(mainPkg.Version) // Setup 'GET /version'
 	go func() {
 		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {

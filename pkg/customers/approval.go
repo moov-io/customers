@@ -39,7 +39,7 @@ var (
 // addApprovalRoutes contains "back office" admin endpoints used to validate (or reject) a Customer
 // TODO(adam): We need to hide these behind an admin level auth, but we'll write them for now.
 // What about a header like x-admin-id ??
-func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo customerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) {
+func addApprovalRoutes(logger log.Logger, svc *admin.Server, repo CustomerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) {
 	svc.AddHandler("/customers/{customerID}/status", updateCustomerStatus(logger, repo, customerSSNRepo, ofac))
 	svc.AddHandler("/customers/{customerID}/addresses/{addressId}", updateCustomerAddress(logger, repo))
 }
@@ -58,7 +58,7 @@ func containsValidPrimaryAddress(addrs []client.CustomerAddress) bool {
 	return false
 }
 
-func updateCustomerStatus(logger log.Logger, repo customerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) http.HandlerFunc {
+func updateCustomerStatus(logger log.Logger, repo CustomerRepository, customerSSNRepo customerSSNRepository, ofac *ofacSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -125,7 +125,7 @@ func (req *updateCustomerAddressRequest) validate() error {
 	}
 }
 
-func updateCustomerAddress(logger log.Logger, repo customerRepository) http.HandlerFunc {
+func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
