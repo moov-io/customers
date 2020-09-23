@@ -126,7 +126,7 @@ var (
 		),
 		execsql(
 			"create_namespace_configuration",
-			`create table namespace_configuration(namespace varchar(40) primary key not null, legal_entity varchar(40) not null, primary_account varchar(40) not null);`,
+			`create table if not exists namespace_configuration(namespace varchar(40) primary key not null, legal_entity varchar(40) not null, primary_account varchar(40) not null);`,
 		),
 	)
 )
