@@ -19,18 +19,19 @@ import (
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
-	"github.com/moov-io/customers"
-	"github.com/moov-io/customers/cmd/server/accounts"
-	"github.com/moov-io/customers/cmd/server/accounts/validator"
-	"github.com/moov-io/customers/cmd/server/accounts/validator/microdeposits"
-	"github.com/moov-io/customers/cmd/server/accounts/validator/mx"
-	"github.com/moov-io/customers/cmd/server/accounts/validator/plaid"
-	"github.com/moov-io/customers/cmd/server/fed"
-	"github.com/moov-io/customers/cmd/server/paygate"
+	mainPkg "github.com/moov-io/customers"
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/internal/util"
+	"github.com/moov-io/customers/pkg/accounts"
 	"github.com/moov-io/customers/pkg/configuration"
+	"github.com/moov-io/customers/pkg/customers"
+	"github.com/moov-io/customers/pkg/fed"
+	"github.com/moov-io/customers/pkg/paygate"
 	"github.com/moov-io/customers/pkg/secrets"
+	"github.com/moov-io/customers/pkg/validator"
+	"github.com/moov-io/customers/pkg/validator/microdeposits"
+	"github.com/moov-io/customers/pkg/validator/mx"
+	"github.com/moov-io/customers/pkg/validator/plaid"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -57,7 +58,7 @@ func main() {
 	logger = log.With(logger, "ts", log.DefaultTimestampUTC)
 	logger = log.With(logger, "caller", log.DefaultCaller)
 
-	logger.Log("startup", fmt.Sprintf("Starting moov-io/customers server version %s", customers.Version))
+	logger.Log("startup", fmt.Sprintf("Starting moov-io/customers server version %s", mainPkg.Version))
 
 	// Channel for errors
 	errs := make(chan error)
@@ -86,15 +87,15 @@ func main() {
 	}()
 
 	accountsRepo := accounts.NewRepo(logger, db)
-	customerRepo := &sqlCustomerRepository{db, logger}
-	customerSSNRepo := &sqlCustomerSSNRepository{db, logger}
-	disclaimerRepo := &sqlDisclaimerRepository{db, logger}
-	documentRepo := &sqlDocumentRepository{db, logger}
+	customerRepo := customers.NewCustomerRepo(logger, db)
+	customerSSNRepo := customers.NewCustomerSSNRepository(logger, db)
+	disclaimerRepo := customers.NewDisclaimerRepo(logger, db)
+	documentRepo := customers.NewDocumentRepo(logger, db)
 	validationsRepo := validator.NewRepo(db)
 
 	// Start Admin server (with Prometheus metrics)
 	adminServer := admin.NewServer(*adminAddr)
-	adminServer.AddVersionHandler(customers.Version) // Setup 'GET /version'
+	adminServer.AddVersionHandler(mainPkg.Version) // Setup 'GET /version'
 	go func() {
 		logger.Log("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
@@ -119,19 +120,16 @@ func main() {
 	// Create our Watchman client
 	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
 	watchmanEndpoint := util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT"))
-	watchmanClient := newWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
+	watchmanClient := customers.NewWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
 	if watchmanClient == nil {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
 	adminServer.AddLivenessCheck("watchman", watchmanClient.Ping)
-	ofac := &ofacSearcher{
-		repo:           customerRepo,
-		watchmanClient: watchmanClient,
-	}
+	ofac := customers.NewOFACSearcher(customerRepo, watchmanClient)
 
 	// Register our admin routes
-	addApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
-	addDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
+	customers.AddApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
+	customers.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
 	ctx := context.Background()
@@ -140,10 +138,8 @@ func main() {
 		panic(err)
 	}
 	stringKeeper := secrets.NewStringKeeper(keeper, 10*time.Second)
-	customerSSNStorage := &ssnStorage{
-		keeper: stringKeeper,
-		repo:   customerSSNRepo,
-	}
+
+	customerSSNStorage := customers.NewSSNStorage(stringKeeper, customerSSNRepo)
 
 	// read transit keeper
 	transitKeeper, err := secrets.OpenLocal(os.Getenv("TRANSIT_LOCAL_BASE64_KEY"))
@@ -170,10 +166,10 @@ func main() {
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
 	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher)
-	addCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
-	addDisclaimerRoutes(logger, router, disclaimerRepo)
-	addDocumentRoutes(logger, router, documentRepo, getBucket(bucketName, cloudProvider, signer))
-	addOFACRoutes(logger, router, customerRepo, ofac)
+	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
+	customers.AddDisclaimerRoutes(logger, router, disclaimerRepo)
+	customers.AddDocumentRoutes(logger, router, documentRepo, customers.GetBucket(bucketName, cloudProvider, signer))
+	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)
@@ -182,7 +178,7 @@ func main() {
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
 	if cloudProvider == "file" {
-		addFileblobRoutes(logger, router, signer, getBucket(bucketName, cloudProvider, signer))
+		customers.AddFileblobRoutes(logger, router, signer, customers.GetBucket(bucketName, cloudProvider, signer))
 	}
 
 	// Start business HTTP server
@@ -249,7 +245,7 @@ func setupStorageBucket(logger log.Logger, bucketName, cloudProvider string) *fi
 			secret = "secret"
 			logger.Log("main", "WARNING!!!! USING INSECURE DEFAULT FILE STORAGE, set FILEBLOB_HMAC_SECRET for ANY production usage")
 		}
-		signer, err := fileblobSigner(baseURL, secret)
+		signer, err := customers.FileblobSigner(baseURL, secret)
 		if err != nil {
 			panic(fmt.Sprintf("fileBucket: %v", err))
 		}

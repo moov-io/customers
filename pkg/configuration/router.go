@@ -9,8 +9,8 @@ import (
 	"net/http"
 
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers/cmd/server/route"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/route"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
