@@ -12,6 +12,7 @@ Method | HTTP request | Description
 [**DecryptAccountNumber**](CustomersApi.md#DecryptAccountNumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 [**DeleteCustomer**](CustomersApi.md#DeleteCustomer) | **Delete** /customers/{customerID} | Delete Customer by ID
 [**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
+[**DeleteCustomerDocument**](CustomersApi.md#DeleteCustomerDocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete a customer&#39;s document
 [**GetAccountValidation**](CustomersApi.md#GetAccountValidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
 [**GetCustomerAccountByID**](CustomersApi.md#GetCustomerAccountByID) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account by ID
@@ -395,6 +396,53 @@ Name | Type | Description  | Notes
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
  **xNamespace** | **optional.String**| Value used to separate and identify models | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## DeleteCustomerDocument
+
+> DeleteCustomerDocument(ctx, customerID, documentID, optional)
+
+Delete a customer's document
+
+Remove a customer's document
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| ID of the customer that owns the document | 
+**documentID** | **string**| ID of the document | 
+ **optional** | ***DeleteCustomerDocumentOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a DeleteCustomerDocumentOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+
+
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
 
 ### Return type
 

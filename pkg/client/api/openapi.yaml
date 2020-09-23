@@ -1448,6 +1448,50 @@ paths:
       tags:
       - Customers
   /customers/{customerID}/documents/{documentID}:
+    delete:
+      description: Remove a customer's document
+      operationId: deleteCustomerDocument
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: ID of the customer that owns the document
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: ID of the document
+        explode: false
+        in: path
+        name: documentID
+        required: true
+        schema:
+          example: 9577ea7e1081
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Customer's document successfully deleted
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to delete customer's document, see error(s)
+      summary: Delete a customer's document
+      tags:
+      - Customers
     get:
       description: Retrieve the referenced document
       operationId: getCustomerDocumentContents

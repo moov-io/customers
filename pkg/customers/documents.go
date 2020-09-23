@@ -18,6 +18,7 @@ import (
 
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 
@@ -36,6 +37,7 @@ func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository
 	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
 	r.Methods("GET").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
+	r.Methods("DELETE").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(deleteCustomerDocument(logger, repo))
 }
 
 func getDocumentID(w http.ResponseWriter, r *http.Request) string {
@@ -199,6 +201,29 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 	}
 }
 
+func deleteCustomerDocument(logger log.Logger, repo DocumentRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w = route.Responder(logger, w, r)
+		requestID := moovhttp.GetRequestID(r)
+
+		customerID, documentID := route.GetCustomerID(w, r), getDocumentID(w, r)
+		if customerID == "" || documentID == "" {
+			return
+		}
+
+		err := repo.deleteCustomerDocument(customerID, documentID)
+		if err != nil {
+			moovhttp.Problem(w, fmt.Errorf("deleting document: %v", err))
+			logger.Log("documents", fmt.Sprintf("error deleting document=%s for customer=%s: %v", documentID, customerID, err), "requestID", requestID)
+			return
+		}
+
+		logger.Log("documents", fmt.Sprintf("successfully deleted document=%s for customer=%s", documentID, customerID), "requestID", requestID)
+
+		w.WriteHeader(http.StatusNoContent)
+	}
+}
+
 func makeDocumentKey(customerID, documentId string) string {
 	return fmt.Sprintf("customer-%s-document-%s", customerID, documentId)
 }
@@ -206,6 +231,7 @@ func makeDocumentKey(customerID, documentId string) string {
 type DocumentRepository interface {
 	getCustomerDocuments(customerID string) ([]*client.Document, error)
 	writeCustomerDocument(customerID string, doc *client.Document) error
+	deleteCustomerDocument(customerID string, documentID string) error
 }
 
 type sqlDocumentRepository struct {
@@ -220,7 +246,7 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 	}
 }
 func (r *sqlDocumentRepository) getCustomerDocuments(customerID string) ([]*client.Document, error) {
-	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ?`
+	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ? and deleted_at is null`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: prepare %v", err)
@@ -256,4 +282,16 @@ func (r *sqlDocumentRepository) writeCustomerDocument(customerID string, doc *cl
 		return fmt.Errorf("writeCustomerDocument: exec: %v", err)
 	}
 	return nil
+}
+
+func (r *sqlDocumentRepository) deleteCustomerDocument(customerID string, documentID string) error {
+	query := `update documents set deleted_at = ? where customer_id = ? and document_id = ? and deleted_at is null;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(time.Now(), customerID, documentID)
+	return err
 }
