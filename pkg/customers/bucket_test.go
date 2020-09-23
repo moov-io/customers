@@ -16,7 +16,7 @@ import (
 
 var (
 	testBucket bucketFunc = func() (*blob.Bucket, error) {
-		signer, err := fileblobSigner("http://localhost:8087", "secret")
+		signer, err := FileblobSigner("http://localhost:8087", "secret")
 		if err != nil {
 			panic(fmt.Sprintf("testBucket: %v", err))
 		}
@@ -44,7 +44,7 @@ func TestBucket__openBucket(t *testing.T) {
 func TestBucket__GetBucket(t *testing.T) {
 	dir, _ := ioutil.TempDir("", "customers-getBucket")
 
-	signer, err := fileblobSigner("http://localhost:8087", "secret")
+	signer, err := FileblobSigner("http://localhost:8087", "secret")
 	if err != nil {
 		t.Fatal(err)
 	}

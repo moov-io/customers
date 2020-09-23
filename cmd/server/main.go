@@ -245,7 +245,7 @@ func setupStorageBucket(logger log.Logger, bucketName, cloudProvider string) *fi
 			secret = "secret"
 			logger.Log("main", "WARNING!!!! USING INSECURE DEFAULT FILE STORAGE, set FILEBLOB_HMAC_SECRET for ANY production usage")
 		}
-		signer, err := fileblobSigner(baseURL, secret)
+		signer, err := customers.FileblobSigner(baseURL, secret)
 		if err != nil {
 			panic(fmt.Sprintf("fileBucket: %v", err))
 		}
