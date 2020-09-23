@@ -251,10 +251,6 @@ paths:
         "200":
           description: Customer removed from customers
         "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
           description: Failed to delete customer, see error(s)
       summary: Delete Customer by ID
       tags:
@@ -307,6 +303,60 @@ paths:
         "404":
           description: No Customer with the specified customerID was found
       summary: Retrieve customer
+      tags:
+      - Customers
+    put:
+      description: Update a Customer object
+      operationId: updateCustomer
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Namespace
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID that identifies this Customer
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomer'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: Customer was successfully updated
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer was not updated, see error(s)
+      summary: Update customer
       tags:
       - Customers
   /customers/{customerID}/address:

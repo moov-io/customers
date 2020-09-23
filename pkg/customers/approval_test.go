@@ -15,6 +15,7 @@ import (
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/base/admin"
+
 	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/go-kit/kit/log"

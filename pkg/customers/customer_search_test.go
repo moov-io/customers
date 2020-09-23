@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
 )

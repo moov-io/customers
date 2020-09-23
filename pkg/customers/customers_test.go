@@ -54,6 +54,11 @@ func (r *testCustomerRepository) deleteCustomer(customerID string) error {
 	return r.err
 }
 
+func (r *testCustomerRepository) updateCustomer(c *client.Customer, namespace string) error {
+	r.customer = c
+	return r.err
+}
+
 func (r *testCustomerRepository) updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error {
 	r.updatedStatus = status
 	return r.err
@@ -385,6 +390,83 @@ func TestCustomers__createCustomer(t *testing.T) {
 	}
 }
 
+func TestCustomers__updateCustomer(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	createReq := &customerRequest{
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Type:      "individual",
+		BirthDate: "1999-01-01",
+		Email:     "jane@example.com",
+		SSN:       "123456789",
+		Phones: []phone{
+			{
+				Number: "123.456.7890",
+				Type:   "cell",
+			},
+		},
+		Addresses: []address{
+			{
+				Address1:   "123 1st st",
+				City:       "fake city",
+				State:      "CA",
+				PostalCode: "90210",
+				Country:    "US",
+			},
+		},
+	}
+	customer, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
+	require.NoError(t,
+		repo.createCustomer(customer, "namespace"),
+	)
+
+	_, err := repo.getCustomer(customer.CustomerID)
+	require.NoError(t, err)
+
+	router := mux.NewRouter()
+	w := httptest.NewRecorder()
+
+	updateReq := *createReq
+	updateReq.FirstName = "Jim"
+	updateReq.LastName = "Smith"
+	updateReq.Email = "jim@google.com"
+	updateReq.Addresses = []address{
+		{
+			Address1:   "555 5th st",
+			City:       "real city",
+			State:      "CA",
+			PostalCode: "90210",
+			Country:    "US",
+		},
+	}
+
+	payload, err := json.Marshal(&updateReq)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s", customer.CustomerID), bytes.NewReader(payload))
+	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-request-id", "test")
+	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var got *client.Customer
+	require.NoError(t, json.NewDecoder(w.Body).Decode(&got))
+	fmt.Println(w.Body.String())
+
+	want, err := repo.getCustomer(customer.CustomerID)
+	require.NoError(t, err)
+
+	got.CreatedAt = want.CreatedAt
+	got.LastModified = want.LastModified
+	got.Metadata = make(map[string]string)
+	require.Equal(t, want, got)
+}
+
 func createTestCustomerRepository(t *testing.T) *sqlCustomerRepository {
 	t.Helper()
 
@@ -451,7 +533,6 @@ func TestCustomers__repository(t *testing.T) {
 func TestCustomerRepository__delete(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
-
 	type customer struct {
 		*client.Customer
 		deleted bool
@@ -503,6 +584,65 @@ func TestCustomerRepository__delete(t *testing.T) {
 		_, ok := deletedCustomerIds[cust.CustomerID]
 		require.Equal(t, cust.deleted, ok)
 	}
+}
+
+func TestCustomerRepository__updateCustomer(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	createReq := customerRequest{
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Email:     "jane@example.com",
+		Phones: []phone{
+			{
+				Number: "123.456.7890",
+				Type:   "Checking",
+			},
+		},
+		Addresses: []address{
+			{
+				Address1:   "123 1st st",
+				City:       "fake city",
+				State:      "CA",
+				PostalCode: "90210",
+				Country:    "US",
+			},
+		},
+	}
+	newCust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
+	err := repo.createCustomer(newCust, "namespace")
+	require.NoError(t, err)
+
+	updateReq := customerRequest{
+		CustomerID: newCust.CustomerID,
+		FirstName:  "Jim",
+		LastName:   "Smith",
+		Email:      "jim@google.com",
+		Phones: []phone{
+			{
+				Number: "555.555.5555",
+			},
+		},
+		Addresses: []address{
+			{
+				Address1: "555 5th st",
+				City:     "real city",
+			},
+		},
+	}
+
+	updatedCust, _, _ := updateReq.asCustomer(testCustomerSSNStorage(t))
+	err = repo.updateCustomer(updatedCust, "namespace")
+	require.NoError(t, err)
+
+	require.Equal(t, newCust.CustomerID, updatedCust.CustomerID)
+	require.Equal(t, updateReq.FirstName, updatedCust.FirstName)
+	require.Equal(t, updateReq.LastName, updatedCust.LastName)
+	require.Equal(t, updateReq.Email, updatedCust.Email)
+	require.Equal(t, updateReq.Phones[0].Number, updatedCust.Phones[0].Number)
+	require.Equal(t, updateReq.Addresses[0].Address1, updatedCust.Addresses[0].Address1)
+	require.Equal(t, updateReq.Addresses[0].City, updatedCust.Addresses[0].City)
 }
 
 func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
