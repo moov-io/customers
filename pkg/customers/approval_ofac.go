@@ -29,14 +29,21 @@ type ofacSearchResult struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-type ofacSearcher struct {
+type OFACSearcher struct {
 	repo           CustomerRepository
 	watchmanClient WatchmanClient
 }
 
+func NewOFACSearcher(repo CustomerRepository, client WatchmanClient) *OFACSearcher {
+	return &OFACSearcher{
+		repo:           repo,
+		watchmanClient: client,
+	}
+}
+
 // storeCustomerOFACSearch performs OFAC searches against the Customer's name and nickname if populated.
 // The higher matching search result is stored in s.customerRepository for use later (in approvals)
-func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID string) error {
+func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID string) error {
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
 
@@ -46,13 +53,13 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 
 	sdn, err := s.watchmanClient.Search(ctx, formatCustomerName(cust), requestID)
 	if err != nil {
-		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.CustomerID, err)
+		return fmt.Errorf("OFACSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.CustomerID, err)
 	}
 	var nickSDN *watchman.OfacSdn
 	if cust.NickName != "" {
 		nickSDN, err = s.watchmanClient.Search(ctx, cust.NickName, requestID)
 		if err != nil {
-			return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.CustomerID, err)
+			return fmt.Errorf("OFACSearcher.storeCustomerOFACSearch: nickname search for customer=%s: %v", cust.CustomerID, err)
 		}
 	}
 	// Save the higher matching SDN (from name search or nick name)
@@ -75,12 +82,12 @@ func (s *ofacSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 		})
 	}
 	if err != nil {
-		return fmt.Errorf("ofacSearcher.storeCustomerOFACSearch: saveCustomerOFACSearch customer=%s: %v", cust.CustomerID, err)
+		return fmt.Errorf("OFACSearcher.storeCustomerOFACSearch: saveCustomerOFACSearch customer=%s: %v", cust.CustomerID, err)
 	}
 	return nil
 }
 
-func addOFACRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, ofac *ofacSearcher) {
+func addOFACRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, ofac *OFACSearcher) {
 	r.Methods("GET").Path("/customers/{customerID}/ofac").HandlerFunc(getLatestCustomerOFACSearch(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/refresh/ofac").HandlerFunc(refreshOFACSearch(logger, repo, ofac))
 }
@@ -106,7 +113,7 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo CustomerRepository) htt
 	}
 }
 
-func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *ofacSearcher) http.HandlerFunc {
+func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSearcher) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")

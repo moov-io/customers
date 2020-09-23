@@ -125,10 +125,7 @@ func main() {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
 	adminServer.AddLivenessCheck("watchman", watchmanClient.Ping)
-	ofac := &ofacSearcher{
-		repo:           customerRepo,
-		watchmanClient: watchmanClient,
-	}
+	ofac := customers.NewOFACSearcher(customerRepo, watchmanClient)
 
 	// Register our admin routes
 	addApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
