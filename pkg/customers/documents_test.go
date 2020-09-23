@@ -239,7 +239,10 @@ func TestDocumentRepository(t *testing.T) {
 			t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
 		}
 		if docs[0].DocumentID != doc.DocumentID {
-			t.Errorf("docs[0].DocumentID=%s doc.DocumentID=%s", docs[0].DocumentID, doc.DocumentID)
+			t.Errorf("got docs[0].DocumentID=%q / want doc.DocumentID=%q", docs[0].DocumentID, doc.DocumentID)
+		}
+		if docs[0].ContentType != "image/png" {
+			t.Errorf("docs[0].ContentType=%q", docs[0].ContentType)
 		}
 	}
 
