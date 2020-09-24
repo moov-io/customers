@@ -195,7 +195,7 @@ func TestDocuments__delete(t *testing.T) {
 	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 
 	customerID := base.ID()
 	// create document
