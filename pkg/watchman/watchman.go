@@ -17,7 +17,7 @@ import (
 	"github.com/go-kit/kit/log"
 )
 
-type WatchmanClient interface {
+type Client interface {
 	Ping() error
 
 	Search(ctx context.Context, name string, requestID string) (*watchman.OfacSdn, error)
@@ -157,12 +157,12 @@ func (c *moovWatchmanClient) Search(ctx context.Context, name string, requestID 
 	return nil, nil // Nothing found
 }
 
-// NewWatchmanClient returns an WatchmanClient instance and will default to using the Watchman address in
+// NewClient returns an WatchmanClient instance and will default to using the Watchman address in
 // moov's standard Kubernetes setup.
 //
 // endpoint is a DNS record responsible for routing us to an Watchman instance.
 // Example: http://watchman.apps.svc.cluster.local:8080
-func NewWatchmanClient(logger log.Logger, endpoint string, debug bool) WatchmanClient {
+func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 	conf := watchman.NewConfiguration()
 	conf.BasePath = "http://localhost" + bind.HTTP("watchman")
 	conf.Debug = debug
