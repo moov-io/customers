@@ -62,7 +62,7 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 		t.Fatal(err)
 	}
 	if res.EntityID != "1241421" {
-		t.Errorf("ofacSearchResult: %#v", res)
+		t.Errorf("ofac search: %#v", res)
 	}
 	if res.CreatedAt.IsZero() {
 		t.Errorf("res.CreatedAt=%v", res.CreatedAt)
@@ -85,7 +85,7 @@ func TestOFACApproval__getLatest(t *testing.T) {
 		customer: &client.Customer{
 			CustomerID: customerID,
 		},
-		savedOFACSearchResult: &ofacSearchResult{
+		savedSearchResult: &client.OfacSearch{
 			EntityID: "142",
 			Match:    1.0,
 		},
@@ -124,7 +124,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 		customer: &client.Customer{
 			CustomerID: customerID,
 		},
-		savedOFACSearchResult: &ofacSearchResult{
+		savedSearchResult: &client.OfacSearch{
 			EntityID: "142",
 			Match:    1.0,
 		},
@@ -145,7 +145,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 	if w.Code != http.StatusOK {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
-	var result ofacSearchResult
+	var result client.OfacSearch
 	if err := json.NewDecoder(w.Body).Decode(&result); err != nil {
 		t.Fatal(err)
 	}
@@ -153,7 +153,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 		t.Errorf("result=%#v", result)
 	}
 
-	repo.savedOFACSearchResult.Match = 0.90 // match isn't high enough to block
+	repo.savedSearchResult.Match = 0.90 // match isn't high enough to block
 
 	w = httptest.NewRecorder()
 	router.ServeHTTP(w, req)
@@ -174,7 +174,7 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 		customer: &client.Customer{
 			CustomerID: customerID,
 		},
-		savedOFACSearchResult: &ofacSearchResult{
+		savedSearchResult: &client.OfacSearch{
 			EntityID: "142",
 			Match:    0.88,
 		},

@@ -37,14 +37,6 @@ var (
 	}()
 )
 
-type ofacSearchResult struct {
-	EntityID  string    `json:"entityID"`
-	SDNName   string    `json:"sdnName"`
-	SDNType   string    `json:"sdnType"`
-	Match     float32   `json:"match"`
-	CreatedAt time.Time `json:"createdAt"`
-}
-
 type OFACSearcher struct {
 	repo           CustomerRepository
 	watchmanClient watchman.Client
@@ -81,18 +73,18 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	// Save the higher matching SDN (from name search or nick name)
 	switch {
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
-		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, ofacSearchResult{
+		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, client.OfacSearch{
 			EntityID:  nickSDN.EntityID,
-			SDNName:   nickSDN.SdnName,
-			SDNType:   nickSDN.SdnType,
+			SdnName:   nickSDN.SdnName,
+			SdnType:   nickSDN.SdnType,
 			Match:     nickSDN.Match,
 			CreatedAt: time.Now(),
 		})
 	case sdn != nil:
-		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, ofacSearchResult{
+		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, client.OfacSearch{
 			EntityID:  sdn.EntityID,
-			SDNName:   sdn.SdnName,
-			SDNType:   sdn.SdnType,
+			SdnName:   sdn.SdnName,
+			SdnType:   sdn.SdnType,
 			Match:     sdn.Match,
 			CreatedAt: time.Now(),
 		})
