@@ -32,10 +32,10 @@ type ofacSearchResult struct {
 
 type OFACSearcher struct {
 	repo           CustomerRepository
-	watchmanClient watchman.WatchmanClient
+	watchmanClient watchman.Client
 }
 
-func NewOFACSearcher(repo CustomerRepository, client watchman.WatchmanClient) *OFACSearcher {
+func NewOFACSearcher(repo CustomerRepository, client watchman.Client) *OFACSearcher {
 	return &OFACSearcher{
 		repo:           repo,
 		watchmanClient: client,

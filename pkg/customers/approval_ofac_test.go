@@ -20,7 +20,7 @@ import (
 	watchmanClient "github.com/moov-io/watchman/client"
 )
 
-func createTestOFACSearcher(repo CustomerRepository, client watchman.WatchmanClient) *OFACSearcher {
+func createTestOFACSearcher(repo CustomerRepository, client watchman.Client) *OFACSearcher {
 	if repo == nil {
 		repo = &testCustomerRepository{}
 	}

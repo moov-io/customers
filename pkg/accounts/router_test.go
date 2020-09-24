@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func createTestOFACSearcher(repo Repository, watchmanClient watchman.WatchmanClient) *AccountOfacSearcher {
+func createTestOFACSearcher(repo Repository, watchmanClient watchman.Client) *AccountOfacSearcher {
 	if repo == nil {
 		repo = &testAccountRepository{}
 	}

@@ -12,7 +12,7 @@ import (
 
 type AccountOfacSearcher struct {
 	Repo           Repository
-	WatchmanClient watchman.WatchmanClient
+	WatchmanClient watchman.Client
 }
 
 // StoreAccountOFACSearch performs OFAC searches against the Account's HolderName and nickname if populated.

@@ -123,7 +123,7 @@ func main() {
 	// Create our Watchman client
 	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
 	watchmanEndpoint := util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT"))
-	watchmanClient := watchman.NewWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
+	watchmanClient := watchman.NewClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
 	if watchmanClient == nil {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
