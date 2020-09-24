@@ -2,31 +2,12 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package storage
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"testing"
-	"time"
-
-	"gocloud.dev/blob"
-)
-
-var (
-	testBucket bucketFunc = func() (*blob.Bucket, error) {
-		signer, err := FileblobSigner("http://localhost:8087", "secret")
-		if err != nil {
-			panic(fmt.Sprintf("testBucket: %v", err))
-		}
-
-		ctx, cancelFn := context.WithTimeout(context.TODO(), 1*time.Second)
-		defer cancelFn()
-
-		dir, _ := ioutil.TempDir("", "testBucket")
-		return fileBucket(ctx, dir, signer)
-	}
 )
 
 func TestBucket__openBucket(t *testing.T) {

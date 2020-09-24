@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package documents
 
 import (
 	"bytes"
@@ -20,6 +20,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/documents/storage"
 	"github.com/moov-io/customers/pkg/route"
 
 	"github.com/go-kit/kit/log"
@@ -33,7 +34,7 @@ var (
 	maxDocumentSize int64 = 20 * 1024 * 1024 // 20MB
 )
 
-func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, bucketFactory bucketFunc) {
+func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, bucketFactory storage.BucketFunc) {
 	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
 	r.Methods("GET").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
@@ -82,7 +83,7 @@ func readDocumentType(v string) (string, error) {
 	return "", fmt.Errorf("unknown Document type: %s", orig)
 }
 
-func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFactory bucketFunc) http.HandlerFunc {
+func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFactory storage.BucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		// TODO(adam): should we store x-namespace along with the Document?
@@ -163,7 +164,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 	}
 }
 
-func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFactory bucketFunc) http.HandlerFunc {
+func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFactory storage.BucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 

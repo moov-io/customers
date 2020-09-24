@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package storage
 
 import (
 	"context"
@@ -22,9 +22,9 @@ import (
 	"gocloud.dev/gcp"
 )
 
-type bucketFunc func() (*blob.Bucket, error)
+type BucketFunc func() (*blob.Bucket, error)
 
-func GetBucket(bucketName, cloudProvider string, FileblobSigner *fileblob.URLSignerHMAC) bucketFunc {
+func GetBucket(bucketName, cloudProvider string, FileblobSigner *fileblob.URLSignerHMAC) BucketFunc {
 	return func() (*blob.Bucket, error) {
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()

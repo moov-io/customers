@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package storage
 
 import (
 	"context"
@@ -21,7 +21,7 @@ import (
 	"gocloud.dev/blob/fileblob"
 )
 
-func AddFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSignerHMAC, bucketFactory bucketFunc) {
+func AddFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSignerHMAC, bucketFactory BucketFunc) {
 	if v := os.Getenv("FILEBLOB_BASE_URL"); v != "" {
 		u, err := url.Parse(v)
 		if u != nil && err == nil {
@@ -32,7 +32,7 @@ func AddFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSig
 	}
 }
 
-func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFactory bucketFunc) http.HandlerFunc {
+func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFactory BucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
