@@ -161,8 +161,12 @@ func (my *mysql) Connect() (*sql.DB, error) {
 		return nil, err
 	}
 
+	migratorLogger := migrator.WithLogger(migrator.LoggerFunc(func(msg string, args ...interface{}) {
+		my.logger.Log("mysql", msg)
+	}))
+
 	// Migrate our database
-	if m, err := migrator.New(mysqlMigrations); err != nil {
+	if m, err := migrator.New(migratorLogger, mysqlMigrations); err != nil {
 		return nil, err
 	} else {
 		if err := m.Migrate(db); err != nil {
