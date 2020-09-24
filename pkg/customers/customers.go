@@ -296,7 +296,7 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 	}
 }
 
-func updateCustomer(logger log.Logger, repo customerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
+func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
