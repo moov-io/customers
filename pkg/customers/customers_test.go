@@ -456,7 +456,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s", customer.CustomerID), bytes.NewReader(payload))
 	req.Header.Set("x-namespace", "test")
 	req.Header.Set("x-request-id", "test")
-	addCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
+	AddCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
 

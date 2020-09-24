@@ -15,7 +15,8 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
-	watchman "github.com/moov-io/watchman/client"
+	"github.com/moov-io/customers/pkg/watchman"
+	watchmanClient "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -31,10 +32,10 @@ type ofacSearchResult struct {
 
 type OFACSearcher struct {
 	repo           CustomerRepository
-	watchmanClient WatchmanClient
+	watchmanClient watchman.WatchmanClient
 }
 
-func NewOFACSearcher(repo CustomerRepository, client WatchmanClient) *OFACSearcher {
+func NewOFACSearcher(repo CustomerRepository, client watchman.WatchmanClient) *OFACSearcher {
 	return &OFACSearcher{
 		repo:           repo,
 		watchmanClient: client,
@@ -55,7 +56,7 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	if err != nil {
 		return fmt.Errorf("OFACSearcher.storeCustomerOFACSearch: name search for customer=%s: %v", cust.CustomerID, err)
 	}
-	var nickSDN *watchman.OfacSdn
+	var nickSDN *watchmanClient.OfacSdn
 	if cust.NickName != "" {
 		nickSDN, err = s.watchmanClient.Search(ctx, cust.NickName, requestID)
 		if err != nil {

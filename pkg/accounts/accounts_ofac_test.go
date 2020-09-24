@@ -5,13 +5,26 @@
 package accounts
 
 import (
-	"github.com/moov-io/customers/pkg/client"
 	"testing"
+
+	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/watchman"
+	watchmanClient "github.com/moov-io/watchman/client"
 )
 
 func TestStoreAccountOFACSearchSuccess(t *testing.T) {
 	mockRepository := mockRepository{}
-	accountOfacSearcher := createTestOFACSearcher(&mockRepository, nil)
+	watchmanClient := watchman.NewTestWatchmanClient(&watchmanClient.OfacSdn{
+		EntityID: "123",
+		SdnName:  "dummy_sdn",
+		SdnType:  "dummy_sdn_type",
+		Programs: nil,
+		Title:    "dummy_title",
+		Remarks:  "dummy_remarks",
+		Match:    10.2,
+	}, nil)
+
+	accountOfacSearcher := createTestOFACSearcher(&mockRepository, watchmanClient)
 	requestID := "someRequestId"
 	account := &client.Account{
 		AccountID:  "123",
