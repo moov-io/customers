@@ -3,21 +3,16 @@ package accounts
 import (
 	"context"
 	"fmt"
-	"github.com/moov-io/customers/pkg/client"
-	watchman "github.com/moov-io/watchman/client"
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/watchman"
+	"github.com/pkg/errors"
 )
 
 type AccountOfacSearcher struct {
 	Repo           Repository
-	WatchmanClient WatchmanClient
-}
-
-type WatchmanClient interface {
-	Ping() error
-
-	Search(ctx context.Context, name string, requestID string) (*watchman.OfacSdn, error)
+	WatchmanClient watchman.Client
 }
 
 // StoreAccountOFACSearch performs OFAC searches against the Account's HolderName and nickname if populated.
@@ -37,6 +32,9 @@ func (s *AccountOfacSearcher) StoreAccountOFACSearch(account *client.Account, re
 	sdn, err := s.WatchmanClient.Search(ctx, account.HolderName, requestID)
 	if err != nil {
 		return fmt.Errorf("AccountOfacSearcher.StoreAccountOFACSearch: name search for account=%s: %v", account.AccountID, err)
+	}
+	if sdn == nil {
+		return nil
 	}
 	err = s.Repo.saveAccountOFACSearch(account.AccountID, &client.OfacSearch{
 		EntityID:  sdn.EntityID,

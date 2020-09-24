@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package watchman
 
 import (
 	"context"
@@ -20,27 +20,9 @@ import (
 	"github.com/ory/dockertest/v3"
 )
 
-type testWatchmanClient struct {
-	sdn *watchman.OfacSdn
-
-	// error to be returned instead of field from above
-	err error
-}
-
-func (c *testWatchmanClient) Ping() error {
-	return c.err
-}
-
-func (c *testWatchmanClient) Search(_ context.Context, name string, _ string) (*watchman.OfacSdn, error) {
-	if c.err != nil {
-		return nil, c.err
-	}
-	return c.sdn, nil
-}
-
 type watchmanDeployment struct {
 	res    *dockertest.Resource
-	client WatchmanClient
+	client Client
 }
 
 func (d *watchmanDeployment) close(t *testing.T) {
@@ -73,7 +55,7 @@ func spawnWatchman(t *testing.T) *watchmanDeployment {
 		t.Fatal(err)
 	}
 
-	client := NewWatchmanClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")), false)
+	client := NewClient(log.NewNopLogger(), fmt.Sprintf("http://localhost:%s", resource.GetPort("8080/tcp")), false)
 	err = pool.Retry(func() error {
 		return client.Ping()
 	})
@@ -85,7 +67,7 @@ func spawnWatchman(t *testing.T) *watchmanDeployment {
 
 func TestWatchman__client(t *testing.T) {
 	endpoint := ""
-	if client := NewWatchmanClient(log.NewNopLogger(), endpoint, false); client == nil {
+	if client := NewClient(log.NewNopLogger(), endpoint, false); client == nil {
 		t.Fatal("expected non-nil client")
 	}
 
@@ -138,7 +120,7 @@ func TestWatchman__search(t *testing.T) {
 }
 
 func TestWatchman_ping(t *testing.T) {
-	client := &testWatchmanClient{}
+	client := &TestWatchmanClient{}
 
 	// Ping tests
 	if err := client.Ping(); err != nil {

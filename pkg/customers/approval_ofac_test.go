@@ -16,24 +16,25 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/pkg/client"
-	watchman "github.com/moov-io/watchman/client"
+	"github.com/moov-io/customers/pkg/watchman"
+	watchmanClient "github.com/moov-io/watchman/client"
 )
 
-func createTestOFACSearcher(repo CustomerRepository, watchmanClient WatchmanClient) *OFACSearcher {
+func createTestOFACSearcher(repo CustomerRepository, client watchman.Client) *OFACSearcher {
 	if repo == nil {
 		repo = &testCustomerRepository{}
 	}
-	if watchmanClient == nil {
-		watchmanClient = &testWatchmanClient{}
+	if client == nil {
+		client = &watchman.TestWatchmanClient{}
 	}
-	return &OFACSearcher{repo: repo, watchmanClient: watchmanClient}
+	return &OFACSearcher{repo: repo, watchmanClient: client}
 }
 
 func TestOFACSearcher__nil(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	ofacClient := &testWatchmanClient{}
+	ofacClient := &watchman.TestWatchmanClient{}
 	searcher := createTestOFACSearcher(repo, ofacClient)
 
 	if err := searcher.storeCustomerOFACSearch(nil, "requestID"); err == nil {
@@ -45,14 +46,13 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	ofacClient := &testWatchmanClient{}
-	searcher := createTestOFACSearcher(repo, ofacClient)
-
-	ofacClient.sdn = &watchman.OfacSdn{
+	ofacClient := watchman.NewTestWatchmanClient(&watchmanClient.OfacSdn{
 		EntityID: "1241421",
 		SdnName:  "Jane Doe",
 		Match:    0.99,
-	}
+	}, nil)
+	searcher := createTestOFACSearcher(repo, ofacClient)
+
 	customerID := base.ID()
 	if err := searcher.storeCustomerOFACSearch(&client.Customer{CustomerID: customerID}, "requestID"); err != nil {
 		t.Fatal(err)
@@ -129,7 +129,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 			Match:    1.0,
 		},
 	}
-	testWatchmanClient := &testWatchmanClient{}
+	testWatchmanClient := watchman.NewTestWatchmanClient(nil, nil)
 	ofac := &OFACSearcher{
 		repo:           repo,
 		watchmanClient: testWatchmanClient,
@@ -179,7 +179,7 @@ func TestOFACApproval__refreshErr(t *testing.T) {
 			Match:    0.88,
 		},
 	}
-	testWatchmanClient := &testWatchmanClient{err: errors.New("bad error")}
+	testWatchmanClient := watchman.NewTestWatchmanClient(nil, errors.New("bad error"))
 	ofac := &OFACSearcher{
 		repo:           repo,
 		watchmanClient: testWatchmanClient,
