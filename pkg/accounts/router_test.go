@@ -15,55 +15,27 @@ import (
 	"strings"
 	"testing"
 
-	watchman "github.com/moov-io/watchman/client"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/moov-io/customers/internal/testclient"
-
 	"github.com/moov-io/base"
-	"github.com/stretchr/testify/require"
-
+	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/fed"
 	"github.com/moov-io/customers/pkg/secrets"
-
 	"github.com/moov-io/customers/pkg/validator"
 	"github.com/moov-io/customers/pkg/validator/testvalidator"
+	"github.com/moov-io/customers/pkg/watchman"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-type testWatchmanClient struct {
-	// error to be returned instead of field from above
-	err error
-}
-
-func (c *testWatchmanClient) Ping() error {
-	return c.err
-}
-
-func (c *testWatchmanClient) Search(_ context.Context, name string, _ string) (*watchman.OfacSdn, error) {
-	if c.err != nil {
-		return nil, c.err
-	}
-	return &watchman.OfacSdn{
-		EntityID: "123",
-		SdnName:  "dummy_sdn",
-		SdnType:  "dummy_sdn_type",
-		Programs: nil,
-		Title:    "dummy_title",
-		Remarks:  "dummy_remarks",
-		Match:    10.2,
-	}, nil
-}
-
-func createTestOFACSearcher(repo Repository, watchmanClient WatchmanClient) *AccountOfacSearcher {
+func createTestOFACSearcher(repo Repository, watchmanClient watchman.WatchmanClient) *AccountOfacSearcher {
 	if repo == nil {
 		repo = &testAccountRepository{}
 	}
 	if watchmanClient == nil {
-		watchmanClient = &testWatchmanClient{}
+		watchmanClient = watchman.NewTestWatchmanClient(nil, nil)
 	}
 	return &AccountOfacSearcher{Repo: repo, WatchmanClient: watchmanClient}
 }
