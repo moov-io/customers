@@ -7,3 +7,4 @@ gitRepoId: "customers"
 additionalProperties:
   isGoSubmodule: true
   packageName: admin
+  enumClassPrefix: true
