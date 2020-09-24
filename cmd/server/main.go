@@ -32,6 +32,7 @@ import (
 	"github.com/moov-io/customers/pkg/validator/microdeposits"
 	"github.com/moov-io/customers/pkg/validator/mx"
 	"github.com/moov-io/customers/pkg/validator/plaid"
+	"github.com/moov-io/customers/pkg/watchman"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -120,7 +121,7 @@ func main() {
 	// Create our Watchman client
 	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
 	watchmanEndpoint := util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT"))
-	watchmanClient := customers.NewWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
+	watchmanClient := watchman.NewWatchmanClient(logger, watchmanEndpoint, util.Yes(debugWatchmanCalls))
 	if watchmanClient == nil {
 		panic("No Watchman client created, see WATCHMAN_ENDPOINT")
 	}
