@@ -123,6 +123,7 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo CustomerRepository) htt
 			moovhttp.Problem(w, err)
 			return
 		}
+		result.Blocked = result.Match > ofacMatchThreshold
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
@@ -153,13 +154,16 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			moovhttp.Problem(w, err)
 			return
 		}
+
 		result, err := repo.getLatestCustomerOFACSearch(customerID)
 		if err != nil {
 			logger.Log("ofac", fmt.Sprintf("error getting latest ofac search: %v", err))
 			moovhttp.Problem(w, err)
 			return
 		}
-		if result.Match > ofacMatchThreshold {
+		result.Blocked = result.Match > ofacMatchThreshold
+
+		if result.Blocked {
 			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
@@ -169,6 +173,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 				return
 			}
 		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
 	}

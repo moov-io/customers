@@ -2526,6 +2526,7 @@ components:
       example:
         sdnType: Individual
         createdAt: 2016-08-29T09:12:33.001Z
+        blocked: false
         match: 0.91
         entityID: "2141"
         sdnName: John Smith
@@ -2534,6 +2535,11 @@ components:
           description: SDN EntityID of the Entity
           example: "2141"
           type: string
+        blocked:
+          description: If the search resulted in a positive match against a sanctions
+            list and should be blocked from making transfers or other operations.
+          example: false
+          type: boolean
         sdnName:
           description: Name of the SDN entity
           example: John Smith

@@ -17,6 +17,8 @@ import (
 type OfacSearch struct {
 	// SDN EntityID of the Entity
 	EntityID string `json:"entityID"`
+	// If the search resulted in a positive match against a sanctions list and should be blocked from making transfers or other operations.
+	Blocked bool `json:"blocked,omitempty"`
 	// Name of the SDN entity
 	SdnName string `json:"sdnName"`
 	// SDN entity type

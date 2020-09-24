@@ -10,4 +10,4 @@ As required by United States law and NACHA guidelines all transfers are checked 
 
 ### OFAC Searches
 
-Customers performs searches against the OFAC list of entities which US businesses are blocked from doing business with. This list changes frequently with world politics and policies. Customer objects are required to be in `OFAC` or greater status in order for `Transfers` to be created.
+Customers performs searches against the OFAC list of entities which US businesses are blocked from doing business with. This list changes frequently with world politics and policies. Customer objects are required to be in either `ReceiveOnly` or `Validated` status in order for `Transfers` to be created.
