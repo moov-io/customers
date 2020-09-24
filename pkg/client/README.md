@@ -48,6 +48,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**DecryptAccountNumber**](docs/CustomersApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 *CustomersApi* | [**DeleteCustomer**](docs/CustomersApi.md#deletecustomer) | **Delete** /customers/{customerID} | Delete Customer by ID
 *CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
+*CustomersApi* | [**DeleteCustomerAddress**](docs/CustomersApi.md#deletecustomeraddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete a customer&#39;s address
 *CustomersApi* | [**DeleteCustomerDocument**](docs/CustomersApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete a customer&#39;s document
 *CustomersApi* | [**GetAccountValidation**](docs/CustomersApi.md#getaccountvalidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer
@@ -66,6 +67,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Get customers
 *CustomersApi* | [**UpdateAccountStatus**](docs/CustomersApi.md#updateaccountstatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
 *CustomersApi* | [**UpdateCustomer**](docs/CustomersApi.md#updatecustomer) | **Put** /customers/{customerID} | Update customer
+*CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customer&#39;s address
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update customer status
 *CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload document
 
@@ -99,6 +101,7 @@ Class | Method | HTTP request | Description
  - [Phone](docs/Phone.md)
  - [TransitAccountNumber](docs/TransitAccountNumber.md)
  - [UpdateAccountStatus](docs/UpdateAccountStatus.md)
+ - [UpdateCustomerAddress](docs/UpdateCustomerAddress.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
  - [UpdateValidation](docs/UpdateValidation.md)
 

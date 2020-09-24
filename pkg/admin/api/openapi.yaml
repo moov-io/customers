@@ -120,47 +120,6 @@ paths:
       summary: Update Customer status
       tags:
       - Customers
-  /customers/{customerID}/addresses/{addressID}:
-    put:
-      description: Updates the specified customer address
-      operationId: updateCustomerAddress
-      parameters:
-      - description: Customer ID
-        explode: false
-        in: path
-        name: customerID
-        required: true
-        schema:
-          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-          type: string
-        style: simple
-      - description: Address ID
-        explode: false
-        in: path
-        name: addressID
-        required: true
-        schema:
-          example: 1d62e297-9727-4084-a902-1031da932c9e
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateCustomerAddress'
-        required: true
-      responses:
-        "200":
-          description: Updated Customer address
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: See error message
-      summary: Update customers address
-      tags:
-      - Customers
 components:
   schemas:
     LivenessProbes:
@@ -198,21 +157,6 @@ components:
           $ref: '#/components/schemas/CustomerStatus'
       required:
       - status
-    UpdateCustomerAddress:
-      example:
-        validated: false
-        type: primary
-      properties:
-        type:
-          description: Attribute of address
-          enum:
-          - primary
-          - secondary
-          type: string
-        validated:
-          default: false
-          description: If this address has been confirmed with the Customer
-          type: boolean
     Error:
       properties:
         error:

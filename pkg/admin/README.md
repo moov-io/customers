@@ -37,7 +37,6 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**GetLivenessProbes**](docs/AdminApi.md#getlivenessprobes) | **Get** /live | Get Liveness Probes
 *AdminApi* | [**GetVersion**](docs/AdminApi.md#getversion) | **Get** /version | Get Version
 *CustomersApi* | [**CreateCustomerDisclaimer**](docs/CustomersApi.md#createcustomerdisclaimer) | **Post** /customers/{customerID}/disclaimers | Create disclaimer
-*CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customers address
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer status
 
 
@@ -47,7 +46,6 @@ Class | Method | HTTP request | Description
  - [CustomerStatus](docs/CustomerStatus.md)
  - [Error](docs/Error.md)
  - [LivenessProbes](docs/LivenessProbes.md)
- - [UpdateCustomerAddress](docs/UpdateCustomerAddress.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
 
 
