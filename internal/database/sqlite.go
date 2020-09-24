@@ -177,8 +177,12 @@ func (s *sqlite) Connect() (*sql.DB, error) {
 		return db, err
 	}
 
+	migratorLogger := migrator.WithLogger(migrator.LoggerFunc(func(msg string, args ...interface{}) {
+		s.logger.Log("sqlite", msg)
+	}))
+
 	// Migrate our database
-	if m, err := migrator.New(sqliteMigrations); err != nil {
+	if m, err := migrator.New(migratorLogger, sqliteMigrations); err != nil {
 		return db, err
 	} else {
 		if err := m.Migrate(db); err != nil {
