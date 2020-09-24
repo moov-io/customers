@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package storage
 
 import (
 	"context"
@@ -15,8 +15,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moov-io/base"
-
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"gocloud.dev/blob"
@@ -24,13 +22,13 @@ import (
 
 func TestFiles__proxyLocalFile(t *testing.T) {
 	// first, upload a file
-	bucket, err := testBucket()
+	bucket, err := TestBucket()
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	customerID, documentID := base.ID(), base.ID()
-	documentKey := makeDocumentKey(customerID, documentID)
+	// customerID, documentID := base.ID(), base.ID()
+	documentKey := "hello" // makeDocumentKey(customerID, documentID)
 
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
@@ -42,7 +40,7 @@ func TestFiles__proxyLocalFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	fd, err := os.Open(filepath.Join("..", "..", "testdata", "colorado.jpg"))
+	fd, err := os.Open(filepath.Join("..", "testdata", "colorado.jpg"))
 	if err != nil {
 		t.Fatal(err)
 	}

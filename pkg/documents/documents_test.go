@@ -2,7 +2,7 @@
 // Use of this source code is governed by an Apache License
 // license that can be found in the LICENSE file.
 
-package customers
+package documents
 
 import (
 	"bytes"
@@ -22,6 +22,7 @@ import (
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/documents/storage"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -65,7 +66,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -112,7 +113,7 @@ func TestDocuments__readDocumentType(t *testing.T) {
 }
 
 func multipartRequest(t *testing.T) *http.Request {
-	fd, err := os.Open(filepath.Join("..", "..", "testdata", "colorado.jpg"))
+	fd, err := os.Open(filepath.Join("testdata", "colorado.jpg"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,7 +149,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -195,7 +196,7 @@ func TestDocuments__uploadCustomerDocument(t *testing.T) {
 	req.URL = u // replace query params with invalid values
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, testBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
