@@ -184,7 +184,7 @@ func (r *sqlAccountRepository) getLatestAccountOFACSearch(accountID string) (*cl
 }
 
 func (r *sqlAccountRepository) saveAccountOFACSearch(accountID string, result *client.OfacSearch) error {
-	query := `insert into account_ofac_searches (account_id, entity_id, sdn_name, sdn_type, percentage_match, created_at) values (?, ?, ?, ?, ?, ?);`
+	query := `insert into account_ofac_searches (account_ofac_search_id, account_id, entity_id, sdn_name, sdn_type, percentage_match, created_at) values (?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return fmt.Errorf("saveAccountOFACSearch: prepare: %v", err)
@@ -195,7 +195,7 @@ func (r *sqlAccountRepository) saveAccountOFACSearch(accountID string, result *c
 		result.CreatedAt = time.Now()
 	}
 
-	if _, err := stmt.Exec(accountID, result.EntityID, result.SdnName, result.SdnType, result.Match, result.CreatedAt); err != nil {
+	if _, err := stmt.Exec(base.ID(), accountID, result.EntityID, result.SdnName, result.SdnType, result.Match, result.CreatedAt); err != nil {
 		return fmt.Errorf("saveAccountOFACSearch: exec: %v", err)
 	}
 	return nil
