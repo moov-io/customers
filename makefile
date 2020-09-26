@@ -6,7 +6,7 @@ GROUPID:= $(shell id -g $$USER)
 
 .PHONY: build build-server build-examples docker release check
 
-build: check build-server
+build: build-server
 
 build-server:
 	CGO_ENABLED=1 go build -o ./bin/server github.com/moov-io/customers/cmd/server
