@@ -452,8 +452,13 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 	defer stmt.Close()
 
+	var birthDate *string
+	if c.BirthDate != "" {
+		birthDate = &c.BirthDate
+	}
+
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BirthDate, client.UNKNOWN, c.Email, now, now, namespace)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, birthDate, client.UNKNOWN, c.Email, now, now, namespace)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
@@ -566,10 +571,10 @@ func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer
 	row := stmt.QueryRow(customerID)
 
 	var birthDate *string
-
 	var cust client.Customer
 	cust.CustomerID = customerID
-	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.Type, &birthDate, &cust.Status, &cust.Email, &cust.CreatedAt, &cust.LastModified)
+	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.Type, &birthDate, &cust.Status, &cust.Email, &cust.CreatedAt,
+		&cust.LastModified)
 	stmt.Close()
 	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
 		return nil, fmt.Errorf("getCustomer: %v", err)
