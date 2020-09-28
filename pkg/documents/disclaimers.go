@@ -15,6 +15,7 @@ import (
 	"github.com/moov-io/base"
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 
@@ -106,8 +107,8 @@ func createDisclaimer(logger log.Logger, disclaimerRepo DisclaimerRepository, do
 			return
 		}
 
-		customerID := route.GetCustomerID(w, r)
-		if customerID == "" {
+		customerID, namespace := route.GetCustomerID(w, r), route.GetNamespace(w, r)
+		if customerID == "" || namespace == "" {
 			return
 		}
 
@@ -117,7 +118,7 @@ func createDisclaimer(logger log.Logger, disclaimerRepo DisclaimerRepository, do
 			return
 		}
 
-		if err := documentExistsForCustomer(customerID, req, docRepo); err != nil {
+		if err := documentExistsForCustomer(customerID, namespace, req, docRepo); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -138,9 +139,9 @@ func createDisclaimer(logger log.Logger, disclaimerRepo DisclaimerRepository, do
 	}
 }
 
-func documentExistsForCustomer(customerID string, req createDisclaimerRequest, docRepo DocumentRepository) error {
+func documentExistsForCustomer(customerID string, namespace string, req createDisclaimerRequest, docRepo DocumentRepository) error {
 	if req.DocumentID != "" {
-		docs, err := docRepo.getCustomerDocuments(customerID)
+		docs, err := docRepo.getCustomerDocuments(customerID, namespace)
 		if err != nil {
 			return err
 		}
