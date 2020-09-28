@@ -6,6 +6,7 @@ package documents
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,7 +26,10 @@ import (
 
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/documents/storage"
+	"github.com/moov-io/customers/pkg/secrets"
+	"github.com/moov-io/customers/pkg/watchman"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -38,7 +42,7 @@ type testDocumentRepository struct {
 	written *client.Document
 }
 
-func (r *testDocumentRepository) getCustomerDocuments(customerID string) ([]*client.Document, error) {
+func (r *testDocumentRepository) getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -72,6 +76,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers/foo/documents", nil)
 	req.Header.Set("x-request-id", "test")
+	req.Header.Set("namespace", "test")
 
 	router := mux.NewRouter()
 	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
@@ -155,6 +160,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := multipartRequest(t)
 	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-namespace", "test")
 
 	router := mux.NewRouter()
 	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
@@ -214,9 +220,11 @@ func TestDocuments__delete(t *testing.T) {
 
 	require.Equal(t, http.StatusNoContent, w.Code)
 
-	docs, err := repo.getCustomerDocuments(customerID)
-	require.NoError(t, err)
-	require.Empty(t, docs)
+	var count int
+	row := db.DB.QueryRow("SELECT COUNT(*) FROM documents where deleted_at is null")
+	require.NoError(t, row.Scan(&count))
+	require.Equal(t, 0, count)
+
 }
 
 func TestDocuments__uploadCustomerDocument(t *testing.T) {
@@ -249,50 +257,65 @@ func TestDocuments__makeDocumentKey(t *testing.T) {
 }
 
 func TestDocumentRepository(t *testing.T) {
-	customerID := base.ID()
-
-	check := func(t *testing.T, repo *sqlDocumentRepository) {
-		docs, err := repo.getCustomerDocuments(customerID)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if len(docs) != 0 {
-			t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
-		}
-
-		// Write a Document and read it back
-		doc := &client.Document{
-			DocumentID:  base.ID(),
-			Type:        "DriversLicense",
-			ContentType: "image/png",
-		}
-		if err := repo.writeCustomerDocument(customerID, doc); err != nil {
-			t.Fatal(err)
-		}
-		docs, err = repo.getCustomerDocuments(customerID)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if len(docs) != 1 {
-			t.Errorf("got %d unexpected documents: %#v", len(docs), docs)
-		}
-		if docs[0].DocumentID != doc.DocumentID {
-			t.Errorf("got docs[0].DocumentID=%q / want doc.DocumentID=%q", docs[0].DocumentID, doc.DocumentID)
-		}
-		if docs[0].ContentType != "image/png" {
-			t.Errorf("docs[0].ContentType=%q", docs[0].ContentType)
-		}
+	tests := []struct {
+		dbName string
+		db     *sql.DB
+	}{
+		{
+			dbName: "sqlite",
+			db:     database.CreateTestSqliteDB(t).DB,
+		},
+		{
+			dbName: "mysql",
+			db:     database.CreateTestMySQLDB(t).DB,
+		},
 	}
 
-	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
-	defer sqliteDB.Close()
-	check(t, &sqlDocumentRepository{sqliteDB.DB, log.NewNopLogger()})
+	for _, tc := range tests {
+		defer tc.db.Close()
 
-	// MySQL tests
-	mysqlDB := database.CreateTestMySQLDB(t)
-	defer mysqlDB.Close()
-	check(t, &sqlDocumentRepository{mysqlDB.DB, log.NewNopLogger()})
+		t.Run(tc.dbName, func(t *testing.T) {
+			logger := log.NewNopLogger()
+			documentRepo := NewDocumentRepo(logger, tc.db)
+			customerRepo := customers.NewCustomerRepo(logger, tc.db)
+			namespace := "test"
+			customerID := base.ID()
+
+			// check empty docs
+			docs, err := documentRepo.getCustomerDocuments(customerID, namespace)
+			require.NoError(t, err)
+			require.Empty(t, docs)
+
+			// create test customer with namespace
+			router := mux.NewRouter()
+			ssnStorage := customers.NewSSNStorage(secrets.TestStringKeeper(t), customers.NewCustomerSSNRepository(logger, tc.db))
+			ofacSearcher := customers.NewOFACSearcher(customerRepo, &watchman.TestWatchmanClient{})
+			customers.AddCustomerRoutes(log.NewNopLogger(), router, customerRepo, ssnStorage, ofacSearcher)
+			body := `{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "birthDate": "1991-04-01", "ssn": "123456789", "type": "individual"}`
+			req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
+
+			req.Header.Add("X-Namespace", namespace)
+			res := httptest.NewRecorder()
+			router.ServeHTTP(res, req)
+			require.Equal(t, http.StatusOK, res.Code)
+
+			// Write a Document and read it back
+			doc := &client.Document{
+				DocumentID:  base.ID(),
+				Type:        "DriversLicense",
+				ContentType: "image/png",
+			}
+			if err := documentRepo.writeCustomerDocument(customerID, doc); err != nil {
+				t.Fatal(err)
+			}
+			docs, err = documentRepo.getCustomerDocuments(customerID, namespace)
+			require.NoError(t, err)
+			require.Len(t, docs, 1)
+
+			require.Equal(t, doc.DocumentID, docs[0].DocumentID)
+			require.Equal(t, "image/png", docs[0].ContentType)
+		})
+	}
 }
 
 func TestDocumentsRepository__Delete(t *testing.T) {
@@ -331,7 +354,7 @@ func TestDocumentsRepository__Delete(t *testing.T) {
 
 	deletedDocIDs := make(map[string]bool)
 	// query all documents that have been marked as deleted
-	query := `select document_id from documents where deleted_at is not null;`
+	query := ` select document_id from documents where deleted_at is not null `
 	stmt, err := repo.db.Prepare(query)
 	require.NoError(t, err)
 

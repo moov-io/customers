@@ -54,12 +54,12 @@ func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		customerID := route.GetCustomerID(w, r)
-		if customerID == "" {
+		customerID, namespace := route.GetCustomerID(w, r), route.GetNamespace(w, r)
+		if customerID == "" || namespace == "" {
 			return
 		}
 
-		docs, err := repo.getCustomerDocuments(customerID)
+		docs, err := repo.getCustomerDocuments(customerID, namespace)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -230,7 +230,7 @@ func makeDocumentKey(customerID, documentId string) string {
 }
 
 type DocumentRepository interface {
-	getCustomerDocuments(customerID string) ([]*client.Document, error)
+	getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error)
 	writeCustomerDocument(customerID string, doc *client.Document) error
 	deleteCustomerDocument(customerID string, documentID string) error
 }
@@ -246,15 +246,16 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 		logger: logger,
 	}
 }
-func (r *sqlDocumentRepository) getCustomerDocuments(customerID string) ([]*client.Document, error) {
-	query := `select document_id, type, content_type, uploaded_at from documents where customer_id = ? and deleted_at is null`
+func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error) {
+	query := `select document_id, documents.type, content_type, uploaded_at from documents join customers on customers.
+	namespace = ? where documents.customer_id = ? and documents.deleted_at is null`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: prepare %v", err)
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(customerID)
+	rows, err := stmt.Query(namespace, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: query %v", err)
 	}
