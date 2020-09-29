@@ -15,8 +15,8 @@ func TestRoute__GetNamespace(t *testing.T) {
 	req := httptest.NewRequest("GET", "/ping", nil)
 	req.Header.Set("x-organization", "foo")
 
-	if ns := GetNamespace(w, req); ns != "foo" {
-		t.Errorf("unexpected ns: %v", ns)
+	if org := GetOrganization(w, req); org != "foo" {
+		t.Errorf("unexpected ns: %v", org)
 	}
 }
 
@@ -24,8 +24,8 @@ func TestRoute__GetNamespaceMissing(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
 
-	if ns := GetNamespace(w, req); ns != "" {
-		t.Errorf("unexpected ns: %v", ns)
+	if org := GetOrganization(w, req); org != "" {
+		t.Errorf("unexpected ns: %v", org)
 	}
 
 	if w.Code != http.StatusBadRequest {

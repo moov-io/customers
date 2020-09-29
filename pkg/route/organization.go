@@ -7,17 +7,14 @@ package route
 import (
 	"fmt"
 	"net/http"
-	"os"
 
 	moovhttp "github.com/moov-io/base/http"
-	"github.com/moov-io/customers/internal/util"
 )
 
-var (
-	organizationHeaderKey = util.Or(os.Getenv("ORGANIZATION_HEADER"), "X-Organization")
-)
+const organizationHeaderKey = "X-Organization"
 
-func GetNamespace(w http.ResponseWriter, r *http.Request) string {
+// GetOrganization returns the value from the X-Organization header and writes an error to w if it's missing
+func GetOrganization(w http.ResponseWriter, r *http.Request) string {
 	if ns := r.Header.Get(organizationHeaderKey); ns == "" {
 		moovhttp.Problem(w, fmt.Errorf("missing %s header", organizationHeaderKey))
 		return ""

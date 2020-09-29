@@ -107,8 +107,8 @@ func createDisclaimer(logger log.Logger, disclaimerRepo DisclaimerRepository, do
 			return
 		}
 
-		customerID, namespace := route.GetCustomerID(w, r), route.GetNamespace(w, r)
-		if customerID == "" || namespace == "" {
+		customerID, organization := route.GetCustomerID(w, r), route.GetOrganization(w, r)
+		if customerID == "" || organization == "" {
 			return
 		}
 
@@ -118,7 +118,7 @@ func createDisclaimer(logger log.Logger, disclaimerRepo DisclaimerRepository, do
 			return
 		}
 
-		if err := documentExistsForCustomer(customerID, namespace, req, docRepo); err != nil {
+		if err := documentExistsForCustomer(customerID, organization, req, docRepo); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}

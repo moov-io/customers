@@ -25,11 +25,11 @@ func getNamespaceConfig(logger log.Logger, repo Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		namespace := route.GetNamespace(w, r)
-		if namespace == "" {
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
 			return
 		}
-		cfg, err := repo.Get(namespace)
+		cfg, err := repo.Get(organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -43,8 +43,8 @@ func updateNamespaceConfig(logger log.Logger, repo Repository) http.HandlerFunc 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		namespace := route.GetNamespace(w, r)
-		if namespace == "" {
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
 			return
 		}
 
@@ -53,7 +53,7 @@ func updateNamespaceConfig(logger log.Logger, repo Repository) http.HandlerFunc 
 			moovhttp.Problem(w, err)
 			return
 		}
-		cfg, err := repo.Update(namespace, &body)
+		cfg, err := repo.Update(organization, &body)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

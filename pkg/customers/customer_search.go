@@ -20,8 +20,8 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		namespace := route.GetNamespace(w, r)
-		if namespace == "" {
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
 			return
 		}
 
@@ -30,7 +30,7 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 			moovhttp.Problem(w, err)
 			return
 		}
-		params.Namespace = namespace
+		params.Namespace = organization
 
 		customers, err := repo.searchCustomers(params)
 		if err != nil {

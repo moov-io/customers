@@ -237,8 +237,8 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		requestID, namespace := moovhttp.GetRequestID(r), route.GetNamespace(w, r)
-		if namespace == "" {
+		requestID, organization := moovhttp.GetRequestID(r), route.GetOrganization(w, r)
+		if organization == "" {
 			return
 		}
 
@@ -267,7 +267,7 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 				return
 			}
 		}
-		if err := repo.createCustomer(cust, namespace); err != nil {
+		if err := repo.createCustomer(cust, organization); err != nil {
 			logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
@@ -301,8 +301,8 @@ func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		requestID, namespace := moovhttp.GetRequestID(r), route.GetNamespace(w, r)
-		if namespace == "" {
+		requestID, organization := moovhttp.GetRequestID(r), route.GetOrganization(w, r)
+		if organization == "" {
 			return
 		}
 
@@ -336,7 +336,7 @@ func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 				return
 			}
 		}
-		if err := repo.updateCustomer(cust, namespace); err != nil {
+		if err := repo.updateCustomer(cust, organization); err != nil {
 			logger.Log("customers", fmt.Sprintf("error updating customer: %v", err), "requestID", requestID)
 			moovhttp.Problem(w, fmt.Errorf("updating customer: %v", err))
 			return

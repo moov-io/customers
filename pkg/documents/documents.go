@@ -54,12 +54,12 @@ func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		customerID, namespace := route.GetCustomerID(w, r), route.GetNamespace(w, r)
-		if customerID == "" || namespace == "" {
+		customerID, organization := route.GetCustomerID(w, r), route.GetOrganization(w, r)
+		if customerID == "" || organization == "" {
 			return
 		}
 
-		docs, err := repo.getCustomerDocuments(customerID, namespace)
+		docs, err := repo.getCustomerDocuments(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
