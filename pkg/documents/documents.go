@@ -64,6 +64,7 @@ func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.Handl
 
 		docs, err := repo.getCustomerDocuments(customerID, organization)
 		if err != nil {
+			logger.Log("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -89,8 +90,11 @@ func readDocumentType(v string) (string, error) {
 func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFactory storage.BucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
-		// TODO(adam): should we store x-organization along with the Document?
 
+		customerID := route.GetCustomerID(w, r)
+		if customerID == "" {
+			return
+		}
 		documentType, err := readDocumentType(r.URL.Query().Get("type"))
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -107,6 +111,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 		// Detect the content type by reading the first 512 bytes of r.Body (read into file as we expect a multipart request)
 		buf := make([]byte, 512)
 		if _, err := file.Read(buf); err != nil && err != io.EOF {
+			logger.Log("documents", fmt.Sprintf("failed to peek: %v", err), "customerID", customerID)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -121,6 +126,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 		// Grab our cloud bucket before writing into our database
 		bucket, err := bucketFactory()
 		if err != nil {
+			logger.Log("documents", fmt.Sprintf("failed to create bucket: %v", err), "customerID", customerID)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -131,6 +137,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 			return
 		}
 		if err := repo.writeCustomerDocument(customerID, doc); err != nil {
+			logger.Log("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -186,8 +193,10 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 		}
 
 		// reject the request if the document is deleted
-		if err := repo.findActiveDocument(customerID, documentID, namespace); err != nil {
-			logger.Log("documents", fmt.Sprintf("not retrieving document=%s due to: %v", documentID, err))
+		if exists, err := repo.exists(customerID, documentID, namespace); !exists || err != nil {
+			if err != nil {
+				logger.Log("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID, "documentID", documentID)
+			}
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
@@ -205,7 +214,7 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 		documentKey := makeDocumentKey(customerID, documentID)
 		rdr, err := bucket.NewReader(ctx, documentKey, nil)
 		if err != nil {
-			moovhttp.Problem(w, fmt.Errorf("error reading %s document: %v", documentKey, err))
+			moovhttp.Problem(w, fmt.Errorf("read documentID=%s: %v", documentKey, err))
 			return
 		}
 		defer rdr.Close()
@@ -213,7 +222,7 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 		w.Header().Set("Content-Type", rdr.ContentType())
 		w.WriteHeader(http.StatusOK)
 		if n, err := io.Copy(w, rdr); n == 0 || err != nil {
-			moovhttp.Problem(w, fmt.Errorf("problem writing %s (n=%d) document: %v", documentKey, n, err))
+			moovhttp.Problem(w, fmt.Errorf("failed writing documentID=%s (bytes read: %d): %v", documentKey, n, err))
 			return
 		}
 	}
@@ -231,8 +240,8 @@ func deleteCustomerDocument(logger log.Logger, repo DocumentRepository) http.Han
 
 		err := repo.deleteCustomerDocument(customerID, documentID)
 		if err != nil {
-			moovhttp.Problem(w, fmt.Errorf("deleting document: %v", err))
-			logger.Log("documents", fmt.Sprintf("error deleting document=%s for customer=%s: %v", documentID, customerID, err), "requestID", requestID)
+			moovhttp.Problem(w, fmt.Errorf("failed to %v", err))
+			logger.Log("documents", fmt.Sprintf("deleting document=%s for customer=%s: %v", documentID, customerID, err), "requestID", requestID)
 			return
 		}
 
@@ -247,7 +256,7 @@ func makeDocumentKey(customerID, documentID string) string {
 }
 
 type DocumentRepository interface {
-	findActiveDocument(customerID string, documentID string, namespace string) error
+	exists(customerID string, documentID string, namespace string) (bool, error)
 	getCustomerDocuments(customerID string, organization string) ([]*client.Document, error)
 
 	writeCustomerDocument(customerID string, doc *client.Document) error
@@ -266,21 +275,21 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 	}
 }
 
-func (r *sqlDocumentRepository) findActiveDocument(customerID string, documentID string, namespace string) error {
+func (r *sqlDocumentRepository) exists(customerID string, documentID string, namespace string) (bool, error) {
 	query := `select documents.document_id from documents
 inner join customers on customers.namespace = ? where documents.customer_id = ? and documents.document_id = ? and documents.deleted_at is null
 limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("getCustomerDocuments: prepare %v", err)
+		return false, fmt.Errorf("prepare exists: %v", err)
 	}
 	defer stmt.Close()
 
 	var docID string
 	if err := stmt.QueryRow(namespace, customerID, documentID).Scan(&docID); err != nil {
-		return err
+		return false, err
 	}
-	return nil
+	return documentID == docID, nil
 }
 
 func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
@@ -288,13 +297,13 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organiza
 	organization = ? where documents.customer_id = ? and documents.deleted_at is null`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return nil, fmt.Errorf("getCustomerDocuments: prepare %v", err)
+		return nil, fmt.Errorf("prepare listing documents: %v", err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(organization, customerID)
 	if err != nil {
-		return nil, fmt.Errorf("getCustomerDocuments: query %v", err)
+		return nil, fmt.Errorf("failed querying customer documents: %v", err)
 	}
 	defer rows.Close()
 
@@ -302,7 +311,7 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organiza
 	for rows.Next() {
 		var doc client.Document
 		if err := rows.Scan(&doc.DocumentID, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {
-			return nil, fmt.Errorf("getCustomerDocuments: scan: %v", err)
+			return nil, fmt.Errorf("scan customer documents: %v", err)
 		}
 		docs = append(docs, &doc)
 	}
@@ -313,12 +322,12 @@ func (r *sqlDocumentRepository) writeCustomerDocument(customerID string, doc *cl
 	query := `insert into documents (document_id, customer_id, type, content_type, uploaded_at) values (?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("writeCustomerDocument: prepare: %v", err)
+		return fmt.Errorf("prepare write: %v", err)
 	}
 	defer stmt.Close()
 
 	if _, err := stmt.Exec(doc.DocumentID, customerID, doc.Type, doc.ContentType, doc.UploadedAt); err != nil {
-		return fmt.Errorf("writeCustomerDocument: exec: %v", err)
+		return fmt.Errorf("write customer document: %v", err)
 	}
 	return nil
 }
@@ -327,7 +336,7 @@ func (r *sqlDocumentRepository) deleteCustomerDocument(customerID string, docume
 	query := `update documents set deleted_at = ? where customer_id = ? and document_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return err
+		return fmt.Errorf("prepare delete: %v", err)
 	}
 	defer stmt.Close()
 

@@ -42,8 +42,8 @@ type testDocumentRepository struct {
 	written *client.Document
 }
 
-func (r *testDocumentRepository) findActiveDocument(customerID string, documentID string, namespace string) error {
-	return r.err
+func (r *testDocumentRepository) exists(customerID string, documentID string, namespace string) (bool, error) {
+	return false, r.err
 }
 
 func (r *testDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
@@ -336,7 +336,8 @@ func TestDocumentRepository(t *testing.T) {
 			require.Equal(t, "image/png", docs[0].ContentType)
 
 			// make sure we read the document
-			err = documentRepo.findActiveDocument(customerID, doc.DocumentID, namespace)
+			exists, err := documentRepo.exists(customerID, doc.DocumentID, namespace)
+			require.Equal(t, true, exists)
 			require.NoError(t, err)
 		})
 	}
@@ -397,6 +398,7 @@ func TestDocumentsRepository__Delete(t *testing.T) {
 	}
 
 	// make sure we find the document as deleted
-	err = repo.findActiveDocument(customerID, docs[0].DocumentID, "")
+	exists, err := repo.exists(customerID, docs[0].DocumentID, "")
+	require.Equal(t, false, exists)
 	require.Equal(t, err, sql.ErrNoRows)
 }

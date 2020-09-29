@@ -66,11 +66,11 @@ func awsBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 
 	bucket, err := s3blob.OpenBucket(ctx, s, bucketName, nil)
 	if err != nil {
-		logger.Log("storage", fmt.Sprintf("ERROR creating %s gcp bucket: %v", bucketName, err))
-	} else {
-		logger.Log("storage", fmt.Sprintf("created %s aws bucket: %T", bucketName, bucket))
+		logger.Log("storage", fmt.Sprintf("ERROR creating %s aws bucket: %v", bucketName, err))
+		return nil, err
 	}
-	return bucket, err
+	logger.Log("storage", fmt.Sprintf("created %s aws bucket: %T", bucketName, bucket))
+	return bucket, nil
 }
 
 func FileblobSigner(baseURL, secret string) (*fileblob.URLSignerHMAC, error) {
@@ -106,8 +106,8 @@ func gcpBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 	bucket, err := gcsblob.OpenBucket(ctx, c, bucketName, nil)
 	if err != nil {
 		logger.Log("storage", fmt.Sprintf("ERROR creating %s gcp bucket: %v", bucketName, err))
-	} else {
-		logger.Log("storage", fmt.Sprintf("created %s gcp bucket: %v", bucketName, err))
+		return nil, err
 	}
-	return bucket, err
+	logger.Log("storage", fmt.Sprintf("created %s gcp bucket: %v", bucketName, err))
+	return bucket, nil
 }
