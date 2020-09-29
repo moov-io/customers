@@ -34,7 +34,7 @@ func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error) {
 	AddCustomerRoutes(log.NewNopLogger(), router, scope.customerRepo, nil, nil)
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers"+query, nil)
-	req.Header.Set("X-Namespace", "namespace")
+	req.Header.Set("X-Organization", "namespace")
 	router.ServeHTTP(w, req)
 
 	var customers []*client.Customer

@@ -14,12 +14,12 @@ import (
 )
 
 var (
-	namespaceHeaderKey = util.Or(os.Getenv("NAMESPACE_HEADER"), "X-Namespace")
+	organizationHeaderKey = util.Or(os.Getenv("ORGANIZATION_HEADER"), "X-Organization")
 )
 
 func GetNamespace(w http.ResponseWriter, r *http.Request) string {
-	if ns := r.Header.Get(namespaceHeaderKey); ns == "" {
-		moovhttp.Problem(w, fmt.Errorf("missing %s header", namespaceHeaderKey))
+	if ns := r.Header.Get(organizationHeaderKey); ns == "" {
+		moovhttp.Problem(w, fmt.Errorf("missing %s header", organizationHeaderKey))
 		return ""
 	} else {
 		return ns

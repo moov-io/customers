@@ -27,7 +27,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers?query=jane+doe", nil)
-	req.Header.Set("X-Namespace", "namespace")
+	req.Header.Set("X-Organization", "namespace")
 	router.ServeHTTP(w, req)
 
 	// verify with zero results we don't return null
@@ -51,7 +51,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 	// find a customer from their partial name
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("GET", "/customers?query=jane", nil)
-	req.Header.Set("X-Namespace", "namespace")
+	req.Header.Set("X-Organization", "namespace")
 	router.ServeHTTP(w, req)
 
 	var resp []*client.Customer
@@ -65,7 +65,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 	// find a customer from full name
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("GET", "/customers?query=jane+doe", nil)
-	req.Header.Set("X-Namespace", "namespace")
+	req.Header.Set("X-Organization", "namespace")
 	router.ServeHTTP(w, req)
 
 	var resp2 []*client.Customer

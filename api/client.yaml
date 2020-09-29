@@ -20,7 +20,7 @@ servers:
 
 tags:
   - name: Configuration
-    description: Endpoints for retrieving and updating configuration for a namespace.
+    description: Endpoints for retrieving and updating configuration for an organization.
   - name: Customers
     description: Endpoints for searching, creating, and verifying individuals according to US government criteria for money movement within the country.
 
@@ -39,10 +39,10 @@ paths:
     get:
       tags: [Configuration]
       summary: Get Configuration
-      description: Retrieve current configuration for the provided namespace.
+      description: Retrieve current configuration for the provided organization.
       operationId: getConfiguration
       parameters:
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -58,10 +58,10 @@ paths:
     put:
       tags: [Configuration]
       summary: Update Configuration
-      description: Update the configuration for the provided namespace.
+      description: Update the configuration for the provided organization.
       operationId: updateConfiguration
       parameters:
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -155,7 +155,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -193,7 +193,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -233,7 +233,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -265,7 +265,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -310,7 +310,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -421,7 +421,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -466,7 +466,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -511,7 +511,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -549,7 +549,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -593,7 +593,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -626,7 +626,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -680,7 +680,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -727,7 +727,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -787,7 +787,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -833,7 +833,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -920,7 +920,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1007,7 +1007,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1090,7 +1090,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1129,7 +1129,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1175,7 +1175,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1231,7 +1231,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1270,7 +1270,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1359,7 +1359,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342
@@ -1398,7 +1398,7 @@ paths:
           example: rs4f9915
           schema:
             type: string
-        - name: X-Namespace
+        - name: X-Organization
           in: header
           description: Value used to separate and identify models
           example: org342

@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -76,7 +77,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers/foo/documents", nil)
 	req.Header.Set("x-request-id", "test")
-	req.Header.Set("namespace", "test")
+	req.Header.Set("x-organization", "test")
 
 	router := mux.NewRouter()
 	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
@@ -100,7 +101,8 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	w.Flush()
 
 	if w.Code != http.StatusOK {
-		t.Errorf("bogus status code: %d", w.Code)
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Errorf("bogus status code: %d - %s", w.Code, string(b))
 	}
 }
 
@@ -294,7 +296,7 @@ func TestDocumentRepository(t *testing.T) {
 			body := `{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "birthDate": "1991-04-01", "ssn": "123456789", "type": "individual"}`
 			req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 
-			req.Header.Add("X-Namespace", namespace)
+			req.Header.Add("X-Organization", namespace)
 			res := httptest.NewRecorder()
 			router.ServeHTTP(res, req)
 			require.Equal(t, http.StatusOK, res.Code)

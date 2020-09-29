@@ -13,7 +13,7 @@ import (
 func TestRoute__GetNamespace(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
-	req.Header.Set("x-namespace", "foo")
+	req.Header.Set("x-organization", "foo")
 
 	if ns := GetNamespace(w, req); ns != "foo" {
 		t.Errorf("unexpected ns: %v", ns)

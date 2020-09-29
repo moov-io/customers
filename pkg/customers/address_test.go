@@ -40,7 +40,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/addresses", cust.CustomerID), bytes.NewReader(payload))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -110,7 +110,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 	req, err := http.NewRequest("PUT", url, bytes.NewReader(payload))
 	require.NoError(t, err)
 
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	res := httptest.NewRecorder()
@@ -167,7 +167,7 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 	url := fmt.Sprintf("/customers/%s/addresses/%s", cust.CustomerID, addressID)
 	req, err := http.NewRequest("DELETE", url, nil)
 	require.NoError(t, err)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	res := httptest.NewRecorder()

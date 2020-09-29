@@ -17,7 +17,7 @@ servers:
 - description: Local development
   url: http://localhost:8087
 tags:
-- description: Endpoints for retrieving and updating configuration for a namespace.
+- description: Endpoints for retrieving and updating configuration for an organization.
   name: Configuration
 - description: Endpoints for searching, creating, and verifying individuals according
     to US government criteria for money movement within the country.
@@ -35,14 +35,14 @@ paths:
       - Customers
   /configuration/customers:
     get:
-      description: Retrieve current configuration for the provided namespace.
+      description: Retrieve current configuration for the provided organization.
       operationId: getConfiguration
       parameters:
       - description: Value used to separate and identify models
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -58,14 +58,14 @@ paths:
       tags:
       - Configuration
     put:
-      description: Update the configuration for the provided namespace.
+      description: Update the configuration for the provided organization.
       operationId: updateConfiguration
       parameters:
       - description: Value used to separate and identify models
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -187,7 +187,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -233,7 +233,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -273,7 +273,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -323,7 +323,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -378,7 +378,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -510,7 +510,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -566,7 +566,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -621,7 +621,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -665,7 +665,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -713,7 +713,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -768,7 +768,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -827,7 +827,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -886,7 +886,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -960,7 +960,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1018,7 +1018,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1122,7 +1122,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1221,7 +1221,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1316,7 +1316,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1366,7 +1366,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1424,7 +1424,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1472,7 +1472,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1585,7 +1585,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1648,7 +1648,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string
@@ -1697,7 +1697,7 @@ paths:
         example: org342
         explode: false
         in: header
-        name: X-Namespace
+        name: X-Organization
         required: false
         schema:
           type: string

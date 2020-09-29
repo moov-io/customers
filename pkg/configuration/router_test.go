@@ -29,7 +29,7 @@ func TestRouterGet(t *testing.T) {
 	}
 
 	req := httptest.NewRequest("GET", "/configuration/customers", nil)
-	req.Header.Set("X-Namespace", "moov")
+	req.Header.Set("X-Organization", "moov")
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
@@ -57,7 +57,7 @@ func TestRouterGetErr(t *testing.T) {
 	}
 
 	req := httptest.NewRequest("GET", "/configuration/customers", nil)
-	req.Header.Set("X-Namespace", "moov")
+	req.Header.Set("X-Organization", "moov")
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
@@ -102,7 +102,7 @@ func TestRouterUpdate(t *testing.T) {
 	})
 
 	req := httptest.NewRequest("PUT", "/configuration/customers", &body)
-	req.Header.Set("X-Namespace", "moov")
+	req.Header.Set("X-Organization", "moov")
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
@@ -136,7 +136,7 @@ func TestRouterUpdateErr(t *testing.T) {
 	})
 
 	req := httptest.NewRequest("PUT", "/configuration/customers", &body)
-	req.Header.Set("X-Namespace", "moov")
+	req.Header.Set("X-Organization", "moov")
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
