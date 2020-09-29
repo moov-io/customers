@@ -27,15 +27,15 @@ type ConfigurationApiService service
 
 // GetConfigurationOpts Optional parameters for the method 'GetConfiguration'
 type GetConfigurationOpts struct {
-	XNamespace optional.String
+	XOrganization optional.String
 }
 
 /*
 GetConfiguration Get Configuration
-Retrieve current configuration for the provided namespace.
+Retrieve current configuration for the provided organization.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *GetConfigurationOpts - Optional Parameters:
- * @param "XNamespace" (optional.String) -  Value used to separate and identify models
+ * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 @return NamespaceConfiguration
 */
 func (a *ConfigurationApiService) GetConfiguration(ctx _context.Context, localVarOptionals *GetConfigurationOpts) (NamespaceConfiguration, *_nethttp.Response, error) {
@@ -71,8 +71,8 @@ func (a *ConfigurationApiService) GetConfiguration(ctx _context.Context, localVa
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
-		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
+		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
@@ -112,16 +112,16 @@ func (a *ConfigurationApiService) GetConfiguration(ctx _context.Context, localVa
 
 // UpdateConfigurationOpts Optional parameters for the method 'UpdateConfiguration'
 type UpdateConfigurationOpts struct {
-	XNamespace optional.String
+	XOrganization optional.String
 }
 
 /*
 UpdateConfiguration Update Configuration
-Update the configuration for the provided namespace.
+Update the configuration for the provided organization.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param namespaceConfiguration
  * @param optional nil or *UpdateConfigurationOpts - Optional Parameters:
- * @param "XNamespace" (optional.String) -  Value used to separate and identify models
+ * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 @return NamespaceConfiguration
 */
 func (a *ConfigurationApiService) UpdateConfiguration(ctx _context.Context, namespaceConfiguration NamespaceConfiguration, localVarOptionals *UpdateConfigurationOpts) (NamespaceConfiguration, *_nethttp.Response, error) {
@@ -157,8 +157,8 @@ func (a *ConfigurationApiService) UpdateConfiguration(ctx _context.Context, name
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if localVarOptionals != nil && localVarOptionals.XNamespace.IsSet() {
-		localVarHeaderParams["X-Namespace"] = parameterToString(localVarOptionals.XNamespace.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
+		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
 	}
 	// body params
 	localVarPostBody = &namespaceConfiguration

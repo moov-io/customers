@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 Get Configuration
 
-Retrieve current configuration for the provided namespace.
+Retrieve current configuration for the provided organization.
 
 ### Required Parameters
 
@@ -32,7 +32,7 @@ Optional parameters are passed through a pointer to a GetConfigurationOpts struc
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -58,7 +58,7 @@ No authorization required
 
 Update Configuration
 
-Update the configuration for the provided namespace.
+Update the configuration for the provided organization.
 
 ### Required Parameters
 
@@ -77,7 +77,7 @@ Optional parameters are passed through a pointer to a UpdateConfigurationOpts st
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 

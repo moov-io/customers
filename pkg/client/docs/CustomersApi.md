@@ -65,7 +65,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -113,7 +113,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -163,7 +163,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -209,7 +209,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -257,7 +257,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -305,7 +305,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -351,7 +351,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -397,7 +397,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -529,7 +529,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -575,7 +575,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -623,7 +623,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -669,7 +669,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -715,7 +715,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -763,7 +763,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -809,7 +809,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -857,7 +857,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -903,7 +903,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -953,7 +953,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -1031,7 +1031,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -1077,7 +1077,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -1125,7 +1125,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -1257,7 +1257,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -1341,7 +1341,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -1391,7 +1391,7 @@ Name | Type | Description  | Notes
 
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
