@@ -96,8 +96,8 @@ Refer to the sqlite driver documentation for [connection parameters](https://git
 
 The following environment variables control which backend service is initialized for Document persistence. These all follow a similar ["blob storage"](https://gocloud.dev/ref/blob/) API provided by a library that Google [build and maintains](https://github.com/google/go-cloud).
 
-- `BUCKET_NAME`: The name of the bucket to use. Must be created outside of Customers if using a cloud provider. Make sure proper access and encryption controls are setup on this bucket to prevent exposure or unauthorized access. Example: `./storage/` (For `file` type backends)
-- `CLOUD_PROVIDER`: Provider name which determines which of the following environmental variables are used to initialize Customer's persistence.
+- `DOCUMENTS_BUCKET`: The name of the bucket to use. Must be created outside of Customers if using a cloud provider. Make sure proper access and encryption controls are setup on this bucket to prevent exposure or unauthorized access. Example: `./storage/` (For `file` type backends or `moov-customers-storage` for GCP/GCS)
+- `DOCUMENTS_PROVIDER`: Provider name which determines which of the following environmental variables are used to initialize Customer's persistence.
 
 ##### AWS S3 Storage
 
