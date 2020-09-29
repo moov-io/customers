@@ -144,8 +144,12 @@ PRAGMA foreign_keys=on;`,
 			"alter table customers add column namespace varchar(40) not null default 'unknown';",
 		),
 		execsql(
-			"create_namespace_configuration",
-			`create table namespace_configuration(namespace varchar(40) primary key not null, legal_entity varchar(40) not null, primary_account varchar(40) not null);`,
+			"create_organization_configuration",
+			`create table organization_configuration(organization varchar(40) primary key not null, legal_entity varchar(40) not null, primary_account varchar(40) not null);`,
+		),
+		execsql(
+			"rename_customers_namespace_to_organization",
+			`alter table customers rename column namespace to organization;`,
 		),
 	)
 )

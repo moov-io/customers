@@ -136,6 +136,18 @@ var (
 			"add_deleted_at__to__customers_addresses",
 			`alter table customers_addresses add column deleted_at datetime;`,
 		),
+		execsql(
+			"rename_customers_namespace_to_organization",
+			`alter table customers rename column namespace to organization;`,
+		),
+		execsql(
+			"rename_namespace_configuration__to__organization_configuration",
+			`alter table namespace_configuration rename to organization_configuration;`,
+		),
+		execsql(
+			"rename_organization_configuration__namespace_to_organization",
+			`alter table organization_configuration rename column namespace to organization;`,
+		),
 	)
 )
 
