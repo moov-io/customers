@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -105,8 +104,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	w.Flush()
 
 	if w.Code != http.StatusOK {
-		b, _ := ioutil.ReadAll(w.Body)
-		t.Errorf("bogus status code: %d - %s", w.Code, string(b))
+		t.Errorf("bogus status code: %d\n%s", w.Code, w.Body.String())
 	}
 }
 
