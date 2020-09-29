@@ -13,7 +13,7 @@ type mockRepository struct {
 	err error
 }
 
-func (r *mockRepository) Get(namespace string) (*client.OrganizationConfiguration, error) {
+func (r *mockRepository) Get(organization string) (*client.OrganizationConfiguration, error) {
 	if r.err != nil {
 		var cfg client.OrganizationConfiguration
 		return &cfg, r.err
@@ -21,7 +21,7 @@ func (r *mockRepository) Get(namespace string) (*client.OrganizationConfiguratio
 	return r.cfg, nil
 }
 
-func (r *mockRepository) Update(namespace string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
+func (r *mockRepository) Update(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
 	if r.err != nil {
 		var cfg client.OrganizationConfiguration
 		return &cfg, r.err

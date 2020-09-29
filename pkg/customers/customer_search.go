@@ -113,7 +113,7 @@ func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.
 
 func buildSearchQuery(params searchParams) (string, []interface{}) {
 	var args []interface{}
-	query := `select customer_id from customers where deleted_at is null and namespace = ?`
+	query := `select customer_id from customers where deleted_at is null and organization = ?`
 	args = append(args, params.Namespace)
 	if params.Query != "" {
 		query += " and lower(first_name) || \" \" || lower(last_name) LIKE ?"

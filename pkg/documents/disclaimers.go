@@ -139,9 +139,9 @@ func createDisclaimer(logger log.Logger, disclaimerRepo DisclaimerRepository, do
 	}
 }
 
-func documentExistsForCustomer(customerID string, namespace string, req createDisclaimerRequest, docRepo DocumentRepository) error {
+func documentExistsForCustomer(customerID string, organization string, req createDisclaimerRequest, docRepo DocumentRepository) error {
 	if req.DocumentID != "" {
-		docs, err := docRepo.getCustomerDocuments(customerID, namespace)
+		docs, err := docRepo.getCustomerDocuments(customerID, organization)
 		if err != nil {
 			return err
 		}

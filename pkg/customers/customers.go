@@ -390,8 +390,8 @@ func replaceCustomerMetadata(logger log.Logger, repo CustomerRepository) http.Ha
 
 type CustomerRepository interface {
 	getCustomer(customerID string) (*client.Customer, error)
-	createCustomer(c *client.Customer, namespace string) error
-	updateCustomer(c *client.Customer, namespace string) error
+	createCustomer(c *client.Customer, organization string) error
+	updateCustomer(c *client.Customer, organization string) error
 	updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error
 	deleteCustomer(customerID string) error
 
@@ -436,7 +436,7 @@ func (r *sqlCustomerRepository) deleteCustomer(customerID string) error {
 	return err
 }
 
-func (r *sqlCustomerRepository) createCustomer(c *client.Customer, namespace string) error {
+func (r *sqlCustomerRepository) createCustomer(c *client.Customer, organization string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
@@ -444,7 +444,7 @@ func (r *sqlCustomerRepository) createCustomer(c *client.Customer, namespace str
 
 	// Insert customer record
 	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified, 
-	namespace)
+	organization)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -458,7 +458,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, birthDate, client.UNKNOWN, c.Email, now, now, namespace)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, birthDate, client.UNKNOWN, c.Email, now, now, organization)
 	if err != nil {
 		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
@@ -479,7 +479,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	return nil
 }
 
-func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, namespace string) error {
+func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
@@ -487,7 +487,7 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, namespace str
 
 	query := `update customers set first_name = ?, middle_name = ?, last_name = ?, nick_name = ?, suffix = ?, type = ?, birth_date = ?, status = ?, email =?, 
 	last_modified = ?,
-	namespace = ? where customer_id = ? and deleted_at is null;`
+	organization = ? where customer_id = ? and deleted_at is null;`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -495,7 +495,7 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, namespace str
 	defer stmt.Close()
 
 	now := time.Now()
-	res, err := stmt.Exec(c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BirthDate, c.Status, c.Email, now, namespace, c.CustomerID)
+	res, err := stmt.Exec(c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BirthDate, c.Status, c.Email, now, organization, c.CustomerID)
 	if err != nil {
 		return fmt.Errorf("updating customer: %v", err)
 	}

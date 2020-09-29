@@ -27,7 +27,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers?query=jane+doe", nil)
-	req.Header.Set("X-Organization", "namespace")
+	req.Header.Set("X-Organization", "organization")
 	router.ServeHTTP(w, req)
 
 	// verify with zero results we don't return null
@@ -44,14 +44,14 @@ func TestCustomersSearchRouter(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Error(err)
 	}
 
 	// find a customer from their partial name
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("GET", "/customers?query=jane", nil)
-	req.Header.Set("X-Organization", "namespace")
+	req.Header.Set("X-Organization", "organization")
 	router.ServeHTTP(w, req)
 
 	var resp []*client.Customer
@@ -65,7 +65,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 	// find a customer from full name
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("GET", "/customers?query=jane+doe", nil)
-	req.Header.Set("X-Organization", "namespace")
+	req.Header.Set("X-Organization", "organization")
 	router.ServeHTTP(w, req)
 
 	var resp2 []*client.Customer
@@ -98,7 +98,7 @@ func TestCustomerSearch__query(t *testing.T) {
 		Query:     "jane doe",
 		Count:     100,
 	})
-	if query != "select customer_id from customers where deleted_at is null and namespace = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
+	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
 	if err := prepare(sqliteDB.DB, query); err != nil {
@@ -116,7 +116,7 @@ func TestCustomerSearch__query(t *testing.T) {
 		Namespace: "foo",
 		Email:     "jane.doe@moov.io",
 	})
-	if query != "select customer_id from customers where deleted_at is null and namespace = ? and lower(email) like ? order by created_at desc limit ?;" {
+	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
 	if err := prepare(sqliteDB.DB, query); err != nil {
@@ -136,7 +136,7 @@ func TestCustomerSearch__query(t *testing.T) {
 		Email:     "jane.doe@moov.io",
 		Count:     25,
 	})
-	if query != "select customer_id from customers where deleted_at is null and namespace = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
+	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
 	if err := prepare(sqliteDB.DB, query); err != nil {

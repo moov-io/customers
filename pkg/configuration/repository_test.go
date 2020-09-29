@@ -17,9 +17,9 @@ func TestRepository(t *testing.T) {
 	t.Parallel()
 
 	check := func(t *testing.T, repo *sqlRepo) {
-		namespace := base.ID()
+		organization := base.ID()
 
-		cfg, err := repo.Get(namespace)
+		cfg, err := repo.Get(organization)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -29,19 +29,19 @@ func TestRepository(t *testing.T) {
 		}
 
 		customerID, accountID := base.ID(), base.ID()
-		writeCustomerAndAccount(t, repo.db, namespace, customerID, accountID)
+		writeCustomerAndAccount(t, repo.db, organization, customerID, accountID)
 
 		// write config
 		cfg = &client.OrganizationConfiguration{
 			LegalEntity:    customerID,
 			PrimaryAccount: accountID,
 		}
-		if _, err := repo.Update(namespace, cfg); err != nil {
+		if _, err := repo.Update(organization, cfg); err != nil {
 			t.Fatal(err)
 		}
 
 		// verify
-		cfg, err = repo.Get(namespace)
+		cfg, err = repo.Get(organization)
 		if err != nil {
 			t.Fatal(err)
 		}

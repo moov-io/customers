@@ -230,7 +230,7 @@ func makeDocumentKey(customerID, documentId string) string {
 }
 
 type DocumentRepository interface {
-	getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error)
+	getCustomerDocuments(customerID string, organization string) ([]*client.Document, error)
 	writeCustomerDocument(customerID string, doc *client.Document) error
 	deleteCustomerDocument(customerID string, documentID string) error
 }
@@ -246,16 +246,16 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 		logger: logger,
 	}
 }
-func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error) {
+func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
 	query := `select document_id, documents.type, content_type, uploaded_at from documents join customers on customers.
-	namespace = ? where documents.customer_id = ? and documents.deleted_at is null`
+	organization = ? where documents.customer_id = ? and documents.deleted_at is null`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: prepare %v", err)
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(namespace, customerID)
+	rows, err := stmt.Query(organization, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: query %v", err)
 	}

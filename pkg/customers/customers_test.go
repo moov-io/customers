@@ -46,7 +46,7 @@ func (r *testCustomerRepository) getCustomer(customerID string) (*client.Custome
 	return r.customer, nil
 }
 
-func (r *testCustomerRepository) createCustomer(c *client.Customer, namespace string) error {
+func (r *testCustomerRepository) createCustomer(c *client.Customer, organization string) error {
 	r.createdCustomer = c
 	return r.err
 }
@@ -56,7 +56,7 @@ func (r *testCustomerRepository) deleteCustomer(customerID string) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomer(c *client.Customer, namespace string) error {
+func (r *testCustomerRepository) updateCustomer(c *client.Customer, organization string) error {
 	r.customer = c
 	return r.err
 }
@@ -147,7 +147,7 @@ func TestCustomers__GetCustomer(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -203,7 +203,7 @@ func TestCustomers__DeleteCustomer(t *testing.T) {
 	}
 	customer, _, _ := cr.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t,
-		repo.createCustomer(customer, "namespace"),
+		repo.createCustomer(customer, "organization"),
 	)
 
 	got, err := repo.getCustomer(customer.CustomerID)
@@ -232,7 +232,7 @@ func TestCustomerRepository__createCustomer(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "jane@example.com",
 		}).asCustomer(testCustomerSSNStorage(t))
-		if err := repo.createCustomer(cust, "namespace"); err != nil {
+		if err := repo.createCustomer(cust, "organization"); err != nil {
 			t.Fatal(err)
 		}
 
@@ -433,7 +433,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	}
 	customer, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t,
-		repo.createCustomer(customer, "namespace"),
+		repo.createCustomer(customer, "organization"),
 	)
 
 	_, err := repo.getCustomer(customer.CustomerID)
@@ -521,7 +521,7 @@ func TestCustomers__repository(t *testing.T) {
 			},
 		},
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Error(err)
 	}
 	if cust == nil {
@@ -561,7 +561,7 @@ func TestCustomerRepository__delete(t *testing.T) {
 		}
 		cust, _, _ := cr.asCustomer(testCustomerSSNStorage(t))
 		require.NoError(t,
-			repo.createCustomer(cust, "namespace"),
+			repo.createCustomer(cust, "organization"),
 		)
 
 		customers[i] = &customer{
@@ -625,7 +625,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		},
 	}
 	newCust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
-	err := repo.createCustomer(newCust, "namespace")
+	err := repo.createCustomer(newCust, "organization")
 	require.NoError(t, err)
 
 	updateReq := customerRequest{
@@ -647,7 +647,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 	}
 
 	updatedCust, _, _ := updateReq.asCustomer(testCustomerSSNStorage(t))
-	err = repo.updateCustomer(updatedCust, "namespace")
+	err = repo.updateCustomer(updatedCust, "organization")
 	require.NoError(t, err)
 
 	require.Equal(t, newCust.CustomerID, updatedCust.CustomerID)
@@ -668,7 +668,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -696,7 +696,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -733,7 +733,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -788,7 +788,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 

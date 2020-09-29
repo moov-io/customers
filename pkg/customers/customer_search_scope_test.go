@@ -34,7 +34,7 @@ func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error) {
 	AddCustomerRoutes(log.NewNopLogger(), router, scope.customerRepo, nil, nil)
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers"+query, nil)
-	req.Header.Set("X-Organization", "namespace")
+	req.Header.Set("X-Organization", "organization")
 	router.ServeHTTP(w, req)
 
 	var customers []*client.Customer
@@ -66,7 +66,7 @@ func (scope *Scope) CreateCustomer(firstName, lastName, email string, customerTy
 		Email:     email,
 		Type:      customerType,
 	}).asCustomer(testCustomerSSNStorage(scope.t))
-	if err := scope.customerRepo.createCustomer(cust, "namespace"); err != nil {
+	if err := scope.customerRepo.createCustomer(cust, "organization"); err != nil {
 		scope.t.Error(err)
 	}
 	return *cust
