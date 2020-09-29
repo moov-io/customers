@@ -13,8 +13,8 @@ import (
 )
 
 type Repository interface {
-	Get(namespace string) (*client.NamespaceConfiguration, error)
-	Update(namespace string, cfg *client.NamespaceConfiguration) (*client.NamespaceConfiguration, error)
+	Get(namespace string) (*client.OrganizationConfiguration, error)
+	Update(namespace string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error)
 }
 
 func NewRepository(db *sql.DB) Repository {
@@ -25,7 +25,7 @@ type sqlRepo struct {
 	db *sql.DB
 }
 
-func (r *sqlRepo) Get(namespace string) (*client.NamespaceConfiguration, error) {
+func (r *sqlRepo) Get(namespace string) (*client.OrganizationConfiguration, error) {
 	query := `select legal_entity, primary_account from namespace_configuration
 where namespace = ? limit 1;`
 	stmt, err := r.db.Prepare(query)
@@ -34,7 +34,7 @@ where namespace = ? limit 1;`
 	}
 	defer stmt.Close()
 
-	var cfg client.NamespaceConfiguration
+	var cfg client.OrganizationConfiguration
 	if err := stmt.QueryRow(namespace).Scan(&cfg.LegalEntity, &cfg.PrimaryAccount); err != nil {
 		if err == sql.ErrNoRows {
 			return &cfg, nil // nothing found, return an empty config
@@ -44,7 +44,7 @@ where namespace = ? limit 1;`
 	return &cfg, nil
 }
 
-func (r *sqlRepo) Update(namespace string, cfg *client.NamespaceConfiguration) (*client.NamespaceConfiguration, error) {
+func (r *sqlRepo) Update(namespace string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
 	if err := r.verifyCustomerInfo(namespace, cfg); err != nil {
 		return nil, errors.New("namespace: customerID or accountID does not belong")
 	}
@@ -60,7 +60,7 @@ func (r *sqlRepo) Update(namespace string, cfg *client.NamespaceConfiguration) (
 	return cfg, err
 }
 
-func (r *sqlRepo) verifyCustomerInfo(namespace string, cfg *client.NamespaceConfiguration) error {
+func (r *sqlRepo) verifyCustomerInfo(namespace string, cfg *client.OrganizationConfiguration) error {
 	query := `select c.namespace from customers as c
 inner join accounts as a
 on c.customer_id = a.customer_id

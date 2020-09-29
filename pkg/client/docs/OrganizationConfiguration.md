@@ -1,4 +1,4 @@
-# NamespaceConfiguration
+# OrganizationConfiguration
 
 ## Properties
 

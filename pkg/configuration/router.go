@@ -48,7 +48,7 @@ func updateNamespaceConfig(logger log.Logger, repo Repository) http.HandlerFunc 
 			return
 		}
 
-		var body client.NamespaceConfiguration
+		var body client.OrganizationConfiguration
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			moovhttp.Problem(w, err)
 			return

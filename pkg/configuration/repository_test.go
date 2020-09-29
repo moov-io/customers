@@ -32,7 +32,7 @@ func TestRepository(t *testing.T) {
 		writeCustomerAndAccount(t, repo.db, namespace, customerID, accountID)
 
 		// write config
-		cfg = &client.NamespaceConfiguration{
+		cfg = &client.OrganizationConfiguration{
 			LegalEntity:    customerID,
 			PrimaryAccount: accountID,
 		}

@@ -9,8 +9,8 @@
 
 package client
 
-// NamespaceConfiguration struct for NamespaceConfiguration
-type NamespaceConfiguration struct {
+// OrganizationConfiguration struct for OrganizationConfiguration
+type OrganizationConfiguration struct {
 	// customerID of legal entity for this Namespace
 	LegalEntity string `json:"legalEntity"`
 	// accountID of funding/source account for this Namespace

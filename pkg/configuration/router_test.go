@@ -22,7 +22,7 @@ import (
 
 func TestRouterGet(t *testing.T) {
 	repo := &mockRepository{
-		cfg: &client.NamespaceConfiguration{
+		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
 			PrimaryAccount: base.ID(),
 		},
@@ -39,7 +39,7 @@ func TestRouterGet(t *testing.T) {
 
 	require.Equal(t, w.Code, http.StatusOK)
 
-	var response client.NamespaceConfiguration
+	var response client.OrganizationConfiguration
 	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +70,7 @@ func TestRouterGetErr(t *testing.T) {
 
 func TestRouterGetMissing(t *testing.T) {
 	repo := &mockRepository{
-		cfg: &client.NamespaceConfiguration{
+		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
 			PrimaryAccount: base.ID(),
 		},
@@ -89,14 +89,14 @@ func TestRouterGetMissing(t *testing.T) {
 
 func TestRouterUpdate(t *testing.T) {
 	repo := &mockRepository{
-		cfg: &client.NamespaceConfiguration{
+		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
 			PrimaryAccount: base.ID(),
 		},
 	}
 
 	var body bytes.Buffer
-	json.NewEncoder(&body).Encode(&client.NamespaceConfiguration{
+	json.NewEncoder(&body).Encode(&client.OrganizationConfiguration{
 		LegalEntity:    base.ID(),
 		PrimaryAccount: base.ID(),
 	})
@@ -112,7 +112,7 @@ func TestRouterUpdate(t *testing.T) {
 
 	require.Equal(t, w.Code, http.StatusOK)
 
-	var response client.NamespaceConfiguration
+	var response client.OrganizationConfiguration
 	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func TestRouterUpdateErr(t *testing.T) {
 	}
 
 	var body bytes.Buffer
-	json.NewEncoder(&body).Encode(&client.NamespaceConfiguration{
+	json.NewEncoder(&body).Encode(&client.OrganizationConfiguration{
 		LegalEntity:    base.ID(),
 		PrimaryAccount: base.ID(),
 	})
@@ -149,14 +149,14 @@ func TestRouterUpdateErr(t *testing.T) {
 
 func TestRouterUpdateMissing(t *testing.T) {
 	repo := &mockRepository{
-		cfg: &client.NamespaceConfiguration{
+		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
 			PrimaryAccount: base.ID(),
 		},
 	}
 
 	var body bytes.Buffer
-	json.NewEncoder(&body).Encode(&client.NamespaceConfiguration{
+	json.NewEncoder(&body).Encode(&client.OrganizationConfiguration{
 		LegalEntity:    base.ID(),
 		PrimaryAccount: base.ID(),
 	})

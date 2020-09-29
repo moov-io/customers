@@ -54,7 +54,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NamespaceConfiguration'
+                $ref: '#/components/schemas/OrganizationConfiguration'
     put:
       tags: [Configuration]
       summary: Update Configuration
@@ -72,14 +72,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NamespaceConfiguration'
+              $ref: '#/components/schemas/OrganizationConfiguration'
       responses:
         '200':
           description: Configuration was successfully updated
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NamespaceConfiguration'
+                $ref: '#/components/schemas/OrganizationConfiguration'
         '400':
           description: Configuration was not updated, see error(s)
           content:
@@ -1427,7 +1427,7 @@ paths:
 
 components:
   schemas:
-    NamespaceConfiguration:
+    OrganizationConfiguration:
       properties:
         legalEntity:
           type: string

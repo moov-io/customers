@@ -11,7 +11,7 @@ Method | HTTP request | Description
 
 ## GetConfiguration
 
-> NamespaceConfiguration GetConfiguration(ctx, optional)
+> OrganizationConfiguration GetConfiguration(ctx, optional)
 
 Get Configuration
 
@@ -36,7 +36,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**NamespaceConfiguration**](NamespaceConfiguration.md)
+[**OrganizationConfiguration**](OrganizationConfiguration.md)
 
 ### Authorization
 
@@ -54,7 +54,7 @@ No authorization required
 
 ## UpdateConfiguration
 
-> NamespaceConfiguration UpdateConfiguration(ctx, namespaceConfiguration, optional)
+> OrganizationConfiguration UpdateConfiguration(ctx, organizationConfiguration, optional)
 
 Update Configuration
 
@@ -66,7 +66,7 @@ Update the configuration for the provided organization.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**namespaceConfiguration** | [**NamespaceConfiguration**](NamespaceConfiguration.md)|  | 
+**organizationConfiguration** | [**OrganizationConfiguration**](OrganizationConfiguration.md)|  | 
  **optional** | ***UpdateConfigurationOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -81,7 +81,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**NamespaceConfiguration**](NamespaceConfiguration.md)
+[**OrganizationConfiguration**](OrganizationConfiguration.md)
 
 ### Authorization
 

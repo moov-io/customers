@@ -9,21 +9,21 @@ import (
 )
 
 type mockRepository struct {
-	cfg *client.NamespaceConfiguration
+	cfg *client.OrganizationConfiguration
 	err error
 }
 
-func (r *mockRepository) Get(namespace string) (*client.NamespaceConfiguration, error) {
+func (r *mockRepository) Get(namespace string) (*client.OrganizationConfiguration, error) {
 	if r.err != nil {
-		var cfg client.NamespaceConfiguration
+		var cfg client.OrganizationConfiguration
 		return &cfg, r.err
 	}
 	return r.cfg, nil
 }
 
-func (r *mockRepository) Update(namespace string, cfg *client.NamespaceConfiguration) (*client.NamespaceConfiguration, error) {
+func (r *mockRepository) Update(namespace string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
 	if r.err != nil {
-		var cfg client.NamespaceConfiguration
+		var cfg client.OrganizationConfiguration
 		return &cfg, r.err
 	}
 	return r.cfg, nil
