@@ -119,7 +119,7 @@ func main() {
 	if cloudProvider == "" {
 		cloudProvider = "file"
 	}
-	signer := setupStorageBucket(logger, bucketName, cloudProvider)
+	signer := setupSigner(logger, bucketName, cloudProvider)
 
 	// Create our Watchman client
 	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
@@ -165,6 +165,8 @@ func main() {
 		Repo: accountsRepo, WatchmanClient: watchmanClient,
 	}
 
+	bucket := storage.GetBucket(logger, os.Getenv("DOCUMENTS_BUCKET"), util.Or(os.Getenv("DOCUMENTS_PROVIDER"), "file"), signer)
+
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
@@ -173,7 +175,7 @@ func main() {
 	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
-	documents.AddDocumentRoutes(logger, router, documentRepo, storage.GetBucket(bucketName, cloudProvider, signer))
+	documents.AddDocumentRoutes(logger, router, documentRepo, bucket)
 	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
 
 	// Add Configuration routes
@@ -183,7 +185,7 @@ func main() {
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
 	if cloudProvider == "file" {
-		storage.AddFileblobRoutes(logger, router, signer, storage.GetBucket(bucketName, cloudProvider, signer))
+		storage.AddFileblobRoutes(logger, router, signer, bucket)
 	}
 
 	// Start business HTTP server
@@ -240,7 +242,7 @@ func addPingRoute(r *mux.Router) {
 	})
 }
 
-func setupStorageBucket(logger log.Logger, bucketName, cloudProvider string) *fileblob.URLSignerHMAC {
+func setupSigner(logger log.Logger, bucketName, cloudProvider string) *fileblob.URLSignerHMAC {
 	if cloudProvider == "file" || cloudProvider == "" {
 		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
 		if baseURL == "" {

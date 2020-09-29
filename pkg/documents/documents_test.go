@@ -43,6 +43,10 @@ type testDocumentRepository struct {
 	written *client.Document
 }
 
+func (r *testDocumentRepository) findActiveDocument(customerID string, documentID string, namespace string) error {
+	return r.err
+}
+
 func (r *testDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
 	if r.err != nil {
 		return nil, r.err
@@ -190,11 +194,8 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusFound {
+	if w.Code != http.StatusBadRequest {
 		t.Errorf("bogus HTTP status: %d", w.Code)
-	}
-	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.DocumentID)) {
-		t.Errorf("unexpected SignedURL: %s", loc)
 	}
 }
 
@@ -226,7 +227,6 @@ func TestDocuments__delete(t *testing.T) {
 	row := db.DB.QueryRow("SELECT COUNT(*) FROM documents where deleted_at is null")
 	require.NoError(t, row.Scan(&count))
 	require.Equal(t, 0, count)
-
 }
 
 func TestDocuments__uploadCustomerDocument(t *testing.T) {
@@ -253,8 +253,10 @@ func TestDocuments__uploadCustomerDocument(t *testing.T) {
 }
 
 func TestDocuments__makeDocumentKey(t *testing.T) {
-	if v := makeDocumentKey("a", "b"); v != "customer-a-document-b" {
-		t.Errorf("got %q", v)
+	key := makeDocumentKey("a", "b")
+
+	if key != "customers/a/documents/b" {
+		t.Errorf("got %q", key)
 	}
 }
 
@@ -316,6 +318,10 @@ func TestDocumentRepository(t *testing.T) {
 
 			require.Equal(t, doc.DocumentID, docs[0].DocumentID)
 			require.Equal(t, "image/png", docs[0].ContentType)
+
+			// make sure we read the document
+			err = documentRepo.findActiveDocument(customerID, doc.DocumentID, namespace)
+			require.NoError(t, err)
 		})
 	}
 }
@@ -373,4 +379,8 @@ func TestDocumentsRepository__Delete(t *testing.T) {
 		_, ok := deletedDocIDs[doc.DocumentID]
 		require.Equal(t, doc.deleted, ok)
 	}
+
+	// make sure we find the document as deleted
+	err = repo.findActiveDocument(customerID, docs[0].DocumentID, "")
+	require.Equal(t, err, sql.ErrNoRows)
 }

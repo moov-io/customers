@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path"
 	"strings"
 	"time"
 
@@ -30,19 +31,21 @@ import (
 
 var (
 	errNoDocumentID = errors.New("no Document ID found")
+)
 
+const (
 	maxDocumentSize int64 = 20 * 1024 * 1024 // 20MB
 )
 
 func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, bucketFactory storage.BucketFunc) {
 	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
-	r.Methods("GET").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
-	r.Methods("DELETE").Path("/customers/{customerID}/documents/{documentId}").HandlerFunc(deleteCustomerDocument(logger, repo))
+	r.Methods("GET").Path("/customers/{customerID}/documents/{documentID}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
+	r.Methods("DELETE").Path("/customers/{customerID}/documents/{documentID}").HandlerFunc(deleteCustomerDocument(logger, repo))
 }
 
 func getDocumentID(w http.ResponseWriter, r *http.Request) string {
-	v, ok := mux.Vars(r)["documentId"]
+	v, ok := mux.Vars(r)["documentID"]
 	if !ok || v == "" {
 		moovhttp.Problem(w, errNoDocumentID)
 		return ""
@@ -149,10 +152,15 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 			moovhttp.Problem(w, err)
 			return
 		}
-		defer writer.Close()
 
 		// Concat our mime buffer back with the multipart file
 		n, err := io.Copy(writer, io.LimitReader(io.MultiReader(bytes.NewReader(buf), file), maxDocumentSize))
+
+		if err := writer.Close(); err != nil {
+			moovhttp.Problem(w, fmt.Errorf("documents: closing writer: %v", err))
+			return
+		}
+
 		if err != nil || n == 0 {
 			moovhttp.Problem(w, fmt.Errorf("documents: wrote %d bytes: %v", n, err))
 			return
@@ -168,11 +176,21 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		customerID, documentId := route.GetCustomerID(w, r), getDocumentID(w, r)
-		if customerID == "" || documentId == "" {
+		customerID, documentID := route.GetCustomerID(w, r), getDocumentID(w, r)
+		if customerID == "" || documentID == "" {
 			return
 		}
-		requestID := moovhttp.GetRequestID(r)
+		namespace := route.GetNamespace(w, r)
+		if namespace == "" {
+			return
+		}
+
+		// reject the request if the document is deleted
+		if err := repo.findActiveDocument(customerID, documentID, namespace); err != nil {
+			logger.Log("documents", fmt.Sprintf("not retrieving document=%s due to: %v", documentID, err))
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
 
 		bucket, err := bucketFactory()
 		if err != nil {
@@ -184,21 +202,20 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()
 
-		documentKey := makeDocumentKey(customerID, documentId)
-		signedURL, err := bucket.SignedURL(ctx, documentKey, &blob.SignedURLOptions{
-			Expiry: 15 * time.Minute,
-		})
+		documentKey := makeDocumentKey(customerID, documentID)
+		rdr, err := bucket.NewReader(ctx, documentKey, nil)
 		if err != nil {
-			moovhttp.Problem(w, err)
+			moovhttp.Problem(w, fmt.Errorf("error reading %s document: %v", documentKey, err))
 			return
 		}
-		if signedURL == "" {
-			moovhttp.Problem(w, fmt.Errorf("document=%s not found", documentId))
-			return
-		}
+		defer rdr.Close()
 
-		logger.Log("documents", fmt.Sprintf("redirecting for document=%s", documentKey), "requestID", requestID)
-		http.Redirect(w, r, signedURL, http.StatusFound)
+		w.Header().Set("Content-Type", rdr.ContentType())
+		w.WriteHeader(http.StatusOK)
+		if n, err := io.Copy(w, rdr); n == 0 || err != nil {
+			moovhttp.Problem(w, fmt.Errorf("problem writing %s (n=%d) document: %v", documentKey, n, err))
+			return
+		}
 	}
 }
 
@@ -225,12 +242,14 @@ func deleteCustomerDocument(logger log.Logger, repo DocumentRepository) http.Han
 	}
 }
 
-func makeDocumentKey(customerID, documentId string) string {
-	return fmt.Sprintf("customer-%s-document-%s", customerID, documentId)
+func makeDocumentKey(customerID, documentID string) string {
+	return path.Join("customers", customerID, "documents", documentID)
 }
 
 type DocumentRepository interface {
+	findActiveDocument(customerID string, documentID string, namespace string) error
 	getCustomerDocuments(customerID string, organization string) ([]*client.Document, error)
+
 	writeCustomerDocument(customerID string, doc *client.Document) error
 	deleteCustomerDocument(customerID string, documentID string) error
 }
@@ -246,6 +265,24 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 		logger: logger,
 	}
 }
+
+func (r *sqlDocumentRepository) findActiveDocument(customerID string, documentID string, namespace string) error {
+	query := `select documents.document_id from documents
+inner join customers on customers.namespace = ? where documents.customer_id = ? and documents.document_id = ? and documents.deleted_at is null
+limit 1;`
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return fmt.Errorf("getCustomerDocuments: prepare %v", err)
+	}
+	defer stmt.Close()
+
+	var docID string
+	if err := stmt.QueryRow(namespace, customerID, documentID).Scan(&docID); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
 	query := `select document_id, documents.type, content_type, uploaded_at from documents join customers on customers.
 	organization = ? where documents.customer_id = ? and documents.deleted_at is null`
@@ -261,7 +298,7 @@ func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organiza
 	}
 	defer rows.Close()
 
-	var docs []*client.Document
+	docs := make([]*client.Document, 0)
 	for rows.Next() {
 		var doc client.Document
 		if err := rows.Scan(&doc.DocumentID, &doc.Type, &doc.ContentType, &doc.UploadedAt); err != nil {

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"time"
 
+	"github.com/go-kit/kit/log"
 	"gocloud.dev/blob"
 )
 
@@ -20,6 +21,6 @@ var (
 		defer cancelFn()
 
 		dir, _ := ioutil.TempDir("", "testBucket")
-		return fileBucket(ctx, dir, signer)
+		return fileBucket(ctx, log.NewNopLogger(), dir, signer)
 	}
 )
