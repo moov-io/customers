@@ -11,8 +11,8 @@ package client
 
 // OrganizationConfiguration struct for OrganizationConfiguration
 type OrganizationConfiguration struct {
-	// customerID of legal entity for this Namespace
+	// customerID of legal entity for this Organization
 	LegalEntity string `json:"legalEntity"`
-	// accountID of funding/source account for this Namespace
+	// accountID of funding/source account for this Organization
 	PrimaryAccount string `json:"primaryAccount"`
 }

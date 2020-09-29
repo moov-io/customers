@@ -62,15 +62,15 @@ func sqliteRepo(t *testing.T) *sqlRepo {
 	return &sqlRepo{db: db.DB}
 }
 
-func writeCustomerAndAccount(t *testing.T, db *sql.DB, namespace string, customerID, accountID string) {
+func writeCustomerAndAccount(t *testing.T, db *sql.DB, organization string, customerID, accountID string) {
 	// TODO(adam): replace after customers/acconts Repository are moved to ./pkg/
-	query := `insert into customers (customer_id, namespace, first_name, last_name) values (?, ?, ?, ?);`
+	query := `insert into customers (customer_id, organization, first_name, last_name) values (?, ?, ?, ?);`
 	stmt, err := db.Prepare(query)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer stmt.Close()
-	if _, err := stmt.Exec(customerID, namespace, "jane", "doe"); err != nil {
+	if _, err := stmt.Exec(customerID, organization, "jane", "doe"); err != nil {
 		t.Fatal(err)
 	}
 

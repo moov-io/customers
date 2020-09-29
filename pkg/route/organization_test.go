@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestRoute__GetNamespace(t *testing.T) {
+func TestRoute__GetOrganization(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
 	req.Header.Set("x-organization", "foo")
@@ -20,7 +20,7 @@ func TestRoute__GetNamespace(t *testing.T) {
 	}
 }
 
-func TestRoute__GetNamespaceMissing(t *testing.T) {
+func TestRoute__GetOrganizationMissing(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/ping", nil)
 

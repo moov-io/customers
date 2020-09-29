@@ -1432,11 +1432,11 @@ components:
         legalEntity:
           type: string
           example: 5c20933f
-          description: customerID of legal entity for this Namespace
+          description: customerID of legal entity for this Organization
         primaryAccount:
           type: string
           example: f6eddffd
-          description: accountID of funding/source account for this Namespace
+          description: accountID of funding/source account for this Organization
       required:
         - legalEntity
         - primaryAccount

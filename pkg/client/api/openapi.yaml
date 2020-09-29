@@ -1735,11 +1735,11 @@ components:
         legalEntity: 5c20933f
       properties:
         legalEntity:
-          description: customerID of legal entity for this Namespace
+          description: customerID of legal entity for this Organization
           example: 5c20933f
           type: string
         primaryAccount:
-          description: accountID of funding/source account for this Namespace
+          description: accountID of funding/source account for this Organization
           example: f6eddffd
           type: string
       required:

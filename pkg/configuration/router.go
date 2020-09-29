@@ -17,11 +17,11 @@ import (
 )
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository) {
-	r.Methods("GET").Path("/configuration/customers").HandlerFunc(getNamespaceConfig(logger, repo))
-	r.Methods("PUT").Path("/configuration/customers").HandlerFunc(updateNamespaceConfig(logger, repo))
+	r.Methods("GET").Path("/configuration/customers").HandlerFunc(getOrganizationConfig(logger, repo))
+	r.Methods("PUT").Path("/configuration/customers").HandlerFunc(updateOrganizationConfig(logger, repo))
 }
 
-func getNamespaceConfig(logger log.Logger, repo Repository) http.HandlerFunc {
+func getOrganizationConfig(logger log.Logger, repo Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -39,7 +39,7 @@ func getNamespaceConfig(logger log.Logger, repo Repository) http.HandlerFunc {
 	}
 }
 
-func updateNamespaceConfig(logger log.Logger, repo Repository) http.HandlerFunc {
+func updateOrganizationConfig(logger log.Logger, repo Repository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 

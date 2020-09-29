@@ -94,9 +94,9 @@ func TestCustomerSearch__query(t *testing.T) {
 
 	// Query search
 	query, args := buildSearchQuery(searchParams{
-		Namespace: "foo",
-		Query:     "jane doe",
-		Count:     100,
+		Organization: "foo",
+		Query:        "jane doe",
+		Count:        100,
 	})
 	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
@@ -113,8 +113,8 @@ func TestCustomerSearch__query(t *testing.T) {
 
 	// Eamil search
 	query, args = buildSearchQuery(searchParams{
-		Namespace: "foo",
-		Email:     "jane.doe@moov.io",
+		Organization: "foo",
+		Email:        "jane.doe@moov.io",
 	})
 	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
@@ -131,10 +131,10 @@ func TestCustomerSearch__query(t *testing.T) {
 
 	// Query and Eamil saerch
 	query, args = buildSearchQuery(searchParams{
-		Namespace: "foo",
-		Query:     "jane doe",
-		Email:     "jane.doe@moov.io",
-		Count:     25,
+		Organization: "foo",
+		Query:        "jane doe",
+		Email:        "jane.doe@moov.io",
+		Count:        25,
 	})
 	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)

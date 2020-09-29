@@ -11,10 +11,11 @@ package client
 
 import (
 	_context "context"
-	"github.com/antihax/optional"
 	_ioutil "io/ioutil"
 	_nethttp "net/http"
 	_neturl "net/url"
+
+	"github.com/antihax/optional"
 )
 
 // Linger please
