@@ -197,6 +197,24 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	}
 }
 
+func TestDocuments__retrieveError(t *testing.T) {
+	repo := &testDocumentRepository{
+		err: errors.New("bad error"),
+	}
+
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+
+	customerID, documentID := base.ID(), base.ID()
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/documents/%s", customerID, documentID), nil)
+	req.Header.Set("X-Namespace", base.ID())
+	router.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusNotFound, w.Code)
+}
+
 func TestDocuments__delete(t *testing.T) {
 	db := database.CreateTestSqliteDB(t)
 	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
