@@ -252,7 +252,7 @@ func TestDisclaimersAdmin__create(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -289,7 +289,7 @@ func TestDisclaimersAdmin__createErr(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -316,7 +316,7 @@ func TestDisclaimersAdmin__createMethodErr(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	resp, err := http.DefaultClient.Do(req)
@@ -344,7 +344,7 @@ func TestDisclaimersAdmin__createJSONErr(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	resp, err := http.DefaultClient.Do(req)

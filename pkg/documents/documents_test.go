@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -42,7 +43,7 @@ type testDocumentRepository struct {
 	written *client.Document
 }
 
-func (r *testDocumentRepository) getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error) {
+func (r *testDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -76,7 +77,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers/foo/documents", nil)
 	req.Header.Set("x-request-id", "test")
-	req.Header.Set("namespace", "test")
+	req.Header.Set("x-organization", "test")
 
 	router := mux.NewRouter()
 	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
@@ -100,7 +101,8 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	w.Flush()
 
 	if w.Code != http.StatusOK {
-		t.Errorf("bogus status code: %d", w.Code)
+		b, _ := ioutil.ReadAll(w.Body)
+		t.Errorf("bogus status code: %d - %s", w.Code, string(b))
 	}
 }
 
@@ -160,7 +162,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := multipartRequest(t)
 	req.Header.Set("x-request-id", "test")
-	req.Header.Set("X-namespace", "test")
+	req.Header.Set("X-organization", "test")
 
 	router := mux.NewRouter()
 	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
@@ -278,15 +280,15 @@ func TestDocumentRepository(t *testing.T) {
 			logger := log.NewNopLogger()
 			documentRepo := NewDocumentRepo(logger, tc.db)
 			customerRepo := customers.NewCustomerRepo(logger, tc.db)
-			namespace := "test"
+			organization := "test"
 			customerID := base.ID()
 
 			// check empty docs
-			docs, err := documentRepo.getCustomerDocuments(customerID, namespace)
+			docs, err := documentRepo.getCustomerDocuments(customerID, organization)
 			require.NoError(t, err)
 			require.Empty(t, docs)
 
-			// create test customer with namespace
+			// create test customer with organization
 			router := mux.NewRouter()
 			ssnStorage := customers.NewSSNStorage(secrets.TestStringKeeper(t), customers.NewCustomerSSNRepository(logger, tc.db))
 			ofacSearcher := customers.NewOFACSearcher(customerRepo, &watchman.TestWatchmanClient{})
@@ -294,7 +296,7 @@ func TestDocumentRepository(t *testing.T) {
 			body := `{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "birthDate": "1991-04-01", "ssn": "123456789", "type": "individual"}`
 			req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 
-			req.Header.Add("X-Namespace", namespace)
+			req.Header.Add("X-Organization", organization)
 			res := httptest.NewRecorder()
 			router.ServeHTTP(res, req)
 			require.Equal(t, http.StatusOK, res.Code)
@@ -308,7 +310,7 @@ func TestDocumentRepository(t *testing.T) {
 			if err := documentRepo.writeCustomerDocument(customerID, doc); err != nil {
 				t.Fatal(err)
 			}
-			docs, err = documentRepo.getCustomerDocuments(customerID, namespace)
+			docs, err = documentRepo.getCustomerDocuments(customerID, organization)
 			require.NoError(t, err)
 			require.Len(t, docs, 1)
 

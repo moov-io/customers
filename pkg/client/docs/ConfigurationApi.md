@@ -11,11 +11,11 @@ Method | HTTP request | Description
 
 ## GetConfiguration
 
-> NamespaceConfiguration GetConfiguration(ctx, optional)
+> OrganizationConfiguration GetConfiguration(ctx, optional)
 
 Get Configuration
 
-Retrieve current configuration for the provided namespace.
+Retrieve current configuration for the provided organization.
 
 ### Required Parameters
 
@@ -32,11 +32,11 @@ Optional parameters are passed through a pointer to a GetConfigurationOpts struc
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
-[**NamespaceConfiguration**](NamespaceConfiguration.md)
+[**OrganizationConfiguration**](OrganizationConfiguration.md)
 
 ### Authorization
 
@@ -54,11 +54,11 @@ No authorization required
 
 ## UpdateConfiguration
 
-> NamespaceConfiguration UpdateConfiguration(ctx, namespaceConfiguration, optional)
+> OrganizationConfiguration UpdateConfiguration(ctx, organizationConfiguration, optional)
 
 Update Configuration
 
-Update the configuration for the provided namespace.
+Update the configuration for the provided organization.
 
 ### Required Parameters
 
@@ -66,7 +66,7 @@ Update the configuration for the provided namespace.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**namespaceConfiguration** | [**NamespaceConfiguration**](NamespaceConfiguration.md)|  | 
+**organizationConfiguration** | [**OrganizationConfiguration**](OrganizationConfiguration.md)|  | 
  **optional** | ***UpdateConfigurationOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -77,11 +77,11 @@ Optional parameters are passed through a pointer to a UpdateConfigurationOpts st
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **xNamespace** | **optional.String**| Value used to separate and identify models | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
-[**NamespaceConfiguration**](NamespaceConfiguration.md)
+[**OrganizationConfiguration**](OrganizationConfiguration.md)
 
 ### Authorization
 

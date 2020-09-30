@@ -20,8 +20,8 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		namespace := route.GetNamespace(w, r)
-		if namespace == "" {
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
 			return
 		}
 
@@ -30,7 +30,7 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 			moovhttp.Problem(w, err)
 			return
 		}
-		params.Namespace = namespace
+		params.Organization = organization
 
 		customers, err := repo.searchCustomers(params)
 		if err != nil {
@@ -47,13 +47,13 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 }
 
 type searchParams struct {
-	Namespace string
-	Query     string
-	Email     string
-	Status    string
-	Type      string
-	Skip      int64
-	Count     int64
+	Organization string
+	Query        string
+	Email        string
+	Status       string
+	Type         string
+	Skip         int64
+	Count        int64
 }
 
 func readSearchParams(r *http.Request) (searchParams, error) {
@@ -113,8 +113,8 @@ func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.
 
 func buildSearchQuery(params searchParams) (string, []interface{}) {
 	var args []interface{}
-	query := `select customer_id from customers where deleted_at is null and namespace = ?`
-	args = append(args, params.Namespace)
+	query := `select customer_id from customers where deleted_at is null and organization = ?`
+	args = append(args, params.Organization)
 	if params.Query != "" {
 		query += " and lower(first_name) || \" \" || lower(last_name) LIKE ?"
 		args = append(args, "%"+params.Query+"%")

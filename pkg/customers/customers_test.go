@@ -46,7 +46,7 @@ func (r *testCustomerRepository) getCustomer(customerID string) (*client.Custome
 	return r.customer, nil
 }
 
-func (r *testCustomerRepository) createCustomer(c *client.Customer, namespace string) error {
+func (r *testCustomerRepository) createCustomer(c *client.Customer, organization string) error {
 	r.createdCustomer = c
 	return r.err
 }
@@ -56,7 +56,7 @@ func (r *testCustomerRepository) deleteCustomer(customerID string) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomer(c *client.Customer, namespace string) error {
+func (r *testCustomerRepository) updateCustomer(c *client.Customer, organization string) error {
 	r.customer = c
 	return r.err
 }
@@ -147,13 +147,13 @@ func TestCustomers__GetCustomer(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.CustomerID), nil)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -179,7 +179,7 @@ func TestCustomers__GetCustomerEmpty(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", base.ID()), nil)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -203,7 +203,7 @@ func TestCustomers__DeleteCustomer(t *testing.T) {
 	}
 	customer, _, _ := cr.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t,
-		repo.createCustomer(customer, "namespace"),
+		repo.createCustomer(customer, "organization"),
 	)
 
 	got, err := repo.getCustomer(customer.CustomerID)
@@ -232,7 +232,7 @@ func TestCustomerRepository__createCustomer(t *testing.T) {
 			LastName:  "Doe",
 			Email:     "jane@example.com",
 		}).asCustomer(testCustomerSSNStorage(t))
-		if err := repo.createCustomer(cust, "namespace"); err != nil {
+		if err := repo.createCustomer(cust, "organization"); err != nil {
 			t.Fatal(err)
 		}
 
@@ -261,7 +261,7 @@ func TestCustomers__GetCustomersError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers/foo", nil)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -346,7 +346,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
 	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "birthDate": "1991-04-01", "ssn": "123456789", "type": "individual", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	repo := createTestCustomerRepository(t)
@@ -374,7 +374,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	// sad path
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("POST", "/customers", strings.NewReader("null"))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 	router.ServeHTTP(w, req)
 	w.Flush()
@@ -386,7 +386,7 @@ func TestCustomers__createCustomer(t *testing.T) {
 	// customerSSNStorage sad path
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("POST", "/customers", strings.NewReader(body))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 
 	if r, ok := customerSSNStorage.repo.(*testCustomerSSNRepository); !ok {
 		t.Fatalf("got %T", customerSSNStorage.repo)
@@ -433,7 +433,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	}
 	customer, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t,
-		repo.createCustomer(customer, "namespace"),
+		repo.createCustomer(customer, "organization"),
 	)
 
 	_, err := repo.getCustomer(customer.CustomerID)
@@ -460,7 +460,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	require.NoError(t, err)
 
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s", customer.CustomerID), bytes.NewReader(payload))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 	AddCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
@@ -521,7 +521,7 @@ func TestCustomers__repository(t *testing.T) {
 			},
 		},
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Error(err)
 	}
 	if cust == nil {
@@ -561,7 +561,7 @@ func TestCustomerRepository__delete(t *testing.T) {
 		}
 		cust, _, _ := cr.asCustomer(testCustomerSSNStorage(t))
 		require.NoError(t,
-			repo.createCustomer(cust, "namespace"),
+			repo.createCustomer(cust, "organization"),
 		)
 
 		customers[i] = &customer{
@@ -625,7 +625,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		},
 	}
 	newCust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
-	err := repo.createCustomer(newCust, "namespace")
+	err := repo.createCustomer(newCust, "organization")
 	require.NoError(t, err)
 
 	updateReq := customerRequest{
@@ -647,7 +647,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 	}
 
 	updatedCust, _, _ := updateReq.asCustomer(testCustomerSSNStorage(t))
-	err = repo.updateCustomer(updatedCust, "namespace")
+	err = repo.updateCustomer(updatedCust, "organization")
 	require.NoError(t, err)
 
 	require.Equal(t, newCust.CustomerID, updatedCust.CustomerID)
@@ -668,7 +668,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -696,7 +696,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -733,7 +733,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -741,7 +741,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), body)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -766,7 +766,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("PUT", "/customers/foo/metadata", nil)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router2 := mux.NewRouter()
@@ -788,7 +788,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "namespace"); err != nil {
+	if err := repo.createCustomer(cust, "organization"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -802,7 +802,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), &buf)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -817,7 +817,7 @@ func TestCustomers__replaceCustomerMetadataInvalid(t *testing.T) {
 	// invalid JSON
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), strings.NewReader("{invalid-json"))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router.ServeHTTP(w, req)
@@ -835,7 +835,7 @@ func TestCustomers__replaceCustomerMetadataError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", "/customers/foo/metadata", body)
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -985,7 +985,7 @@ func TestCustomers__minimumFields(t *testing.T) {
 	w := httptest.NewRecorder()
 	body := `{"firstName": "jane", "lastName": "doe", "type": "individual"}`
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	repo := createTestCustomerRepository(t)
@@ -1006,7 +1006,7 @@ func TestCustomers__minimumFields(t *testing.T) {
 func TestCustomers__BadReq(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader("®"))
-	req.Header.Set("x-namespace", "test")
+	req.Header.Set("x-organization", "test")
 	req.Header.Set("x-request-id", "test")
 
 	repo := createTestCustomerRepository(t)

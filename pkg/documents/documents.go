@@ -54,12 +54,12 @@ func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.Handl
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		customerID, namespace := route.GetCustomerID(w, r), route.GetNamespace(w, r)
-		if customerID == "" || namespace == "" {
+		customerID, organization := route.GetCustomerID(w, r), route.GetOrganization(w, r)
+		if customerID == "" || organization == "" {
 			return
 		}
 
-		docs, err := repo.getCustomerDocuments(customerID, namespace)
+		docs, err := repo.getCustomerDocuments(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -86,7 +86,7 @@ func readDocumentType(v string) (string, error) {
 func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFactory storage.BucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
-		// TODO(adam): should we store x-namespace along with the Document?
+		// TODO(adam): should we store x-organization along with the Document?
 
 		documentType, err := readDocumentType(r.URL.Query().Get("type"))
 		if err != nil {
@@ -230,7 +230,7 @@ func makeDocumentKey(customerID, documentId string) string {
 }
 
 type DocumentRepository interface {
-	getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error)
+	getCustomerDocuments(customerID string, organization string) ([]*client.Document, error)
 	writeCustomerDocument(customerID string, doc *client.Document) error
 	deleteCustomerDocument(customerID string, documentID string) error
 }
@@ -246,16 +246,16 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 		logger: logger,
 	}
 }
-func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, namespace string) ([]*client.Document, error) {
+func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
 	query := `select document_id, documents.type, content_type, uploaded_at from documents join customers on customers.
-	namespace = ? where documents.customer_id = ? and documents.deleted_at is null`
+	organization = ? where documents.customer_id = ? and documents.deleted_at is null`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: prepare %v", err)
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(namespace, customerID)
+	rows, err := stmt.Query(organization, customerID)
 	if err != nil {
 		return nil, fmt.Errorf("getCustomerDocuments: query %v", err)
 	}

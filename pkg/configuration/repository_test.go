@@ -17,9 +17,9 @@ func TestRepository(t *testing.T) {
 	t.Parallel()
 
 	check := func(t *testing.T, repo *sqlRepo) {
-		namespace := base.ID()
+		organization := base.ID()
 
-		cfg, err := repo.Get(namespace)
+		cfg, err := repo.Get(organization)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -29,19 +29,19 @@ func TestRepository(t *testing.T) {
 		}
 
 		customerID, accountID := base.ID(), base.ID()
-		writeCustomerAndAccount(t, repo.db, namespace, customerID, accountID)
+		writeCustomerAndAccount(t, repo.db, organization, customerID, accountID)
 
 		// write config
-		cfg = &client.NamespaceConfiguration{
+		cfg = &client.OrganizationConfiguration{
 			LegalEntity:    customerID,
 			PrimaryAccount: accountID,
 		}
-		if _, err := repo.Update(namespace, cfg); err != nil {
+		if _, err := repo.Update(organization, cfg); err != nil {
 			t.Fatal(err)
 		}
 
 		// verify
-		cfg, err = repo.Get(namespace)
+		cfg, err = repo.Get(organization)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -62,15 +62,15 @@ func sqliteRepo(t *testing.T) *sqlRepo {
 	return &sqlRepo{db: db.DB}
 }
 
-func writeCustomerAndAccount(t *testing.T, db *sql.DB, namespace string, customerID, accountID string) {
+func writeCustomerAndAccount(t *testing.T, db *sql.DB, organization string, customerID, accountID string) {
 	// TODO(adam): replace after customers/acconts Repository are moved to ./pkg/
-	query := `insert into customers (customer_id, namespace, first_name, last_name) values (?, ?, ?, ?);`
+	query := `insert into customers (customer_id, organization, first_name, last_name) values (?, ?, ?, ?);`
 	stmt, err := db.Prepare(query)
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer stmt.Close()
-	if _, err := stmt.Exec(customerID, namespace, "jane", "doe"); err != nil {
+	if _, err := stmt.Exec(customerID, organization, "jane", "doe"); err != nil {
 		t.Fatal(err)
 	}
 
