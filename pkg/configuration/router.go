@@ -7,6 +7,7 @@ package configuration
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -34,6 +35,9 @@ var (
 		"image/gif":     ".gif",
 		"image/png":     ".png",
 	}
+
+	errMissingFile     = errors.New("expected multipart upload with key of 'file'")
+	errUnsupportedType = fmt.Errorf("image MIME type must be one of %s", strings.Join(supportedContentTypes(), ","))
 )
 
 // returns a list of supported MIME types from contentTypeFileExtensions
@@ -111,9 +115,8 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 
 		file, _, err := r.FormFile("file")
 		if file == nil || err != nil {
-			msg := "expected multipart upload with key of 'file'"
-			logger.Log("configuration", msg, "error", err, "organization", organization, "requestID", requestID)
-			moovhttp.Problem(w, fmt.Errorf("%s error=%v", msg, err))
+			logger.Log("configuration", errMissingFile, "error", err, "organization", organization, "requestID", requestID)
+			moovhttp.Problem(w, errMissingFile)
 			return
 		}
 		defer file.Close()
@@ -130,7 +133,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 		ext, supported := contentTypeFileExtensions[contentType]
 		if !supported {
 			logger.Log("configuration", "unsupported content type for logo image file", "error", err, "contentType", contentType, "organization", organization, "requestID", requestID)
-			moovhttp.Problem(w, fmt.Errorf("image MIME type must be one of %s", strings.Join(supportedContentTypes(), ",")))
+			moovhttp.Problem(w, errUnsupportedType)
 			return
 		}
 
