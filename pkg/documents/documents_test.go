@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -41,6 +40,10 @@ type testDocumentRepository struct {
 	err       error
 
 	written *client.Document
+}
+
+func (r *testDocumentRepository) exists(customerID string, documentID string, organization string) (bool, error) {
+	return false, r.err
 }
 
 func (r *testDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
@@ -101,8 +104,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	w.Flush()
 
 	if w.Code != http.StatusOK {
-		b, _ := ioutil.ReadAll(w.Body)
-		t.Errorf("bogus status code: %d - %s", w.Code, string(b))
+		t.Errorf("bogus status code: %d\n%s", w.Code, w.Body.String())
 	}
 }
 
@@ -190,12 +192,27 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	if w.Code != http.StatusFound {
+	if w.Code != http.StatusBadRequest {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
-	if loc := w.Header().Get("Location"); !strings.Contains(loc, makeDocumentKey("foo", doc.DocumentID)) {
-		t.Errorf("unexpected SignedURL: %s", loc)
+}
+
+func TestDocuments__retrieveError(t *testing.T) {
+	repo := &testDocumentRepository{
+		err: errors.New("bad error"),
 	}
+
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+
+	customerID, documentID := base.ID(), base.ID()
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/documents/%s", customerID, documentID), nil)
+	req.Header.Set("X-Organization", base.ID())
+	router.ServeHTTP(w, req)
+
+	require.Equal(t, http.StatusNotFound, w.Code)
 }
 
 func TestDocuments__delete(t *testing.T) {
@@ -226,7 +243,6 @@ func TestDocuments__delete(t *testing.T) {
 	row := db.DB.QueryRow("SELECT COUNT(*) FROM documents where deleted_at is null")
 	require.NoError(t, row.Scan(&count))
 	require.Equal(t, 0, count)
-
 }
 
 func TestDocuments__uploadCustomerDocument(t *testing.T) {
@@ -253,8 +269,10 @@ func TestDocuments__uploadCustomerDocument(t *testing.T) {
 }
 
 func TestDocuments__makeDocumentKey(t *testing.T) {
-	if v := makeDocumentKey("a", "b"); v != "customer-a-document-b" {
-		t.Errorf("got %q", v)
+	key := makeDocumentKey("a", "b")
+
+	if key != "customers/a/documents/b" {
+		t.Errorf("got %q", key)
 	}
 }
 
@@ -316,6 +334,11 @@ func TestDocumentRepository(t *testing.T) {
 
 			require.Equal(t, doc.DocumentID, docs[0].DocumentID)
 			require.Equal(t, "image/png", docs[0].ContentType)
+
+			// make sure we read the document
+			exists, err := documentRepo.exists(customerID, doc.DocumentID, organization)
+			require.Equal(t, true, exists)
+			require.NoError(t, err)
 		})
 	}
 }
@@ -373,4 +396,9 @@ func TestDocumentsRepository__Delete(t *testing.T) {
 		_, ok := deletedDocIDs[doc.DocumentID]
 		require.Equal(t, doc.deleted, ok)
 	}
+
+	// make sure we find the document as deleted
+	exists, err := repo.exists(customerID, docs[0].DocumentID, "")
+	require.Equal(t, false, exists)
+	require.Equal(t, err, sql.ErrNoRows)
 }
