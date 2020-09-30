@@ -151,6 +151,10 @@ PRAGMA foreign_keys=on;`,
 			"rename_customers_namespace_to_organization",
 			`alter table customers rename column namespace to organization;`,
 		),
+		execsql(
+			"add_logo_file__to__organization_configuration",
+			"alter table organization_configuration add column logo_file varchar(80)",
+		),
 	)
 )
 

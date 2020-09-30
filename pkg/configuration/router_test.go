@@ -8,12 +8,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/documents/storage"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -21,19 +23,21 @@ import (
 )
 
 func TestRouterGet(t *testing.T) {
+	org := "moov"
 	repo := &mockRepository{
 		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
 			PrimaryAccount: base.ID(),
+			LogoFile:       fmt.Sprintf("%s-logo.jpg", org),
 		},
 	}
 
 	req := httptest.NewRequest("GET", "/configuration/customers", nil)
-	req.Header.Set("X-Organization", "moov")
+	req.Header.Set("X-Organization", org)
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo)
+	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -49,6 +53,9 @@ func TestRouterGet(t *testing.T) {
 	if response.PrimaryAccount == "" {
 		t.Errorf("PrimaryAccount=%q", response.PrimaryAccount)
 	}
+	if response.LogoFile == "" {
+		t.Errorf("LogoFile=%q", response.LogoFile)
+	}
 }
 
 func TestRouterGetErr(t *testing.T) {
@@ -61,7 +68,7 @@ func TestRouterGetErr(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo)
+	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -80,7 +87,7 @@ func TestRouterGetMissing(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo)
+	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -88,10 +95,12 @@ func TestRouterGetMissing(t *testing.T) {
 }
 
 func TestRouterUpdate(t *testing.T) {
+	org := "moov"
 	repo := &mockRepository{
 		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
 			PrimaryAccount: base.ID(),
+			LogoFile:       fmt.Sprintf("%s-logo.jpg", org),
 		},
 	}
 
@@ -102,11 +111,11 @@ func TestRouterUpdate(t *testing.T) {
 	})
 
 	req := httptest.NewRequest("PUT", "/configuration/customers", &body)
-	req.Header.Set("X-Organization", "moov")
+	req.Header.Set("X-Organization", org)
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo)
+	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -121,6 +130,9 @@ func TestRouterUpdate(t *testing.T) {
 	}
 	if response.PrimaryAccount == "" {
 		t.Errorf("PrimaryAccount=%q", response.PrimaryAccount)
+	}
+	if response.LogoFile == "" {
+		t.Errorf("LogoFile=%q", response.LogoFile)
 	}
 }
 
@@ -140,7 +152,7 @@ func TestRouterUpdateErr(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo)
+	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -165,7 +177,7 @@ func TestRouterUpdateMissing(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo)
+	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 

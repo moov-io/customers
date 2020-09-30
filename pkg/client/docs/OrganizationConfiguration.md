@@ -6,6 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **LegalEntity** | **string** | customerID of legal entity for this Organization | 
 **PrimaryAccount** | **string** | accountID of funding/source account for this Organization | 
+**LogoFile** | **string** | logo image file for this Organization | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

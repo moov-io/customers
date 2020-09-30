@@ -6,6 +6,7 @@ package configuration
 
 import (
 	"database/sql"
+	"fmt"
 	"testing"
 
 	"github.com/moov-io/base"
@@ -23,18 +24,20 @@ func TestRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if cfg.LegalEntity != "" || cfg.PrimaryAccount != "" {
+		if cfg.LegalEntity != "" || cfg.PrimaryAccount != "" || cfg.LogoFile != "" {
 			t.Errorf("unexpected legal entity: %q", cfg.LegalEntity)
 			t.Errorf("unexpected primary account: %q", cfg.PrimaryAccount)
+			t.Errorf("unexpected logo file name: %q", cfg.LogoFile)
 		}
 
-		customerID, accountID := base.ID(), base.ID()
+		customerID, accountID, organizationID := base.ID(), base.ID(), base.ID()
 		writeCustomerAndAccount(t, repo.db, organization, customerID, accountID)
 
 		// write config
 		cfg = &client.OrganizationConfiguration{
 			LegalEntity:    customerID,
 			PrimaryAccount: accountID,
+			LogoFile:       fmt.Sprintf("%s-logo.png", organizationID),
 		}
 		if _, err := repo.Update(organization, cfg); err != nil {
 			t.Fatal(err)
@@ -45,9 +48,10 @@ func TestRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if cfg.LegalEntity == "" || cfg.PrimaryAccount == "" {
+		if cfg.LegalEntity == "" || cfg.PrimaryAccount == "" || cfg.LogoFile == "" {
 			t.Errorf("expected legal entity: %q", cfg.LegalEntity)
 			t.Errorf("expected primary account: %q", cfg.PrimaryAccount)
+			t.Errorf("expected logo file name: %q", cfg.LogoFile)
 		}
 	}
 

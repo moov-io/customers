@@ -86,6 +86,53 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /configuration/logo:
+    put:
+      tags: [Configuration]
+      summary: Upload organization's logo
+      description: Update the organization's configuration to include a logo image file.
+      operationId: uploadOrganizationLogo
+      parameters:
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: Logo image file to be uploaded
+                  type: string
+                  format: binary
+              required:
+                - file
+            encoding:
+              file:
+                contentType: image/jpeg, image/svg+xml, image/gif, image/png
+      responses:
+        '201':
+          description: Logo image file was successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConfiguration'
+        '200':
+          description: Existing logo image file was successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConfiguration'
+        '400':
+          description: Configuration was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers:
     get:
       tags: [Customers]
@@ -1437,6 +1484,10 @@ components:
           type: string
           example: f6eddffd
           description: accountID of funding/source account for this Organization
+        logoFile:
+          type: string
+          example: c3f721d.png
+          description: logo image file for this Organization
       required:
         - legalEntity
         - primaryAccount

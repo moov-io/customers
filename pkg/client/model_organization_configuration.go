@@ -15,4 +15,6 @@ type OrganizationConfiguration struct {
 	LegalEntity string `json:"legalEntity"`
 	// accountID of funding/source account for this Organization
 	PrimaryAccount string `json:"primaryAccount"`
+	// logo image file for this Organization
+	LogoFile string `json:"logoFile,omitempty"`
 }

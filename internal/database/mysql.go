@@ -148,6 +148,10 @@ var (
 			"rename_organization_configuration__namespace_to_organization",
 			`alter table organization_configuration rename column namespace to organization;`,
 		),
+		execsql(
+			"add_logo_file__to__organization_configuration",
+			"alter table organization_configuration add column logo_file varchar(80)",
+		),
 	)
 )
 

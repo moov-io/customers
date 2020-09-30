@@ -25,8 +25,9 @@ type sqlRepo struct {
 	db *sql.DB
 }
 
+// Get returns the requested organization configuration, or an empty config if the org doesn't exist
 func (r *sqlRepo) Get(organization string) (*client.OrganizationConfiguration, error) {
-	query := `select legal_entity, primary_account from organization_configuration
+	query := `select legal_entity, primary_account, logo_file from organization_configuration
 where organization = ? limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -35,7 +36,7 @@ where organization = ? limit 1;`
 	defer stmt.Close()
 
 	var cfg client.OrganizationConfiguration
-	if err := stmt.QueryRow(organization).Scan(&cfg.LegalEntity, &cfg.PrimaryAccount); err != nil {
+	if err := stmt.QueryRow(organization).Scan(&cfg.LegalEntity, &cfg.PrimaryAccount, &cfg.LogoFile); err != nil {
 		if err == sql.ErrNoRows {
 			return &cfg, nil // nothing found, return an empty config
 		}
@@ -44,19 +45,20 @@ where organization = ? limit 1;`
 	return &cfg, nil
 }
 
+// Update updates the requested organization's configuration or inserts a new one if the organization doesn't already have a configuration stored
 func (r *sqlRepo) Update(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
 	if err := r.verifyCustomerInfo(organization, cfg); err != nil {
 		return nil, errors.New("organization: customerID or accountID does not belong")
 	}
 
-	query := `replace into organization_configuration (organization, legal_entity, primary_account) values (?, ?, ?);`
+	query := `replace into organization_configuration (organization, legal_entity, primary_account, logo_file) values (?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("organization update: %v", err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(organization, cfg.LegalEntity, cfg.PrimaryAccount)
+	_, err = stmt.Exec(organization, cfg.LegalEntity, cfg.PrimaryAccount, cfg.LogoFile)
 	return cfg, err
 }
 

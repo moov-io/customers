@@ -92,6 +92,58 @@ paths:
       summary: Update Configuration
       tags:
       - Configuration
+  /configuration/logo:
+    put:
+      description: Update the organization's configuration to include a logo image
+        file.
+      operationId: uploadOrganizationLogo
+      parameters:
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Organization
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          multipart/form-data:
+            encoding:
+              file:
+                contentType: image/jpeg, image/svg+xml, image/gif, image/png
+                style: form
+            schema:
+              properties:
+                file:
+                  description: Logo image file to be uploaded
+                  format: binary
+                  type: string
+              required:
+              - file
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConfiguration'
+          description: Logo image file was successfully created
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConfiguration'
+          description: Existing logo image file was successfully updated
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Configuration was not updated, see error(s)
+      summary: Upload organization's logo
+      tags:
+      - Configuration
   /customers:
     get:
       description: Search for customers using different filter parameters
@@ -1731,6 +1783,7 @@ components:
   schemas:
     OrganizationConfiguration:
       example:
+        logoFile: c3f721d.png
         primaryAccount: f6eddffd
         legalEntity: 5c20933f
       properties:
@@ -1741,6 +1794,10 @@ components:
         primaryAccount:
           description: accountID of funding/source account for this Organization
           example: f6eddffd
+          type: string
+        logoFile:
+          description: logo image file for this Organization
+          example: c3f721d.png
           type: string
       required:
       - legalEntity

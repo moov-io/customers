@@ -120,6 +120,7 @@ func main() {
 		cloudProvider = "file"
 	}
 	signer := setupStorageBucket(logger, bucketName, cloudProvider)
+	bucket := storage.GetBucket(bucketName, cloudProvider, signer)
 
 	// Create our Watchman client
 	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
@@ -173,12 +174,12 @@ func main() {
 	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
-	documents.AddDocumentRoutes(logger, router, documentRepo, storage.GetBucket(bucketName, cloudProvider, signer))
+	documents.AddDocumentRoutes(logger, router, documentRepo, bucket)
 	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)
-	configuration.RegisterRoutes(logger, router, configRepo)
+	configuration.RegisterRoutes(logger, router, configRepo, bucket)
 
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
