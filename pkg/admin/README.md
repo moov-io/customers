@@ -37,16 +37,13 @@ Class | Method | HTTP request | Description
 *AdminApi* | [**GetLivenessProbes**](docs/AdminApi.md#getlivenessprobes) | **Get** /live | Get Liveness Probes
 *AdminApi* | [**GetVersion**](docs/AdminApi.md#getversion) | **Get** /version | Get Version
 *CustomersApi* | [**CreateCustomerDisclaimer**](docs/CustomersApi.md#createcustomerdisclaimer) | **Post** /customers/{customerID}/disclaimers | Create disclaimer
-*CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer status
 
 
 ## Documentation For Models
 
  - [CreateUserDisclaimer](docs/CreateUserDisclaimer.md)
- - [CustomerStatus](docs/CustomerStatus.md)
  - [Error](docs/Error.md)
  - [LivenessProbes](docs/LivenessProbes.md)
- - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
 
 
 ## Documentation For Authorization

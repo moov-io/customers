@@ -10,16 +10,31 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	moovhttp "github.com/moov-io/base/http"
+	watchmanClient "github.com/moov-io/watchman/client"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/watchman"
-	watchmanClient "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+)
+
+var (
+	ofacMatchThreshold float32 = func() float32 {
+		if v := os.Getenv("OFAC_MATCH_THRESHOLD"); v != "" {
+			f, err := strconv.ParseFloat(v, 32)
+			if err == nil && f > 0.00 {
+				return float32(f)
+			}
+		}
+		return 0.99 // default, 99%
+	}()
 )
 
 type ofacSearchResult struct {
