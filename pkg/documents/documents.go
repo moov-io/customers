@@ -187,13 +187,13 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 		if customerID == "" || documentID == "" {
 			return
 		}
-		namespace := route.GetNamespace(w, r)
-		if namespace == "" {
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
 			return
 		}
 
 		// reject the request if the document is deleted
-		if exists, err := repo.exists(customerID, documentID, namespace); !exists || err != nil {
+		if exists, err := repo.exists(customerID, documentID, organization); !exists || err != nil {
 			if err != nil {
 				logger.Log("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID, "documentID", documentID)
 			}
@@ -256,7 +256,7 @@ func makeDocumentKey(customerID, documentID string) string {
 }
 
 type DocumentRepository interface {
-	exists(customerID string, documentID string, namespace string) (bool, error)
+	exists(customerID string, documentID string, organization string) (bool, error)
 	getCustomerDocuments(customerID string, organization string) ([]*client.Document, error)
 
 	writeCustomerDocument(customerID string, doc *client.Document) error
@@ -275,9 +275,9 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 	}
 }
 
-func (r *sqlDocumentRepository) exists(customerID string, documentID string, namespace string) (bool, error) {
+func (r *sqlDocumentRepository) exists(customerID string, documentID string, organization string) (bool, error) {
 	query := `select documents.document_id from documents
-inner join customers on customers.namespace = ? where documents.customer_id = ? and documents.document_id = ? and documents.deleted_at is null
+inner join customers on customers.organization = ? where documents.customer_id = ? and documents.document_id = ? and documents.deleted_at is null
 limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -286,7 +286,7 @@ limit 1;`
 	defer stmt.Close()
 
 	var docID string
-	if err := stmt.QueryRow(namespace, customerID, documentID).Scan(&docID); err != nil {
+	if err := stmt.QueryRow(organization, customerID, documentID).Scan(&docID); err != nil {
 		return false, err
 	}
 	return documentID == docID, nil

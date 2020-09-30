@@ -42,7 +42,7 @@ type testDocumentRepository struct {
 	written *client.Document
 }
 
-func (r *testDocumentRepository) exists(customerID string, documentID string, namespace string) (bool, error) {
+func (r *testDocumentRepository) exists(customerID string, documentID string, organization string) (bool, error) {
 	return false, r.err
 }
 
@@ -209,7 +209,7 @@ func TestDocuments__retrieveError(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/documents/%s", customerID, documentID), nil)
-	req.Header.Set("X-Namespace", base.ID())
+	req.Header.Set("X-Organization", base.ID())
 	router.ServeHTTP(w, req)
 
 	require.Equal(t, http.StatusNotFound, w.Code)
@@ -336,7 +336,7 @@ func TestDocumentRepository(t *testing.T) {
 			require.Equal(t, "image/png", docs[0].ContentType)
 
 			// make sure we read the document
-			exists, err := documentRepo.exists(customerID, doc.DocumentID, namespace)
+			exists, err := documentRepo.exists(customerID, doc.DocumentID, organization)
 			require.Equal(t, true, exists)
 			require.NoError(t, err)
 		})
