@@ -277,7 +277,8 @@ func NewDocumentRepo(logger log.Logger, db *sql.DB) DocumentRepository {
 
 func (r *sqlDocumentRepository) exists(customerID string, documentID string, organization string) (bool, error) {
 	query := `select documents.document_id from documents
-inner join customers on customers.organization = ? where documents.customer_id = ? and documents.document_id = ? and documents.deleted_at is null
+inner join customers on customers.organization = ?
+where documents.customer_id = ? and documents.document_id = ? and documents.deleted_at is null
 limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -293,8 +294,9 @@ limit 1;`
 }
 
 func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
-	query := `select document_id, documents.type, content_type, uploaded_at from documents inner join customers on customers.
-	organization = ? where documents.customer_id = ? and documents.deleted_at is null;`
+	query := `select document_id, documents.type, content_type, uploaded_at from documents
+inner join customers on customers.customer_id = documents.customer_id
+where customers.organization = ? and documents.customer_id = ? and documents.deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("prepare listing documents: %v", err)
