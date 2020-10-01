@@ -293,8 +293,8 @@ limit 1;`
 }
 
 func (r *sqlDocumentRepository) getCustomerDocuments(customerID string, organization string) ([]*client.Document, error) {
-	query := `select document_id, documents.type, content_type, uploaded_at from documents join customers on customers.
-	organization = ? where documents.customer_id = ? and documents.deleted_at is null`
+	query := `select document_id, documents.type, content_type, uploaded_at from documents inner join customers on customers.
+	organization = ? where documents.customer_id = ? and documents.deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("prepare listing documents: %v", err)
