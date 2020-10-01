@@ -6,6 +6,7 @@ package configuration
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -14,6 +15,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/pkg/client"
@@ -71,8 +73,7 @@ func getOrganizationConfig(logger log.Logger, repo Repository) http.HandlerFunc 
 			moovhttp.Problem(w, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(cfg)
+		respondWithJSON(w, http.StatusOK, cfg)
 	}
 }
 
@@ -95,8 +96,7 @@ func updateOrganizationConfig(logger log.Logger, repo Repository) http.HandlerFu
 			moovhttp.Problem(w, err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(cfg)
+		respondWithJSON(w, http.StatusOK, cfg)
 	}
 }
 
@@ -130,7 +130,7 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 		}
 		defer bucket.Close()
 
-		rdr, err := bucket.NewReader(r.Context(), cfg.LogoFile, nil)
+		rdr, err := bucket.NewReader(r.Context(), makeDocumentKey(organization, cfg.LogoFile), nil)
 		if err != nil {
 			logger.Log("configuration", "problem reading logo file from storage bucket", "error", err, "organization", organization, "logoFile", cfg.LogoFile, "requestID", requestID)
 			moovhttp.Problem(w, err)
@@ -184,14 +184,21 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 			return
 		}
 
-		orgCfg, err := repo.Get(organization)
+		originalConfig, err := repo.Get(organization)
 		if err != nil {
 			logger.Log("configuration", "error retrieving organization configuration", "error", err, "organization", organization, "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
-		replaceExisting := (orgCfg.LogoFile != "") // keep track so we can return appropriate HTTP status code
-		orgCfg.LogoFile = makeDocumentKey(organization, fmt.Sprintf("organization-%s-logo%s", organization, ext))
+		replaceExisting := (originalConfig.LogoFile != "") // keep track so we can return appropriate HTTP status code
+		originalConfig.LogoFile = fmt.Sprintf("organization-%s-logo%s", organization, ext)
+
+		updatedCfg, err := repo.Update(organization, originalConfig)
+		if err != nil {
+			logger.Log("configuration", "problem updating configuration", "error", err, "organization", organization, "requestID", requestID)
+			moovhttp.Problem(w, err)
+			return
+		}
 
 		bucket, err := bucketFactory()
 		if err != nil {
@@ -201,7 +208,11 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 		}
 		defer bucket.Close()
 
-		writer, err := bucket.NewWriter(r.Context(), orgCfg.LogoFile, &blob.WriterOptions{
+		// Write our document from the request body
+		ctx, cancelFn := context.WithTimeout(r.Context(), 60*time.Second)
+		defer cancelFn()
+
+		writer, err := bucket.NewWriter(ctx, makeDocumentKey(organization, updatedCfg.LogoFile), &blob.WriterOptions{
 			ContentDisposition: "inline",
 			ContentType:        contentType,
 		})
@@ -219,20 +230,18 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 			return
 		}
 
-		updatedCfg, err := repo.Update(organization, orgCfg)
-		if err != nil {
-			logger.Log("configuration", "problem updating configuration", "error", err, "organization", organization, "requestID", requestID)
-			moovhttp.Problem(w, err)
-			return
-		}
-
 		status := http.StatusCreated // respond with 201 if the resource didn't previously exist and was successfully created
 		if replaceExisting {
 			status = http.StatusOK // status ok if the the resource already existed and was successfully modified
 		}
-		w.WriteHeader(status)
-		json.NewEncoder(w).Encode(updatedCfg)
+		respondWithJSON(w, status, updatedCfg)
 	}
+}
+
+func respondWithJSON(w http.ResponseWriter, status int, body interface{}) {
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(body)
 }
 
 func makeDocumentKey(organization string, docID string) string {

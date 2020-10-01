@@ -85,7 +85,6 @@ func fileBucket(ctx context.Context, logger log.Logger, bucketName string, signe
 	if err := os.Mkdir(bucketName, 0777); strings.Contains(bucketName, "..") || (err != nil && !os.IsExist(err)) {
 		return nil, fmt.Errorf("problem creating %s error=%v", bucketName, err)
 	}
-	logger.Log("storage", fmt.Sprintf("created %s for file bucket", bucketName))
 	return fileblob.OpenBucket(bucketName, &fileblob.Options{
 		URLSigner: signer,
 	})
