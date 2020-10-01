@@ -299,10 +299,9 @@ func TestDocumentRepository(t *testing.T) {
 			documentRepo := NewDocumentRepo(logger, tc.db)
 			customerRepo := customers.NewCustomerRepo(logger, tc.db)
 			organization := "test"
-			customerID := base.ID()
 
 			// check empty docs
-			docs, err := documentRepo.getCustomerDocuments(customerID, organization)
+			docs, err := documentRepo.getCustomerDocuments(base.ID(), organization)
 			require.NoError(t, err)
 			require.Empty(t, docs)
 
@@ -319,16 +318,21 @@ func TestDocumentRepository(t *testing.T) {
 			router.ServeHTTP(res, req)
 			require.Equal(t, http.StatusOK, res.Code)
 
+			var cust client.Customer
+			if err := json.NewDecoder(res.Body).Decode(&cust); err != nil {
+				t.Fatal(err)
+			}
+
 			// Write a Document and read it back
 			doc := &client.Document{
 				DocumentID:  base.ID(),
 				Type:        "DriversLicense",
 				ContentType: "image/png",
 			}
-			if err := documentRepo.writeCustomerDocument(customerID, doc); err != nil {
+			if err := documentRepo.writeCustomerDocument(cust.CustomerID, doc); err != nil {
 				t.Fatal(err)
 			}
-			docs, err = documentRepo.getCustomerDocuments(customerID, organization)
+			docs, err = documentRepo.getCustomerDocuments(cust.CustomerID, organization)
 			require.NoError(t, err)
 			require.Len(t, docs, 1)
 
@@ -336,7 +340,7 @@ func TestDocumentRepository(t *testing.T) {
 			require.Equal(t, "image/png", docs[0].ContentType)
 
 			// make sure we read the document
-			exists, err := documentRepo.exists(customerID, doc.DocumentID, organization)
+			exists, err := documentRepo.exists(cust.CustomerID, doc.DocumentID, organization)
 			require.Equal(t, true, exists)
 			require.NoError(t, err)
 		})
