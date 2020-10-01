@@ -165,7 +165,7 @@ func main() {
 		Repo: accountsRepo, WatchmanClient: watchmanClient,
 	}
 
-	bucket := storage.GetBucket(logger, os.Getenv("DOCUMENTS_BUCKET"), util.Or(os.Getenv("DOCUMENTS_PROVIDER"), "file"), signer)
+	bucket := storage.GetBucket(logger, util.Or(os.Getenv("DOCUMENTS_BUCKET"), "./storage"), util.Or(os.Getenv("DOCUMENTS_PROVIDER"), "file"), signer)
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()
