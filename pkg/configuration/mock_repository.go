@@ -21,7 +21,7 @@ func (r *mockRepository) Get(organization string) (*client.OrganizationConfigura
 	return r.cfg, nil
 }
 
-func (r *mockRepository) Update(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
+func (r *mockRepository) Upsert(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
 	if r.err != nil {
 		var cfg client.OrganizationConfiguration
 		return &cfg, r.err

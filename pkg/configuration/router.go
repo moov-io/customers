@@ -92,7 +92,7 @@ func updateOrganizationConfig(logger log.Logger, repo Repository) http.HandlerFu
 			moovhttp.Problem(w, err)
 			return
 		}
-		cfg, err := repo.Update(organization, &body)
+		cfg, err := repo.Upsert(organization, &body)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -195,10 +195,10 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 			moovhttp.Problem(w, err)
 			return
 		}
-		replaceExisting := (originalConfig.LogoFile != "") // keep track so we can return appropriate HTTP status code
+		wasUpsertd := (originalConfig.LogoFile != "") // keep track so we can return appropriate HTTP status code
 		originalConfig.LogoFile = fmt.Sprintf("organization-%s-logo%s", organization, ext)
 
-		updatedCfg, err := repo.Update(organization, originalConfig)
+		updatedCfg, err := repo.Upsert(organization, originalConfig)
 		if err != nil {
 			logger.Log("configuration", "problem updating configuration", "error", err, "organization", organization, "requestID", requestID)
 			moovhttp.Problem(w, err)
@@ -236,7 +236,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 		}
 
 		status := http.StatusCreated // respond with 201 if the resource didn't previously exist and was successfully created
-		if replaceExisting {
+		if wasUpsertd {
 			status = http.StatusOK // status ok if the the resource already existed and was successfully modified
 		}
 		respondWithJSON(w, status, updatedCfg)

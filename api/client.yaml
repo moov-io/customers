@@ -90,7 +90,7 @@ paths:
     get:
       tags: [Configuration]
       summary: Retreive an organization's logo
-      description: Retrieve a previously-uploaded logo image from an organization configuration
+      description: Retrieve a logo file from the organization's configuration
       operationId: getOrganizationLogo
       parameters:
         - name: X-Organization

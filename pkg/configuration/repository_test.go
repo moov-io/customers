@@ -39,7 +39,7 @@ func TestRepository(t *testing.T) {
 			PrimaryAccount: accountID,
 			LogoFile:       fmt.Sprintf("%s-logo.png", organizationID),
 		}
-		if _, err := repo.Update(organization, cfg); err != nil {
+		if _, err := repo.Upsert(organization, cfg); err != nil {
 			t.Fatal(err)
 		}
 

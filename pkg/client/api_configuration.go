@@ -113,7 +113,7 @@ func (a *ConfigurationApiService) GetConfiguration(ctx _context.Context, localVa
 
 /*
 GetOrganizationLogo Retreive an organization's logo
-Retrieve a previously-uploaded logo image from an organization configuration
+Retrieve a logo file from the organization&#39;s configuration
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param xOrganization Value used to separate and identify models
 @return *os.File

@@ -60,7 +60,7 @@ No authorization required
 
 Retreive an organization's logo
 
-Retrieve a previously-uploaded logo image from an organization configuration
+Retrieve a logo file from the organization's configuration
 
 ### Required Parameters
 
