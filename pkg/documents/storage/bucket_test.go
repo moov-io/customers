@@ -8,15 +8,17 @@ import (
 	"context"
 	"io/ioutil"
 	"testing"
+
+	"github.com/go-kit/kit/log"
 )
 
 func TestBucket__openBucket(t *testing.T) {
 	// test the invalid cases
-	bucket, err := openBucket(context.TODO(), "", "", nil)
+	bucket, err := openBucket(context.TODO(), log.NewNopLogger(), "", "", nil)
 	if bucket != nil || err == nil {
 		t.Errorf("expected error: bucket=%v error=%v", bucket, err)
 	}
-	bucket, err = openBucket(context.TODO(), "", "other", nil)
+	bucket, err = openBucket(context.TODO(), log.NewNopLogger(), "", "other", nil)
 	if bucket != nil || err == nil {
 		t.Errorf("expected error: bucket=%v error=%v", bucket, err)
 	}
@@ -30,7 +32,7 @@ func TestBucket__GetBucket(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	bucket, err := GetBucket(dir, "file", signer)()
+	bucket, err := GetBucket(log.NewNopLogger(), dir, "file", signer)()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,20 +41,20 @@ func TestBucket__GetBucket(t *testing.T) {
 	}
 
 	// error case
-	if _, err := GetBucket("", "", nil)(); err == nil {
+	if _, err := GetBucket(log.NewNopLogger(), "", "", nil)(); err == nil {
 		t.Fatal("expected error")
 	}
 }
 
 func TestBucketAWS(t *testing.T) {
-	bucket, err := openBucket(context.TODO(), "", "aws", nil)
+	bucket, err := openBucket(context.TODO(), log.NewNopLogger(), "", "aws", nil)
 	if err == nil || bucket != nil {
 		t.Errorf("expected error bucket=%v", bucket)
 	}
 }
 
 func TestBucketGCP(t *testing.T) {
-	bucket, err := openBucket(context.TODO(), "", "gcp", nil)
+	bucket, err := openBucket(context.TODO(), log.NewNopLogger(), "", "gcp", nil)
 	if err == nil || bucket != nil {
 		t.Errorf("expected error bucket=%v", bucket)
 	}

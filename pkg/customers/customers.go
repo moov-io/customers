@@ -443,7 +443,7 @@ func (r *sqlCustomerRepository) createCustomer(c *client.Customer, organization 
 	}
 
 	// Insert customer record
-	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified, 
+	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified,
 	organization)
 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
@@ -485,7 +485,7 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 		return err
 	}
 
-	query := `update customers set first_name = ?, middle_name = ?, last_name = ?, nick_name = ?, suffix = ?, type = ?, birth_date = ?, status = ?, email =?, 
+	query := `update customers set first_name = ?, middle_name = ?, last_name = ?, nick_name = ?, suffix = ?, type = ?, birth_date = ?, status = ?, email =?,
 	last_modified = ?,
 	organization = ? where customer_id = ? and deleted_at is null;`
 	stmt, err := tx.Prepare(query)
@@ -544,7 +544,7 @@ func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID 
 }
 
 func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customerID string, addresses []client.CustomerAddress) error {
-	query := `replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, 
+	query := `replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?,
 	?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -765,7 +765,7 @@ func (r *sqlCustomerRepository) addCustomerAddress(customerID string, req addres
 }
 
 func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID string, req updateCustomerAddressRequest) error {
-	query := `update customers_addresses set type = ?, address1 = ?, address2 = ?, city = ?, state = ?, postal_code = ?, country = ?, 
+	query := `update customers_addresses set type = ?, address1 = ?, address2 = ?, city = ?, state = ?, postal_code = ?, country = ?,
 	validated = ? where customer_id = ? and address_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

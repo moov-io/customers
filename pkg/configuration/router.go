@@ -12,6 +12,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"path"
 	"strings"
 
 	moovhttp "github.com/moov-io/base/http"
@@ -190,7 +191,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 			return
 		}
 		replaceExisting := (orgCfg.LogoFile != "") // keep track so we can return appropriate HTTP status code
-		orgCfg.LogoFile = fmt.Sprintf("organization-%s-logo%s", organization, ext)
+		orgCfg.LogoFile = makeDocumentKey(organization, fmt.Sprintf("organization-%s-logo%s", organization, ext))
 
 		bucket, err := bucketFactory()
 		if err != nil {
@@ -232,4 +233,8 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 		w.WriteHeader(status)
 		json.NewEncoder(w).Encode(updatedCfg)
 	}
+}
+
+func makeDocumentKey(organization string, docID string) string {
+	return path.Join("organiations", organization, docID)
 }

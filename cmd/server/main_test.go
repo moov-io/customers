@@ -14,21 +14,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSetupStorageBucket(t *testing.T) {
+func TestMain__setupSigner(t *testing.T) {
 	logger := log.NewNopLogger()
 
-	signer := setupStorageBucket(logger, "", "file")
+	signer := setupSigner(logger, "", "file")
 	if signer == nil {
 		t.Fatal("expected non-nil Signer")
 	}
 
-	signer = setupStorageBucket(logger, "", "other")
+	signer = setupSigner(logger, "", "other")
 	if signer != nil {
 		t.Fatal("expected nil Signer")
 	}
 }
 
-func TestSetupValidationStrategies(t *testing.T) {
+func TestMain__setupValidationStrategies(t *testing.T) {
 	logger := log.NewNopLogger()
 	adminServer := admin.NewServer(*adminAddr)
 

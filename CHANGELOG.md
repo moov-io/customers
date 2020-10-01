@@ -4,7 +4,7 @@ Customers v0.5.0 comes with several new features including Customer searching/fi
 
 **BREAKING CHANGES**
 
-We now require the `X-Organization` HTTP header (can be changed with `ORGANIZATION_HEADER`) on requests. This is to enforce isolation of models for multi-tenant installs. The value can be a free-form string so a UUID, random string, or other identifier can be supplied.
+We now require the `X-Organization` HTTP header on requests. This is to enforce isolation of models for multi-tenant installs. The value can be a free-form string so a UUID, random string, or other identifier can be supplied.
 
 - Accounts require HolderName (legal name on the financial account)
 - ./pkg/client and ./pkg/admin package move
