@@ -206,6 +206,88 @@ func TestRouterUpdateMissing(t *testing.T) {
 	require.Equal(t, w.Code, http.StatusBadRequest)
 }
 
+func TestRouterGetOrganizationLogo_missingHeader(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	w := httptest.NewRecorder()
+
+	router := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), router, &mockRepository{}, nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, w.Code, http.StatusBadRequest)
+	response := make(map[string]string)
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, response, "error")
+	require.Equal(t, response["error"], "missing X-Organization header")
+}
+
+func TestRouterGetOrganizationLogo_repoError(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	req.Header.Add("x-organization", "orgID")
+	w := httptest.NewRecorder()
+
+	router := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), router, &mockRepository{err: errors.New("real bad error")}, nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, w.Code, http.StatusBadRequest)
+	response := make(map[string]string)
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, response, "error")
+	require.Equal(t, response["error"], "real bad error")
+}
+
+func TestRouterGetOrganizationLogo_noLogoUploaded(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	req.Header.Add("x-organization", "orgID")
+	w := httptest.NewRecorder()
+
+	router := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), router, &mockRepository{
+		cfg: &client.OrganizationConfiguration{},
+	}, nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, w.Code, http.StatusBadRequest)
+	response := make(map[string]string)
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, response, "error")
+	require.Equal(t, response["error"], "no logo uploaded for organization orgID")
+}
+
+func TestRouterGetOrganizationLogo_missingFile(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	req.Header.Add("x-organization", "orgID")
+	w := httptest.NewRecorder()
+
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
+	router := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), router, &mockRepository{
+		cfg: &client.OrganizationConfiguration{LogoFile: "some-file.png"},
+	}, bucketFunc)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, w.Code, http.StatusBadRequest)
+	response := make(map[string]string)
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, response, "error")
+	require.Contains(t, response["error"], "file not found")
+}
+
 func TestRouterUploadRetrieveLogo(t *testing.T) {
 	repo := &mockRepository{
 		cfg: &client.OrganizationConfiguration{

@@ -22,6 +22,7 @@ import (
 	"github.com/moov-io/customers/pkg/documents/storage"
 	"github.com/moov-io/customers/pkg/route"
 	"gocloud.dev/blob"
+	"gocloud.dev/gcerrors"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -132,8 +133,12 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 
 		rdr, err := bucket.NewReader(r.Context(), makeDocumentKey(organization, cfg.LogoFile), nil)
 		if err != nil {
-			logger.Log("configuration", "problem reading logo file from storage bucket", "error", err, "organization", organization, "logoFile", cfg.LogoFile, "requestID", requestID)
-			moovhttp.Problem(w, err)
+			msg := "error retrieving logo file"
+			if gcerrors.Code(err) == gcerrors.NotFound {
+				msg = msg + " - file not found"
+			}
+			logger.Log("configuration", msg, "error", err, "organization", organization, "logoFile", cfg.LogoFile, "requestID", requestID)
+			moovhttp.Problem(w, fmt.Errorf(msg))
 			return
 		}
 		defer rdr.Close()
