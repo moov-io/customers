@@ -40,8 +40,11 @@ func TestRouterGet(t *testing.T) {
 	req.Header.Set("X-Organization", org)
 	w := httptest.NewRecorder()
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -71,8 +74,11 @@ func TestRouterGetErr(t *testing.T) {
 	req.Header.Set("X-Organization", "moov")
 	w := httptest.NewRecorder()
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -90,8 +96,11 @@ func TestRouterGetMissing(t *testing.T) {
 	req := httptest.NewRequest("GET", "/configuration/customers", nil)
 	w := httptest.NewRecorder()
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -118,8 +127,11 @@ func TestRouterUpdate(t *testing.T) {
 	req.Header.Set("X-Organization", org)
 	w := httptest.NewRecorder()
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -155,8 +167,11 @@ func TestRouterUpdateErr(t *testing.T) {
 	req.Header.Set("X-Organization", "moov")
 	w := httptest.NewRecorder()
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -180,15 +195,18 @@ func TestRouterUpdateMissing(t *testing.T) {
 	req := httptest.NewRequest("PUT", "/configuration/customers", &body)
 	w := httptest.NewRecorder()
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
 	require.Equal(t, w.Code, http.StatusBadRequest)
 }
 
-func TestRouterUploadNewLogo(t *testing.T) {
+func TestRouterUploadRetrieveLogo(t *testing.T) {
 	repo := &mockRepository{
 		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
@@ -201,11 +219,15 @@ func TestRouterUploadNewLogo(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "moov")
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
+	require.Equal(t, http.StatusCreated, w.Result().StatusCode)
 	var response client.OrganizationConfiguration
 	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
 		t.Fatal(err)
@@ -219,6 +241,39 @@ func TestRouterUploadNewLogo(t *testing.T) {
 	if response.LogoFile == "" {
 		t.Errorf("LogoFile=%q", response.LogoFile)
 	}
+
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	req.Header.Add("x-organization", "moov")
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Result().StatusCode, "failed to retrieve logo file")
+}
+
+func TestRouterUpdateLogo(t *testing.T) {
+	repo := &mockRepository{
+		cfg: &client.OrganizationConfiguration{
+			LegalEntity:    base.ID(),
+			PrimaryAccount: base.ID(),
+			LogoFile:       "organization-moov-logo.jpg",
+		},
+	}
+
+	w := httptest.NewRecorder()
+	req := multipartRequest(t, "file", "moov.jpg")
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "moov")
+
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
+	router := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Result().StatusCode)
 }
 
 func TestRouterUploadLogo_missingHeader(t *testing.T) {
@@ -229,9 +284,12 @@ func TestRouterUploadLogo_missingHeader(t *testing.T) {
 		},
 	}
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	w := httptest.NewRecorder()
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, httptest.NewRequest(http.MethodPut, "/configuration/logo", nil))
 	w.Flush()
 
@@ -257,8 +315,11 @@ func TestRouterUploadLogo_missingFile(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "moov")
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -284,8 +345,11 @@ func TestRouterUploadLogo_unsupportedFileType(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "moov")
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -308,8 +372,11 @@ func TestRouterUploadLogo_repoError(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "moov")
 
+	tempDir, bucketFunc := storage.NewTestBucket()
+	defer os.RemoveAll(tempDir)
+
 	router := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	RegisterRoutes(log.NewNopLogger(), router, repo, bucketFunc)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -320,6 +387,10 @@ func TestRouterUploadLogo_repoError(t *testing.T) {
 	}
 	require.Contains(t, response, "error")
 	require.Equal(t, response["error"], "scary DB error")
+}
+
+func TestRouterGetLogo(t *testing.T) {
+
 }
 
 func multipartRequest(t *testing.T, fieldName string, fileName string) *http.Request {

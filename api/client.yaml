@@ -87,9 +87,48 @@ paths:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /configuration/logo:
+    get:
+      tags: [Configuration]
+      summary: Retreive an organization's logo
+      description: Retrieve a previously-uploaded logo image from an organization configuration
+      operationId: getOrganizationLogo
+      parameters:
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Logo image file in original upload format
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+            image/gif:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Failed to retrieve image file, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
     put:
       tags: [Configuration]
-      summary: Upload organization's logo
+      summary: Upload an organization's logo
       description: Update the organization's configuration to include a logo image file.
       operationId: uploadOrganizationLogo
       parameters:

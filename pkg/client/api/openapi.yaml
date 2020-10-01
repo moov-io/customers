@@ -93,6 +93,49 @@ paths:
       tags:
       - Configuration
   /configuration/logo:
+    get:
+      description: Retrieve a previously-uploaded logo image from an organization
+        configuration
+      operationId: getOrganizationLogo
+      parameters:
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Organization
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            image/png:
+              schema:
+                format: binary
+                type: string
+            image/jpg:
+              schema:
+                format: binary
+                type: string
+            image/svg+xml:
+              schema:
+                format: binary
+                type: string
+            image/gif:
+              schema:
+                format: binary
+                type: string
+          description: Logo image file in original upload format
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to retrieve image file, see error(s)
+      summary: Retreive an organization's logo
+      tags:
+      - Configuration
     put:
       description: Update the organization's configuration to include a logo image
         file.
@@ -141,7 +184,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Configuration was not updated, see error(s)
-      summary: Upload organization's logo
+      summary: Upload an organization's logo
       tags:
       - Configuration
   /customers:
