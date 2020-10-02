@@ -107,7 +107,7 @@ func TestRouterGetMissing(t *testing.T) {
 	require.Equal(t, w.Code, http.StatusBadRequest)
 }
 
-func TestRouterUpsert(t *testing.T) {
+func TestRouterUpdate(t *testing.T) {
 	org := "moov"
 	repo := &mockRepository{
 		cfg: &client.OrganizationConfiguration{
@@ -152,7 +152,7 @@ func TestRouterUpsert(t *testing.T) {
 	}
 }
 
-func TestRouterUpsertErr(t *testing.T) {
+func TestRouterUpdateErr(t *testing.T) {
 	repo := &mockRepository{
 		err: errors.New("bad error"),
 	}
@@ -178,7 +178,7 @@ func TestRouterUpsertErr(t *testing.T) {
 	require.Equal(t, w.Code, http.StatusBadRequest)
 }
 
-func TestRouterUpsertMissing(t *testing.T) {
+func TestRouterUpdateMissing(t *testing.T) {
 	repo := &mockRepository{
 		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),
@@ -333,7 +333,7 @@ func TestRouterUploadRetrieveLogo(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Result().StatusCode, "failed to retrieve logo file")
 }
 
-func TestRouterUpsertLogo(t *testing.T) {
+func TestRouterUpdateLogo(t *testing.T) {
 	repo := &mockRepository{
 		cfg: &client.OrganizationConfiguration{
 			LegalEntity:    base.ID(),

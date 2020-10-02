@@ -14,7 +14,7 @@ import (
 
 type Repository interface {
 	Get(organization string) (*client.OrganizationConfiguration, error)
-	Upsert(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error)
+	Update(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error)
 }
 
 func NewRepository(db *sql.DB) Repository {
@@ -45,8 +45,8 @@ where organization = ? limit 1;`
 	return &cfg, nil
 }
 
-// Upsert updates the requested organization's configuration or inserts a new one if the organization doesn't already have a configuration stored
-func (r *sqlRepo) Upsert(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
+// Update updates the requested organization's configuration or inserts a new one if the organization doesn't already have a configuration stored
+func (r *sqlRepo) Update(organization string, cfg *client.OrganizationConfiguration) (*client.OrganizationConfiguration, error) {
 	if err := r.verifyCustomerInfo(organization, cfg); err != nil {
 		return nil, errors.New("organization: customerID or accountID does not belong")
 	}
