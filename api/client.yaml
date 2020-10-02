@@ -86,6 +86,47 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
+  /configuration/logo:
+    put:
+      tags: [Configuration]
+      summary: Upload organization logo
+      description: Upload an organization's logo, or update it if it already exists
+      operationId: uploadOrganizationLogo
+      parameters:
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: Logo image file to be uploaded
+                  type: string
+                  format: binary
+              required:
+                - file
+            encoding:
+              file:
+                contentType: image/jpeg, image/svg+xml, image/gif, image/png
+      responses:
+        '204':
+          description: Logo image file was successfully uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConfiguration'
+        '400':
+          description: Configuration was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
   /customers:
     get:
       tags: [Customers]

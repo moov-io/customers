@@ -165,7 +165,7 @@ func main() {
 		Repo: accountsRepo, WatchmanClient: watchmanClient,
 	}
 
-	bucket := storage.GetBucket(logger, os.Getenv("DOCUMENTS_BUCKET"), util.Or(os.Getenv("DOCUMENTS_PROVIDER"), "file"), signer)
+	bucket := storage.GetBucket(logger, util.Or(os.Getenv("DOCUMENTS_BUCKET"), "./storage"), util.Or(os.Getenv("DOCUMENTS_PROVIDER"), "file"), signer)
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()
@@ -180,7 +180,7 @@ func main() {
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)
-	configuration.RegisterRoutes(logger, router, configRepo)
+	configuration.RegisterRoutes(logger, router, configRepo, bucket)
 
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
