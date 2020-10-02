@@ -177,7 +177,44 @@ func TestRouterUpdateMissing(t *testing.T) {
 	require.Equal(t, w.Code, http.StatusBadRequest)
 }
 
-func TestRouterUploadLogo(t *testing.T) {
+func TestRouterGetOrganizationLogo_missingHeader(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	w := httptest.NewRecorder()
+
+	router := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), router, &mockRepository{}, nil)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, w.Code, http.StatusBadRequest)
+	response := make(map[string]string)
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, response, "error")
+	require.Equal(t, "missing X-Organization header", response["error"])
+}
+
+func TestRouterGetOrganizationLogo_noLogoUploaded(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	req.Header.Add("x-organization", "orgID")
+	w := httptest.NewRecorder()
+
+	router := mux.NewRouter()
+	RegisterRoutes(log.NewNopLogger(), router, &mockRepository{}, storage.NewTestBucket(t))
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, w.Code, http.StatusBadRequest)
+	response := make(map[string]string)
+	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, response, "error")
+	require.Equal(t, "error retrieving logo file - file not found", response["error"])
+}
+
+func TestRouterUploadAndGetLogo(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := multipartRequest(t, "file", "image.png")
 	req.Header.Set("x-request-id", "test")
@@ -189,6 +226,17 @@ func TestRouterUploadLogo(t *testing.T) {
 	w.Flush()
 
 	require.Equal(t, http.StatusNoContent, w.Result().StatusCode)
+
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "moov")
+
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Result().StatusCode)
+	require.Equal(t, "image/png", w.Header().Get("Content-Type"))
 }
 
 func TestRouterUploadLogo_missingHeader(t *testing.T) {
@@ -204,7 +252,7 @@ func TestRouterUploadLogo_missingHeader(t *testing.T) {
 		t.Fatal(err)
 	}
 	require.Contains(t, response, "error")
-	require.Equal(t, response["error"], "missing X-Organization header")
+	require.Equal(t, "missing X-Organization header", response["error"])
 }
 
 func TestRouterUploadLogo_missingFile(t *testing.T) {
@@ -224,7 +272,7 @@ func TestRouterUploadLogo_missingFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	require.Contains(t, response, "error")
-	require.Equal(t, response["error"], errMissingFile.Error())
+	require.Equal(t, errMissingFile.Error(), response["error"])
 }
 
 func TestRouterUploadLogo_unsupportedFileType(t *testing.T) {
@@ -244,7 +292,7 @@ func TestRouterUploadLogo_unsupportedFileType(t *testing.T) {
 		t.Fatal(err)
 	}
 	require.Contains(t, response, "error")
-	require.Equal(t, response["error"], errUnsupportedType.Error())
+	require.Equal(t, errUnsupportedType.Error(), response["error"])
 }
 
 func multipartRequest(t *testing.T, fieldName string, fileName string) *http.Request {

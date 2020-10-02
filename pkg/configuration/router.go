@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"path"
 	"strings"
@@ -21,6 +22,7 @@ import (
 	"github.com/moov-io/customers/pkg/documents/storage"
 	"github.com/moov-io/customers/pkg/route"
 	"gocloud.dev/blob"
+	"gocloud.dev/gcerrors"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -53,6 +55,7 @@ func listAllowedContentTypes() string {
 func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, bucketFunc storage.BucketFunc) {
 	r.Methods("GET").Path("/configuration/customers").HandlerFunc(getOrganizationConfig(logger, repo))
 	r.Methods("PUT").Path("/configuration/customers").HandlerFunc(updateOrganizationConfig(logger, repo))
+	r.Methods("GET").Path("/configuration/logo").HandlerFunc(getOrganizationLogo(logger, repo, bucketFunc))
 	r.Methods("PUT").Path("/configuration/logo").HandlerFunc(uploadOrganizationLogo(logger, repo, bucketFunc))
 }
 
@@ -95,6 +98,48 @@ func updateOrganizationConfig(logger log.Logger, repo Repository) http.HandlerFu
 		}
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(cfg)
+	}
+}
+
+func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory storage.BucketFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		requestID := moovhttp.GetRequestID(r)
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			logger.Log("configuration", "get organization logo called with no organization header", "requestID", requestID)
+			return
+		}
+
+		bucket, err := bucketFactory()
+		if err != nil {
+			logger.Log("configuration", "problem retrieving logo image", "error", err, "organization", organization, "requestID", requestID)
+			moovhttp.Problem(w, err)
+			return
+		}
+		defer bucket.Close()
+
+		rdr, err := bucket.NewReader(r.Context(), makeDocumentKey(organization), nil)
+		if err != nil {
+			msg := "error retrieving logo file"
+			if gcerrors.Code(err) == gcerrors.NotFound {
+				msg = msg + " - file not found"
+			}
+			logger.Log("configuration", msg, "error", err, "organization", organization, "requestID", requestID)
+			moovhttp.Problem(w, fmt.Errorf(msg))
+			return
+		}
+		defer rdr.Close()
+
+		fBytes, err := ioutil.ReadAll(rdr)
+		if err != nil || fBytes == nil {
+			logger.Log("configuration", "problem reading logo file", "error", err, "organization", organization, "requestID", requestID)
+			moovhttp.Problem(w, fmt.Errorf("problem reading logo file - error=%v", err))
+			return
+		}
+
+		w.Header().Set("Content-Type", rdr.ContentType())
+		w.WriteHeader(http.StatusOK)
+		w.Write(fBytes)
 	}
 }
 
