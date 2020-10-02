@@ -192,8 +192,11 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 			return
 		}
 
+		// get organization
+		organization := route.GetOrganization(w, r)
+
 		// grab encrypted account number
-		encrypted, err := repo.getEncryptedAccountNumber(customerID, accountID)
+		encrypted, err := repo.getEncryptedAccountNumber(organization, customerID, accountID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

@@ -28,7 +28,7 @@ type Repository interface {
 
 	updateAccountStatus(accountID string, status client.AccountStatus) error
 
-	getEncryptedAccountNumber(customerID, accountID string) (string, error)
+	getEncryptedAccountNumber(organization, customerID, accountID string) (string, error)
 
 	getLatestAccountOFACSearch(accountID string) (*client.OfacSearch, error)
 	saveAccountOFACSearch(id string, result *client.OfacSearch) error
@@ -161,6 +161,7 @@ func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, 
 	}
 	defer stmt.Close()
 
+	// TODO: remove userID
 	_, err = stmt.Exec(
 		account.AccountID,
 		account.CustomerID,
@@ -207,8 +208,12 @@ func (r *sqlAccountRepository) updateAccountStatus(accountID string, status clie
 	return err
 }
 
-func (r *sqlAccountRepository) getEncryptedAccountNumber(customerID, accountID string) (string, error) {
-	query := `select encrypted_account_number from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
+func (r *sqlAccountRepository) getEncryptedAccountNumber(organization, customerID, accountID string) (string, error) {
+	query := `select encrypted_account_number 
+from accounts as a 
+inner join customers as c on c.customer_id = a.customer_id 
+where a.customer_id = ? and a.account_id = ? and c.organization = ? and a.deleted_at is null 
+limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return "", err
@@ -216,7 +221,7 @@ func (r *sqlAccountRepository) getEncryptedAccountNumber(customerID, accountID s
 	defer stmt.Close()
 
 	var encrypted string
-	if err := stmt.QueryRow(customerID, accountID).Scan(&encrypted); err != nil {
+	if err := stmt.QueryRow(customerID, accountID, organization).Scan(&encrypted); err != nil {
 		if err == sql.ErrNoRows {
 			return "", nil
 		}
