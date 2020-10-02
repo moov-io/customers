@@ -128,8 +128,8 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/api/master/openapi-common.yaml#/components/schemas/Error'
     put:
       tags: [Configuration]
-      summary: Upload an organization's logo
-      description: Update the organization's configuration to include a logo image file.
+      summary: Upload an organization's logo, or update it if it already exists
+      description: Updates the logo image file in the organization's configuration.
       operationId: uploadOrganizationLogo
       parameters:
         - name: X-Organization
