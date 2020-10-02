@@ -209,5 +209,5 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 }
 
 func makeDocumentKey(organization string) string {
-	return path.Join("configuration", organization, "logo")
+	return path.Join("organizations", organization, "logo")
 }
