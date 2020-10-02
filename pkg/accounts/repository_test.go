@@ -12,6 +12,7 @@ import (
 
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/go-kit/kit/log"
@@ -79,6 +80,7 @@ func TestRepository(t *testing.T) {
 
 func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
+	organization := "test-org"
 	repo := setupTestAccountRepository(t)
 
 	keeper := secrets.TestStringKeeper(t)
@@ -97,8 +99,21 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// create customer
+	customerRepo := customers.NewCustomerRepo(log.NewNopLogger(), repo.db.DB)
+	cust := &client.Customer{
+		CustomerID: customerID,
+		FirstName:  "jane",
+		LastName:   "doe",
+		Type:       client.INDIVIDUAL,
+	}
+	custErr := customerRepo.CreateCustomer(cust, organization)
+	if custErr != nil {
+		t.Fatal(custErr)
+	}
+
 	// read encrypted account number
-	encrypted, err := repo.getEncryptedAccountNumber(customerID, acct.AccountID)
+	encrypted, err := repo.getEncryptedAccountNumber(organization, customerID, acct.AccountID)
 	if err != nil {
 		t.Fatal(err)
 	}

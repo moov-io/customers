@@ -40,7 +40,7 @@ func (r *mockRepository) getAccountsByCustomerID(customerID string) ([]*client.A
 	return r.Accounts, nil
 }
 
-func (r *mockRepository) CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error) {
+func (r *mockRepository) CreateCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
 	if r.Err != nil {
 		return nil, r.Err
 	}
