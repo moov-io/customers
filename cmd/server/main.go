@@ -165,7 +165,7 @@ func main() {
 		Repo: accountsRepo, WatchmanClient: watchmanClient,
 	}
 
-	bucket := storage.GetBucket(logger, os.Getenv("DOCUMENTS_BUCKET"), util.Or(os.Getenv("DOCUMENTS_PROVIDER"), "file"), signer)
+	bucket := storage.GetBucket(logger, util.Or(os.Getenv("DOCUMENTS_BUCKET"), "./storage"), util.Or(os.Getenv("DOCUMENTS_PROVIDER"), "file"), signer)
 
 	// Setup business HTTP routes
 	router := mux.NewRouter()
@@ -175,7 +175,14 @@ func main() {
 	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
-	documents.AddDocumentRoutes(logger, router, documentRepo, bucket)
+
+	docsKeeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-documents", os.Getenv("CLOUD_PROVIDER"))
+	if err != nil {
+		panic(err)
+	}
+	defer docsKeeper.Close()
+
+	documents.AddDocumentRoutes(logger, router, documentRepo, docsKeeper, bucket)
 	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
 
 	// Add Configuration routes

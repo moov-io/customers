@@ -83,7 +83,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	req.Header.Set("x-organization", "test")
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -167,7 +167,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	req.Header.Set("X-organization", "test")
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -203,7 +203,7 @@ func TestDocuments__retrieveError(t *testing.T) {
 	}
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 
 	customerID, documentID := base.ID(), base.ID()
 
@@ -220,7 +220,7 @@ func TestDocuments__delete(t *testing.T) {
 	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 
 	customerID := base.ID()
 	// create document
@@ -259,7 +259,7 @@ func TestDocuments__uploadCustomerDocument(t *testing.T) {
 	req.URL = u // replace query params with invalid values
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
