@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	moovhttp "github.com/moov-io/base/http"
 
 	"github.com/moov-io/customers/pkg/client"
@@ -39,7 +39,7 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 			return
 		}
 
-		logger.Log("customers", fmt.Sprintf("found %d customers in search", len(customers)))
+		logger.WithKeyValue("customers", fmt.Sprintf("found %d customers in search", len(customers)))
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)

@@ -15,7 +15,7 @@ import (
 	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/secrets"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 )
 
 type testAccountRepository struct {

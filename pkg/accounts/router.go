@@ -22,7 +22,7 @@ import (
 	"github.com/moov-io/customers/pkg/secrets/mask"
 	"github.com/moov-io/customers/pkg/validator"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 )
 
@@ -130,18 +130,18 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 			return
 		}
 		if err := request.validate(); err != nil {
-			logger.Log("accounts", fmt.Sprintf("problem validating account: %v", err), "requestID", moovhttp.GetRequestID(r))
+			logger.WithKeyValue("accounts", fmt.Sprintf("problem validating account: %v", err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)
 			return
 		}
 		if err := request.disfigure(keeper); err != nil {
-			logger.Log("accounts", fmt.Sprintf("problem disfiguring account: %v", err), "requestID", moovhttp.GetRequestID(r))
+			logger.WithKeyValue("accounts", fmt.Sprintf("problem disfiguring account: %v", err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		if _, err := fedClient.LookupInstitution(request.RoutingNumber); err != nil {
-			logger.Log("accounts", fmt.Sprintf("problem looking up routing number=%q: %v", request.RoutingNumber, err), "requestID", moovhttp.GetRequestID(r))
+			logger.WithKeyValue("accounts", fmt.Sprintf("problem looking up routing number=%q: %v", request.RoutingNumber, err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -149,14 +149,14 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 		customerID, userID := route.GetCustomerID(w, r), moovhttp.GetUserID(r)
 		account, err := repo.CreateCustomerAccount(customerID, userID, &request)
 		if err != nil {
-			logger.Log("accounts", fmt.Sprintf("problem saving account: %v", err), "requestID", moovhttp.GetRequestID(r))
+			logger.WithKeyValue("accounts", fmt.Sprintf("problem saving account: %v", err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		// Perform an OFAC search with the Customer information
 		if err := ofac.StoreAccountOFACSearch(account, requestID); err != nil {
-			logger.Log("accounts", fmt.Sprintf("error with OFAC search for account=%s: %v", account.AccountID, err), "requestID", requestID)
+			logger.WithKeyValue("accounts", fmt.Sprintf("error with OFAC search for account=%s: %v", account.AccountID, err), "requestID", requestID)
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")

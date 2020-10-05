@@ -15,10 +15,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
 	kitprom "github.com/go-kit/kit/metrics/prometheus"
 	"github.com/lopezator/migrator"
 	"github.com/mattn/go-sqlite3"
+	"github.com/moov-io/base/log"
 	stdprom "github.com/prometheus/client_golang/prometheus"
 )
 
@@ -174,7 +174,7 @@ func (s *sqlite) Connect() (*sql.DB, error) {
 
 	sqliteVersionLogOnce.Do(func() {
 		if v, _, _ := sqlite3.Version(); v != "" {
-			s.logger.Log("main", fmt.Sprintf("sqlite version %s", v))
+			s.logger.WithKeyValue("main", fmt.Sprintf("sqlite version %s", v))
 		}
 	})
 
@@ -187,7 +187,7 @@ func (s *sqlite) Connect() (*sql.DB, error) {
 	}
 
 	migratorLogger := migrator.WithLogger(migrator.LoggerFunc(func(msg string, args ...interface{}) {
-		s.logger.Log("sqlite", msg)
+		s.logger.WithKeyValue("sqlite", msg)
 	}))
 
 	// Migrate our database

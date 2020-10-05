@@ -25,7 +25,7 @@ import (
 	"github.com/moov-io/customers/pkg/validator/microdeposits"
 	"github.com/moov-io/customers/pkg/validator/testvalidator"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 )
 

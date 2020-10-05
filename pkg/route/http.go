@@ -14,8 +14,8 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	// "github.com/moov-io/base/idempotent/lru" // TODO(adam): use with LRU below
 
-	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics/prometheus"
+	"github.com/moov-io/base/log"
 	stdprometheus "github.com/prometheus/client_golang/prometheus"
 )
 
@@ -30,7 +30,13 @@ var (
 
 func Responder(logger log.Logger, w http.ResponseWriter, r *http.Request) http.ResponseWriter {
 	route := fmt.Sprintf("%s-%s", strings.ToLower(r.Method), cleanMetricsPath(r.URL.Path))
-	return moovhttp.Wrap(logger, routeHistogram.With("route", route), w, r)
+
+	// ASK: we can change logger type in base/http from go-kit/log.Logger to base/log.Logger
+	// but such change will require us to change many other projects (Watchman, Fed, Wire, ?)
+	// right now as a temporary solution (to be able to move forward) I'm passing
+	// nil for logger which will not write request duration in logs
+
+	return moovhttp.Wrap(nil, routeHistogram.With("route", route), w, r)
 }
 
 var baseIdRegex = regexp.MustCompile(`([a-f0-9]{40})`)

@@ -16,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"gocloud.dev/blob"
 	"gocloud.dev/blob/fileblob"
 	"gocloud.dev/blob/gcsblob"
@@ -66,10 +66,10 @@ func awsBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 
 	bucket, err := s3blob.OpenBucket(ctx, s, bucketName, nil)
 	if err != nil {
-		logger.Log("storage", fmt.Sprintf("ERROR creating %s aws bucket: %v", bucketName, err))
+		logger.WithKeyValue("storage", fmt.Sprintf("ERROR creating %s aws bucket: %v", bucketName, err))
 		return nil, err
 	}
-	logger.Log("storage", fmt.Sprintf("created %s aws bucket: %T", bucketName, bucket))
+	logger.WithKeyValue("storage", fmt.Sprintf("created %s aws bucket: %T", bucketName, bucket))
 	return bucket, nil
 }
 
@@ -85,7 +85,7 @@ func fileBucket(ctx context.Context, logger log.Logger, bucketName string, signe
 	if err := os.Mkdir(bucketName, 0777); strings.Contains(bucketName, "..") || (err != nil && !os.IsExist(err)) {
 		return nil, fmt.Errorf("problem creating %s error=%v", bucketName, err)
 	}
-	logger.Log("storage", fmt.Sprintf("created %s for file bucket", bucketName))
+	logger.WithKeyValue("storage", fmt.Sprintf("created %s for file bucket", bucketName))
 	return fileblob.OpenBucket(bucketName, &fileblob.Options{
 		URLSigner: signer,
 	})
@@ -105,9 +105,9 @@ func gcpBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 
 	bucket, err := gcsblob.OpenBucket(ctx, c, bucketName, nil)
 	if err != nil {
-		logger.Log("storage", fmt.Sprintf("ERROR creating %s gcp bucket: %v", bucketName, err))
+		logger.WithKeyValue("storage", fmt.Sprintf("ERROR creating %s gcp bucket: %v", bucketName, err))
 		return nil, err
 	}
-	logger.Log("storage", fmt.Sprintf("created %s gcp bucket: %v", bucketName, err))
+	logger.WithKeyValue("storage", fmt.Sprintf("created %s gcp bucket: %v", bucketName, err))
 	return bucket, nil
 }

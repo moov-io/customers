@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
 
@@ -38,7 +38,7 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
-		logger.Log("customers", fmt.Sprintf("added address for customer=%s", customerID), "requestID", requestID)
+		logger.WithKeyValue("customers", fmt.Sprintf("added address for customer=%s", customerID), "requestID", requestID)
 
 		respondWithCustomer(logger, w, customerID, requestID, repo)
 	}
@@ -65,12 +65,12 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		}
 
 		if err := repo.updateCustomerAddress(customerID, addressId, req); err != nil {
-			logger.Log("customers", fmt.Sprintf("error updating customer's address: customer=%s address=%s: %v", customerID, addressId, err), "requestID", requestID)
+			logger.WithKeyValue("customers", fmt.Sprintf("error updating customer's address: customer=%s address=%s: %v", customerID, addressId, err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		logger.Log("customers", fmt.Sprintf("updating address=%s for customer=%s", addressId, customerID), "requestID", requestID)
+		logger.WithKeyValue("customers", fmt.Sprintf("updating address=%s for customer=%s", addressId, customerID), "requestID", requestID)
 		respondWithCustomer(logger, w, customerID, requestID, repo)
 	}
 }
@@ -88,11 +88,11 @@ func deleteCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		err := repo.deleteCustomerAddress(customerID, addressId)
 		if err != nil {
 			moovhttp.Problem(w, err)
-			logger.Log("customers", fmt.Sprintf("error deleting customer's address: customer=%s address=%s: %v", customerID, addressId, err), "requestID", requestID)
+			logger.WithKeyValue("customers", fmt.Sprintf("error deleting customer's address: customer=%s address=%s: %v", customerID, addressId, err), "requestID", requestID)
 			return
 		}
 
-		logger.Log("customers", fmt.Sprintf("successfully deleted address=%s for customer=%s", addressId, customerID), "requestID", requestID)
+		logger.WithKeyValue("customers", fmt.Sprintf("successfully deleted address=%s for customer=%s", addressId, customerID), "requestID", requestID)
 		w.WriteHeader(http.StatusNoContent)
 	}
 }

@@ -21,7 +21,7 @@ import (
 	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/watchman"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 )
 
@@ -140,27 +140,27 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		logger.Log("ofac", fmt.Sprintf("running live OFAC search for customer=%s", customerID), "requestID", requestID, "userID", userID)
+		logger.WithKeyValue("ofac", fmt.Sprintf("running live OFAC search for customer=%s", customerID), "requestID", requestID, "userID", userID)
 
 		if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
-			logger.Log("ofac", fmt.Sprintf("error refreshing ofac search: %v", err))
+			logger.WithKeyValue("ofac", fmt.Sprintf("error refreshing ofac search: %v", err))
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		result, err := repo.getLatestCustomerOFACSearch(customerID)
 		if err != nil {
-			logger.Log("ofac", fmt.Sprintf("error getting latest ofac search: %v", err))
+			logger.WithKeyValue("ofac", fmt.Sprintf("error getting latest ofac search: %v", err))
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		if result.Blocked {
 			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
-			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
+			logger.WithKeyValue("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
 			if err := repo.updateCustomerStatus(cust.CustomerID, client.REJECTED, "manual OFAC refresh"); err != nil {
-				logger.Log("ofac", fmt.Sprintf("error updating customer=%s error=%v", cust.CustomerID, err))
+				logger.WithKeyValue("ofac", fmt.Sprintf("error updating customer=%s error=%v", cust.CustomerID, err))
 				moovhttp.Problem(w, err)
 				return
 			}

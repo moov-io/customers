@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"gocloud.dev/blob"
 	"gocloud.dev/blob/fileblob"
 )

@@ -16,7 +16,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/pkg/route"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 	"gocloud.dev/blob/fileblob"
 )
@@ -60,7 +60,7 @@ func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFac
 		}
 		defer rdr.Close()
 
-		logger.Log("files", fmt.Sprintf("proxying document=%s contentType=%s", key, rdr.ContentType()), "requestID", moovhttp.GetRequestID(r))
+		logger.WithKeyValue("files", fmt.Sprintf("proxying document=%s contentType=%s", key, rdr.ContentType()), "requestID", moovhttp.GetRequestID(r))
 
 		w.Header().Set("Content-Disposition", "inline")
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", rdr.Size()))
