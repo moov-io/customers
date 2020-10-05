@@ -5,7 +5,9 @@ All URIs are relative to *http://localhost:8087*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**GetConfiguration**](ConfigurationApi.md#GetConfiguration) | **Get** /configuration/customers | Get Configuration
+[**GetOrganizationLogo**](ConfigurationApi.md#GetOrganizationLogo) | **Get** /configuration/logo | Get organization logo
 [**UpdateConfiguration**](ConfigurationApi.md#UpdateConfiguration) | **Put** /configuration/customers | Update Configuration
+[**UploadOrganizationLogo**](ConfigurationApi.md#UploadOrganizationLogo) | **Put** /configuration/logo | Upload organization logo
 
 
 
@@ -52,6 +54,40 @@ No authorization required
 [[Back to README]](../README.md)
 
 
+## GetOrganizationLogo
+
+> *os.File GetOrganizationLogo(ctx, xOrganization)
+
+Get organization logo
+
+Retrieve the organization's logo
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**xOrganization** | **string**| Value used to separate and identify models | 
+
+### Return type
+
+[***os.File**](*os.File.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: image/png, image/jpg, image/svg+xml, image/gif, application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## UpdateConfiguration
 
 > OrganizationConfiguration UpdateConfiguration(ctx, organizationConfiguration, optional)
@@ -90,6 +126,41 @@ No authorization required
 ### HTTP request headers
 
 - **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UploadOrganizationLogo
+
+> OrganizationConfiguration UploadOrganizationLogo(ctx, xOrganization, file)
+
+Upload organization logo
+
+Upload an organization's logo, or update it if it already exists
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**xOrganization** | **string**| Value used to separate and identify models | 
+**file** | ***os.File*****os.File**| Logo image file to be uploaded | 
+
+### Return type
+
+[**OrganizationConfiguration**](OrganizationConfiguration.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: multipart/form-data
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
