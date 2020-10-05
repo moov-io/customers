@@ -86,6 +86,86 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /configuration/logo:
+    get:
+      tags: [Configuration]
+      summary: Get organization logo
+      description: Retrieve the organization's logo
+      operationId: getOrganizationLogo
+      parameters:
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Logo image file in original upload format
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/svg+xml:
+              schema:
+                type: string
+                format: binary
+            image/gif:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Failed to retrieve image file, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+    put:
+      tags: [Configuration]
+      summary: Upload organization logo
+      description: Upload an organization's logo, or update it if it already exists
+      operationId: uploadOrganizationLogo
+      parameters:
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: Logo image file to be uploaded
+                  type: string
+                  format: binary
+              required:
+                - file
+            encoding:
+              file:
+                contentType: image/jpeg, image/svg+xml, image/gif, image/png
+      responses:
+        '204':
+          description: Logo image file was successfully uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganizationConfiguration'
+        '400':
+          description: Configuration was not updated, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers:
     get:
       tags: [Customers]
