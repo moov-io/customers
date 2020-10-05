@@ -228,8 +228,10 @@ func TestDocuments_uploadTooLarge(t *testing.T) {
 
 	require.Equal(t, http.StatusBadRequest, w.Code)
 	b, err := ioutil.ReadAll(w.Body)
-	str := string(b)
-	require.Contains(t, str, "exceeds maximum size")
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "exceeds maximum size")
 }
 
 func TestDocuments__retrieveError(t *testing.T) {
