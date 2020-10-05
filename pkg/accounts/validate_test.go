@@ -14,14 +14,15 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/moov-io/base"
+	payclient "github.com/moov-io/paygate/pkg/client"
+	"github.com/stretchr/testify/require"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/paygate"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/validator"
 	"github.com/moov-io/customers/pkg/validator/microdeposits"
 	"github.com/moov-io/customers/pkg/validator/testvalidator"
-	payclient "github.com/moov-io/paygate/pkg/client"
-	"github.com/stretchr/testify/require"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -33,7 +34,7 @@ func TestRouter__AccountValidation(t *testing.T) {
 	validations := &validator.MockRepository{}
 
 	// create account
-	acc, err := accounts.createCustomerAccount(customerID, userID, &createAccountRequest{
+	acc, err := accounts.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.CHECKING,
@@ -103,7 +104,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 	}
 
 	// create account
-	acc, err := accounts.createCustomerAccount(customerID, userID, &createAccountRequest{
+	acc, err := accounts.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.CHECKING,
@@ -111,7 +112,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Test when account is validated already", func(t *testing.T) {
-		acc, err := accounts.createCustomerAccount(customerID, userID, &createAccountRequest{
+		acc, err := accounts.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber: "1234",
 			RoutingNumber: "987654321",
 			Type:          client.CHECKING,
@@ -252,7 +253,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
 	}
 
-	acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+	acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123456",
 		RoutingNumber: "987654323",
 		Type:          client.CHECKING,
@@ -260,7 +261,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	require.NoError(t, err)
 
 	t.Run("Test when account is validated already", func(t *testing.T) {
-		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+		acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber: "123",
 			RoutingNumber: "987654320",
 			Type:          client.CHECKING,
@@ -351,7 +352,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		encrypted, err := keeper.EncryptString("1234")
 		require.NoError(t, err)
 
-		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+		acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber:          "1234",
 			RoutingNumber:          "987654321",
 			Type:                   client.CHECKING,
@@ -421,7 +422,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		encrypted, err := keeper.EncryptString("12345")
 		require.NoError(t, err)
 
-		acc, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+		acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber:          "12345",
 			RoutingNumber:          "987654322",
 			Type:                   client.CHECKING,

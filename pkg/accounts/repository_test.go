@@ -8,10 +8,11 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+	"github.com/stretchr/testify/require"
+
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
-	"github.com/stretchr/testify/require"
 
 	"github.com/go-kit/kit/log"
 )
@@ -42,13 +43,13 @@ func TestRepository(t *testing.T) {
 	require.Error(t, err)
 
 	// initial read, find no accounts
-	accounts, err := repo.getCustomerAccounts(customerID)
+	accounts, err := repo.getAccountsByCustomerID(customerID)
 	if len(accounts) != 0 || err != nil {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}
 
 	// create account
-	acct, err := repo.createCustomerAccount(customerID, userID, &createAccountRequest{
+	acct, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.CHECKING,
@@ -58,7 +59,7 @@ func TestRepository(t *testing.T) {
 	}
 
 	// read after creating
-	accounts, err = repo.getCustomerAccounts(customerID)
+	accounts, err = repo.getAccountsByCustomerID(customerID)
 	if len(accounts) != 1 || err != nil {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}
@@ -70,7 +71,7 @@ func TestRepository(t *testing.T) {
 	if err := repo.deactivateCustomerAccount(acct.AccountID); err != nil {
 		t.Fatal(err)
 	}
-	accounts, err = repo.getCustomerAccounts(customerID)
+	accounts, err = repo.getAccountsByCustomerID(customerID)
 	if len(accounts) != 0 || err != nil {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}
@@ -83,7 +84,7 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	// create account
-	req := &createAccountRequest{
+	req := &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.CHECKING,
@@ -91,7 +92,7 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 	if err := req.disfigure(keeper); err != nil {
 		t.Fatal(err)
 	}
-	acct, err := repo.createCustomerAccount(customerID, userID, req)
+	acct, err := repo.CreateCustomerAccount(customerID, userID, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,7 +114,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 	keeper := secrets.TestStringKeeper(t)
 
 	// create account
-	req := &createAccountRequest{
+	req := &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.CHECKING,
@@ -121,7 +122,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 	if err := req.disfigure(keeper); err != nil {
 		t.Fatal(err)
 	}
-	acct, err := repo.createCustomerAccount(customerID, userID, req)
+	acct, err := repo.CreateCustomerAccount(customerID, userID, req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -146,7 +147,7 @@ func TestRepositoryUnique(t *testing.T) {
 
 	check := func(t *testing.T, repo *sqlAccountRepository) {
 		customerID, userID := base.ID(), base.ID()
-		req := &createAccountRequest{
+		req := &CreateAccountRequest{
 			AccountNumber: "156421",
 			RoutingNumber: "123456780",
 			Type:          client.SAVINGS,
@@ -156,11 +157,11 @@ func TestRepositoryUnique(t *testing.T) {
 		}
 
 		// first write should pass
-		if _, err := repo.createCustomerAccount(customerID, userID, req); err != nil {
+		if _, err := repo.CreateCustomerAccount(customerID, userID, req); err != nil {
 			t.Fatal(err)
 		}
 		// second write should fail
-		if _, err := repo.createCustomerAccount(customerID, userID, req); err != nil {
+		if _, err := repo.CreateCustomerAccount(customerID, userID, req); err != nil {
 			if !database.UniqueViolation(err) {
 				t.Fatalf("unexpected error: %v", err)
 			}

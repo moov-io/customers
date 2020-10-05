@@ -85,9 +85,9 @@ func deleteCustomer(logger log.Logger, repo CustomerRepository) func(http.Respon
 }
 
 func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID string, requestID string, repo CustomerRepository) {
-	cust, err := repo.getCustomer(customerID)
+	cust, err := repo.GetCustomer(customerID)
 	if err != nil {
-		logger.Log("customers", fmt.Sprintf("getCustomer: lookup: %v", err), "requestID", requestID)
+		logger.Log("customers", fmt.Sprintf("GetCustomer: lookup: %v", err), "requestID", requestID)
 		moovhttp.Problem(w, err)
 		return
 	}
@@ -267,8 +267,8 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 				return
 			}
 		}
-		if err := repo.createCustomer(cust, organization); err != nil {
-			logger.Log("customers", fmt.Sprintf("createCustomer: %v", err), "requestID", requestID)
+		if err := repo.CreateCustomer(cust, organization); err != nil {
+			logger.Log("customers", fmt.Sprintf("CreateCustomer: %v", err), "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -285,7 +285,7 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 
 		logger.Log("customers", fmt.Sprintf("created customer=%s", cust.CustomerID), "requestID", requestID)
 
-		cust, err = repo.getCustomer(cust.CustomerID)
+		cust, err = repo.GetCustomer(cust.CustomerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -349,7 +349,7 @@ func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 		}
 
 		logger.Log("customers", fmt.Sprintf("updated customer=%s", cust.CustomerID), "requestID", requestID)
-		cust, err = repo.getCustomer(cust.CustomerID)
+		cust, err = repo.GetCustomer(cust.CustomerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -389,13 +389,13 @@ func replaceCustomerMetadata(logger log.Logger, repo CustomerRepository) http.Ha
 }
 
 type CustomerRepository interface {
-	getCustomer(customerID string) (*client.Customer, error)
-	createCustomer(c *client.Customer, organization string) error
+	GetCustomer(customerID string) (*client.Customer, error)
+	CreateCustomer(c *client.Customer, organization string) error
 	updateCustomer(c *client.Customer, organization string) error
 	updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error
 	deleteCustomer(customerID string) error
 
-	searchCustomers(params searchParams) ([]*client.Customer, error)
+	searchCustomers(params SearchParams) ([]*client.Customer, error)
 
 	getCustomerMetadata(customerID string) (map[string]string, error)
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
@@ -436,7 +436,7 @@ func (r *sqlCustomerRepository) deleteCustomer(customerID string) error {
 	return err
 }
 
-func (r *sqlCustomerRepository) createCustomer(c *client.Customer, organization string) error {
+func (r *sqlCustomerRepository) CreateCustomer(c *client.Customer, organization string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
@@ -460,7 +460,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	now := time.Now()
 	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, birthDate, client.UNKNOWN, c.Email, now, now, organization)
 	if err != nil {
-		return fmt.Errorf("createCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
+		return fmt.Errorf("CreateCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
 
 	err = r.updatePhonesByCustomerID(tx, c.CustomerID, c.Phones)
@@ -474,7 +474,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("createCustomer: tx.Commit: %v", err)
+		return fmt.Errorf("CreateCustomer: tx.Commit: %v", err)
 	}
 	return nil
 }
@@ -520,7 +520,7 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("createCustomer: tx.Commit: %v", err)
+		return fmt.Errorf("CreateCustomer: tx.Commit: %v", err)
 	}
 	return nil
 }
@@ -561,7 +561,7 @@ func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customer
 	return nil
 }
 
-func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer, error) {
+func (r *sqlCustomerRepository) GetCustomer(customerID string) (*client.Customer, error) {
 	query := `select first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -577,7 +577,7 @@ func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer
 		&cust.LastModified)
 	stmt.Close()
 	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
-		return nil, fmt.Errorf("getCustomer: %v", err)
+		return nil, fmt.Errorf("GetCustomer: %v", err)
 	}
 	if cust.FirstName == "" {
 		return nil, nil // not found
@@ -588,19 +588,19 @@ func (r *sqlCustomerRepository) getCustomer(customerID string) (*client.Customer
 
 	phones, err := r.readPhones(customerID)
 	if err != nil {
-		return nil, fmt.Errorf("getCustomer: readPhones: %v", err)
+		return nil, fmt.Errorf("GetCustomer: readPhones: %v", err)
 	}
 	cust.Phones = phones
 
 	addresses, err := r.readAddresses(customerID)
 	if err != nil {
-		return nil, fmt.Errorf("getCustomer: readAddresses: %v", err)
+		return nil, fmt.Errorf("GetCustomer: readAddresses: %v", err)
 	}
 	cust.Addresses = addresses
 
 	metadata, err := r.getCustomerMetadata(customerID)
 	if err != nil {
-		return nil, fmt.Errorf("getCustomer: getCustomerMetadata: %v", err)
+		return nil, fmt.Errorf("GetCustomer: getCustomerMetadata: %v", err)
 	}
 	cust.Metadata = metadata
 
@@ -611,13 +611,13 @@ func (r *sqlCustomerRepository) readPhones(customerID string) ([]client.Phone, e
 	query := `select number, valid, type from customers_phones where customer_id = ?;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return nil, fmt.Errorf("getCustomer: prepare customers_phones: err=%v", err)
+		return nil, fmt.Errorf("GetCustomer: prepare customers_phones: err=%v", err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(customerID)
 	if err != nil {
-		return nil, fmt.Errorf("getCustomer: query customers_phones: err=%v", err)
+		return nil, fmt.Errorf("GetCustomer: query customers_phones: err=%v", err)
 	}
 	defer rows.Close()
 
@@ -625,7 +625,7 @@ func (r *sqlCustomerRepository) readPhones(customerID string) ([]client.Phone, e
 	for rows.Next() {
 		var p client.Phone
 		if err := rows.Scan(&p.Number, &p.Valid, &p.Type); err != nil {
-			return nil, fmt.Errorf("getCustomer: scan customers_phones: err=%v", err)
+			return nil, fmt.Errorf("GetCustomer: scan customers_phones: err=%v", err)
 		}
 		phones = append(phones, p)
 	}

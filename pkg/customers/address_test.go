@@ -24,7 +24,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.createCustomer(cust, "organization")
+	err := repo.CreateCustomer(cust, "organization")
 	require.NoError(t, err)
 
 	address := address{
@@ -74,7 +74,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.createCustomer(cust, "organization")
+	err := repo.CreateCustomer(cust, "organization")
 	require.NoError(t, err)
 
 	address := address{
@@ -86,7 +86,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 		Type:       "primary",
 	}
 	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
-	cust, err = repo.getCustomer(cust.CustomerID) // refresh customer object after updating address
+	cust, err = repo.GetCustomer(cust.CustomerID) // refresh customer object after updating address
 	require.NoError(t, err)
 
 	updateReq := updateCustomerAddressRequest{
@@ -144,7 +144,7 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.createCustomer(cust, "organization")
+	err := repo.CreateCustomer(cust, "organization")
 	require.NoError(t, err)
 
 	address := address{
@@ -157,7 +157,7 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 	}
 	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
 
-	cust, err = repo.getCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID)
 	require.NoError(t, err)
 	addressID := cust.Addresses[0].AddressID
 
@@ -174,7 +174,7 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 	router.ServeHTTP(res, req)
 	require.Equal(t, http.StatusNoContent, res.Code)
 
-	cust, err = repo.getCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID)
 	require.NoError(t, err)
 	require.Empty(t, cust.Addresses)
 }
@@ -211,7 +211,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.createCustomer(cust, "organization")
+	err := repo.CreateCustomer(cust, "organization")
 	require.NoError(t, err)
 
 	address := address{
@@ -224,7 +224,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 	}
 	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
 
-	cust, err = repo.getCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID)
 	require.NoError(t, err)
 
 	addressID := cust.Addresses[0].AddressID
@@ -240,7 +240,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 	err = repo.updateCustomerAddress(cust.CustomerID, addressID, updateReq)
 	require.NoError(t, err)
 
-	cust, err = repo.getCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID)
 	require.NoError(t, err)
 
 	require.Len(t, cust.Addresses, 1)
@@ -268,7 +268,7 @@ func TestCustomerRepository__deleteCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.createCustomer(cust, "organization")
+	err := repo.CreateCustomer(cust, "organization")
 	require.NoError(t, err)
 
 	address := address{
@@ -281,14 +281,14 @@ func TestCustomerRepository__deleteCustomerAddress(t *testing.T) {
 	}
 	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
 
-	cust, err = repo.getCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID)
 	require.NoError(t, err)
 
 	addressID := cust.Addresses[0].AddressID
 	err = repo.deleteCustomerAddress(cust.CustomerID, addressID)
 	require.NoError(t, err)
 
-	cust, err = repo.getCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID)
 	require.NoError(t, err)
 
 	require.Len(t, cust.Addresses, 0)

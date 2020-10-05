@@ -8,6 +8,8 @@ import (
 	"github.com/moov-io/customers/pkg/client"
 )
 
+var _ Repository = (*mockRepository)(nil)
+
 type mockRepository struct {
 	Accounts      []*client.Account
 	AccountNumber string
@@ -24,14 +26,21 @@ func (r *mockRepository) getCustomerAccount(customerID, accountID string) (*clie
 	return nil, nil
 }
 
-func (r *mockRepository) getCustomerAccounts(customerID string) ([]*client.Account, error) {
+func (r *mockRepository) GetCustomerAccountsByIDs(accountIDs []string) ([]*client.Account, error) {
 	if r.Err != nil {
 		return nil, r.Err
 	}
 	return r.Accounts, nil
 }
 
-func (r *mockRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
+func (r *mockRepository) getAccountsByCustomerID(customerID string) ([]*client.Account, error) {
+	if r.Err != nil {
+		return nil, r.Err
+	}
+	return r.Accounts, nil
+}
+
+func (r *mockRepository) CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error) {
 	if r.Err != nil {
 		return nil, r.Err
 	}

@@ -44,7 +44,7 @@ func TestCustomersSearchRouter(t *testing.T) {
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.createCustomer(cust, "organization"); err != nil {
+	if err := repo.CreateCustomer(cust, "organization"); err != nil {
 		t.Error(err)
 	}
 
@@ -93,11 +93,13 @@ func TestCustomerSearch__query(t *testing.T) {
 	}
 
 	// Query search
-	query, args := buildSearchQuery(searchParams{
-		Organization: "foo",
-		Query:        "jane doe",
-		Count:        100,
-	})
+	query, args := buildSearchQuery(
+		SearchParams{
+			Organization: "foo",
+			Query:        "jane doe",
+			Count:        100,
+		},
+	)
 	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
@@ -112,10 +114,12 @@ func TestCustomerSearch__query(t *testing.T) {
 	}
 
 	// Eamil search
-	query, args = buildSearchQuery(searchParams{
-		Organization: "foo",
-		Email:        "jane.doe@moov.io",
-	})
+	query, args = buildSearchQuery(
+		SearchParams{
+			Organization: "foo",
+			Email:        "jane.doe@moov.io",
+		},
+	)
 	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}
@@ -130,12 +134,14 @@ func TestCustomerSearch__query(t *testing.T) {
 	}
 
 	// Query and Eamil saerch
-	query, args = buildSearchQuery(searchParams{
-		Organization: "foo",
-		Query:        "jane doe",
-		Email:        "jane.doe@moov.io",
-		Count:        25,
-	})
+	query, args = buildSearchQuery(
+		SearchParams{
+			Organization: "foo",
+			Query:        "jane doe",
+			Email:        "jane.doe@moov.io",
+			Count:        25,
+		},
+	)
 	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
 		t.Errorf("unexpected query: %q", query)
 	}

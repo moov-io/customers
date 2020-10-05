@@ -13,10 +13,11 @@ import (
 	"time"
 
 	moovhttp "github.com/moov-io/base/http"
+	watchmanClient "github.com/moov-io/watchman/client"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/watchman"
-	watchmanClient "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -125,7 +126,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		cust, err := repo.getCustomer(customerID)
+		cust, err := repo.GetCustomer(customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **AccountID** | **string** | A unique identifier for this account | 
+**CustomerID** | **string** | The unique identifier for the customer who owns the account | 
 **HolderName** | **string** | Legal holder name on the account | 
 **MaskedAccountNumber** | **string** | The masked account number for the bank account | 
 **RoutingNumber** | **string** | The ABA routing transit number for the bank account. | 

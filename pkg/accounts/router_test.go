@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
+
 	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/fed"
@@ -131,7 +132,7 @@ func TestRefreshAccountAndCheckAccountOfacSearch(t *testing.T) {
 }
 
 func TestAccountCreationRequest(t *testing.T) {
-	req := &createAccountRequest{}
+	req := &CreateAccountRequest{}
 	if err := req.validate(); err == nil {
 		t.Error("expected error")
 	}
@@ -167,7 +168,7 @@ func TestGetAccountByID(t *testing.T) {
 	var err error
 	for i := 0; i < 5; i++ {
 		accounts = append(accounts, &account{customerID: base.ID()})
-		accounts[i].Account, err = repo.createCustomerAccount(accounts[i].customerID, base.ID(), &createAccountRequest{
+		accounts[i].Account, err = repo.CreateCustomerAccount(accounts[i].customerID, base.ID(), &CreateAccountRequest{
 			AccountNumber: fmt.Sprintf("%d", i),
 			RoutingNumber: "987654320",
 			Type:          client.CHECKING,
@@ -317,7 +318,7 @@ func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*c
 }
 
 func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *client.Account {
-	params := &createAccountRequest{
+	params := &CreateAccountRequest{
 		HolderName:    "John Doe",
 		AccountNumber: "18749",
 		RoutingNumber: "987654320",
