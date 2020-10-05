@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
@@ -195,6 +196,40 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	if w.Code != http.StatusBadRequest {
 		t.Errorf("bogus HTTP status: %d", w.Code)
 	}
+}
+
+func TestDocuments_uploadTooLarge(t *testing.T) {
+	var body bytes.Buffer
+	mp := multipart.NewWriter(&body)
+	part, err := mp.CreateFormFile("file", "exceedinglyLargeFile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := part.Write(make([]byte, 21*1024*1024)); err != nil {
+		t.Fatal(err)
+	}
+	if err := mp.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, "/customers/abc/documents?type=driverslicense", &body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", mp.FormDataContentType())
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	str := string(b)
+	require.Contains(t, str, "exceeds maximum size")
 }
 
 func TestDocuments__retrieveError(t *testing.T) {

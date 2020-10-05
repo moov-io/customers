@@ -108,13 +108,18 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 			return
 		}
 		defer file.Close()
-
 		fBytes, err := ioutil.ReadAll(file)
 		if err != nil {
 			logger.Log("documents", "failed to read file from multipart form", "error", err, "customerID", customerID, "requestID", requestID)
 			moovhttp.Problem(w, err)
 			return
 		}
+		if int64(len(fBytes)) > maxDocumentSize {
+			logger.Log("documents", "max file size exceeded", "customerID", customerID, "requestID", requestID)
+			moovhttp.Problem(w, fmt.Errorf("file exceeds maximum size of %dMB", maxDocumentSize/(1024*1024)))
+			return
+		}
+
 		contentType := http.DetectContentType(fBytes)
 		doc := &client.Document{
 			DocumentID:  base.ID(),
