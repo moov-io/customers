@@ -16,7 +16,7 @@ import (
 	"github.com/moov-io/base/docker"
 	watchman "github.com/moov-io/watchman/client"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/ory/dockertest/v3"
 )
 

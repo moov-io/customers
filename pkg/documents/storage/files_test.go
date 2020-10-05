@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 	"gocloud.dev/blob"
 )

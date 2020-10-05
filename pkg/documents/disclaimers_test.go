@@ -20,7 +20,7 @@ import (
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 )
 

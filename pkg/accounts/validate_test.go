@@ -23,7 +23,7 @@ import (
 	payclient "github.com/moov-io/paygate/pkg/client"
 	"github.com/stretchr/testify/require"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
 )
 

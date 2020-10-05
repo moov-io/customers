@@ -17,7 +17,7 @@ import (
 
 	"github.com/moov-io/customers/pkg/client"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 )
 
 func TestCustomers__updateCustomerStatus(t *testing.T) {
