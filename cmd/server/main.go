@@ -187,7 +187,7 @@ func main() {
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)
-	configuration.RegisterRoutes(logger, router, configRepo)
+	configuration.RegisterRoutes(logger, router, configRepo, bucket)
 
 	// Optionally serve /files/ as our fileblob routes
 	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
