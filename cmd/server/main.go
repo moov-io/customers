@@ -103,9 +103,10 @@ func main() {
 	adminServer := admin.NewServer(*adminAddr)
 	adminServer.AddVersionHandler(mainPkg.Version) // Setup 'GET /version'
 	go func() {
-		logger.Log(fmt.Sprintf("admin listening on %s", adminServer.BindAddr()))
+		logger.WithKeyValue("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
-			logger.LogErrorF("problem starting admin http: %v", err)
+			err = fmt.Errorf("problem starting admin http: %v", err)
+			logger.WithKeyValue("admin", err.Error())
 			errs <- err
 		}
 	}()

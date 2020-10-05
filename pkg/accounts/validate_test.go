@@ -8,10 +8,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/moov-io/customers/pkg/customers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/moov-io/customers/pkg/customers"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/moov-io/base"
