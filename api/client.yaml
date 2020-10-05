@@ -856,7 +856,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/ofac:
     get:
-      tags: [ Customers ]
+      tags: [Customers]
       summary: Latest Account OFAC search
       description: Get the latest OFAC search for an Account
       operationId: getLatestAccountOFACSearch
@@ -902,7 +902,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/refresh/ofac:
     put:
-      tags: [ Customers ]
+      tags: [Customers]
       summary: Refresh Account OFAC search
       description: Refresh OFAC search for a given Account
       operationId: refreshAccountOFACSearch
@@ -948,7 +948,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/status:
     put:
-      tags: [ Customers ]
+      tags: [Customers]
       summary: Update Account Status
       description: Update the status for the specified accountID
       operationId: updateAccountStatus

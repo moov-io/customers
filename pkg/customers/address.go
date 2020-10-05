@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
 
+	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 )
 
@@ -124,4 +125,13 @@ func (req *updateCustomerAddressRequest) validate() error {
 	default:
 		return fmt.Errorf("updateCustomerAddressRequest: unknown type: %s", req.Type)
 	}
+}
+
+func containsValidPrimaryAddress(addrs []client.CustomerAddress) bool {
+	for i := range addrs {
+		if strings.EqualFold(addrs[i].Type, "primary") && addrs[i].Validated {
+			return true
+		}
+	}
+	return false
 }

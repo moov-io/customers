@@ -33,6 +33,7 @@ func AddCustomerRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository
 	r.Methods("DELETE").Path("/customers/{customerID}").HandlerFunc(deleteCustomer(logger, repo))
 	r.Methods("POST").Path("/customers").HandlerFunc(createCustomer(logger, repo, customerSSNStorage, ofac))
 	r.Methods("PUT").Path("/customers/{customerID}/metadata").HandlerFunc(replaceCustomerMetadata(logger, repo))
+	r.Methods("PUT").Path("/customers/{customerID}/status").HandlerFunc(updateCustomerStatus(logger, repo))
 }
 
 // formatCustomerName returns a Customer's name joined as one string. It accounts for

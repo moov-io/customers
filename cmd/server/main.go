@@ -132,7 +132,6 @@ func main() {
 	ofac := customers.NewOFACSearcher(customerRepo, watchmanClient)
 
 	// Register our admin routes
-	customers.AddApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
 	documents.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
