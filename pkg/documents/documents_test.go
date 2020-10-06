@@ -198,25 +198,8 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	}
 }
 
-func TestDocuments_uploadTooLarge(t *testing.T) {
-	var body bytes.Buffer
-	mp := multipart.NewWriter(&body)
-	part, err := mp.CreateFormFile("file", "exceedinglyLargeFile")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, err := part.Write(make([]byte, 21*1024*1024)); err != nil {
-		t.Fatal(err)
-	}
-	if err := mp.Close(); err != nil {
-		t.Fatal(err)
-	}
-
-	req, err := http.NewRequest(http.MethodPost, "/customers/abc/documents?type=driverslicense", &body)
-	if err != nil {
-		t.Fatal(err)
-	}
-	req.Header.Set("Content-Type", mp.FormDataContentType())
+func TestDocuments_fileTooLarge(t *testing.T) {
+	req := multipartFileOfSize(t, "file", maxDocumentSize+512)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
 
@@ -231,7 +214,83 @@ func TestDocuments_uploadTooLarge(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.Contains(t, string(b), "exceeds maximum size")
+	require.Contains(t, string(b), "file exceeds maximum size")
+}
+
+// bufio Peek(n) returns an EOF error if the file is smaller than n bytes
+func TestDocuments_fileSmallerThanPeek(t *testing.T) {
+	req := multipartFileOfSize(t, "file", 256)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestDocuments_formTooLarge(t *testing.T) {
+	req := multipartFileOfSize(t, "file", maxFormSize+512)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "request body exceeds maximum size")
+}
+
+func TestDocuments_missingFileKey(t *testing.T) {
+	req := multipartFileOfSize(t, "bogusKey", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "expected multipart upload with key of 'file'")
+}
+
+func multipartFileOfSize(t *testing.T, fileKey string, size int64) *http.Request {
+	var body bytes.Buffer
+	mp := multipart.NewWriter(&body)
+	part, err := mp.CreateFormFile(fileKey, "exceedinglyLargeFile")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := part.Write(make([]byte, size)); err != nil {
+		t.Fatal(err)
+	}
+	if err := mp.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	req, err := http.NewRequest(http.MethodPost, "/customers/abc/documents?type=driverslicense", &body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req.Header.Set("Content-Type", mp.FormDataContentType())
+
+	return req
 }
 
 func TestDocuments__retrieveError(t *testing.T) {

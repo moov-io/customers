@@ -5,11 +5,13 @@
 package documents
 
 import (
+	"bufio"
 	"context"
 	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"path"
@@ -30,11 +32,13 @@ import (
 )
 
 var (
-	errNoDocumentID = errors.New("no Document ID found")
+	errNoDocumentID    = errors.New("no Document ID found")
+	errRequestTooLarge = errors.New("http: request body too large")
 )
 
 const (
-	maxDocumentSize int64 = 20 * 1024 * 1024 // 20MB
+	maxDocumentSize int64 = 20 << 20                    // 20MB
+	maxFormSize     int64 = maxDocumentSize + (5 << 20) // restricts request body size to allow for the document plus a small buffer
 )
 
 func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, keeper *secrets.Keeper, bucketFactory storage.BucketFunc) {
@@ -102,31 +106,35 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 			return
 		}
 
-		file, _, err := r.FormFile("file")
-		if file == nil || err != nil {
+		// if r.Body is larger than maxFormSize an error will be returned when the body is read
+		r.Body = http.MaxBytesReader(w, r.Body, maxFormSize)
+		file, fileHeader, err := r.FormFile("file")
+		if err != nil {
+			if strings.Contains(err.Error(), "request body too large") {
+				logger.Log("documents", "max form size exceeded", "customerID", customerID, "requestID", requestID)
+				moovhttp.Problem(w, fmt.Errorf("request body exceeds maximum size of %dMB", maxFormSize/(1<<20)))
+				return
+			}
+			logger.Log("documents", "error reading form file", "error", err, "customerID", customerID, "requestID", requestID)
 			moovhttp.Problem(w, fmt.Errorf("expected multipart upload with key of 'file' error=%v", err))
 			return
 		}
 		defer file.Close()
-		fBytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			logger.Log("documents", "failed to read file from multipart form", "error", err, "customerID", customerID, "requestID", requestID)
-			moovhttp.Problem(w, err)
-			return
-		}
-		if int64(len(fBytes)) > maxDocumentSize {
+
+		if fileHeader.Size > maxDocumentSize {
 			logger.Log("documents", "max file size exceeded", "customerID", customerID, "requestID", requestID)
-			moovhttp.Problem(w, fmt.Errorf("file exceeds maximum size of %dMB", maxDocumentSize/(1024*1024)))
+			moovhttp.Problem(w, fmt.Errorf("file exceeds maximum size of %dMB", maxDocumentSize/(1<<20)))
 			return
 		}
 
-		contentType := http.DetectContentType(fBytes)
-		doc := &client.Document{
-			DocumentID:  base.ID(),
-			Type:        documentType,
-			ContentType: contentType,
-			UploadedAt:  time.Now(),
+		fileReader := bufio.NewReader(file)
+		sniff, err := fileReader.Peek(512)
+		if err != nil && err != io.EOF {
+			logger.Log("documents", "peek failed", "error", err, "customerID", customerID, "requestID", requestID)
+			moovhttp.Problem(w, err)
+			return
 		}
+		contentType := http.DetectContentType(sniff)
 
 		// Grab our cloud bucket before writing into our database
 		bucket, err := bucketFactory()
@@ -137,6 +145,12 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		}
 		defer bucket.Close()
 
+		doc := &client.Document{
+			DocumentID:  base.ID(),
+			Type:        documentType,
+			ContentType: contentType,
+			UploadedAt:  time.Now(),
+		}
 		if err := repo.writeCustomerDocument(customerID, doc); err != nil {
 			logger.Log("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID, "requestID", requestID)
 			moovhttp.Problem(w, err)
@@ -148,6 +162,13 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
+		fBytes := make([]byte, fileHeader.Size)
+		_, err = fileReader.Read(fBytes)
+		if err != nil {
+			logger.Log("documents", "read failed", "error", err, "customerID", customerID, "requestID", requestID)
+			moovhttp.Problem(w, err)
+			return
+		}
 		encryptedDoc, err := keeper.Encrypt(ctx, fBytes)
 		if err != nil {
 			logger.Log("documents", "failed to encrypt document", "error", err, "customer", customerID, "requestID", requestID)
