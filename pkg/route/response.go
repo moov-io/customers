@@ -58,7 +58,13 @@ func (w *ResponseWriter) WriteHeader(code int) {
 	}
 
 	if requestID := GetRequestID(w.request); requestID != "" && w.log != nil {
-		w.log.WithKeyValue("method", w.request.Method, "path", w.request.URL.Path, "status", strconv.Itoa(code), "duration", diff.String(), "requestID", requestID)
+		w.log.WithMap(map[string]string{
+			"method":    w.request.Method,
+			"path":      w.request.URL.Path,
+			"status":    strconv.Itoa(code),
+			"duration":  diff.String(),
+			"requestID": requestID,
+		})
 	}
 }
 

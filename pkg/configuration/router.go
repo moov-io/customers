@@ -53,6 +53,8 @@ func listAllowedContentTypes() string {
 }
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, bucketFunc storage.BucketFunc) {
+	logger = logger.WithKeyValue("package", "configuration")
+
 	r.Methods("GET").Path("/configuration/customers").HandlerFunc(getOrganizationConfig(logger, repo))
 	r.Methods("PUT").Path("/configuration/customers").HandlerFunc(updateOrganizationConfig(logger, repo))
 	r.Methods("GET").Path("/configuration/logo").HandlerFunc(getOrganizationLogo(logger, repo, bucketFunc))
@@ -103,16 +105,17 @@ func updateOrganizationConfig(logger log.Logger, repo Repository) http.HandlerFu
 
 func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory storage.BucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		requestID := moovhttp.GetRequestID(r)
 		organization := route.GetOrganization(w, r)
 		if organization == "" {
-			logger.WithKeyValue("configuration", "get organization logo called with no organization header", "requestID", requestID)
+			logger.Log("get organization logo called with no organization header")
 			return
 		}
 
+		logger = logger.WithKeyValue("organization", organization)
+
 		bucket, err := bucketFactory()
 		if err != nil {
-			logger.WithKeyValue("configuration", "problem retrieving logo image", "error", err.Error(), "organization", organization, "requestID", requestID)
+			logger.LogError("problem retrieving logo image", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -127,7 +130,8 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 				http.NotFound(w, r)
 				return
 			}
-			logger.WithKeyValue("configuration", msg, "error", err.Error(), "organization", organization, "requestID", requestID)
+
+			logger.LogError(msg, err)
 			moovhttp.Problem(w, fmt.Errorf(msg))
 			return
 		}
@@ -135,7 +139,7 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 
 		fBytes, err := ioutil.ReadAll(rdr)
 		if err != nil || fBytes == nil {
-			logger.WithKeyValue("configuration", "problem reading logo file", "error", err.Error(), "organization", organization, "requestID", requestID)
+			logger.LogError("problem reading logo file", err)
 			moovhttp.Problem(w, fmt.Errorf("problem reading logo file - error=%v", err))
 			return
 		}
@@ -148,16 +152,15 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 
 func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory storage.BucketFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		requestID := moovhttp.GetRequestID(r)
 		organization := route.GetOrganization(w, r)
 		if organization == "" {
-			logger.WithKeyValue("configuration", "upload logo called with no organization header", "requestID", requestID)
+			logger.Log("upload logo called with no organization header")
 			return
 		}
 
 		file, _, err := r.FormFile("file")
 		if file == nil || err != nil {
-			logger.WithKeyValue("configuration", errMissingFile.Error(), "error", err.Error(), "organization", organization, "requestID", requestID)
+			logger.LogError(errMissingFile.Error(), err)
 			moovhttp.Problem(w, errMissingFile)
 			return
 		}
@@ -166,21 +169,22 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 		// Detect the content type by reading the first 512 bytes of r.Body (read into file as we expect a multipart request)
 		buf := make([]byte, 512)
 		if _, err := file.Read(buf); err != nil && err != io.EOF {
-			logger.WithKeyValue("configuration", "problem reading file", "error", err.Error(), "organization", organization, "requestID", requestID)
+			logger.LogError("problem reading file", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		contentType := http.DetectContentType(buf)
 		if !allowedContentTypes[contentType] {
-			logger.WithKeyValue("configuration", "unsupported content type for logo image file", "contentType", contentType, "organization", organization, "requestID", requestID)
+			logger.WithKeyValue("contentType", contentType).
+				Log("unsupported content type for logo image file")
 			moovhttp.Problem(w, errUnsupportedType)
 			return
 		}
 
 		bucket, err := bucketFactory()
 		if err != nil {
-			logger.WithKeyValue("configuration", "problem uploading logo image", "error", err.Error(), "organization", organization, "requestID", requestID)
+			logger.LogError("problem uploading logo image", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -194,7 +198,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 			ContentType:        contentType,
 		})
 		if err != nil {
-			logger.WithKeyValue("configuration", "problem uploading logo image", "error", err.Error(), "organization", organization, "requestID", requestID)
+			logger.LogError("problem uploading logo image", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -202,7 +206,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 
 		written, err := io.Copy(writer, io.LimitReader(io.MultiReader(bytes.NewReader(buf), file), maxImageSize))
 		if err != nil || written == 0 {
-			logger.WithKeyValue("configuration", "problem uploading logo image", "error", err.Error(), "organization", organization, "requestID", requestID)
+			logger.LogError("problem uploading logo image", err)
 			moovhttp.Problem(w, fmt.Errorf("problem writing file - wrote %d bytes with error=%v", written, err))
 			return
 		}

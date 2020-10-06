@@ -27,6 +27,8 @@ import (
 type BucketFunc func() (*blob.Bucket, error)
 
 func GetBucket(logger log.Logger, bucketName, cloudProvider string, FileblobSigner *fileblob.URLSignerHMAC) BucketFunc {
+	logger = logger.WithKeyValue("package", "storage")
+
 	return func() (*blob.Bucket, error) {
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()
@@ -66,10 +68,10 @@ func awsBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 
 	bucket, err := s3blob.OpenBucket(ctx, s, bucketName, nil)
 	if err != nil {
-		logger.WithKeyValue("storage", fmt.Sprintf("ERROR creating %s aws bucket: %v", bucketName, err))
+		logger.LogErrorF("ERROR creating %s aws bucket: %v", bucketName, err)
 		return nil, err
 	}
-	logger.WithKeyValue("storage", fmt.Sprintf("created %s aws bucket: %T", bucketName, bucket))
+	logger.Log(fmt.Sprintf("created %s aws bucket: %T", bucketName, bucket))
 	return bucket, nil
 }
 
@@ -85,7 +87,7 @@ func fileBucket(ctx context.Context, logger log.Logger, bucketName string, signe
 	if err := os.Mkdir(bucketName, 0777); strings.Contains(bucketName, "..") || (err != nil && !os.IsExist(err)) {
 		return nil, fmt.Errorf("problem creating %s error=%v", bucketName, err)
 	}
-	logger.WithKeyValue("storage", fmt.Sprintf("created %s for file bucket", bucketName))
+	logger.LogErrorF("created %s for file bucket", bucketName)
 	return fileblob.OpenBucket(bucketName, &fileblob.Options{
 		URLSigner: signer,
 	})
@@ -105,9 +107,9 @@ func gcpBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 
 	bucket, err := gcsblob.OpenBucket(ctx, c, bucketName, nil)
 	if err != nil {
-		logger.WithKeyValue("storage", fmt.Sprintf("ERROR creating %s gcp bucket: %v", bucketName, err))
+		logger.LogErrorF("ERROR creating %s gcp bucket: %v", bucketName, err)
 		return nil, err
 	}
-	logger.WithKeyValue("storage", fmt.Sprintf("created %s gcp bucket: %v", bucketName, err))
+	logger.Log(fmt.Sprintf("created %s gcp bucket: %v", bucketName, err))
 	return bucket, nil
 }
