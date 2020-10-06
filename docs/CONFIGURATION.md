@@ -99,6 +99,8 @@ The following environment variables control which backend service is initialized
 - `DOCUMENTS_BUCKET`: The name of the bucket to use. Must be created outside of Customers if using a cloud provider. Make sure proper access and encryption controls are setup on this bucket to prevent exposure or unauthorized access. Example: `./storage/` (For `file` type backends or `moov-customers-storage` for GCP/GCS)
 - `DOCUMENTS_PROVIDER`: Provider name which determines which of the following environmental variables are used to initialize Customer's persistence.
 
+- `DOCUMENTS_SECRET_PROVIDER`: Provider name which determines which of the following environmental variables are used to initialize Customer's persistence. Defaults to [local filesystem storage](#local-filesystem-storage).
+
 ##### AWS S3 Storage
 
 For more information see the [Go Cloud Development Kit docs for s3blob](https://godoc.org/gocloud.dev/blob/s3blob). Use `CLOUD_PROVIDER=aws` to read the following environmental variables:
@@ -114,7 +116,7 @@ For more information see the [Go Cloud Development Kit docs for gcsblob](https:/
 
 ##### Local filesystem Storage
 
-For more information see the [Go Cloud Development Kit docs for fileblob](https://godoc.org/gocloud.dev/blob/fileblob). This is the default if no other provider is specified. Use `CLOUD_PROVIDER=file` to read the following environmental variables:
+For more information see the [Go Cloud Development Kit docs for fileblob](https://godoc.org/gocloud.dev/blob/fileblob). This is the default if no other provider is specified. Use `CLOUD_PROVIDER=local` to read the following environmental variables:
 
 - `FILEBLOB_BASE_URL`: A filepath for storage on local disk. (Default: `./storage/`)
 - `FILEBLOB_HMAC_SECRET`: HMAC secret value used to sign URLs. You *MUST* change this for production usage! (Default: `secret`)

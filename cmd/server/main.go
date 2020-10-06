@@ -176,7 +176,7 @@ func main() {
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
 
-	docsKeeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-documents", os.Getenv("CLOUD_PROVIDER"))
+	docsKeeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-documents", util.Or(os.Getenv("DOCUMENTS_SECRET_PROVIDER"), "local"))
 	if err != nil {
 		panic(err)
 	}
