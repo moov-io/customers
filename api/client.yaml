@@ -1528,7 +1528,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportAccountResponse'
+                $ref: '#/components/schemas/ReportAccountsResponse'
           description: A list of customers' accounts
         "400":
           content:
@@ -2245,3 +2245,7 @@ components:
           $ref: '#/components/schemas/Customer'
         Account:
           $ref: '#/components/schemas/Account'
+    ReportAccountsResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReportAccountResponse'

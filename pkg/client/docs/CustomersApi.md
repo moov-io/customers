@@ -926,7 +926,7 @@ No authorization required
 
 ## GetReportOfCustomerAccounts
 
-> ReportAccountResponse GetReportOfCustomerAccounts(ctx, optional)
+> []ReportAccountResponse GetReportOfCustomerAccounts(ctx, optional)
 
 
 
@@ -952,7 +952,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**ReportAccountResponse**](ReportAccountResponse.md)
+[**[]ReportAccountResponse**](ReportAccountResponse.md)
 
 ### Authorization
 
