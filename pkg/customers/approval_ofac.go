@@ -104,6 +104,8 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 }
 
 func AddOFACRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, ofac *OFACSearcher) {
+	logger = logger.WithKeyValue("package", "ofac")
+
 	r.Methods("GET").Path("/customers/{customerID}/ofac").HandlerFunc(getLatestCustomerOFACSearch(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/refresh/ofac").HandlerFunc(refreshOFACSearch(logger, repo, ofac))
 }
@@ -134,7 +136,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 
-		requestID, userID := moovhttp.GetRequestID(r), moovhttp.GetUserID(r)
+		requestID := moovhttp.GetRequestID(r)
 		customerID := route.GetCustomerID(w, r)
 		if customerID == "" {
 			return
@@ -146,29 +148,29 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		logger.WithKeyValue("ofac", fmt.Sprintf("running live OFAC search for customer=%s", customerID), "requestID", requestID, "userID", userID)
+		logger.Log(fmt.Sprintf("running live OFAC search for customer=%s", customerID))
 
 		if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
-			logger.WithKeyValue("ofac", fmt.Sprintf("error refreshing ofac search: %v", err))
+			logger.LogErrorF("error refreshing ofac search: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 		result, err := repo.getLatestCustomerOFACSearch(customerID)
 		if err != nil {
-			logger.WithKeyValue("ofac", fmt.Sprintf("error getting latest ofac search: %v", err))
+			logger.LogErrorF("error getting latest ofac search: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 		if result.Match > ofacMatchThreshold {
-			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
-			logger.WithKeyValue("ofac", err.Error(), "requestID", requestID, "userID", userID)
+			logger.LogErrorF("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
 
 			if err := repo.updateCustomerStatus(cust.CustomerID, client.REJECTED, "manual OFAC refresh"); err != nil {
-				logger.WithKeyValue("ofac", fmt.Sprintf("error updating customer=%s error=%v", cust.CustomerID, err))
+				logger.LogErrorF("error updating customer=%s error=%v", cust.CustomerID, err)
 				moovhttp.Problem(w, err)
 				return
 			}
 		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
 	}

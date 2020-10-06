@@ -26,6 +26,8 @@ import (
 )
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, validations validator.Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy, ofac *AccountOfacSearcher) {
+	logger = logger.WithKeyValue("package", "accounts")
+
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, accounts, fedClient))
 	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, accounts, fedClient, keeper, ofac))
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, accounts, keeper, transitKeeper))
@@ -129,18 +131,18 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 			return
 		}
 		if err := request.validate(); err != nil {
-			logger.WithKeyValue("accounts", fmt.Sprintf("problem validating account: %v", err), "requestID", moovhttp.GetRequestID(r))
+			logger.LogErrorF("problem validating account: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 		if err := request.disfigure(keeper); err != nil {
-			logger.WithKeyValue("accounts", fmt.Sprintf("problem disfiguring account: %v", err), "requestID", moovhttp.GetRequestID(r))
+			logger.LogErrorF("problem disfiguring account: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		if _, err := fedClient.LookupInstitution(request.RoutingNumber); err != nil {
-			logger.WithKeyValue("accounts", fmt.Sprintf("problem looking up routing number=%q: %v", request.RoutingNumber, err), "requestID", moovhttp.GetRequestID(r))
+			logger.LogErrorF("problem looking up routing number=%q: %v", request.RoutingNumber, err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -148,14 +150,14 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 		customerID, userID := route.GetCustomerID(w, r), moovhttp.GetUserID(r)
 		account, err := repo.createCustomerAccount(customerID, userID, &request)
 		if err != nil {
-			logger.WithKeyValue("accounts", fmt.Sprintf("problem saving account: %v", err), "requestID", moovhttp.GetRequestID(r))
+			logger.LogErrorF("problem saving account: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		// Perform an OFAC search with the Customer information
 		if err := ofac.StoreAccountOFACSearch(account, requestID); err != nil {
-			logger.WithKeyValue("accounts", fmt.Sprintf("error with OFAC search for account=%s: %v", account.AccountID, err), "requestID", requestID)
+			logger.LogErrorF("error with OFAC search for account=%s: %v", account.AccountID, err)
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")

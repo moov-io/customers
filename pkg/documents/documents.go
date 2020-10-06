@@ -38,6 +38,8 @@ const (
 )
 
 func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, bucketFactory storage.BucketFunc) {
+	logger = logger.WithKeyValue("package", "documents")
+
 	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, bucketFactory))
 	r.Methods("GET").Path("/customers/{customerID}/documents/{documentID}").HandlerFunc(retrieveRawDocument(logger, repo, bucketFactory))
@@ -64,7 +66,7 @@ func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.Handl
 
 		docs, err := repo.getCustomerDocuments(customerID, organization)
 		if err != nil {
-			logger.WithKeyValue("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID)
+			logger.WithKeyValue("customerID", customerID).LogErrorF("failed to %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -95,6 +97,9 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 		if customerID == "" {
 			return
 		}
+
+		logger = logger.WithKeyValue("customerID", customerID)
+
 		documentType, err := readDocumentType(r.URL.Query().Get("type"))
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -111,7 +116,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 		// Detect the content type by reading the first 512 bytes of r.Body (read into file as we expect a multipart request)
 		buf := make([]byte, 512)
 		if _, err := file.Read(buf); err != nil && err != io.EOF {
-			logger.WithKeyValue("documents", fmt.Sprintf("failed to peek: %v", err), "customerID", customerID)
+			logger.LogErrorF("failed to peek: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -126,36 +131,32 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, bucketFa
 		// Grab our cloud bucket before writing into our database
 		bucket, err := bucketFactory()
 		if err != nil {
-			logger.WithKeyValue("documents", fmt.Sprintf("failed to create bucket: %v", err), "customerID", customerID)
+			logger.LogErrorF("failed to create bucket: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 		defer bucket.Close()
 
-		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
-		if customerID == "" {
-			return
-		}
 		if err := repo.writeCustomerDocument(customerID, doc); err != nil {
-			logger.WithKeyValue("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID)
+			logger.LogErrorF("failed to %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
-		logger.WithKeyValue("documents", fmt.Sprintf("uploading document=%s (content-type: %s) for customer=%s", doc.DocumentID, contentType, customerID), "requestID", requestID)
+		logger.Log(fmt.Sprintf("uploading document=%s (content-type: %s)", doc.DocumentID, contentType))
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
 		documentKey := makeDocumentKey(customerID, doc.DocumentID)
-		logger.WithKeyValue("documents", fmt.Sprintf("writing %s", documentKey), "requestID", requestID)
+		logger.Log(fmt.Sprintf("writing %s", documentKey))
 
 		writer, err := bucket.NewWriter(ctx, documentKey, &blob.WriterOptions{
 			ContentDisposition: "inline",
 			ContentType:        contentType,
 		})
 		if err != nil {
-			logger.WithKeyValue("documents", fmt.Sprintf("problem uploading document=%s: %v", doc.DocumentID, err), "requestID", requestID)
+			logger.LogErrorF("problem uploading document=%s: %v", doc.DocumentID, err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -195,7 +196,7 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 		// reject the request if the document is deleted
 		if exists, err := repo.exists(customerID, documentID, organization); !exists || err != nil {
 			if err != nil {
-				logger.WithKeyValue("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID, "documentID", documentID)
+				logger.WithKeyValue("customerID", customerID).LogErrorF("failed to %v", err)
 			}
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -231,21 +232,22 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, bucketFacto
 func deleteCustomerDocument(logger log.Logger, repo DocumentRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
-		requestID := moovhttp.GetRequestID(r)
 
 		customerID, documentID := route.GetCustomerID(w, r), getDocumentID(w, r)
 		if customerID == "" || documentID == "" {
 			return
 		}
 
+		logger = logger.WithKeyValue("customerID", customerID)
+
 		err := repo.deleteCustomerDocument(customerID, documentID)
 		if err != nil {
+			logger.LogErrorF("deleting document=%s: %v", documentID, err)
 			moovhttp.Problem(w, fmt.Errorf("failed to %v", err))
-			logger.WithKeyValue("documents", fmt.Sprintf("deleting document=%s for customer=%s: %v", documentID, customerID, err), "requestID", requestID)
 			return
 		}
 
-		logger.WithKeyValue("documents", fmt.Sprintf("successfully deleted document=%s for customer=%s", documentID, customerID), "requestID", requestID)
+		logger.Log(fmt.Sprintf("successfully deleted document=%s", documentID))
 
 		w.WriteHeader(http.StatusNoContent)
 	}
