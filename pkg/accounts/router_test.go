@@ -19,6 +19,7 @@ import (
 
 	"github.com/moov-io/customers/internal/testclient"
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/fed"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/validator"
@@ -44,7 +45,9 @@ func createTestOFACSearcher(repo Repository, watchmanClient watchman.Client) *Ac
 func TestAccountRoutes(t *testing.T) {
 	customerID := base.ID()
 
-	handler := setupRouter(t)
+	repo := setupTestAccountRepository(t)
+	setupCustomerWithOrganization(t, customerID, "moov", repo)
+	handler := setupRouterWithTestAccountRepo(t, repo)
 
 	// first read, expect no accounts
 	accounts := httpReadAccounts(t, handler, customerID)
@@ -191,17 +194,31 @@ func TestGetAccountByID(t *testing.T) {
 }
 
 func TestRoutes__DecryptAccountNumber(t *testing.T) {
-	customerID := base.ID()
+	customerID, userID := base.ID(), base.ID()
+	organization := "test-org"
 
-	handler := setupRouter(t)
+	repo := setupTestAccountRepository(t)
+	keeper := secrets.TestStringKeeper(t)
 
-	// create an account
-	account := httpCreateAccount(t, handler, customerID)
-	if account == nil {
-		t.Fatal("missing account")
+	handler := setupRouterWithTestAccountRepo(t, repo)
+
+	// create account
+	req := &createAccountRequest{
+		AccountNumber: "123",
+		RoutingNumber: "987654320",
+		Type:          client.CHECKING,
+	}
+	if err := req.disfigure(keeper); err != nil {
+		t.Fatal(err)
+	}
+	account, err := repo.CreateCustomerAccount(customerID, userID, req)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	httpDecryptAccountNumber(t, handler, customerID, account.AccountID)
+	setupCustomerWithOrganization(t, customerID, organization, repo)
+
+	httpDecryptAccountNumber(t, handler, customerID, account.AccountID, organization)
 }
 
 func TestRoutes__EmptyAccounts(t *testing.T) {
@@ -285,6 +302,21 @@ func setupRouter(t *testing.T) *mux.Router {
 	return handler
 }
 
+func setupRouterWithTestAccountRepo(t *testing.T, testRepo *testAccountRepository) *mux.Router {
+	handler := mux.NewRouter()
+
+	testFedClient := &fed.MockClient{}
+	validations := &validator.MockRepository{}
+	keeper := secrets.TestStringKeeper(t)
+	validationStrategies := map[validator.StrategyKey]validator.Strategy{
+		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
+	}
+
+	RegisterRoutes(log.NewNopLogger(), handler, testRepo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(testRepo, nil))
+
+	return handler
+}
+
 func setupRouterWithRepo(t *testing.T, repo *mockRepository) *mux.Router {
 	handler := mux.NewRouter()
 
@@ -298,6 +330,22 @@ func setupRouterWithRepo(t *testing.T, repo *mockRepository) *mux.Router {
 	RegisterRoutes(log.NewNopLogger(), handler, repo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(repo, nil))
 
 	return handler
+}
+
+func setupCustomerWithOrganization(t *testing.T, customerID, organization string, testRepo *testAccountRepository) *client.Customer {
+	customerRepo := customers.NewCustomerRepo(log.NewNopLogger(), testRepo.db.DB)
+	cust := &client.Customer{
+		CustomerID: customerID,
+		FirstName:  "jane",
+		LastName:   "doe",
+		Type:       client.INDIVIDUAL,
+	}
+	custErr := customerRepo.CreateCustomer(cust, organization)
+	if custErr != nil {
+		t.Fatal(custErr)
+	}
+
+	return cust
 }
 
 func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*client.Account {
@@ -394,6 +442,7 @@ func httpCompleteAccountValidation(t *testing.T, handler *mux.Router, customerID
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/validations/%s", customerID, accountID, validationID), body)
+	req.Header.Set("X-Organization", "moov")
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
@@ -429,9 +478,10 @@ func httpDeleteAccount(t *testing.T, handler *mux.Router, customerID, accountID 
 	}
 }
 
-func httpDecryptAccountNumber(t *testing.T, handler *mux.Router, customerID, accountID string) {
+func httpDecryptAccountNumber(t *testing.T, handler *mux.Router, customerID, accountID, organization string) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/decrypt", customerID, accountID), nil)
+	req.Header.Set("X-Organization", organization)
 	handler.ServeHTTP(w, req)
 
 	if w.Code != http.StatusOK {
