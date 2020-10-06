@@ -40,5 +40,6 @@ func TestKeeper(t *testing.T) *secrets.Keeper {
 	if err != nil {
 		t.Fatal(err)
 	}
+	t.Cleanup(func() { keeper.Close() })
 	return keeper
 }

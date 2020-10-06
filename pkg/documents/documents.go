@@ -171,7 +171,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		encryptedDoc, err := keeper.Encrypt(ctx, fBytes)
 		if err != nil {
 			logger.Log("documents", "failed to encrypt document", "error", err, "customer", customerID, "requestID", requestID)
-			moovhttp.Problem(w, fmt.Errorf("file upload failed to to encryption error - err=%v", err))
+			moovhttp.Problem(w, fmt.Errorf("file upload error - err=%v", err))
 			return
 		}
 

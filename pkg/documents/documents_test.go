@@ -24,6 +24,7 @@ import (
 
 	"github.com/moov-io/base"
 	"github.com/stretchr/testify/require"
+	"gocloud.dev/blob"
 
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
@@ -198,7 +199,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 	}
 }
 
-func TestDocuments_fileTooLarge(t *testing.T) {
+func TestDocumentsUpload_fileTooLarge(t *testing.T) {
 	req := multipartFileOfSize(t, "file", maxDocumentSize+512)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
@@ -218,7 +219,7 @@ func TestDocuments_fileTooLarge(t *testing.T) {
 }
 
 // bufio Peek(n) returns an EOF error if the file is smaller than n bytes
-func TestDocuments_fileSmallerThanPeek(t *testing.T) {
+func TestDocumentsUpload_fileSmallerThanPeek(t *testing.T) {
 	req := multipartFileOfSize(t, "file", 256)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
@@ -232,7 +233,7 @@ func TestDocuments_fileSmallerThanPeek(t *testing.T) {
 	require.Equal(t, http.StatusOK, w.Code)
 }
 
-func TestDocuments_formTooLarge(t *testing.T) {
+func TestDocumentsUpload_formTooLarge(t *testing.T) {
 	req := multipartFileOfSize(t, "file", maxFormSize+512)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
@@ -251,7 +252,7 @@ func TestDocuments_formTooLarge(t *testing.T) {
 	require.Contains(t, string(b), "request body exceeds maximum size")
 }
 
-func TestDocuments_missingFileKey(t *testing.T) {
+func TestDocumentsUpload_missingFileKey(t *testing.T) {
 	req := multipartFileOfSize(t, "bogusKey", 10)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
@@ -268,6 +269,70 @@ func TestDocuments_missingFileKey(t *testing.T) {
 		t.Fatal(err)
 	}
 	require.Contains(t, string(b), "expected multipart upload with key of 'file'")
+}
+
+func TestDocumentsUpload_repoErr(t *testing.T) {
+	repo := &testDocumentRepository{err: errors.New("real bad error")}
+	req := multipartFileOfSize(t, "file", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "real bad error")
+}
+
+func TestDocumentsUpload_keeperErr(t *testing.T) {
+	keeper := secrets.TestKeeper(t)
+	keeper.Close()
+	req := multipartFileOfSize(t, "file", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, keeper, storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "Keeper has been closed")
+}
+
+func TestDocumentsUpload_BucketErr(t *testing.T) {
+	keeper := secrets.TestKeeper(t)
+	bucketFunc := func() (*blob.Bucket, error) {
+		return nil, errors.New("bucket error")
+	}
+	req := multipartFileOfSize(t, "file", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, keeper, bucketFunc)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "bucket error")
 }
 
 func multipartFileOfSize(t *testing.T, fileKey string, size int64) *http.Request {
