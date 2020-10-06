@@ -63,13 +63,6 @@ func main() {
 		logger = log.NewDefaultLogger()
 	}
 
-	// ASK: I don't know how to implement this...
-	// option 1: just get rid of it
-	// option 2: get ts with DefaultTimestampUTC built into .Log() method (the same as caller info is done now)
-	// option 3: rewrite base/log's WithKeyValue->WithMap to accept interface{} instead of string
-	// for now just comment this (option 1)
-	// logger = log.With(logger, "ts", log.DefaultTimestampUTC)
-
 	logger.WithKeyValue("startup", fmt.Sprintf("Starting moov-io/customers server version %s", mainPkg.Version))
 
 	// Channel for errors
