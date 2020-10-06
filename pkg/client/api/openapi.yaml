@@ -1843,7 +1843,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportAccountResponse'
+                $ref: '#/components/schemas/ReportAccountsResponse'
           description: A list of customers' accounts
         "400":
           content:
@@ -2832,6 +2832,10 @@ components:
         Account:
           $ref: '#/components/schemas/Account'
       type: object
+    ReportAccountsResponse:
+      items:
+        $ref: '#/components/schemas/ReportAccountResponse'
+      type: array
     Error:
       properties:
         error:
