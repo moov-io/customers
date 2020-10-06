@@ -21,8 +21,8 @@ import (
 	"github.com/moov-io/base/http/bind"
 
 	mainPkg "github.com/moov-io/customers"
-	"github.com/moov-io/customers/internal/database"
 
+	"github.com/moov-io/base/database"
 	"github.com/moov-io/base/log"
 
 	"github.com/moov-io/customers/internal/util"
@@ -81,16 +81,14 @@ func main() {
 	}
 
 	// Setup database connection
-	db, err := database.New(logger, os.Getenv("DATABASE_TYPE"))
+	// TODO: create actual config for DB
+	ctx := context.TODO()
+	db, closeDB, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, ctx)
 	if err != nil {
 		logger.LogError("failed to connect to database", err)
 		os.Exit(1)
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			logger.LogError("failed to close database connection", err)
-		}
-	}()
+	defer closeDB()
 
 	accountsRepo := accounts.NewRepo(logger, db)
 	customerRepo := customers.NewCustomerRepo(logger, db)
