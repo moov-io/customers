@@ -58,7 +58,7 @@ func (r *mockRepository) updateAccountStatus(accountID string, status client.Acc
 	return r.Err
 }
 
-func (r *mockRepository) getEncryptedAccountNumber(customerID, accountID string) (string, error) {
+func (r *mockRepository) getEncryptedAccountNumber(organization, customerID, accountID string) (string, error) {
 	if r.Err != nil {
 		return "", r.Err
 	}

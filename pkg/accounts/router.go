@@ -216,8 +216,11 @@ func decryptAccountNumber(logger log.Logger, repo Repository, keeper *secrets.St
 			return
 		}
 
+		// get organization
+		organization := route.GetOrganization(w, r)
+
 		// grab encrypted value
-		encrypted, err := repo.getEncryptedAccountNumber(customerID, accountID)
+		encrypted, err := repo.getEncryptedAccountNumber(organization, customerID, accountID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
