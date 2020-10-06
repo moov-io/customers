@@ -75,6 +75,7 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
 		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, client.OfacSearch{
 			EntityID:  nickSDN.EntityID,
+			Blocked:   nickSDN.Match > ofacMatchThreshold,
 			SdnName:   nickSDN.SdnName,
 			SdnType:   nickSDN.SdnType,
 			Match:     nickSDN.Match,
@@ -83,6 +84,7 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	case sdn != nil:
 		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, client.OfacSearch{
 			EntityID:  sdn.EntityID,
+			Blocked:   sdn.Match > ofacMatchThreshold,
 			SdnName:   sdn.SdnName,
 			SdnType:   sdn.SdnType,
 			Match:     sdn.Match,
@@ -115,7 +117,6 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo CustomerRepository) htt
 			moovhttp.Problem(w, err)
 			return
 		}
-		result.Blocked = result.Match > ofacMatchThreshold
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
@@ -153,7 +154,6 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			moovhttp.Problem(w, err)
 			return
 		}
-		result.Blocked = result.Match > ofacMatchThreshold
 
 		if result.Blocked {
 			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)

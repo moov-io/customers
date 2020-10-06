@@ -2558,6 +2558,7 @@ components:
           format: date-time
           type: string
       required:
+      - blocked
       - createdAt
       - entityID
       - match
