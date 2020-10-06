@@ -205,13 +205,7 @@ func TestRouterGetOrganizationLogo_noLogoUploaded(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	require.Equal(t, w.Code, http.StatusBadRequest)
-	response := make(map[string]string)
-	if err := json.NewDecoder(w.Body).Decode(&response); err != nil {
-		t.Fatal(err)
-	}
-	require.Contains(t, response, "error")
-	require.Equal(t, "error retrieving logo file - file not found", response["error"])
+	require.Equal(t, http.StatusNotFound, w.Code)
 }
 
 func TestRouterUploadAndGetLogo(t *testing.T) {
