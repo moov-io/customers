@@ -142,6 +142,7 @@ func (r *sqlAccountRepository) getAccountsByCustomerID(customerID string) ([]*cl
 
 func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error) {
 	account := &client.Account{
+		CustomerID:          customerID,
 		AccountID:           base.ID(),
 		HolderName:          req.HolderName,
 		MaskedAccountNumber: req.maskedAccountNumber,
@@ -161,9 +162,17 @@ func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, 
 	defer stmt.Close()
 
 	_, err = stmt.Exec(
-		account.AccountID, customerID, userID, req.HolderName,
-		req.encryptedAccountNumber, req.hashedAccountNumber, req.maskedAccountNumber,
-		account.RoutingNumber, account.Status, account.Type, time.Now(),
+		account.AccountID,
+		account.CustomerID,
+		userID,
+		req.HolderName,
+		req.encryptedAccountNumber,
+		req.hashedAccountNumber,
+		req.maskedAccountNumber,
+		account.RoutingNumber,
+		account.Status,
+		account.Type,
+		time.Now(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("problem creating account=%s: %v", account.AccountID, err)
