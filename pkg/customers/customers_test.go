@@ -30,13 +30,13 @@ import (
 var _ CustomerRepository = (*testCustomerRepository)(nil)
 
 type testCustomerRepository struct {
-	err              error
-	customer         *client.Customer
-	ofacSearchResult *ofacSearchResult
+	err          error
+	customer     *client.Customer
+	searchResult *client.OfacSearch
 
-	createdCustomer       *client.Customer
-	updatedStatus         client.CustomerStatus
-	savedOFACSearchResult *ofacSearchResult
+	createdCustomer   *client.Customer
+	updatedStatus     client.CustomerStatus
+	savedSearchResult *client.OfacSearch
 }
 
 func (r *testCustomerRepository) getCustomer(customerID string) (*client.Customer, error) {
@@ -97,18 +97,18 @@ func (r *testCustomerRepository) deleteCustomerAddress(customerID string, addres
 	return r.err
 }
 
-func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*ofacSearchResult, error) {
+func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*client.OfacSearch, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
-	if r.savedOFACSearchResult != nil {
-		return r.savedOFACSearchResult, nil
+	if r.savedSearchResult != nil {
+		return r.savedSearchResult, nil
 	}
-	return r.ofacSearchResult, nil
+	return r.searchResult, nil
 }
 
-func (r *testCustomerRepository) saveCustomerOFACSearch(customerID string, result ofacSearchResult) error {
-	r.savedOFACSearchResult = &result
+func (r *testCustomerRepository) saveCustomerOFACSearch(customerID string, result client.OfacSearch) error {
+	r.savedSearchResult = &result
 	return r.err
 }
 
@@ -911,11 +911,11 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 		t.Fatal(err)
 	}
 	if res != nil {
-		t.Errorf("unexpected ofacSearchResult: %#v", res)
+		t.Errorf("unexpected ofac search: %#v", res)
 	}
 
 	// save a record and read it back
-	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{EntityID: "14141"}); err != nil {
+	if err := repo.saveCustomerOFACSearch(customerID, client.OfacSearch{EntityID: "14141"}); err != nil {
 		t.Fatal(err)
 	}
 	res, err = repo.getLatestCustomerOFACSearch(customerID)
@@ -923,11 +923,11 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 		t.Fatal(err)
 	}
 	if res == nil || res.EntityID != "14141" {
-		t.Errorf("ofacSearchResult: %#v", res)
+		t.Errorf("ofac search: %#v", res)
 	}
 
 	// save another and get it back
-	if err := repo.saveCustomerOFACSearch(customerID, ofacSearchResult{EntityID: "777121"}); err != nil {
+	if err := repo.saveCustomerOFACSearch(customerID, client.OfacSearch{EntityID: "777121"}); err != nil {
 		t.Fatal(err)
 	}
 	res, err = repo.getLatestCustomerOFACSearch(customerID)
@@ -935,7 +935,7 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 		t.Fatal(err)
 	}
 	if res == nil || res.EntityID != "777121" {
-		t.Errorf("ofacSearchResult: %#v", res)
+		t.Errorf("ofac search: %#v", res)
 	}
 }
 

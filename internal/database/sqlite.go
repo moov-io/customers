@@ -41,7 +41,7 @@ var (
 		),
 		execsql(
 			"create_customers_addresses",
-			`create table if not exists customers_addresses(address_id primary key, customer_id, type, address1, address2, city, state, postal_code, country, validated, 
+			`create table if not exists customers_addresses(address_id primary key, customer_id, type, address1, address2, city, state, postal_code, country, validated,
 			deleted_at datetime, unique (customer_id, address1) on conflict abort);`,
 		),
 		execsql(
@@ -150,6 +150,10 @@ PRAGMA foreign_keys=on;`,
 		execsql(
 			"rename_customers_namespace_to_organization",
 			`alter table customers rename column namespace to organization;`,
+		),
+		execsql(
+			"add_blocked__to__customer_ofac_searches",
+			`alter table customer_ofac_searches add column blocked boolean;`,
 		),
 	)
 )

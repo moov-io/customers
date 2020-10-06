@@ -2048,6 +2048,10 @@ components:
           type: string
           description: SDN EntityID of the Entity
           example: "2141"
+        blocked:
+          type: boolean
+          description: If the search resulted in a positive match against a sanctions list and should be blocked from making transfers or other operations.
+          example: false
         sdnName:
           type: string
           description: Name of the SDN entity
@@ -2066,6 +2070,7 @@ components:
           example: '2016-08-29T09:12:33.001Z'
       required:
         - entityID
+        - blocked
         - sdnName
         - sdnType
         - match
