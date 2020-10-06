@@ -23,6 +23,7 @@ Method | HTTP request | Description
 [**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
 [**GetLatestAccountOFACSearch**](CustomersApi.md#GetLatestAccountOFACSearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC search
 [**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
+[**GetReportOfCustomerAccounts**](CustomersApi.md#GetReportOfCustomerAccounts) | **Get** /reports/accounts | 
 [**InitAccountValidation**](CustomersApi.md#InitAccountValidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
 [**RefreshAccountOFACSearch**](CustomersApi.md#RefreshAccountOFACSearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC search
@@ -908,6 +909,50 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**OfacSearch**](OFACSearch.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## GetReportOfCustomerAccounts
+
+> ReportAccountResponse GetReportOfCustomerAccounts(ctx, optional)
+
+
+
+Retrieves a list of customer and account information.
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+ **optional** | ***GetReportOfCustomerAccountsOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+
+Optional parameters are passed through a pointer to a GetReportOfCustomerAccountsOpts struct
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **accountIDs** | **optional.String**| A list of customer account IDs with a limit of 25 IDs. | 
+
+### Return type
+
+[**ReportAccountResponse**](ReportAccountResponse.md)
 
 ### Authorization
 

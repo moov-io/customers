@@ -30,6 +30,7 @@ import (
 	"github.com/moov-io/customers/pkg/documents/storage"
 	"github.com/moov-io/customers/pkg/fed"
 	"github.com/moov-io/customers/pkg/paygate"
+	"github.com/moov-io/customers/pkg/reports"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/validator"
 	"github.com/moov-io/customers/pkg/validator/microdeposits"
@@ -176,6 +177,7 @@ func main() {
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
 	documents.AddDocumentRoutes(logger, router, documentRepo, bucket)
 	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
+	reports.AddRoutes(logger, router, customerRepo, accountsRepo)
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)

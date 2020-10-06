@@ -32,7 +32,7 @@ func updateCustomerStatus(logger log.Logger, repo CustomerRepository) http.Handl
 			return
 		}
 
-		cust, err := repo.getCustomer(customerID)
+		cust, err := repo.GetCustomer(customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

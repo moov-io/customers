@@ -1504,7 +1504,38 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-
+  /reports/accounts:
+    get:
+      tags: [Customers]
+      description: Retrieves a list of customer and account information.
+      operationId: getReportOfCustomerAccounts
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: accountIDs
+          in: query
+          description: A list of customer account IDs with a limit of 25 IDs.
+          example: f6eddffd,f6eddffe,f6eddfff
+          schema:
+            type: string
+          required: false
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportAccountResponse'
+          description: A list of customers' accounts
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
 components:
   schemas:
     OrganizationConfiguration:
@@ -1895,6 +1926,10 @@ components:
           type: string
           description: A unique identifier for this account
           example: e1b1544a
+        customerID:
+          type: string
+          description: The unique identifier for the customer who owns the account
+          example: e1b1544a
         holderName:
           type: string
           description: Legal holder name on the account
@@ -1915,6 +1950,7 @@ components:
           $ref: '#/components/schemas/InstitutionDetails'
       required:
         - accountID
+        - customerID
         - holderName
         - maskedAccountNumber
         - routingNumber
@@ -2202,3 +2238,10 @@ components:
           $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/api/client.yaml#/components/schemas/AccountStatus'
       required:
         - status
+    ReportAccountResponse:
+      type: object
+      properties:
+        Customer:
+          $ref: '#/components/schemas/Customer'
+        Account:
+          $ref: '#/components/schemas/Account'

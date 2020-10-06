@@ -134,7 +134,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		cust, err := repo.getCustomer(customerID)
+		cust, err := repo.GetCustomer(customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

@@ -8,9 +8,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/moov-io/base"
+
 	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/go-kit/kit/log"
@@ -18,9 +20,10 @@ import (
 
 type Repository interface {
 	getCustomerAccount(customerID, accountID string) (*client.Account, error)
-	getCustomerAccounts(customerID string) ([]*client.Account, error)
+	GetCustomerAccountsByIDs(accountIDs []string) ([]*client.Account, error)
+	getAccountsByCustomerID(customerID string) ([]*client.Account, error)
 
-	createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error)
+	CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error)
 	deactivateCustomerAccount(accountID string) error
 
 	updateAccountStatus(accountID string, status client.AccountStatus) error
@@ -29,6 +32,47 @@ type Repository interface {
 
 	getLatestAccountOFACSearch(accountID string) (*client.OfacSearch, error)
 	saveAccountOFACSearch(id string, result *client.OfacSearch) error
+}
+
+func (r *sqlAccountRepository) GetCustomerAccountsByIDs(accountIDs []string) ([]*client.Account, error) {
+	query := fmt.Sprintf(
+		`select account_id, customer_id, holder_name, masked_account_number, routing_number, status, type from accounts where account_id in (?%s) and deleted_at is null;`,
+		strings.Repeat(",?", len(accountIDs)-1),
+	)
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, err
+	}
+
+	var args []interface{}
+	for _, id := range accountIDs {
+		args = append(args, id)
+	}
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []*client.Account
+	for rows.Next() {
+		account := &client.Account{}
+		err = rows.Scan(
+			&account.AccountID,
+			&account.CustomerID,
+			&account.HolderName,
+			&account.MaskedAccountNumber,
+			&account.RoutingNumber,
+			&account.Status,
+			&account.Type,
+		)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, account)
+	}
+
+	return result, nil
 }
 
 func NewRepo(logger log.Logger, db *sql.DB) *sqlAccountRepository {
@@ -41,7 +85,7 @@ type sqlAccountRepository struct {
 }
 
 func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) (*client.Account, error) {
-	query := `select account_id, holder_name, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
+	query := `select account_id, customer_id, holder_name, masked_account_number, routing_number, status, type from accounts where customer_id = ? and account_id = ? and deleted_at is null limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -50,7 +94,15 @@ func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) 
 
 	var a client.Account
 	row := stmt.QueryRow(customerID, accountID)
-	if err := row.Scan(&a.AccountID, &a.HolderName, &a.MaskedAccountNumber, &a.RoutingNumber, &a.Status, &a.Type); err != nil {
+	if err := row.Scan(
+		&a.AccountID,
+		&a.CustomerID,
+		&a.HolderName,
+		&a.MaskedAccountNumber,
+		&a.RoutingNumber,
+		&a.Status,
+		&a.Type,
+	); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("account: %s for customer: %s was not found", accountID, customerID)
 		}
@@ -59,7 +111,7 @@ func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) 
 	return &a, nil
 }
 
-func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client.Account, error) {
+func (r *sqlAccountRepository) getAccountsByCustomerID(customerID string) ([]*client.Account, error) {
 	query := `select account_id from accounts where customer_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
@@ -88,7 +140,7 @@ func (r *sqlAccountRepository) getCustomerAccounts(customerID string) ([]*client
 	return out, nil
 }
 
-func (r *sqlAccountRepository) createCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
+func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error) {
 	account := &client.Account{
 		AccountID:           base.ID(),
 		HolderName:          req.HolderName,

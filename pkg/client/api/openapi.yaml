@@ -1814,6 +1814,45 @@ paths:
       summary: Refresh Customer OFAC search
       tags:
       - Customers
+  /reports/accounts:
+    get:
+      description: Retrieves a list of customer and account information.
+      operationId: getReportOfCustomerAccounts
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: A list of customer account IDs with a limit of 25 IDs.
+        example: f6eddffd,f6eddffe,f6eddfff
+        explode: true
+        in: query
+        name: accountIDs
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportAccountResponse'
+          description: A list of customers' accounts
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      tags:
+      - Customers
 components:
   schemas:
     OrganizationConfiguration:
@@ -2336,12 +2375,17 @@ components:
             state: OH
           name: First Bank
         holderName: My Company,llc or Wade Arnold
+        customerID: e1b1544a
         type: checking
         maskedAccountNumber: "0001027028"
         status: validated
       properties:
         accountID:
           description: A unique identifier for this account
+          example: e1b1544a
+          type: string
+        customerID:
+          description: The unique identifier for the customer who owns the account
           example: e1b1544a
           type: string
         holderName:
@@ -2364,6 +2408,7 @@ components:
           $ref: '#/components/schemas/InstitutionDetails'
       required:
       - accountID
+      - customerID
       - holderName
       - maskedAccountNumber
       - routingNumber
@@ -2722,6 +2767,71 @@ components:
           $ref: '#/components/schemas/AccountStatus'
       required:
       - status
+    ReportAccountResponse:
+      example:
+        Account:
+          accountID: e1b1544a
+          routingNumber: "051504597"
+          institution:
+            routingNumber: "123456780"
+            phoneNumber: "5551112222"
+            address:
+              zip: "43724"
+              address2: address2
+              city: CALDWELL
+              address1: 430 NORTH ST
+              state: OH
+            name: First Bank
+          holderName: My Company,llc or Wade Arnold
+          customerID: e1b1544a
+          type: checking
+          maskedAccountNumber: "0001027028"
+          status: validated
+        Customer:
+          lastName: Smith
+          addresses:
+          - country: US
+            validated: true
+            address2: address2
+            city: city
+            address1: address1
+            postalCode: postalCode
+            state: state
+            type: Primary
+            addressID: 851233a1
+          - country: US
+            validated: true
+            address2: address2
+            city: city
+            address1: address1
+            postalCode: postalCode
+            state: state
+            type: Primary
+            addressID: 851233a1
+          metadata:
+            paygateID: 23beb5fd
+          nickName: Bob
+          phones:
+          - valid: true
+            number: +1.818.555.1212
+            type: Home
+          - valid: true
+            number: +1.818.555.1212
+            type: Home
+          suffix: suffix
+          birthDate: 2016-08-29
+          firstName: Robert
+          createdAt: 2016-08-29T09:12:33.001Z
+          customerID: e210a9d6
+          middleName: Flex
+          lastModified: 2016-08-29T09:12:33.001Z
+          email: email
+      properties:
+        Customer:
+          $ref: '#/components/schemas/Customer'
+        Account:
+          $ref: '#/components/schemas/Account'
+      type: object
     Error:
       properties:
         error:
