@@ -23,7 +23,7 @@ type Repository interface {
 	GetCustomerAccountsByIDs(accountIDs []string) ([]*client.Account, error)
 	getAccountsByCustomerID(customerID string) ([]*client.Account, error)
 
-	CreateCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error)
+	CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error)
 	deactivateCustomerAccount(accountID string) error
 
 	updateAccountStatus(accountID string, status client.AccountStatus) error
@@ -140,7 +140,7 @@ func (r *sqlAccountRepository) getAccountsByCustomerID(customerID string) ([]*cl
 	return out, nil
 }
 
-func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, req *createAccountRequest) (*client.Account, error) {
+func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error) {
 	// TODO: remove userID
 	account := &client.Account{
 		CustomerID:          customerID,

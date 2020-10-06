@@ -203,7 +203,7 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	handler := setupRouterWithTestAccountRepo(t, repo)
 
 	// create account
-	req := &createAccountRequest{
+	req := &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.CHECKING,
