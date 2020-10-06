@@ -32,8 +32,7 @@ import (
 )
 
 var (
-	errNoDocumentID    = errors.New("no Document ID found")
-	errRequestTooLarge = errors.New("http: request body too large")
+	errNoDocumentID = errors.New("no Document ID found")
 )
 
 const (
@@ -214,7 +213,7 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, keeper *sec
 			if err != nil {
 				logger.Log("documents", fmt.Sprintf("failed to %v", err), "customerID", customerID, "documentID", documentID, "requestID", requestID)
 			}
-			w.WriteHeader(http.StatusNotFound)
+			http.NotFound(w, r)
 			return
 		}
 
