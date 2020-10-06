@@ -23,8 +23,8 @@ import (
 	payclient "github.com/moov-io/paygate/pkg/client"
 	"github.com/stretchr/testify/require"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 )
 
 func TestRouter__AccountValidation(t *testing.T) {

@@ -21,8 +21,8 @@ import (
 	"github.com/moov-io/customers/pkg/secrets/mask"
 	"github.com/moov-io/customers/pkg/validator"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 )
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, validations validator.Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy, ofac *AccountOfacSearcher) {

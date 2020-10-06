@@ -24,8 +24,8 @@ import (
 	"gocloud.dev/blob"
 	"gocloud.dev/gcerrors"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 )
 
 const maxImageSize int64 = 20 * 1024 * 1024 // 20MB

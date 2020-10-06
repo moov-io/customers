@@ -5,9 +5,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/moov-io/base/log"
 	fuzz "github.com/google/gofuzz"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 	"github.com/stretchr/testify/require"
 
 	"github.com/moov-io/customers/pkg/client"

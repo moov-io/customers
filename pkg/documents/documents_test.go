@@ -31,8 +31,8 @@ import (
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/watchman"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 )
 
 type testDocumentRepository struct {
