@@ -34,9 +34,19 @@ var (
 	errNoDocumentID = errors.New("no Document ID found")
 )
 
+type sizeLimit uint64
+
+func (l sizeLimit) Limit() int64 {
+	return int64(l)
+}
+
+func (l sizeLimit) String() string {
+	return fmt.Sprintf("%dMB", l>>20)
+}
+
 const (
-	maxDocumentSize int64 = 20 << 20                    // 20MB
-	maxFormSize     int64 = maxDocumentSize + (5 << 20) // restricts request body size to allow for the document plus a small buffer
+	maxDocumentSize sizeLimit = 20 << 20                    // 20MB
+	maxFormSize     sizeLimit = maxDocumentSize + (5 << 20) // restricts request body size to allow for the document plus a small buffer
 )
 
 func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, keeper *secrets.Keeper, bucketFactory storage.BucketFunc) {
@@ -105,12 +115,12 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		}
 
 		// if r.Body is larger than maxFormSize an error will be returned when the body is read
-		r.Body = http.MaxBytesReader(w, r.Body, maxFormSize)
+		r.Body = http.MaxBytesReader(w, r.Body, maxFormSize.Limit())
 		file, fileHeader, err := r.FormFile("file")
 		if err != nil {
 			if strings.Contains(err.Error(), "request body too large") {
 				logger.Log("documents", "max form size exceeded", "customerID", customerID, "requestID", requestID)
-				moovhttp.Problem(w, fmt.Errorf("request body exceeds maximum size of %dMB", maxFormSize/(1<<20)))
+				moovhttp.Problem(w, fmt.Errorf("request body exceeds maximum size of %s", maxFormSize))
 				return
 			}
 			logger.Log("documents", "error reading form file", "error", err, "customerID", customerID, "requestID", requestID)
@@ -119,9 +129,9 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		}
 		defer file.Close()
 
-		if fileHeader.Size > maxDocumentSize {
+		if fileHeader.Size > maxDocumentSize.Limit() {
 			logger.Log("documents", "max file size exceeded", "customerID", customerID, "requestID", requestID)
-			moovhttp.Problem(w, fmt.Errorf("file exceeds maximum size of %dMB", maxDocumentSize/(1<<20)))
+			moovhttp.Problem(w, fmt.Errorf("file exceeds maximum size of %s", maxDocumentSize))
 			return
 		}
 

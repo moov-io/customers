@@ -170,7 +170,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 }
 
 func TestDocumentsUpload_fileTooLarge(t *testing.T) {
-	req := multipartFileOfSize(t, "file", maxDocumentSize+512)
+	req := multipartFileOfSize(t, "file", maxDocumentSize.Limit()+512)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
 
@@ -185,7 +185,7 @@ func TestDocumentsUpload_fileTooLarge(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.Contains(t, string(b), "file exceeds maximum size")
+	require.Contains(t, string(b), "file exceeds maximum size of 20MB")
 }
 
 // bufio Peek(n) returns an EOF error if the file is smaller than n bytes
@@ -204,7 +204,7 @@ func TestDocumentsUpload_fileSmallerThanPeek(t *testing.T) {
 }
 
 func TestDocumentsUpload_formTooLarge(t *testing.T) {
-	req := multipartFileOfSize(t, "file", maxFormSize+512)
+	req := multipartFileOfSize(t, "file", maxFormSize.Limit()+512)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
 
@@ -219,7 +219,7 @@ func TestDocumentsUpload_formTooLarge(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	require.Contains(t, string(b), "request body exceeds maximum size")
+	require.Contains(t, string(b), "request body exceeds maximum size of 25MB")
 }
 
 func TestDocumentsUpload_missingFileKey(t *testing.T) {
@@ -459,4 +459,11 @@ func TestDocuments__makeDocumentKey(t *testing.T) {
 	if key != "customers/a/documents/b" {
 		t.Errorf("got %q", key)
 	}
+}
+
+func TestDocuments__sizeLimit(t *testing.T) {
+	lim := sizeLimit(100 << 20)
+
+	require.Equal(t, "100MB", lim.String())
+	require.Equal(t, int64(100<<20), lim.Limit())
 }
