@@ -26,8 +26,8 @@ import (
 	"github.com/moov-io/customers/pkg/validator/testvalidator"
 	"github.com/moov-io/customers/pkg/watchman"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -10,9 +10,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/moov-io/base/log"
 	moovhttp "github.com/moov-io/base/http"
 
+	"github.com/moov-io/base/log"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 )

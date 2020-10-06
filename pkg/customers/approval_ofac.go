@@ -21,8 +21,8 @@ import (
 	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/watchman"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 )
 
 var (

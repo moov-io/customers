@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 	"gocloud.dev/blob"
 )
 

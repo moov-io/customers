@@ -11,8 +11,8 @@ import (
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/secrets"
 
-	"github.com/moov-io/base/log"
 	"github.com/moov-io/base"
+	"github.com/moov-io/base/log"
 )
 
 var (

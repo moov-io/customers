@@ -23,8 +23,8 @@ import (
 
 	"github.com/moov-io/customers/pkg/client"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 )
 
 var _ CustomerRepository = (*testCustomerRepository)(nil)

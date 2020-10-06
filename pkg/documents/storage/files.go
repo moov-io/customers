@@ -16,8 +16,8 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/customers/pkg/route"
 
-	"github.com/moov-io/base/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 	"gocloud.dev/blob/fileblob"
 )
 
