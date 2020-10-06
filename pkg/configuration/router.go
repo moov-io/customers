@@ -123,6 +123,9 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 			msg := "error retrieving logo file"
 			if gcerrors.Code(err) == gcerrors.NotFound {
 				msg = msg + " - file not found"
+				logger.Log("configuration", msg, "error", err, "organization", organization, "requestID", requestID)
+				http.NotFound(w, r)
+				return
 			}
 			logger.Log("configuration", msg, "error", err, "organization", organization, "requestID", requestID)
 			moovhttp.Problem(w, fmt.Errorf(msg))

@@ -13,6 +13,7 @@ import (
 
 	"github.com/moov-io/ach"
 	moovhttp "github.com/moov-io/base/http"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/fed"
 	"github.com/moov-io/customers/pkg/route"
@@ -47,7 +48,7 @@ func getCustomerAccounts(logger log.Logger, repo Repository, fedClient fed.Clien
 		w = route.Responder(logger, w, r)
 
 		customerID := route.GetCustomerID(w, r)
-		accounts, err := repo.getCustomerAccounts(customerID)
+		accounts, err := repo.getAccountsByCustomerID(customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -69,7 +70,7 @@ func decorateInstitutionDetails(accounts []*client.Account, client fed.Client) [
 	return accounts
 }
 
-type createAccountRequest struct {
+type CreateAccountRequest struct {
 	HolderName    string             `json:"holderName"`
 	AccountNumber string             `json:"accountNumber"`
 	RoutingNumber string             `json:"routingNumber"`
@@ -81,7 +82,7 @@ type createAccountRequest struct {
 	maskedAccountNumber    string
 }
 
-func (req *createAccountRequest) validate() error {
+func (req *CreateAccountRequest) validate() error {
 	if req.HolderName == "" {
 		return errors.New("missing HolderName")
 	}
@@ -102,7 +103,7 @@ func (req *createAccountRequest) validate() error {
 	return nil
 }
 
-func (req *createAccountRequest) disfigure(keeper *secrets.StringKeeper) error {
+func (req *CreateAccountRequest) disfigure(keeper *secrets.StringKeeper) error {
 	if enc, err := keeper.EncryptString(req.AccountNumber); err != nil {
 		return fmt.Errorf("problem encrypting account number: %v", err)
 	} else {
@@ -123,7 +124,7 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 
 		requestID := moovhttp.GetRequestID(r)
 
-		var request createAccountRequest
+		var request CreateAccountRequest
 		if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -146,7 +147,7 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 		}
 
 		customerID, userID := route.GetCustomerID(w, r), moovhttp.GetUserID(r)
-		account, err := repo.createCustomerAccount(customerID, userID, &request)
+		account, err := repo.CreateCustomerAccount(customerID, userID, &request)
 		if err != nil {
 			logger.Log("accounts", fmt.Sprintf("problem saving account: %v", err), "requestID", moovhttp.GetRequestID(r))
 			moovhttp.Problem(w, err)

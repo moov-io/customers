@@ -148,6 +148,10 @@ var (
 			"rename_organization_configuration__namespace_to_organization",
 			`alter table organization_configuration rename column namespace to organization;`,
 		),
+		execsql(
+			"add_blocked__to__customer_ofac_searches",
+			`alter table customer_ofac_searches add column blocked boolean;`,
+		),
 	)
 )
 

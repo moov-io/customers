@@ -10,25 +10,32 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 	"time"
 
 	moovhttp "github.com/moov-io/base/http"
+	watchmanClient "github.com/moov-io/watchman/client"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/watchman"
-	watchmanClient "github.com/moov-io/watchman/client"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 )
 
-type ofacSearchResult struct {
-	EntityID  string    `json:"entityID"`
-	SDNName   string    `json:"sdnName"`
-	SDNType   string    `json:"sdnType"`
-	Match     float32   `json:"match"`
-	CreatedAt time.Time `json:"createdAt"`
-}
+var (
+	ofacMatchThreshold float32 = func() float32 {
+		if v := os.Getenv("OFAC_MATCH_THRESHOLD"); v != "" {
+			f, err := strconv.ParseFloat(v, 32)
+			if err == nil && f > 0.00 {
+				return float32(f)
+			}
+		}
+		return 0.99 // default, 99%
+	}()
+)
 
 type OFACSearcher struct {
 	repo           CustomerRepository
@@ -66,18 +73,20 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 	// Save the higher matching SDN (from name search or nick name)
 	switch {
 	case nickSDN != nil && nickSDN.Match > sdn.Match:
-		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, ofacSearchResult{
+		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, client.OfacSearch{
 			EntityID:  nickSDN.EntityID,
-			SDNName:   nickSDN.SdnName,
-			SDNType:   nickSDN.SdnType,
+			Blocked:   nickSDN.Match > ofacMatchThreshold,
+			SdnName:   nickSDN.SdnName,
+			SdnType:   nickSDN.SdnType,
 			Match:     nickSDN.Match,
 			CreatedAt: time.Now(),
 		})
 	case sdn != nil:
-		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, ofacSearchResult{
+		err = s.repo.saveCustomerOFACSearch(cust.CustomerID, client.OfacSearch{
 			EntityID:  sdn.EntityID,
-			SDNName:   sdn.SdnName,
-			SDNType:   sdn.SdnType,
+			Blocked:   sdn.Match > ofacMatchThreshold,
+			SdnName:   sdn.SdnName,
+			SdnType:   sdn.SdnType,
 			Match:     sdn.Match,
 			CreatedAt: time.Now(),
 		})
@@ -125,7 +134,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		cust, err := repo.getCustomer(customerID)
+		cust, err := repo.GetCustomer(customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -138,13 +147,15 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			moovhttp.Problem(w, err)
 			return
 		}
+
 		result, err := repo.getLatestCustomerOFACSearch(customerID)
 		if err != nil {
 			logger.Log("ofac", fmt.Sprintf("error getting latest ofac search: %v", err))
 			moovhttp.Problem(w, err)
 			return
 		}
-		if result.Match > ofacMatchThreshold {
+
+		if result.Blocked {
 			err = fmt.Errorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
 			logger.Log("ofac", err.Error(), "requestID", requestID, "userID", userID)
 
@@ -154,6 +165,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 				return
 			}
 		}
+
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(result)
 	}

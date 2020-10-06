@@ -12,6 +12,7 @@ import (
 
 	"github.com/go-kit/kit/log"
 	moovhttp "github.com/moov-io/base/http"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 )
@@ -46,7 +47,7 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 	}
 }
 
-type searchParams struct {
+type SearchParams struct {
 	Organization string
 	Query        string
 	Email        string
@@ -56,8 +57,8 @@ type searchParams struct {
 	Count        int64
 }
 
-func readSearchParams(r *http.Request) (searchParams, error) {
-	params := searchParams{
+func readSearchParams(r *http.Request) (SearchParams, error) {
+	params := SearchParams{
 		Query:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("query"))),
 		Email:  strings.ToLower(strings.TrimSpace(r.URL.Query().Get("email"))),
 		Status: strings.ToLower(strings.TrimSpace(r.URL.Query().Get("status"))),
@@ -74,7 +75,7 @@ func readSearchParams(r *http.Request) (searchParams, error) {
 	return params, nil
 }
 
-func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.Customer, error) {
+func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.Customer, error) {
 	query, args := buildSearchQuery(params)
 
 	stmt, err := r.db.Prepare(query)
@@ -102,7 +103,7 @@ func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.
 
 	// Read each Customer
 	for i := range customerIDs {
-		cust, err := r.getCustomer(customerIDs[i])
+		cust, err := r.GetCustomer(customerIDs[i])
 		if err != nil {
 			return customers, fmt.Errorf("search: customerID=%s error=%v", customerIDs[i], err)
 		}
@@ -111,7 +112,7 @@ func (r *sqlCustomerRepository) searchCustomers(params searchParams) ([]*client.
 	return customers, nil
 }
 
-func buildSearchQuery(params searchParams) (string, []interface{}) {
+func buildSearchQuery(params SearchParams) (string, []interface{}) {
 	var args []interface{}
 	query := `select customer_id from customers where deleted_at is null and organization = ?`
 	args = append(args, params.Organization)

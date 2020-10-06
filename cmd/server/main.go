@@ -30,6 +30,7 @@ import (
 	"github.com/moov-io/customers/pkg/documents/storage"
 	"github.com/moov-io/customers/pkg/fed"
 	"github.com/moov-io/customers/pkg/paygate"
+	"github.com/moov-io/customers/pkg/reports"
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/validator"
 	"github.com/moov-io/customers/pkg/validator/microdeposits"
@@ -132,7 +133,6 @@ func main() {
 	ofac := customers.NewOFACSearcher(customerRepo, watchmanClient)
 
 	// Register our admin routes
-	customers.AddApprovalRoutes(logger, adminServer, customerRepo, customerSSNRepo, ofac)
 	documents.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
@@ -184,6 +184,7 @@ func main() {
 
 	documents.AddDocumentRoutes(logger, router, documentRepo, docsKeeper, bucket)
 	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
+	reports.AddRoutes(logger, router, customerRepo, accountsRepo)
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)

@@ -61,6 +61,7 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get customer documents
 *CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC search
 *CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
+*CustomersApi* | [**GetReportOfCustomerAccounts**](docs/CustomersApi.md#getreportofcustomeraccounts) | **Get** /reports/accounts | 
 *CustomersApi* | [**InitAccountValidation**](docs/CustomersApi.md#initaccountvalidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers
 *CustomersApi* | [**RefreshAccountOFACSearch**](docs/CustomersApi.md#refreshaccountofacsearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC search
@@ -101,6 +102,7 @@ Class | Method | HTTP request | Description
  - [OfacSearch](docs/OfacSearch.md)
  - [OrganizationConfiguration](docs/OrganizationConfiguration.md)
  - [Phone](docs/Phone.md)
+ - [ReportAccountResponse](docs/ReportAccountResponse.md)
  - [TransitAccountNumber](docs/TransitAccountNumber.md)
  - [UpdateAccountStatus](docs/UpdateAccountStatus.md)
  - [UpdateCustomerAddress](docs/UpdateCustomerAddress.md)

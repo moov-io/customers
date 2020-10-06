@@ -9,19 +9,8 @@
 
 package client
 
-// Account struct for Account
-type Account struct {
-	// A unique identifier for this account
-	AccountID string `json:"accountID"`
-	// The unique identifier for the customer who owns the account
-	CustomerID string `json:"customerID"`
-	// Legal holder name on the account
-	HolderName string `json:"holderName"`
-	// The masked account number for the bank account
-	MaskedAccountNumber string `json:"maskedAccountNumber"`
-	// The ABA routing transit number for the bank account.
-	RoutingNumber string             `json:"routingNumber"`
-	Status        AccountStatus      `json:"status"`
-	Type          AccountType        `json:"type"`
-	Institution   InstitutionDetails `json:"institution,omitempty"`
+// ReportAccountResponse struct for ReportAccountResponse
+type ReportAccountResponse struct {
+	Customer Customer `json:"Customer,omitempty"`
+	Account  Account  `json:"Account,omitempty"`
 }

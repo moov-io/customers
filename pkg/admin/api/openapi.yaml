@@ -87,39 +87,6 @@ paths:
       summary: Create disclaimer
       tags:
       - Customers
-  /customers/{customerID}/status:
-    put:
-      description: Updates a customer status and initiates the required checks for
-        that new status
-      operationId: updateCustomerStatus
-      parameters:
-      - description: Customer ID
-        explode: false
-        in: path
-        name: customerID
-        required: true
-        schema:
-          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-          type: string
-        style: simple
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateCustomerStatus'
-        required: true
-      responses:
-        "200":
-          description: Updated Customer status
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: See error message
-      summary: Update Customer status
-      tags:
-      - Customers
 components:
   schemas:
     LivenessProbes:
@@ -145,18 +112,6 @@ components:
           type: string
       required:
       - text
-    UpdateCustomerStatus:
-      example:
-        comment: User submitted address information
-      properties:
-        comment:
-          description: Free form text for admin users
-          example: User submitted address information
-          type: string
-        status:
-          $ref: '#/components/schemas/CustomerStatus'
-      required:
-      - status
     Error:
       properties:
         error:
@@ -165,12 +120,3 @@ components:
           type: string
       required:
       - error
-    CustomerStatus:
-      description: State of the customer
-      enum:
-      - Deceased
-      - Rejected
-      - Unknown
-      - ReceiveOnly
-      - Verified
-      type: string

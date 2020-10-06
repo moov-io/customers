@@ -83,36 +83,6 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-  /customers/{customerID}/status:
-    put:
-      tags: [Customers]
-      summary: Update Customer status
-      description: Updates a customer status and initiates the required checks for that new status
-      operationId: updateCustomerStatus
-      parameters:
-        - name: customerID
-          in: path
-          description: Customer ID
-          required: true
-          schema:
-            type: string
-            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateCustomerStatus'
-      responses:
-        '200':
-          description: Updated Customer status
-        '400':
-          description: See error message
-          content:
-            application/json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-
 components:
   schemas:
     LivenessProbes:
@@ -133,13 +103,3 @@ components:
           example: Please read and accept the attached document
       required:
         - text
-    UpdateCustomerStatus:
-      properties:
-        comment:
-          type: string
-          description: Free form text for admin users
-          example: User submitted address information
-        status:
-          $ref: 'https://raw.githubusercontent.com/moov-io/customers/master/api/client.yaml#/components/schemas/CustomerStatus'
-      required:
-        - status
