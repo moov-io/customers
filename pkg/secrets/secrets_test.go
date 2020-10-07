@@ -12,7 +12,7 @@ import (
 )
 
 func TestSecrets(t *testing.T) {
-	// We assume CLOUD_PROVIDER is unset
+	// We assume SSN_SECRET_PROVIDER is unset
 	keeper, err := GetSecretKeeper("foo")
 	if err != nil {
 		t.Fatal(err)

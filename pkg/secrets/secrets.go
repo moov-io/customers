@@ -93,7 +93,7 @@ var (
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 		defer cancelFn()
 
-		return OpenSecretKeeper(ctx, path, os.Getenv("CLOUD_PROVIDER"))
+		return OpenSecretKeeper(ctx, path, os.Getenv("SSN_SECRET_PROVIDER"))
 	}
 )
 
@@ -144,7 +144,7 @@ func OpenLocal(base64Key string) (*secrets.Keeper, error) {
 
 // openGCPKMS returns a Google Cloud Key Management Service Keeper for managing secrets in Google's cloud
 //
-// The environmental variable SECRETS_GCP_KEY_RESOURCE_ID is required and has the following form:
+// The environment variable SECRETS_GCP_KEY_RESOURCE_ID is required and has the following form:
 //  'projects/MYPROJECT/locations/MYLOCATION/keyRings/MYKEYRING/cryptoKeys/MYKEY'
 //
 // See https://cloud.google.com/kms/docs/object-hierarchy#key for more information

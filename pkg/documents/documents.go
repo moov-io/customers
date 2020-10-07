@@ -36,10 +36,6 @@ var (
 
 type sizeLimit uint64
 
-func (l sizeLimit) Limit() int64 {
-	return int64(l)
-}
-
 func (l sizeLimit) String() string {
 	return fmt.Sprintf("%dMB", l>>20)
 }
@@ -115,7 +111,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		}
 
 		// if r.Body is larger than maxFormSize an error will be returned when the body is read
-		r.Body = http.MaxBytesReader(w, r.Body, maxFormSize.Limit())
+		r.Body = http.MaxBytesReader(w, r.Body, int64(maxFormSize))
 		file, fileHeader, err := r.FormFile("file")
 		if err != nil {
 			if strings.Contains(err.Error(), "request body too large") {
@@ -129,7 +125,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		}
 		defer file.Close()
 
-		if fileHeader.Size > maxDocumentSize.Limit() {
+		if fileHeader.Size > int64(maxDocumentSize) {
 			logger.Log("documents", "max file size exceeded", "customerID", customerID, "requestID", requestID)
 			moovhttp.Problem(w, fmt.Errorf("file exceeds maximum size of %s", maxDocumentSize))
 			return

@@ -170,7 +170,7 @@ func TestDocumentsUploadAndRetrieval(t *testing.T) {
 }
 
 func TestDocumentsUpload_fileTooLarge(t *testing.T) {
-	req := multipartFileOfSize(t, "file", maxDocumentSize.Limit()+512)
+	req := multipartFileOfSize(t, "file", int64(maxDocumentSize)+512)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
 
@@ -204,7 +204,7 @@ func TestDocumentsUpload_fileSmallerThanPeek(t *testing.T) {
 }
 
 func TestDocumentsUpload_formTooLarge(t *testing.T) {
-	req := multipartFileOfSize(t, "file", maxFormSize.Limit()+512)
+	req := multipartFileOfSize(t, "file", int64(maxFormSize)+512)
 	req.Header.Set("x-request-id", "test")
 	req.Header.Set("X-organization", "test")
 
@@ -465,5 +465,4 @@ func TestDocuments__sizeLimit(t *testing.T) {
 	lim := sizeLimit(100 << 20)
 
 	require.Equal(t, "100MB", lim.String())
-	require.Equal(t, int64(100<<20), lim.Limit())
 }
