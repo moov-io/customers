@@ -7,7 +7,7 @@
 
 The following environment variables can be set to configure behavior in Accounts.
 
-| environment Variable | Description | Default |
+| Environment Variable | Description | Default |
 |-----|-----|-----|
 | `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
 | `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
@@ -17,7 +17,7 @@ The following environment variables can be set to configure behavior in Accounts
 
 The Moov [Fed](https://github.com/moov-io/fed) service is used for routing number lookup and verification.
 
-| environment Variable | Description | Default |
+| Environment Variable | Description | Default |
 |-----|-----|-----|
 | `FED_ENDPOINT` | HTTP address for Moov Fed interaction to lookup ABA routing numbers. | `http://fed.apps.svc.cluster.local:8080` |
 | `FED_DEBUG_CALLS` | Print debugging information with all Fed API calls. | `false` |
@@ -26,7 +26,7 @@ The Moov [Fed](https://github.com/moov-io/fed) service is used for routing numbe
 
 The Moov [PayGate](https://github.com/moov-io/paygate) service is used to initiate micro-deposits for account validation.
 
-| environment Variable | Description | Default |
+| Environment Variable | Description | Default |
 |-----|-----|-----|
 | `PAYGATE_ENDPOINT` | HTTP address for Moov PayGate interactions. | `http://paygate.apps.svc.cluster.local:8080` |
 | `PAYGATE_DEBUG_CALLS` | Print debugging information with all PayGate API calls. | `false` |
@@ -35,7 +35,7 @@ The Moov [PayGate](https://github.com/moov-io/paygate) service is used to initia
 
 The Moov [Watchman](https://github.com/moov-io/watchman) service is used for OFAC and other sanctions list searching and compliance.
 
-| environment Variable | Description | Default |
+| Environment Variable | Description | Default |
 |-----|-----|-----|
 | `OFAC_MATCH_THRESHOLD` | Percent match against OFAC data that's required for paygate to block a transaction. | `99%` |
 | `WATCHMAN_ENDPOINT` | HTTP address for [OFAC](https://github.com/moov-io/watchman) interaction, defaults to Kubernetes inside clusters and local dev otherwise. | Kubernetes DNS |
@@ -135,7 +135,7 @@ The following environment variables control which backend service is utilized fo
 
 - `SECRETS_GCP_KEY_RESOURCE_ID`: A Google Cloud resource ID used to interact with their Key Management Service (KMS). This value has the form `projects/MYPROJECT/locations/MYLOCATION/keyRings/MYKEYRING/cryptoKeys/MYKEY` and [their documentation has more details](https://cloud.google.com/kms/docs/object-hierarchy#key).
 
-##### HashiCorp Vault Vtorage (`vault`)
+##### HashiCorp Vault Storage (`vault`)
 
 - `VAULT_SERVER_TOKEN`: A Vault generated value used to authenticate. See [the HashiCorp Vault documentation](https://www.vaultproject.io/docs/concepts/tokens.html) for more details.
 - `VAULT_SERVER_URL`: A URL for accessing the vault instance. In production environments this should be an HTTPS (TLS) secured connection.
