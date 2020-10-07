@@ -6,30 +6,28 @@ package documents
 
 import (
 	"bytes"
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
 	"testing"
 	"time"
 
 	"github.com/moov-io/base"
 	"github.com/stretchr/testify/require"
+	"gocloud.dev/blob"
 
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
-	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/documents/storage"
 	"github.com/moov-io/customers/pkg/secrets"
-	"github.com/moov-io/customers/pkg/watchman"
 
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
@@ -38,11 +36,14 @@ import (
 type testDocumentRepository struct {
 	documents []*client.Document
 	err       error
-
-	written *client.Document
+	docExists bool
+	written   *client.Document
 }
 
 func (r *testDocumentRepository) exists(customerID string, documentID string, organization string) (bool, error) {
+	if r.docExists {
+		return true, nil
+	}
 	return false, r.err
 }
 
@@ -83,7 +84,7 @@ func TestDocuments__getCustomerDocuments(t *testing.T) {
 	req.Header.Set("x-organization", "test")
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -129,6 +130,181 @@ func TestDocuments__readDocumentType(t *testing.T) {
 	}
 }
 
+func TestDocumentsUploadAndRetrieval(t *testing.T) {
+	repo := &testDocumentRepository{docExists: true}
+
+	w := httptest.NewRecorder()
+	req := multipartRequest(t)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.NewTestBucket(t))
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	if w.Code != http.StatusOK {
+		t.Errorf("bogus status code: %d", w.Code)
+	}
+
+	var doc client.Document
+	if err := json.NewDecoder(w.Body).Decode(&doc); err != nil {
+		t.Fatal(err)
+	}
+	if doc.DocumentID == "" {
+		t.Fatal("failed to read document")
+	}
+	if doc.ContentType != "image/jpeg" {
+		t.Errorf("unknown content type: %s", doc.ContentType)
+	}
+
+	// Test the HTTP retrieval route
+	w = httptest.NewRecorder()
+	req = httptest.NewRequest("GET", fmt.Sprintf("/customers/foo/documents/%s", doc.DocumentID), nil)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestDocumentsUpload_fileTooLarge(t *testing.T) {
+	req := multipartFileOfSize(t, "file", int64(maxDocumentSize)+512)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "file exceeds maximum size of 20MB")
+}
+
+// bufio Peek(n) returns an EOF error if the file is smaller than n bytes
+func TestDocumentsUpload_fileSmallerThanPeek(t *testing.T) {
+	req := multipartFileOfSize(t, "file", 256)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusOK, w.Code)
+}
+
+func TestDocumentsUpload_formTooLarge(t *testing.T) {
+	req := multipartFileOfSize(t, "file", int64(maxFormSize)+512)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "request body exceeds maximum size of 25MB")
+}
+
+func TestDocumentsUpload_missingFileKey(t *testing.T) {
+	req := multipartFileOfSize(t, "bogusKey", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "expected multipart upload with key of 'file'")
+}
+
+func TestDocumentsUpload_repoErr(t *testing.T) {
+	repo := &testDocumentRepository{err: errors.New("real bad error")}
+	req := multipartFileOfSize(t, "file", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "real bad error")
+}
+
+func TestDocumentsUpload_keeperErr(t *testing.T) {
+	keeper := secrets.TestKeeper(t)
+	keeper.Close()
+	req := multipartFileOfSize(t, "file", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, keeper, storage.TestBucket)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "Keeper has been closed")
+}
+
+func TestDocumentsUpload_BucketErr(t *testing.T) {
+	keeper := secrets.TestKeeper(t)
+	bucketFunc := func() (*blob.Bucket, error) {
+		return nil, errors.New("bucket error")
+	}
+	req := multipartFileOfSize(t, "file", 10)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+
+	w := httptest.NewRecorder()
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, &testDocumentRepository{}, keeper, bucketFunc)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "bucket error")
+}
+
 func multipartRequest(t *testing.T) *http.Request {
 	fd, err := os.Open(filepath.Join("testdata", "colorado.jpg"))
 	if err != nil {
@@ -158,43 +334,27 @@ func multipartRequest(t *testing.T) *http.Request {
 	return req
 }
 
-func TestDocumentsUploadAndRetrieval(t *testing.T) {
-	repo := &testDocumentRepository{}
-
-	w := httptest.NewRecorder()
-	req := multipartRequest(t)
-	req.Header.Set("x-request-id", "test")
-	req.Header.Set("X-organization", "test")
-
-	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
-	router.ServeHTTP(w, req)
-	w.Flush()
-
-	if w.Code != http.StatusOK {
-		t.Errorf("bogus status code: %d", w.Code)
-	}
-
-	var doc client.Document
-	if err := json.NewDecoder(w.Body).Decode(&doc); err != nil {
+func multipartFileOfSize(t *testing.T, fileKey string, size int64) *http.Request {
+	var body bytes.Buffer
+	mp := multipart.NewWriter(&body)
+	part, err := mp.CreateFormFile(fileKey, "exceedinglyLargeFile")
+	if err != nil {
 		t.Fatal(err)
 	}
-	if doc.DocumentID == "" {
-		t.Fatal("failed to read document")
+	if _, err := part.Write(make([]byte, size)); err != nil {
+		t.Fatal(err)
 	}
-	if doc.ContentType != "image/jpeg" {
-		t.Errorf("unknown content type: %s", doc.ContentType)
+	if err := mp.Close(); err != nil {
+		t.Fatal(err)
 	}
 
-	// Test the HTTP retrieval route
-	w = httptest.NewRecorder()
-	req = httptest.NewRequest("GET", fmt.Sprintf("/customers/foo/documents/%s", doc.DocumentID), nil)
-	router.ServeHTTP(w, req)
-	w.Flush()
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("bogus HTTP status: %d", w.Code)
+	req, err := http.NewRequest(http.MethodPost, "/customers/abc/documents?type=driverslicense", &body)
+	if err != nil {
+		t.Fatal(err)
 	}
+	req.Header.Set("Content-Type", mp.FormDataContentType())
+
+	return req
 }
 
 func TestDocuments__retrieveError(t *testing.T) {
@@ -203,7 +363,7 @@ func TestDocuments__retrieveError(t *testing.T) {
 	}
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 
 	customerID, documentID := base.ID(), base.ID()
 
@@ -215,12 +375,37 @@ func TestDocuments__retrieveError(t *testing.T) {
 	require.Equal(t, http.StatusNotFound, w.Code)
 }
 
+func TestDocumentsRetrieve_bucketErr(t *testing.T) {
+	repo := &testDocumentRepository{
+		docExists: true,
+	}
+	keeper := secrets.TestKeeper(t)
+	bucketFunc := func() (*blob.Bucket, error) { return nil, errors.New("bucket error") }
+	customerID, documentID := base.ID(), base.ID()
+
+	w := httptest.NewRecorder()
+	req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/customers/%s/documents/%s", customerID, documentID), nil)
+	req.Header.Set("x-request-id", "test")
+	req.Header.Set("X-organization", "test")
+	router := mux.NewRouter()
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, keeper, bucketFunc)
+	router.ServeHTTP(w, req)
+	w.Flush()
+
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	b, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	require.Contains(t, string(b), "bucket error")
+}
+
 func TestDocuments__delete(t *testing.T) {
 	db := database.CreateTestSqliteDB(t)
 	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 
 	customerID := base.ID()
 	// create document
@@ -259,7 +444,7 @@ func TestDocuments__uploadCustomerDocument(t *testing.T) {
 	req.URL = u // replace query params with invalid values
 
 	router := mux.NewRouter()
-	AddDocumentRoutes(log.NewNopLogger(), router, repo, storage.TestBucket)
+	AddDocumentRoutes(log.NewNopLogger(), router, repo, secrets.TestKeeper(t), storage.TestBucket)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -276,133 +461,8 @@ func TestDocuments__makeDocumentKey(t *testing.T) {
 	}
 }
 
-func TestDocumentRepository(t *testing.T) {
-	tests := []struct {
-		dbName string
-		db     *sql.DB
-	}{
-		{
-			dbName: "sqlite",
-			db:     database.CreateTestSqliteDB(t).DB,
-		},
-		{
-			dbName: "mysql",
-			db:     database.CreateTestMySQLDB(t).DB,
-		},
-	}
+func TestDocuments__sizeLimit(t *testing.T) {
+	lim := sizeLimit(100 << 20)
 
-	for _, tc := range tests {
-		defer tc.db.Close()
-
-		t.Run(tc.dbName, func(t *testing.T) {
-			logger := log.NewNopLogger()
-			documentRepo := NewDocumentRepo(logger, tc.db)
-			customerRepo := customers.NewCustomerRepo(logger, tc.db)
-			organization := "test"
-
-			// check empty docs
-			docs, err := documentRepo.getCustomerDocuments(base.ID(), organization)
-			require.NoError(t, err)
-			require.Empty(t, docs)
-
-			// create test customer with organization
-			router := mux.NewRouter()
-			ssnStorage := customers.NewSSNStorage(secrets.TestStringKeeper(t), customers.NewCustomerSSNRepository(logger, tc.db))
-			ofacSearcher := customers.NewOFACSearcher(customerRepo, &watchman.TestWatchmanClient{})
-			customers.AddCustomerRoutes(log.NewNopLogger(), router, customerRepo, ssnStorage, ofacSearcher)
-			body := `{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "birthDate": "1991-04-01", "ssn": "123456789", "type": "individual"}`
-			req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
-
-			req.Header.Add("X-Organization", organization)
-			res := httptest.NewRecorder()
-			router.ServeHTTP(res, req)
-			require.Equal(t, http.StatusOK, res.Code)
-
-			var cust client.Customer
-			if err := json.NewDecoder(res.Body).Decode(&cust); err != nil {
-				t.Fatal(err)
-			}
-
-			// Write a Document and read it back
-			doc := &client.Document{
-				DocumentID:  base.ID(),
-				Type:        "DriversLicense",
-				ContentType: "image/png",
-			}
-			if err := documentRepo.writeCustomerDocument(cust.CustomerID, doc); err != nil {
-				t.Fatal(err)
-			}
-			docs, err = documentRepo.getCustomerDocuments(cust.CustomerID, organization)
-			require.NoError(t, err)
-			require.Len(t, docs, 1)
-
-			require.Equal(t, doc.DocumentID, docs[0].DocumentID)
-			require.Equal(t, "image/png", docs[0].ContentType)
-
-			// make sure we read the document
-			exists, err := documentRepo.exists(cust.CustomerID, doc.DocumentID, organization)
-			require.Equal(t, true, exists)
-			require.NoError(t, err)
-		})
-	}
-}
-
-func TestDocumentsRepository__Delete(t *testing.T) {
-	db := database.CreateTestSqliteDB(t)
-	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
-
-	type document struct {
-		*client.Document
-		deleted bool
-	}
-
-	customerID := base.ID()
-	docs := make([]*document, 10)
-	for i := 0; i < len(docs); i++ {
-		doc := &client.Document{
-			DocumentID:  base.ID(),
-			Type:        "DriversLicense",
-			ContentType: "image/png",
-		}
-		err := repo.writeCustomerDocument(customerID, doc)
-		require.NoError(t, err)
-		docs[i] = &document{
-			Document: doc,
-		}
-	}
-
-	// mark documents to be deleted
-	indexesToDelete := []int{1, 2, 5, 8}
-	for _, idx := range indexesToDelete {
-		require.Less(t, idx, len(docs))
-		docs[idx].deleted = true
-		require.NoError(t,
-			repo.deleteCustomerDocument(customerID, docs[idx].DocumentID),
-		)
-	}
-
-	deletedDocIDs := make(map[string]bool)
-	// query all documents that have been marked as deleted
-	query := ` select document_id from documents where deleted_at is not null `
-	stmt, err := repo.db.Prepare(query)
-	require.NoError(t, err)
-
-	rows, err := stmt.Query()
-	require.NoError(t, err)
-
-	for rows.Next() {
-		var ID *string
-		require.NoError(t, rows.Scan(&ID))
-		deletedDocIDs[*ID] = true
-	}
-
-	for _, doc := range docs {
-		_, ok := deletedDocIDs[doc.DocumentID]
-		require.Equal(t, doc.deleted, ok)
-	}
-
-	// make sure we find the document as deleted
-	exists, err := repo.exists(customerID, docs[0].DocumentID, "")
-	require.Equal(t, false, exists)
-	require.Equal(t, err, sql.ErrNoRows)
+	require.Equal(t, "100MB", lim.String())
 }

@@ -2,7 +2,7 @@
 
 ### Configuration
 
-Watchman offers a few [environmental variables](https://github.com/moov-io/watchman#configuration) for reading the lists, search tuning, and binding to different HTTP ports.
+Watchman offers a few [environment variables](https://github.com/moov-io/watchman#configuration) for reading the lists, search tuning, and binding to different HTTP ports.
 
 ### OFAC Checks
 

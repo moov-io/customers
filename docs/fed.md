@@ -2,7 +2,7 @@
 
 ### Configuration
 
-Fed offers a few [environmental variables](https://github.com/moov-io/fed#configuration) for reading different files or binding to different HTTP ports.
+Fed offers a few [environment variables](https://github.com/moov-io/fed#configuration) for reading different files or binding to different HTTP ports.
 
 ### Data files
 

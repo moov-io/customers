@@ -34,3 +34,12 @@ func TestStringKeeper(t *testing.T) *StringKeeper {
 	}
 	return NewStringKeeper(keeper, 1*time.Second)
 }
+
+func TestKeeper(t *testing.T) *secrets.Keeper {
+	keeper, err := testSecretKeeper(testSecretKey)("test-keeper")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { keeper.Close() })
+	return keeper
+}
