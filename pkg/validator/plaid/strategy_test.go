@@ -81,3 +81,12 @@ func TestStrategy(t *testing.T) {
 		require.Contains(t, (*response)["result"], "validated")
 	})
 }
+
+func TestEnv(t *testing.T) {
+	fmt.Printf("ATRIUM_API_KEY=%q\n", os.Getenv("ATRIUM_API_KEY"))
+	fmt.Printf("ATRIUM_CLIENT_ID=%q\n", os.Getenv("ATRIUM_CLIENT_ID"))
+	fmt.Printf("PLAID_CLIENT_ID=%q\n", os.Getenv("PLAID_CLIENT_ID"))
+	fmt.Printf("PLAID_SECRET=%q\n", os.Getenv("PLAID_SECRET"))
+	fmt.Printf("PLAID_ENVIRONMENT=%q\n", os.Getenv("PLAID_ENVIRONMENT"))
+	fmt.Printf("PLAID_CLIENT_NAME=%q\n", os.Getenv("PLAID_CLIENT_NAME"))
+}
