@@ -225,7 +225,7 @@ func TestCustomers__DeleteCustomer(t *testing.T) {
 	require.Nil(t, got)
 }
 
-func TestCustomerRepository__createCustomer(t *testing.T) {
+func TestCustomerRepository__CreateCustomer(t *testing.T) {
 	check := func(t *testing.T, repo *sqlCustomerRepository) {
 		cust, _, _ := (customerRequest{
 			FirstName: "Jane",
@@ -340,7 +340,7 @@ func TestCustomers__addressValidate(t *testing.T) {
 	}
 }
 
-func TestCustomers__createCustomer(t *testing.T) {
+func TestCustomers__CreateCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
 	phone := `{"number": "555.555.5555", "type": "mobile"}`
 	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`

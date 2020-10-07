@@ -1945,16 +1945,16 @@ Retrieves a list of customer and account information.
  * @param optional nil or *GetReportOfCustomerAccountsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
  * @param "AccountIDs" (optional.String) -  A list of customer account IDs with a limit of 25 IDs.
-@return ReportAccountResponse
+@return []ReportAccountResponse
 */
-func (a *CustomersApiService) GetReportOfCustomerAccounts(ctx _context.Context, localVarOptionals *GetReportOfCustomerAccountsOpts) (ReportAccountResponse, *_nethttp.Response, error) {
+func (a *CustomersApiService) GetReportOfCustomerAccounts(ctx _context.Context, localVarOptionals *GetReportOfCustomerAccountsOpts) ([]ReportAccountResponse, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  ReportAccountResponse
+		localVarReturnValue  []ReportAccountResponse
 	)
 
 	// create path and map variables

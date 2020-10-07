@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/moov-io/customers/pkg/customers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -30,6 +31,7 @@ import (
 
 func TestRouter__AccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
+	organization := "moov"
 	accounts := setupTestAccountRepository(t)
 	validations := &validator.MockRepository{}
 
@@ -46,6 +48,7 @@ func TestRouter__AccountValidation(t *testing.T) {
 		req, err := http.NewRequest("GET", "/", nil)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Organization", organization)
 		req = mux.SetURLVars(req, map[string]string{
 			"customerID":   customerID,
 			"accountID":    acc.AccountID,
@@ -245,6 +248,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 func TestRouter__CompleteAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
+	organization := "moov"
 	repo := setupTestAccountRepository(t)
 	keeper := secrets.TestStringKeeper(t)
 	validations := &validator.MockRepository{}
@@ -360,6 +364,18 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		})
 		require.NoError(t, err)
 
+		customerRepo := customers.NewCustomerRepo(log.NewNopLogger(), repo.db.DB)
+		cust := &client.Customer{
+			CustomerID: customerID,
+			FirstName:  "mary",
+			LastName:   "doe",
+			Type:       client.INDIVIDUAL,
+		}
+		custErr := customerRepo.CreateCustomer(cust, organization)
+		if custErr != nil {
+			t.Fatal(custErr)
+		}
+
 		validation := &validator.Validation{
 			AccountID: acc.AccountID,
 			Strategy:  "test",
@@ -385,6 +401,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("POST", "/", body)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Organization", organization)
 		req = mux.SetURLVars(req, map[string]string{
 			"customerID":   customerID,
 			"accountID":    acc.AccountID,
@@ -419,6 +436,8 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	// has own tests. The only value I see right now is that it shows how
 	// request for microdeposits strategy may look like...
 	t.Run("Test micro-deposits strategy", func(t *testing.T) {
+		// Redefine customerID and userID to use new unique values
+		customerID, userID := base.ID(), base.ID()
 		encrypted, err := keeper.EncryptString("12345")
 		require.NoError(t, err)
 
@@ -451,6 +470,18 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 			{Strategy: "micro-deposits", Vendor: "moov"}: microdeposits.NewStrategy(paygateClient),
 		}
 
+		customerRepo := customers.NewCustomerRepo(log.NewNopLogger(), repo.db.DB)
+		cust := &client.Customer{
+			CustomerID: customerID,
+			FirstName:  "john",
+			LastName:   "doe",
+			Type:       client.INDIVIDUAL,
+		}
+		custErr := customerRepo.CreateCustomer(cust, organization)
+		if custErr != nil {
+			t.Fatal(custErr)
+		}
+
 		// build request with strategy params
 		params := &client.CompleteAccountValidationRequest{
 			VendorRequest: validator.VendorRequest{
@@ -467,6 +498,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("PUT", "/", body)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Organization", organization)
 		req = mux.SetURLVars(req, map[string]string{
 			"customerID":   customerID,
 			"accountID":    acc.AccountID,
