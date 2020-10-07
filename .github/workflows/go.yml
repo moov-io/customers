@@ -32,7 +32,7 @@ jobs:
       run: make admin && make client
 
     - name: Check
-      run: make check
+      run: go test ./pkg/validator/plaid/ -run TestEnv -count 1 -v
       env:
         ATRIUM_API_KEY: ${{ secrets.ATRIUM_API_KEY }}
         ATRIUM_CLIENT_ID: ${{ secrets.ATRIUM_CLIENT_ID }}
