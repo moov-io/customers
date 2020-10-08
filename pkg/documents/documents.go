@@ -252,8 +252,10 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, keeper *sec
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err != nil && err != io.EOF {
-
+		if n == 0 || int64(n) != rdr.Size() {
+			logger.Log("documents", "failed reading document from storage bucket", "bytesRead", n, "customerID", customerID, "documentID", documentID, "requestID", requestID)
+			moovhttp.Problem(w, fmt.Errorf("failed reading document from storage bucket"))
+			return
 		}
 
 		doc, err := keeper.Decrypt(ctx, encryptedDoc)
