@@ -85,10 +85,10 @@ func (str *StringKeeper) DecryptString(in string) (string, error) {
 // OpenSecretKeeper returns a Go Cloud Development Kit (Go CDK) Keeper object which can be used
 // to encrypt and decrypt byte slices and stored in various services.
 // Checkout https://gocloud.dev/ref/secrets/ for more details.
-func OpenSecretKeeper(ctx context.Context, path, cloudProvider string) (*secrets.Keeper, error) {
+func OpenSecretKeeper(ctx context.Context, path, cloudProvider string, localBase64Key string) (*secrets.Keeper, error) {
 	switch strings.ToLower(cloudProvider) {
 	case "", "local":
-		return OpenLocal(os.Getenv("SECRETS_LOCAL_BASE64_KEY"))
+		return OpenLocal(localBase64Key)
 	case "gcp":
 		return openGCPKMS()
 	case "vault":

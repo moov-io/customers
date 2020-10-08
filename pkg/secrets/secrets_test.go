@@ -15,7 +15,7 @@ import (
 
 func TestSecrets(t *testing.T) {
 	ctx := context.Background()
-	keeper, err := OpenSecretKeeper(ctx, "foo", "")
+	keeper, err := OpenSecretKeeper(ctx, "foo", "", "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -134,10 +134,10 @@ func TestOpenSecretKeeper(t *testing.T) {
 	// Just call these and make sure they don't panic.
 	//
 	// The result depends on env variables, which in TravisCI is different than local.
-	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "gcp") })
-	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "vault") })
-	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "") })
-	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "local") })
-	_, err := OpenSecretKeeper(ctx, "", "foo")
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "gcp", "") })
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "vault", "") })
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "", "superSecretKey") })
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "local", "superSecretKey") })
+	_, err := OpenSecretKeeper(ctx, "", "foo", "")
 	require.Error(t, err)
 }

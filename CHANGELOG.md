@@ -28,7 +28,7 @@ IMPROVEMENTS
 - cmd/server: read OFAC_ENDPOINT or WATCHMAN_ENDPOINT
 - customers: send back an array of search results, not null
 - database/mysql: fix migration for customer type
-- docs: reference ./cmd/genkey/ for SECRETS_LOCAL_BASE64_KEY
+- docs: reference ./cmd/genkey/ for [local secret keys](./docs/CONFIGURATION.md#local-filesystem-local)
 - fed: support debugging API calls
 - paygate: support debugging API calls
 - watchman: support debugging API calls
