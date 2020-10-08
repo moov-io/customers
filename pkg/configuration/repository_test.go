@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/base/database"
 	"github.com/moov-io/customers/pkg/client"
 )
 
