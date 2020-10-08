@@ -137,7 +137,7 @@ func main() {
 
 	// Setup Customer SSN storage wrapper
 	ctx := context.Background()
-	keeper, err := secrets.OpenSecretKeeper(ctx, "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"))
+	keeper, err := secrets.OpenSecretKeeper(ctx, "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
 	if err != nil {
 		panic(err)
 	}
@@ -165,8 +165,6 @@ func main() {
 		Repo: accountsRepo, WatchmanClient: watchmanClient,
 	}
 
-	bucket := storage.GetBucket(logger, util.Or(os.Getenv("DOCUMENTS_BUCKET_NAME"), "./storage"), util.Or(os.Getenv("DOCUMENTS_STORAGE_PROVIDER"), "file"), signer)
-
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
@@ -176,7 +174,12 @@ func main() {
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
 
-	docsKeeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-documents", util.Or(os.Getenv("DOCUMENTS_SECRET_PROVIDER"), "local"))
+	docsStorageProvider := util.Or(os.Getenv("DOCUMENTS_STORAGE_PROVIDER"), "file")
+	docsBucketName := util.Or(os.Getenv("DOCUMENTS_BUCKET_NAME"), "./storage")
+	bucket := storage.GetBucket(logger, docsBucketName, docsStorageProvider, signer)
+
+	docsSecretProvider := util.Or(os.Getenv("DOCUMENTS_SECRET_PROVIDER"), "local")
+	docsKeeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-documents", docsSecretProvider, os.Getenv("DOCUMENTS_SECRET_KEY"))
 	if err != nil {
 		panic(err)
 	}
