@@ -252,6 +252,9 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, keeper *sec
 			moovhttp.Problem(w, err)
 			return
 		}
+		if err != nil && err != io.EOF {
+
+		}
 
 		doc, err := keeper.Decrypt(ctx, encryptedDoc)
 		if err != nil {
