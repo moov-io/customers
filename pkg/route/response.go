@@ -10,14 +10,8 @@ import (
 	"github.com/moov-io/base/log"
 )
 
-// ASK(adam)
-// Initially we agreed to look at how tempalter project implements logic of
-// Wrap method In templater / identity I was not able to find code that:
-//
-//   * records request time
-//   * Adds CORS headers
 // To avoid changes into base/http.Wrap and its dependencies (Fed, Watchman,
-// ...) I decided to temporary copy Wrap code here. When we rewrite Customers
+// ...) base/http.Wrap code is duplicated here. When we rewrite Customers
 // routing based on templater we will get rid of this code. Agree? Thoughts?
 
 // ResponseWriter implements Go's standard library http.ResponseWriter to complete HTTP requests
