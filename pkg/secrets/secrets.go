@@ -102,28 +102,27 @@ func OpenSecretKeeper(ctx context.Context, path, cloudProvider string) (*secrets
 // The scheme for the base64 key should look like: 'base64key://'
 // The URL hostname must be a base64-encoded key, of length 32 bytes when decoded.
 func OpenLocal(base64Key string) (*secrets.Keeper, error) {
-	var key [32]byte
-	if base64Key != "" {
-		if strings.HasPrefix(base64Key, localsecrets.Scheme) {
-			keeper, err := secrets.OpenKeeper(context.Background(), base64Key)
-			if err != nil {
-				return nil, fmt.Errorf("problem reading base64 url key: %v", err)
-			}
-			return keeper, nil
-		} else {
-			k, err := localsecrets.Base64Key(base64Key)
-			if err != nil {
-				return nil, fmt.Errorf("problem reading base64key: %v", err)
-			}
-			key = k
-		}
-	} else {
+	if base64Key == "" {
 		k, err := localsecrets.Base64Key(base64.StdEncoding.EncodeToString(bytes.Repeat([]byte("1"), 32)))
 		if err != nil {
 			return nil, err
 		}
-		key = k
+		return localsecrets.NewKeeper(k), nil
 	}
+
+	if strings.HasPrefix(base64Key, localsecrets.Scheme) {
+		keeper, err := secrets.OpenKeeper(context.Background(), base64Key)
+		if err != nil {
+			return nil, fmt.Errorf("problem reading base64 url key: %v", err)
+		}
+		return keeper, nil
+	}
+
+	key, err := localsecrets.Base64Key(base64Key)
+	if err != nil {
+		return nil, fmt.Errorf("problem reading base64key: %v", err)
+	}
+
 	return localsecrets.NewKeeper(key), nil
 }
 
