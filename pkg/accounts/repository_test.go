@@ -8,14 +8,12 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
-	"github.com/stretchr/testify/require"
-
-	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/base/database"
+	"github.com/moov-io/base/log"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/secrets"
-
-	"github.com/moov-io/base/log"
+	"github.com/stretchr/testify/require"
 )
 
 type testAccountRepository struct {
