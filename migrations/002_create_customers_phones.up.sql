@@ -3,5 +3,5 @@ create table if not exists customers_phones (
   number VARCHAR(20), 
   valid BOOLEAN, 
   type integer, 
-  unique (customer_id, number)
+  constraint customer_number unique (customer_id, number)
 );

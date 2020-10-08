@@ -10,5 +10,5 @@ create table if not exists customers_addresses(
   country varchar(3), 
   validated BOOLEAN, 
   deleted_at datetime,
-  unique (customer_id, address1)
+  constraint customer_address unique (customer_id, address1)
 );

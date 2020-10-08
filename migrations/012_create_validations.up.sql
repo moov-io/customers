@@ -7,5 +7,3 @@ create table if not exists validations(
   created_at datetime, 
   updated_at datetime
 );
-
-create index idx_validations_validation_account_ids on validations (validation_id, account_id)
