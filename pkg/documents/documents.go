@@ -222,7 +222,7 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, keeper *sec
 		// reject the request if the document is deleted
 		if exists, err := repo.exists(customerID, documentID, organization); !exists || err != nil {
 			if err != nil {
-				logger.LogError("failed to check document existance", err)
+				logger.LogError("failed to check document existence", err)
 			}
 			http.NotFound(w, r)
 			return
