@@ -12,17 +12,17 @@ import (
 )
 
 func TestSecrets(t *testing.T) {
-	// We assume SSN_SECRET_PROVIDER is unset
-	keeper, err := GetSecretKeeper("foo")
+	ctx := context.Background()
+	keeper, err := OpenSecretKeeper(ctx, "foo", "")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	encrypted, err := keeper.Encrypt(context.Background(), []byte("hello, world"))
+	encrypted, err := keeper.Encrypt(ctx, []byte("hello, world"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	out, err := keeper.Decrypt(context.Background(), encrypted)
+	out, err := keeper.Decrypt(ctx, encrypted)
 	if err != nil {
 		t.Fatal(err)
 	}

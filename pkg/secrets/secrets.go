@@ -82,21 +82,6 @@ func (str *StringKeeper) DecryptString(in string) (string, error) {
 	return string(bs), nil
 }
 
-type SecretFunc func(path string) (*secrets.Keeper, error)
-
-var (
-	GetSecretKeeper SecretFunc = func(path string) (*secrets.Keeper, error) {
-		if path == "" {
-			return nil, errors.New("GetSecretKeeper: nil path")
-		}
-
-		ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
-		defer cancelFn()
-
-		return OpenSecretKeeper(ctx, path, os.Getenv("SSN_SECRET_PROVIDER"))
-	}
-)
-
 // OpenSecretKeeper returns a Go Cloud Development Kit (Go CDK) Keeper object which can be used
 // to encrypt and decrypt byte slices and stored in various services.
 // Checkout https://gocloud.dev/ref/secrets/ for more details.
