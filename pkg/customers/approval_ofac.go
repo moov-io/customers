@@ -98,7 +98,7 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 }
 
 func AddOFACRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, ofac *OFACSearcher) {
-	logger = logger.WithKeyValue("package", "ofac")
+	logger = logger.WithKeyValue("package", "customers")
 
 	r.Methods("GET").Path("/customers/{customerID}/ofac").HandlerFunc(getLatestCustomerOFACSearch(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/refresh/ofac").HandlerFunc(refreshOFACSearch(logger, repo, ofac))
