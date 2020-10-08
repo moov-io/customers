@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestSecrets(t *testing.T) {
@@ -132,6 +134,10 @@ func TestOpenSecretKeeper(t *testing.T) {
 	// Just call these and make sure they don't panic.
 	//
 	// The result depends on env variables, which in TravisCI is different than local.
-	OpenSecretKeeper(ctx, "", "gcp")
-	OpenSecretKeeper(ctx, "", "vault")
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "gcp") })
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "vault") })
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "") })
+	require.NotPanics(t, func() { OpenSecretKeeper(ctx, "", "local") })
+	_, err := OpenSecretKeeper(ctx, "", "foo")
+	require.Error(t, err)
 }
