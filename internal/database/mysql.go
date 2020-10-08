@@ -182,7 +182,7 @@ func (my *mysql) Connect() (*sql.DB, error) {
 	}
 
 	migratorLogger := migrator.WithLogger(migrator.LoggerFunc(func(msg string, args ...interface{}) {
-		my.logger.WithKeyValue("mysql", msg)
+		my.logger.WithKeyValue("package", "mysql").Log(msg)
 	}))
 
 	// Migrate our database

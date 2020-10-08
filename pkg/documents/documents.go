@@ -74,7 +74,7 @@ func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.Handl
 
 		docs, err := repo.getCustomerDocuments(customerID, organization)
 		if err != nil {
-			logger.WithKeyValue("customerID", customerID).LogErrorF("failed to %v", err)
+			logger.WithKeyValue("customerID", customerID).LogError("failed to get customer document", err)
 			moovhttp.Problem(w, err)
 			return
 		}
