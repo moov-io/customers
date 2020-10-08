@@ -240,7 +240,7 @@ func main() {
 	// Block/Wait for an error
 	if err := <-errs; err != nil {
 		shutdownServer()
-		logger.LogError("service errror", err)
+		logger.LogError("service error", err)
 	}
 }
 
