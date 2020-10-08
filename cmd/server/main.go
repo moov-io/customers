@@ -63,7 +63,8 @@ func main() {
 		logger = log.NewDefaultLogger()
 	}
 
-	logger.WithKeyValue("startup", fmt.Sprintf("Starting moov-io/customers server version %s", mainPkg.Version))
+	logger = logger.WithKeyValue("app", "customers")
+	logger.WithKeyValue("phase", "startup").Log(fmt.Sprintf("Starting moov-io/customers server version %s", mainPkg.Version))
 
 	// Channel for errors
 	errs := make(chan error)
@@ -76,18 +77,18 @@ func main() {
 
 	// Setup SQLite database
 	if sqliteVersion, _, _ := sqlite3.Version(); sqliteVersion != "" {
-		logger.WithKeyValue("main", fmt.Sprintf("sqlite version %s", sqliteVersion))
+		logger.Log(fmt.Sprintf("sqlite version %s", sqliteVersion))
 	}
 
 	// Setup database connection
 	db, err := database.New(logger, os.Getenv("DATABASE_TYPE"))
 	if err != nil {
-		logger.WithKeyValue("main", err.Error())
+		logger.LogError("failed to connect to database", err)
 		os.Exit(1)
 	}
 	defer func() {
 		if err := db.Close(); err != nil {
-			logger.WithKeyValue("main", err.Error())
+			logger.LogError("failed to close database connection", err)
 		}
 	}()
 
@@ -102,10 +103,9 @@ func main() {
 	adminServer := admin.NewServer(*adminAddr)
 	adminServer.AddVersionHandler(mainPkg.Version) // Setup 'GET /version'
 	go func() {
-		logger.WithKeyValue("admin", fmt.Sprintf("listening on %s", adminServer.BindAddr()))
+		logger.Log(fmt.Sprintf("admin listening on %s", adminServer.BindAddr()))
 		if err := adminServer.Listen(); err != nil {
-			err = fmt.Errorf("problem starting admin http: %v", err)
-			logger.WithKeyValue("admin", err.Error())
+			logger.LogErrorF("problem starting admin http: %v", err)
 			errs <- err
 		}
 	}()
@@ -218,21 +218,21 @@ func main() {
 	}
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.WithKeyValue("shutdown", err.Error())
+			logger.WithKeyValue("phase", "shutdown").LogError("failed to shutdown server", err)
 		}
 	}
 
 	// Start business logic HTTP server
 	go func() {
 		if certFile, keyFile := os.Getenv("HTTPS_CERT_FILE"), os.Getenv("HTTPS_KEY_FILE"); certFile != "" && keyFile != "" {
-			logger.WithKeyValue("startup", fmt.Sprintf("binding to %s for secure HTTP server", *httpAddr))
+			logger.WithKeyValue("phase", "startup").Log(fmt.Sprintf("binding to %s for secure HTTP server", *httpAddr))
 			if err := serve.ListenAndServeTLS(certFile, keyFile); err != nil {
-				logger.WithKeyValue("exit", err.Error())
+				logger.LogError("failed to start TLS server", err)
 			}
 		} else {
-			logger.WithKeyValue("startup", fmt.Sprintf("binding to %s for HTTP server", *httpAddr))
+			logger.WithKeyValue("phase", "startup").Log(fmt.Sprintf("binding to %s for HTTP server", *httpAddr))
 			if err := serve.ListenAndServe(); err != nil {
-				logger.WithKeyValue("exit", err.Error())
+				logger.LogError("failed to start server", err)
 			}
 		}
 	}()
@@ -240,7 +240,7 @@ func main() {
 	// Block/Wait for an error
 	if err := <-errs; err != nil {
 		shutdownServer()
-		logger.WithKeyValue("exit", err.Error())
+		logger.LogError("service errror", err)
 	}
 }
 
@@ -261,7 +261,7 @@ func setupSigner(logger log.Logger, bucketName, cloudProvider string) *fileblob.
 		}
 		if secret == "" {
 			secret = "secret"
-			logger.WithKeyValue("main", "WARNING!!!! USING INSECURE DEFAULT FILE STORAGE, set FILEBLOB_HMAC_SECRET for ANY production usage")
+			logger.Log("WARNING!!!! USING INSECURE DEFAULT FILE STORAGE, set FILEBLOB_HMAC_SECRET for ANY production usage")
 		}
 		signer, err := storage.FileblobSigner(baseURL, secret)
 		if err != nil {

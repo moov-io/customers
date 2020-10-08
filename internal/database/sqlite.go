@@ -174,7 +174,7 @@ func (s *sqlite) Connect() (*sql.DB, error) {
 
 	sqliteVersionLogOnce.Do(func() {
 		if v, _, _ := sqlite3.Version(); v != "" {
-			s.logger.WithKeyValue("main", fmt.Sprintf("sqlite version %s", v))
+			s.logger.Log(fmt.Sprintf("sqlite version %s", v))
 		}
 	})
 
@@ -187,7 +187,7 @@ func (s *sqlite) Connect() (*sql.DB, error) {
 	}
 
 	migratorLogger := migrator.WithLogger(migrator.LoggerFunc(func(msg string, args ...interface{}) {
-		s.logger.WithKeyValue("sqlite", msg)
+		s.logger.Log(fmt.Sprintf("sqlite: %s", msg))
 	}))
 
 	// Migrate our database
