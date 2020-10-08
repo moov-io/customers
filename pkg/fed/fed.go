@@ -10,7 +10,7 @@ import (
 
 	"github.com/moov-io/customers/internal/util"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 )
 
 func Cache(logger log.Logger, endpoint string, debug bool) Client {

@@ -25,8 +25,8 @@ import (
 	"github.com/moov-io/customers/pkg/validator/microdeposits"
 	"github.com/moov-io/customers/pkg/validator/testvalidator"
 
-	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
+	"github.com/moov-io/base/log"
 )
 
 func TestRouter__AccountValidation(t *testing.T) {

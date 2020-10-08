@@ -17,7 +17,7 @@ import (
 	"github.com/moov-io/customers/pkg/secrets"
 	"github.com/moov-io/customers/pkg/validator"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 )
 
 func getAccountValidation(logger log.Logger, accounts Repository, validations validator.Repository) http.HandlerFunc {

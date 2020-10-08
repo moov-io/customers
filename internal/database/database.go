@@ -10,8 +10,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/go-kit/kit/log"
 	"github.com/lopezator/migrator"
+	"github.com/moov-io/base/log"
 )
 
 func New(logger log.Logger, _type string) (*sql.DB, error) {

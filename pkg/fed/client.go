@@ -17,7 +17,7 @@ import (
 	moovfed "github.com/moov-io/fed/client"
 
 	"github.com/antihax/optional"
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 )
 
 type Client interface {
@@ -105,7 +105,8 @@ func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 		}
 	}
 
-	logger.Log("fed", fmt.Sprintf("using %s for FED address", conf.BasePath))
+	logger = logger.WithKeyValue("package", "fed")
+	logger.Log(fmt.Sprintf("using %s for FED address", conf.BasePath))
 
 	return &moovClient{
 		underlying: moovfed.NewAPIClient(conf),

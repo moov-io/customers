@@ -16,7 +16,7 @@ import (
 	"github.com/moov-io/base/docker"
 	"github.com/moov-io/paygate/pkg/config"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/ory/dockertest/v3"
 	"gopkg.in/yaml.v2"
 )

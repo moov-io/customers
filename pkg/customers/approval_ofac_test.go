@@ -12,9 +12,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base"
+	"github.com/moov-io/base/log"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/watchman"
 	watchmanClient "github.com/moov-io/watchman/client"

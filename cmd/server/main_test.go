@@ -8,8 +8,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/go-kit/kit/log"
 	"github.com/moov-io/base/admin"
+	"github.com/moov-io/base/log"
 	"github.com/moov-io/customers/pkg/validator"
 	"github.com/stretchr/testify/require"
 )

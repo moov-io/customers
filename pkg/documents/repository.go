@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-kit/kit/log"
+	"github.com/moov-io/base/log"
 	"github.com/moov-io/customers/pkg/client"
 )
 
