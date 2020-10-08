@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
+	"github.com/moov-io/base/log"
 
 	"github.com/moov-io/customers/pkg/accounts"
 	"github.com/moov-io/customers/pkg/client"
@@ -22,6 +22,8 @@ func AddRoutes(
 	customerRepo customers.CustomerRepository,
 	accountRepo accounts.Repository,
 ) {
+	logger = logger.WithKeyValue("package", "reports")
+
 	r.Methods("GET").Path("/reports/accounts").HandlerFunc(getCustomerAccounts(logger, customerRepo, accountRepo))
 }
 
@@ -37,7 +39,6 @@ func getCustomerAccounts(
 ) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
-		requestID := moovhttp.GetRequestID(r)
 
 		accountIDsInput := r.URL.Query().Get("accountIDs")
 		accountIDsInput = strings.TrimSpace(accountIDsInput)
@@ -51,7 +52,7 @@ func getCustomerAccounts(
 
 		allAccounts, err := accountRepo.GetCustomerAccountsByIDs(accountIDs)
 		if err != nil {
-			logger.Log("customers", "error getting customers' accounts", "error", err, "requestID", requestID)
+			logger.LogError("error getting customers' accounts", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -60,7 +61,7 @@ func getCustomerAccounts(
 		for _, acc := range allAccounts {
 			cust, err := customerRepo.GetCustomer(acc.CustomerID)
 			if err != nil {
-				logger.Log("customers", "error getting customer", "error", err, "requestID", requestID)
+				logger.LogError("error getting customer", err)
 				moovhttp.Problem(w, err)
 				return
 			}

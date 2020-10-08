@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base"
+	"github.com/moov-io/base/log"
 	"github.com/stretchr/testify/require"
 
 	"github.com/moov-io/customers/internal/database"
