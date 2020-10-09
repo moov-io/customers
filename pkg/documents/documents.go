@@ -170,8 +170,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
 		defer cancelFn()
 
-		fBytes := make([]byte, fileHeader.Size)
-		_, err = fileReader.Read(fBytes)
+		fBytes, err := ioutil.ReadAll(fileReader)
 		if err != nil {
 			logger.LogError("read failed", err)
 			moovhttp.Problem(w, err)
