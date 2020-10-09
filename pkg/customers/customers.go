@@ -486,6 +486,7 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	query := `update customers set first_name = ?, middle_name = ?, last_name = ?, nick_name = ?, suffix = ?, type = ?, birth_date = ?, status = ?, email =?,
 	last_modified = ?,
@@ -528,17 +529,39 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 }
 
 func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID string, phones []client.Phone) error {
-	query := `replace into customers_phones (customer_id, number, valid, type) values (?, ?, ?, ?);`
-	stmt, err := tx.Prepare(query)
+	deleteQuery := `delete from customers_phones where customer_id = ?`
+	var args []interface{}
+	args = append(args, customerID)
+	if len(phones) > 0 {
+		deleteQuery = fmt.Sprintf("%s and number not in (?%s)", deleteQuery, strings.Repeat(",?", len(phones)-1))
+		for _, p := range phones {
+			args = append(args, p.Number)
+		}
+	}
+	deleteQuery = fmt.Sprintf("%s;", deleteQuery)
+
+	stmt, err := tx.Prepare(deleteQuery)
 	if err != nil {
-		return fmt.Errorf("preparing tx update on customers_phones err=%v | rollback=%v", err, tx.Rollback())
+		return fmt.Errorf("preparing query: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(args...)
+	if err != nil {
+		return fmt.Errorf("executing query: %v", err)
+	}
+
+	replaceQuery := `replace into customers_phones (customer_id, number, valid, type) values (?, ?, ?, ?);`
+	stmt, err = tx.Prepare(replaceQuery)
+	if err != nil {
+		return fmt.Errorf("preparing query: %v", err)
 	}
 	defer stmt.Close()
 
 	for _, phone := range phones {
 		_, err := stmt.Exec(customerID, phone.Number, phone.Valid, phone.Type)
 		if err != nil {
-			return fmt.Errorf("executing update on customers_phones err=%v | rollback=%v", err, tx.Rollback())
+			return fmt.Errorf("executing update on customer's phone: %v", err)
 		}
 	}
 
@@ -546,20 +569,43 @@ func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID 
 }
 
 func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customerID string, addresses []client.CustomerAddress) error {
-	query := `replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?,
-	?, ?);`
-	stmt, err := tx.Prepare(query)
+	deleteQuery := `delete from customers_addresses where customer_id = ?`
+	var args []interface{}
+	args = append(args, customerID)
+	if len(addresses) > 0 {
+		deleteQuery = fmt.Sprintf("%s and address1 not in (?%s)", deleteQuery, strings.Repeat(",?", len(addresses)-1))
+		for _, a := range addresses {
+			args = append(args, a.Address1)
+		}
+	}
+	deleteQuery = fmt.Sprintf("%s;", deleteQuery)
+
+	stmt, err := tx.Prepare(deleteQuery)
 	if err != nil {
-		return fmt.Errorf("preparing tx on customers_addresses err=%v | rollback=%v", err, tx.Rollback())
+		return fmt.Errorf("preparing query: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(args...)
+	if err != nil {
+		panic(err)
+	}
+
+	replaceQuery := `replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?,
+	?, ?);`
+	stmt, err = tx.Prepare(replaceQuery)
+	if err != nil {
+		return fmt.Errorf("preparing query: %v", err)
 	}
 	defer stmt.Close()
 
 	for _, addr := range addresses {
 		_, err := stmt.Exec(addr.AddressID, customerID, addr.Type, addr.Address1, addr.Address2, addr.City, addr.State, addr.PostalCode, addr.Country, addr.Validated)
 		if err != nil {
-			return fmt.Errorf("executing update on customers_addresses err=%v | rollback=%v", err, tx.Rollback())
+			return fmt.Errorf("executing query: %v", err)
 		}
 	}
+
 	return nil
 }
 
