@@ -7,20 +7,24 @@ package customers
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gorilla/mux"
 	"github.com/moov-io/base/log"
+	"github.com/stretchr/testify/require"
 
 	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/client"
 )
 
 func TestCustomersSearchRouter(t *testing.T) {
-	repo := createTestCustomerRepository(t)
-	defer repo.close()
+	db := database.CreateTestMySQLDB(t)
+	repo := NewCustomerRepo(log.NewNopLogger(), db.DB)
+	defer db.Close()
 
 	router := mux.NewRouter()
 	AddCustomerRoutes(log.NewNopLogger(), router, repo, nil, nil)
@@ -77,82 +81,114 @@ func TestCustomersSearchRouter(t *testing.T) {
 	}
 }
 
-func TestCustomerSearch__query(t *testing.T) {
-	sqliteDB := database.CreateTestSqliteDB(t)
-	defer sqliteDB.Close()
-
-	mysqlDB := database.CreateTestMySQLDB(t)
-	defer mysqlDB.Close()
-
-	prepare := func(db *sql.DB, query string) error {
-		stmt, err := db.Prepare(query)
-		if err != nil {
-			return err
+func TestRepository__searchCustomers(t *testing.T) {
+	logger := log.NewNopLogger()
+	org := "test"
+	createCustomer := func(repo CustomerRepository, i int) *client.Customer {
+		var req = &customerRequest{
+			FirstName: fmt.Sprintf("jane-%d", i),
+			LastName:  fmt.Sprintf("doe-%d", i),
+			Email:     fmt.Sprintf("jane-%d@moov.com", i),
+			Phones: []phone{
+				{
+					Number: "555-555-5555",
+					Type:   "primary",
+				},
+			},
+			Addresses: []address{
+				{
+					Type:       "primary",
+					Address1:   "123 Cool St.",
+					City:       "San Francisco",
+					State:      "CA",
+					PostalCode: "94030",
+					Country:    "US",
+				},
+			},
+			Metadata: map[string]string{"key": "val"},
 		}
-		return stmt.Close()
+		cust, _, _ := req.asCustomer(testCustomerSSNStorage(t))
+		require.NoError(t, repo.CreateCustomer(cust, org))
+		return cust
 	}
 
-	// Query search
-	query, args := buildSearchQuery(
-		SearchParams{
-			Organization: "foo",
-			Query:        "jane doe",
-			Count:        100,
+	tests := []struct {
+		desc string
+		db   *sql.DB
+	}{
+		{
+			desc: "sqlite",
+			db:   database.CreateTestSqliteDB(t).DB,
 		},
-	)
-	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? order by created_at desc limit ?;" {
-		t.Errorf("unexpected query: %q", query)
-	}
-	if err := prepare(sqliteDB.DB, query); err != nil {
-		t.Errorf("sqlite: %v", err)
-	}
-	if err := prepare(mysqlDB.DB, query); err != nil {
-		t.Errorf("mysql: %v", err)
-	}
-	if len(args) != 3 {
-		t.Errorf("unexpected args: %#v", args)
+		{
+			desc: "mysql",
+			db:   database.CreateTestMySQLDB(t).DB,
+		},
 	}
 
-	// Eamil search
-	query, args = buildSearchQuery(
-		SearchParams{
-			Organization: "foo",
-			Email:        "jane.doe@moov.io",
-		},
-	)
-	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(email) like ? order by created_at desc limit ?;" {
-		t.Errorf("unexpected query: %q", query)
-	}
-	if err := prepare(sqliteDB.DB, query); err != nil {
-		t.Errorf("sqlite: %v", err)
-	}
-	if err := prepare(mysqlDB.DB, query); err != nil {
-		t.Errorf("mysql: %v", err)
-	}
-	if len(args) != 3 {
-		t.Errorf("unexpected args: %#v", args)
-	}
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			defer tc.db.Close()
+			repo := NewCustomerRepo(logger, tc.db)
 
-	// Query and Eamil saerch
-	query, args = buildSearchQuery(
-		SearchParams{
-			Organization: "foo",
-			Query:        "jane doe",
-			Email:        "jane.doe@moov.io",
-			Count:        25,
-		},
-	)
-	if query != "select customer_id from customers where deleted_at is null and organization = ? and lower(first_name) || \" \" || lower(last_name) LIKE ? and lower(email) like ? order by created_at desc limit ?;" {
-		t.Errorf("unexpected query: %q", query)
-	}
-	if err := prepare(sqliteDB.DB, query); err != nil {
-		t.Errorf("sqlite: %v", err)
-	}
-	if err := prepare(mysqlDB.DB, query); err != nil {
-		t.Errorf("mysql: %v", err)
-	}
-	if len(args) != 4 {
-		t.Errorf("unexpected args: %#v", args)
+			n := 20 // seed database with customers
+			var customers []*client.Customer
+			for i := 0; i < n; i++ {
+				customers = append(customers, createCustomer(repo, i))
+			}
+
+			/* Search by Count */
+			params := SearchParams{
+				Organization: org,
+				Count:        5,
+			}
+			got, err := repo.searchCustomers(params)
+			require.NoError(t, err)
+			require.Len(t, got, int(params.Count))
+
+			/* Search by email */
+			params = SearchParams{
+				Organization: org,
+				Count:        1,
+				Email:        "JaNe-3@moov.com",
+			}
+			got, err = repo.searchCustomers(params)
+			require.NoError(t, err)
+			require.Equal(t, strings.ToLower(params.Email), got[0].Email)
+
+			if tc.desc == "mysql" {
+				/* Search by query */
+				params = SearchParams{
+					Organization: org,
+					Count:        100,
+					Query:        "jane-10",
+				}
+				got, err = repo.searchCustomers(params)
+				require.NoError(t, err)
+				require.Len(t, got, 1)
+			}
+
+			/* Search by customerIDs */
+			wantIDs := make([]string, 3)
+			for i := 0; i < len(wantIDs); i++ {
+				wantIDs[i] = customers[i].CustomerID
+			}
+
+			got, err = repo.searchCustomers(SearchParams{
+				Organization: org,
+				CustomerIDs:  wantIDs,
+				Count:        10,
+			})
+			require.NoError(t, err)
+			require.Len(t, got, len(wantIDs))
+
+			var gotIDs []string
+			for _, c := range got {
+				gotIDs = append(gotIDs, c.CustomerID)
+			}
+
+			require.ElementsMatch(t, wantIDs, gotIDs)
+		})
 	}
 }
 
@@ -192,7 +228,7 @@ func TestGet100MostRecentlyCreatedCustomersWhenSpecifyingMoreThanAvailable(t *te
 	scope.assert.Equal(100, len(customers))
 }
 
-func TestGetCustomersWithVerifiedStatus(t *testing.T) {
+func TestSearchCustomersWithVerifiedStatus(t *testing.T) {
 	// Create two customers. 1 with Unknown STATUS and 1 with Verified
 	scope := Setup(t)
 	customer := scope.CreateCustomer("John", "Doe", "john.doe@email.com", client.INDIVIDUAL)
@@ -216,7 +252,7 @@ func TestGetCustomersWithVerifiedStatus(t *testing.T) {
 	}
 }
 
-func TestGetCustomersByName(t *testing.T) {
+func TestSearchCustomersByName(t *testing.T) {
 	scope := Setup(t)
 	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.INDIVIDUAL)
 	_ = scope.CreateCustomer("John", "Doe", "jane.doe@gmail.com", client.INDIVIDUAL)
@@ -240,7 +276,7 @@ func TestGetCustomersByName(t *testing.T) {
 	scope.assert.Equal(0, len(customers))
 }
 
-func TestGetCustomersByEmail(t *testing.T) {
+func TestSearchCustomersByEmail(t *testing.T) {
 	scope := Setup(t)
 	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.INDIVIDUAL)
 	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com", client.INDIVIDUAL)
@@ -255,7 +291,7 @@ func TestGetCustomersByEmail(t *testing.T) {
 	scope.assert.Equal(0, len(customers))
 }
 
-func TestGetCustomersByNameAndEmail(t *testing.T) {
+func TestSearchCustomersByNameAndEmail(t *testing.T) {
 	scope := Setup(t)
 	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.INDIVIDUAL)
 	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com", client.INDIVIDUAL)
@@ -282,7 +318,7 @@ func TestGetCustomersByNameAndEmail(t *testing.T) {
 	scope.assert.Equal(0, len(customers))
 }
 
-func TestGetCustomersUsingPaging(t *testing.T) {
+func TestSearchCustomersUsingPaging(t *testing.T) {
 	scope := Setup(t)
 	_ = scope.CreateCustomers(30, client.INDIVIDUAL)
 
@@ -303,7 +339,7 @@ func TestGetCustomersUsingPaging(t *testing.T) {
 	scope.assert.Equal(0, len(customers))
 }
 
-func TestGetCustomersUsingPagingFailure(t *testing.T) {
+func TestSearchCustomersUsingPagingFailure(t *testing.T) {
 	scope := Setup(t)
 	_ = scope.CreateCustomers(30, client.INDIVIDUAL)
 
@@ -317,7 +353,7 @@ func TestGetCustomersUsingPagingFailure(t *testing.T) {
 	scope.assert.Equal(0, len(customers))
 }
 
-func TestGetCustomersByType(t *testing.T) {
+func TestSearchCustomersByType(t *testing.T) {
 	scope := Setup(t)
 	_ = scope.CreateCustomers(10, client.INDIVIDUAL)
 	_ = scope.CreateCustomers(20, client.BUSINESS)

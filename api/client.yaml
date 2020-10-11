@@ -206,8 +206,14 @@ paths:
             type: string
         - name: count
           in: query
-          description: Optional parameter for searching for customers by specifying the amount to return
+          description: Optional parameter for searching by specifying the amount to return
           example: 20
+          schema:
+            type: string
+        - name: customerIDs
+          in: query
+          description: Optional parameter for searching by customers' IDs
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081,970ef15d-a4e1-473f-b5d7-da38163b0ba3
           schema:
             type: string
       responses:

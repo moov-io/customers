@@ -76,11 +76,6 @@ func (r *testCustomerRepository) searchCustomers(params SearchParams) ([]*client
 	return nil, nil
 }
 
-func (r *testCustomerRepository) getCustomerMetadata(customerID string) (map[string]string, error) {
-	out := make(map[string]string)
-	return out, r.err
-}
-
 func (r *testCustomerRepository) replaceCustomerMetadata(customerID string, metadata map[string]string) error {
 	return r.err
 }
@@ -221,7 +216,7 @@ func TestCustomers__DeleteCustomer(t *testing.T) {
 	require.Equal(t, http.StatusNoContent, w.Code)
 	require.Empty(t, w.Body)
 	got, err = repo.GetCustomer(customer.CustomerID)
-	require.NoError(t, err)
+	require.Error(t, err)
 	require.Nil(t, got)
 }
 
@@ -256,7 +251,7 @@ func TestCustomerRepository__CreateCustomer(t *testing.T) {
 	check(t, &sqlCustomerRepository{mysqlDB.DB, log.NewNopLogger()})
 }
 
-func TestCustomers__GetCustomersError(t *testing.T) {
+func TestCustomers__searchCustomersError(t *testing.T) {
 	repo := &testCustomerRepository{err: errors.New("bad error")}
 
 	w := httptest.NewRecorder()
@@ -446,6 +441,12 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	updateReq.FirstName = "Jim"
 	updateReq.LastName = "Smith"
 	updateReq.Email = "jim@google.com"
+	updateReq.Phones = []phone{
+		{
+			Number: "555.555.5555",
+			Type:   "cell",
+		},
+	}
 	updateReq.Addresses = []address{
 		{
 			Address1:   "555 5th st",
@@ -455,7 +456,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			Country:    "US",
 		},
 	}
-
 	payload, err := json.Marshal(&updateReq)
 	require.NoError(t, err)
 
@@ -465,19 +465,19 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	AddCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
-
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var got *client.Customer
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&got))
-	fmt.Println(w.Body.String())
-
-	want, err := repo.GetCustomer(customer.CustomerID)
+	want, _, _ := updateReq.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t, err)
 
-	got.CreatedAt = want.CreatedAt
-	got.LastModified = want.LastModified
-	got.Metadata = make(map[string]string)
+	want.CustomerID = got.CustomerID
+	want.Addresses[0].AddressID = got.Addresses[0].AddressID
+	want.BirthDate = got.BirthDate
+	want.Status = got.Status
+	want.CreatedAt = got.CreatedAt
+	want.LastModified = got.LastModified
 	require.Equal(t, want, got)
 }
 
@@ -493,8 +493,8 @@ func TestCustomers__repository(t *testing.T) {
 	defer repo.close()
 
 	cust, err := repo.GetCustomer(base.ID())
-	if err != nil {
-		t.Errorf("unexpected error: %v", err)
+	if err == nil {
+		t.Errorf("expected not found error: %v", err)
 	}
 	if cust != nil {
 		t.Error("expected no Customer")
@@ -853,12 +853,16 @@ func TestCustomerRepository__metadata(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	getMetadata := func(customerID string) map[string]string {
+		meta, err := repo.getMetadata([]string{customerID})
+		if err != nil {
+			t.Fatal(err)
+		}
+		return meta[customerID].Metadata
+	}
 	customerID := base.ID()
 
-	meta, err := repo.getCustomerMetadata(customerID)
-	if err != nil {
-		t.Fatal(err)
-	}
+	meta := getMetadata(customerID)
 	if len(meta) != 0 {
 		t.Errorf("unknown metadata: %#v", meta)
 	}
@@ -867,10 +871,8 @@ func TestCustomerRepository__metadata(t *testing.T) {
 	if err := repo.replaceCustomerMetadata(customerID, map[string]string{"key": "bar"}); err != nil {
 		t.Fatal(err)
 	}
-	meta, err = repo.getCustomerMetadata(customerID)
-	if err != nil {
-		t.Fatal(err)
-	}
+
+	meta = getMetadata(customerID)
 	if len(meta) != 1 || meta["key"] != "bar" {
 		t.Errorf("unknown metadata: %#v", meta)
 	}

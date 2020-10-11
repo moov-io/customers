@@ -2517,12 +2517,13 @@ func (a *CustomersApiService) ReplaceCustomerMetadata(ctx _context.Context, cust
 
 // SearchCustomersOpts Optional parameters for the method 'SearchCustomers'
 type SearchCustomersOpts struct {
-	Query  optional.String
-	Email  optional.String
-	Status optional.String
-	Type_  optional.String
-	Skip   optional.String
-	Count  optional.String
+	Query       optional.String
+	Email       optional.String
+	Status      optional.String
+	Type_       optional.String
+	Skip        optional.String
+	Count       optional.String
+	CustomerIDs optional.String
 }
 
 /*
@@ -2535,7 +2536,8 @@ Search for customers using different filter parameters
  * @param "Status" (optional.String) -  Optional parameter for searching by customer status
  * @param "Type_" (optional.String) -  Optional parameter for searching by customer type
  * @param "Skip" (optional.String) -  Optional parameter for searching for customers by skipping over an initial group
- * @param "Count" (optional.String) -  Optional parameter for searching for customers by specifying the amount to return
+ * @param "Count" (optional.String) -  Optional parameter for searching by specifying the amount to return
+ * @param "CustomerIDs" (optional.String) -  Optional parameter for searching by customers' IDs
 @return []Customer
 */
 func (a *CustomersApiService) SearchCustomers(ctx _context.Context, localVarOptionals *SearchCustomersOpts) ([]Customer, *_nethttp.Response, error) {
@@ -2571,6 +2573,9 @@ func (a *CustomersApiService) SearchCustomers(ctx _context.Context, localVarOpti
 	}
 	if localVarOptionals != nil && localVarOptionals.Count.IsSet() {
 		localVarQueryParams.Add("count", parameterToString(localVarOptionals.Count.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.CustomerIDs.IsSet() {
+		localVarQueryParams.Add("customerIDs", parameterToString(localVarOptionals.CustomerIDs.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{}
