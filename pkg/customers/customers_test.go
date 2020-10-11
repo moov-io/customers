@@ -446,6 +446,12 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	updateReq.FirstName = "Jim"
 	updateReq.LastName = "Smith"
 	updateReq.Email = "jim@google.com"
+	updateReq.Phones = []phone{
+		{
+			Number: "555.555.5555",
+			Type:   "cell",
+		},
+	}
 	updateReq.Addresses = []address{
 		{
 			Address1:   "555 5th st",
@@ -455,7 +461,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			Country:    "US",
 		},
 	}
-
 	payload, err := json.Marshal(&updateReq)
 	require.NoError(t, err)
 
@@ -465,19 +470,19 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	AddCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
 	router.ServeHTTP(w, req)
 	w.Flush()
-
 	require.Equal(t, http.StatusOK, w.Code)
 
 	var got *client.Customer
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&got))
-	fmt.Println(w.Body.String())
-
-	want, err := repo.GetCustomer(customer.CustomerID)
+	want, _, _ := updateReq.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t, err)
 
-	got.CreatedAt = want.CreatedAt
-	got.LastModified = want.LastModified
-	got.Metadata = make(map[string]string)
+	want.CustomerID = got.CustomerID
+	want.Addresses[0].AddressID = got.Addresses[0].AddressID
+	want.BirthDate = got.BirthDate
+	want.Status = got.Status
+	want.CreatedAt = got.CreatedAt
+	want.LastModified = got.LastModified
 	require.Equal(t, want, got)
 }
 
