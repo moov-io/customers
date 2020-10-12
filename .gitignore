@@ -30,3 +30,4 @@ cover.out
 
 .idea/*
 .vscode/*
+pkged.go
