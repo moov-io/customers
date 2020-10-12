@@ -400,7 +400,6 @@ type CustomerRepository interface {
 
 	searchCustomers(params SearchParams) ([]*client.Customer, error)
 
-	getCustomerMetadata(customerID string) (map[string]string, error)
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
 
 	addCustomerAddress(customerID string, address address) error
@@ -610,99 +609,19 @@ func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customer
 }
 
 func (r *sqlCustomerRepository) GetCustomer(customerID string) (*client.Customer, error) {
-	query := `select first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified from customers where customer_id = ? and deleted_at is null limit 1;`
-	stmt, err := r.db.Prepare(query)
+	custs, err := r.searchCustomers(SearchParams{
+		Count:       1,
+		CustomerIDs: []string{customerID},
+	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("getting customer: %v", err)
 	}
 
-	row := stmt.QueryRow(customerID)
-
-	var birthDate *string
-	var cust client.Customer
-	cust.CustomerID = customerID
-	err = row.Scan(&cust.FirstName, &cust.MiddleName, &cust.LastName, &cust.NickName, &cust.Suffix, &cust.Type, &birthDate, &cust.Status, &cust.Email, &cust.CreatedAt,
-		&cust.LastModified)
-	stmt.Close()
-	if err != nil && !strings.Contains(err.Error(), "no rows in result set") {
-		return nil, fmt.Errorf("GetCustomer: %v", err)
-	}
-	if cust.FirstName == "" {
-		return nil, nil // not found
-	}
-	if birthDate != nil {
-		cust.BirthDate = *birthDate
+	if len(custs) == 0 {
+		return nil, errors.New("customer not found")
 	}
 
-	phones, err := r.readPhones(customerID)
-	if err != nil {
-		return nil, fmt.Errorf("GetCustomer: readPhones: %v", err)
-	}
-	cust.Phones = phones
-
-	addresses, err := r.readAddresses(customerID)
-	if err != nil {
-		return nil, fmt.Errorf("GetCustomer: readAddresses: %v", err)
-	}
-	cust.Addresses = addresses
-
-	metadata, err := r.getCustomerMetadata(customerID)
-	if err != nil {
-		return nil, fmt.Errorf("GetCustomer: getCustomerMetadata: %v", err)
-	}
-	cust.Metadata = metadata
-
-	return &cust, nil
-}
-
-func (r *sqlCustomerRepository) readPhones(customerID string) ([]client.Phone, error) {
-	query := `select number, valid, type from customers_phones where customer_id = ?;`
-	stmt, err := r.db.Prepare(query)
-	if err != nil {
-		return nil, fmt.Errorf("GetCustomer: prepare customers_phones: err=%v", err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(customerID)
-	if err != nil {
-		return nil, fmt.Errorf("GetCustomer: query customers_phones: err=%v", err)
-	}
-	defer rows.Close()
-
-	var phones []client.Phone
-	for rows.Next() {
-		var p client.Phone
-		if err := rows.Scan(&p.Number, &p.Valid, &p.Type); err != nil {
-			return nil, fmt.Errorf("GetCustomer: scan customers_phones: err=%v", err)
-		}
-		phones = append(phones, p)
-	}
-	return phones, rows.Err()
-}
-
-func (r *sqlCustomerRepository) readAddresses(customerID string) ([]client.CustomerAddress, error) {
-	query := `select address_id, type, address1, address2, city, state, postal_code, country, validated from customers_addresses where customer_id = ? and deleted_at is null;`
-	stmt, err := r.db.Prepare(query)
-	if err != nil {
-		return nil, fmt.Errorf("readAddresses: prepare customers_addresses: err=%v", err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(customerID)
-	if err != nil {
-		return nil, fmt.Errorf("readAddresses: query customers_addresses: err=%v", err)
-	}
-	defer rows.Close()
-
-	var adds []client.CustomerAddress
-	for rows.Next() {
-		var a client.CustomerAddress
-		if err := rows.Scan(&a.AddressID, &a.Type, &a.Address1, &a.Address2, &a.City, &a.State, &a.PostalCode, &a.Country, &a.Validated); err != nil {
-			return nil, fmt.Errorf("readAddresses: scan customers_addresses: err=%v", err)
-		}
-		adds = append(adds, a)
-	}
-	return adds, rows.Err()
+	return custs[0], nil
 }
 
 func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error {
@@ -734,32 +653,6 @@ func (r *sqlCustomerRepository) updateCustomerStatus(customerID string, status c
 		return fmt.Errorf("updateCustomerStatus: insert status exec: %v", err)
 	}
 	return tx.Commit()
-}
-
-func (r *sqlCustomerRepository) getCustomerMetadata(customerID string) (map[string]string, error) {
-	out := make(map[string]string)
-
-	query := `select meta_key, meta_value from customer_metadata where customer_id = ?;`
-	stmt, err := r.db.Prepare(query)
-	if err != nil {
-		return out, fmt.Errorf("getCustomerMetadata: prepare: %v", err)
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(customerID)
-	if err != nil {
-		return out, fmt.Errorf("getCustomerMetadata: query: %v", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		key, value := "", ""
-		if err := rows.Scan(&key, &value); err != nil {
-			return out, fmt.Errorf("getCustomerMetadata: scan: %v", err)
-		}
-		out[key] = value
-	}
-	return out, nil
 }
 
 func (r *sqlCustomerRepository) replaceCustomerMetadata(customerID string, metadata map[string]string) error {

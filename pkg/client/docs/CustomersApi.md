@@ -1218,7 +1218,8 @@ Name | Type | Description  | Notes
  **status** | **optional.String**| Optional parameter for searching by customer status | 
  **type_** | **optional.String**| Optional parameter for searching by customer type | 
  **skip** | **optional.String**| Optional parameter for searching for customers by skipping over an initial group | 
- **count** | **optional.String**| Optional parameter for searching for customers by specifying the amount to return | 
+ **count** | **optional.String**| Optional parameter for searching by specifying the amount to return | 
+ **customerIDs** | **optional.String**| Optional parameter for searching by customers&#39; IDs | 
 
 ### Return type
 
