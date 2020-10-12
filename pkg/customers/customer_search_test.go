@@ -254,6 +254,10 @@ func TestSearchCustomersWithVerifiedStatus(t *testing.T) {
 
 func TestSearchCustomersByName(t *testing.T) {
 	scope := Setup(t)
+	scope.customerRepo = &sqlCustomerRepository{
+		logger: log.NewNopLogger(),
+		db:     database.CreateTestMySQLDB(t).DB,
+	}
 	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.INDIVIDUAL)
 	_ = scope.CreateCustomer("John", "Doe", "jane.doe@gmail.com", client.INDIVIDUAL)
 
@@ -293,6 +297,10 @@ func TestSearchCustomersByEmail(t *testing.T) {
 
 func TestSearchCustomersByNameAndEmail(t *testing.T) {
 	scope := Setup(t)
+	scope.customerRepo = &sqlCustomerRepository{
+		logger: log.NewNopLogger(),
+		db:     database.CreateTestMySQLDB(t).DB,
+	}
 	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.INDIVIDUAL)
 	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com", client.INDIVIDUAL)
 
