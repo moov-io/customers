@@ -135,8 +135,7 @@ func main() {
 	documents.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
-	ctx := context.Background()
-	keeper, err := secrets.OpenSecretKeeper(ctx, "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
+	keeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
 	if err != nil {
 		panic(err)
 	}
