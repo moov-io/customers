@@ -4,11 +4,12 @@ VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+(-[a-zA-Z0-9]*)?)' vers
 USERID := $(shell id -u $$USER)
 GROUPID:= $(shell id -g $$USER)
 
-.PHONY: build build-server build-examples docker release check
+.PHONY: build build-server build-examples docker release check install
 
 build: build-server
 
 build-server:
+	pkger -include /migrations
 	CGO_ENABLED=1 go build -o ./bin/server github.com/moov-io/customers/cmd/server
 
 .PHONY: check
@@ -46,6 +47,7 @@ clean:
 	@rm -rf ./bin/ cover.out coverage.txt openapi-generator-cli-*.jar misspell* staticcheck* lint-project.sh
 
 dist: clean
+	pkger -include /migrations
 ifeq ($(OS),Windows_NT)
 	CGO_ENABLED=1 GOOS=windows go build -o bin/customers.exe github.com/moov-io/customers/cmd/server
 else
@@ -94,3 +96,6 @@ AUTHORS:
 	@$(file >$@,# This file lists all individuals having contributed content to the repository.)
 	@$(file >>$@,# For how it is generated, see `make AUTHORS`.)
 	@echo "$(shell git log --format='\n%aN <%aE>' | LC_ALL=C.UTF-8 sort -uf)" >> $@
+
+install:
+	go install github.com/markbates/pkger/cmd/pkger
