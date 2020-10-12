@@ -27,6 +27,7 @@ import (
 
 	"github.com/moov-io/customers/internal/util"
 	"github.com/moov-io/customers/pkg/accounts"
+	"github.com/moov-io/customers/pkg/config"
 	"github.com/moov-io/customers/pkg/configuration"
 	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/documents"
@@ -81,9 +82,15 @@ func main() {
 	}
 
 	// Setup database connection
-	// TODO: create actual config for DB
+	conf := config.New()
+	err := conf.Load()
+	if err != nil {
+		logger.LogError("failed to load application config", err)
+		os.Exit(1)
+	}
+
 	ctx := context.TODO()
-	db, closeDB, err := database.NewAndMigrate(database.InMemorySqliteConfig, logger, ctx)
+	db, closeDB, err := database.NewAndMigrate(*conf.Database, logger, ctx)
 	if err != nil {
 		logger.LogError("failed to connect to database", err)
 		os.Exit(1)
