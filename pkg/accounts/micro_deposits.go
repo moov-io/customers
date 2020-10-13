@@ -10,9 +10,10 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/moov-io/paygate/pkg/client"
+
 	customerClient "github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/paygate"
-	"github.com/moov-io/paygate/pkg/client"
 )
 
 func handleMicroDepositValidation(repo Repository, paygateClient paygate.Client, accountID, customerID, userID string, microDeposits []string) error {
@@ -41,7 +42,7 @@ func handleMicroDepositValidation(repo Repository, paygateClient paygate.Client,
 			return err
 		}
 		// Amounts validated, so mark the Account has approved
-		return repo.updateAccountStatus(accountID, customerClient.VALIDATED)
+		return repo.updateAccountStatus(accountID, customerClient.ACCOUNTSTATUS_VALIDATED)
 	}
 
 	return fmt.Errorf("microDepositID=%s is in status: %s", micro.MicroDepositID, micro.Status)

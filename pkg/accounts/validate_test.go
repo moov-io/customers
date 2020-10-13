@@ -8,10 +8,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/moov-io/customers/pkg/customers"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/moov-io/customers/pkg/customers"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/moov-io/base"
@@ -39,7 +40,7 @@ func TestRouter__AccountValidation(t *testing.T) {
 	acc, err := accounts.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Type:          client.CHECKING,
+		Type:          client.ACCOUNTTYPE_CHECKING,
 	})
 	require.NoError(t, err)
 
@@ -110,7 +111,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 	acc, err := accounts.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Type:          client.CHECKING,
+		Type:          client.ACCOUNTTYPE_CHECKING,
 	})
 	require.NoError(t, err)
 
@@ -118,11 +119,11 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 		acc, err := accounts.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber: "1234",
 			RoutingNumber: "987654321",
-			Type:          client.CHECKING,
+			Type:          client.ACCOUNTTYPE_CHECKING,
 		})
 		require.NoError(t, err)
 
-		err = accounts.updateAccountStatus(acc.AccountID, client.VALIDATED)
+		err = accounts.updateAccountStatus(acc.AccountID, client.ACCOUNTSTATUS_VALIDATED)
 		require.NoError(t, err)
 
 		params := map[string]string{
@@ -260,7 +261,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 	acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123456",
 		RoutingNumber: "987654323",
-		Type:          client.CHECKING,
+		Type:          client.ACCOUNTTYPE_CHECKING,
 	})
 	require.NoError(t, err)
 
@@ -268,11 +269,11 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber: "123",
 			RoutingNumber: "987654320",
-			Type:          client.CHECKING,
+			Type:          client.ACCOUNTTYPE_CHECKING,
 		})
 		require.NoError(t, err)
 
-		err = repo.updateAccountStatus(acc.AccountID, client.VALIDATED)
+		err = repo.updateAccountStatus(acc.AccountID, client.ACCOUNTSTATUS_VALIDATED)
 		require.NoError(t, err)
 
 		// build request for test strategy
@@ -359,7 +360,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber:          "1234",
 			RoutingNumber:          "987654321",
-			Type:                   client.CHECKING,
+			Type:                   client.ACCOUNTTYPE_CHECKING,
 			encryptedAccountNumber: encrypted,
 		})
 		require.NoError(t, err)
@@ -369,7 +370,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 			CustomerID: customerID,
 			FirstName:  "mary",
 			LastName:   "doe",
-			Type:       client.INDIVIDUAL,
+			Type:       client.CUSTOMERTYPE_INDIVIDUAL,
 		}
 		custErr := customerRepo.CreateCustomer(cust, organization)
 		if custErr != nil {
@@ -444,7 +445,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		acc, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 			AccountNumber:          "12345",
 			RoutingNumber:          "987654322",
-			Type:                   client.CHECKING,
+			Type:                   client.ACCOUNTTYPE_CHECKING,
 			encryptedAccountNumber: encrypted,
 		})
 		require.NoError(t, err)
@@ -475,7 +476,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 			CustomerID: customerID,
 			FirstName:  "john",
 			LastName:   "doe",
-			Type:       client.INDIVIDUAL,
+			Type:       client.CUSTOMERTYPE_INDIVIDUAL,
 		}
 		custErr := customerRepo.CreateCustomer(cust, organization)
 		if custErr != nil {
@@ -513,7 +514,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		// check if account status was set to validated
 		updatedAccount, err := repo.getCustomerAccount(customerID, acc.AccountID)
 		require.NoError(t, err)
-		require.Equal(t, client.VALIDATED, updatedAccount.Status)
+		require.Equal(t, client.ACCOUNTSTATUS_VALIDATED, updatedAccount.Status)
 
 		// check if validation status was set to completed
 		validation, err = validations.GetValidation(validation.AccountID, validation.ValidationID)

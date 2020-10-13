@@ -14,9 +14,10 @@ type CustomerStatus string
 
 // List of CustomerStatus
 const (
-	DECEASED     CustomerStatus = "Deceased"
-	REJECTED     CustomerStatus = "Rejected"
-	UNKNOWN      CustomerStatus = "Unknown"
-	RECEIVE_ONLY CustomerStatus = "ReceiveOnly"
-	VERIFIED     CustomerStatus = "Verified"
+	CUSTOMERSTATUS_DECEASED     CustomerStatus = "Deceased"
+	CUSTOMERSTATUS_REJECTED     CustomerStatus = "Rejected"
+	CUSTOMERSTATUS_UNKNOWN      CustomerStatus = "Unknown"
+	CUSTOMERSTATUS_RECEIVE_ONLY CustomerStatus = "ReceiveOnly"
+	CUSTOMERSTATUS_VERIFIED     CustomerStatus = "Verified"
+	CUSTOMERSTATUS_FROZEN       CustomerStatus = "Frozen"
 )

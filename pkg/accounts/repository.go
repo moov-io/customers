@@ -148,7 +148,7 @@ func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, 
 		HolderName:          req.HolderName,
 		MaskedAccountNumber: req.maskedAccountNumber,
 		RoutingNumber:       req.RoutingNumber,
-		Status:              client.NONE,
+		Status:              client.ACCOUNTSTATUS_NONE,
 		Type:                req.Type,
 	}
 	query := `insert into accounts (

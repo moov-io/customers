@@ -14,6 +14,6 @@ type AccountStatus string
 
 // List of AccountStatus
 const (
-	NONE      AccountStatus = "none"
-	VALIDATED AccountStatus = "validated"
+	ACCOUNTSTATUS_NONE      AccountStatus = "none"
+	ACCOUNTSTATUS_VALIDATED AccountStatus = "validated"
 )

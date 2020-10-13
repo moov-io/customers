@@ -53,7 +53,7 @@ func TestRepository(t *testing.T) {
 	acct, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Type:          client.CHECKING,
+		Type:          client.ACCOUNTTYPE_CHECKING,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -89,7 +89,7 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 	req := &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Type:          client.CHECKING,
+		Type:          client.ACCOUNTTYPE_CHECKING,
 	}
 	if err := req.disfigure(keeper); err != nil {
 		t.Fatal(err)
@@ -105,7 +105,7 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 		CustomerID: customerID,
 		FirstName:  "jane",
 		LastName:   "doe",
-		Type:       client.INDIVIDUAL,
+		Type:       client.CUSTOMERTYPE_INDIVIDUAL,
 	}
 	custErr := customerRepo.CreateCustomer(cust, organization)
 	if custErr != nil {
@@ -132,7 +132,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 	req := &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Type:          client.CHECKING,
+		Type:          client.ACCOUNTTYPE_CHECKING,
 	}
 	if err := req.disfigure(keeper); err != nil {
 		t.Fatal(err)
@@ -143,7 +143,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 	}
 
 	// update status
-	if err := repo.updateAccountStatus(acct.AccountID, client.VALIDATED); err != nil {
+	if err := repo.updateAccountStatus(acct.AccountID, client.ACCOUNTSTATUS_VALIDATED); err != nil {
 		t.Fatal(err)
 	}
 
@@ -152,7 +152,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if acct.Status != client.VALIDATED {
+	if acct.Status != client.ACCOUNTSTATUS_VALIDATED {
 		t.Errorf("unexpected status: %s", acct.Status)
 	}
 }
@@ -165,7 +165,7 @@ func TestRepositoryUnique(t *testing.T) {
 		req := &CreateAccountRequest{
 			AccountNumber: "156421",
 			RoutingNumber: "123456780",
-			Type:          client.SAVINGS,
+			Type:          client.ACCOUNTTYPE_SAVINGS,
 		}
 		if err := req.disfigure(keeper); err != nil {
 			t.Fatal(err)
