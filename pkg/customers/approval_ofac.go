@@ -160,7 +160,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 		if result.Blocked {
 			logger.LogErrorF("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
 
-			if err := repo.updateCustomerStatus(cust.CustomerID, client.REJECTED, "manual OFAC refresh"); err != nil {
+			if err := repo.updateCustomerStatus(cust.CustomerID, client.CUSTOMERSTATUS_REJECTED, "manual OFAC refresh"); err != nil {
 				logger.LogErrorF("error updating customer=%s error=%v", cust.CustomerID, err)
 				moovhttp.Problem(w, err)
 				return

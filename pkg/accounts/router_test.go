@@ -143,7 +143,7 @@ func TestAccountCreationRequest(t *testing.T) {
 	req.HolderName = "John Doe"
 	req.AccountNumber = "12345"
 	req.RoutingNumber = "987654320"
-	req.Type = client.SAVINGS
+	req.Type = client.ACCOUNTTYPE_SAVINGS
 
 	if err := req.validate(); err != nil {
 		t.Error(err)
@@ -174,7 +174,7 @@ func TestGetAccountByID(t *testing.T) {
 		accounts[i].Account, err = repo.CreateCustomerAccount(accounts[i].customerID, base.ID(), &CreateAccountRequest{
 			AccountNumber: fmt.Sprintf("%d", i),
 			RoutingNumber: "987654320",
-			Type:          client.CHECKING,
+			Type:          client.ACCOUNTTYPE_CHECKING,
 		})
 		require.NoError(t, err)
 	}
@@ -206,7 +206,7 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 	req := &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
-		Type:          client.CHECKING,
+		Type:          client.ACCOUNTTYPE_CHECKING,
 	}
 	if err := req.disfigure(keeper); err != nil {
 		t.Fatal(err)
@@ -256,7 +256,7 @@ func TestUpdateAccountStatus(t *testing.T) {
 	c := testclient.New(t, router)
 
 	req := client.UpdateAccountStatus{
-		Status: client.VALIDATED,
+		Status: client.ACCOUNTSTATUS_VALIDATED,
 	}
 	account, resp, err := c.CustomersApi.UpdateAccountStatus(context.TODO(), customerID, accountID, req)
 	if resp != nil && resp.Body != nil {
@@ -338,7 +338,7 @@ func setupCustomerWithOrganization(t *testing.T, customerID, organization string
 		CustomerID: customerID,
 		FirstName:  "jane",
 		LastName:   "doe",
-		Type:       client.INDIVIDUAL,
+		Type:       client.CUSTOMERTYPE_INDIVIDUAL,
 	}
 	custErr := customerRepo.CreateCustomer(cust, organization)
 	if custErr != nil {
@@ -370,7 +370,7 @@ func httpCreateAccount(t *testing.T, handler *mux.Router, customerID string) *cl
 		HolderName:    "John Doe",
 		AccountNumber: "18749",
 		RoutingNumber: "987654320",
-		Type:          client.SAVINGS,
+		Type:          client.ACCOUNTTYPE_SAVINGS,
 	}
 
 	var buf bytes.Buffer

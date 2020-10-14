@@ -270,7 +270,7 @@ func TestCustomers__searchCustomersError(t *testing.T) {
 }
 
 func TestCustomers__customerRequest(t *testing.T) {
-	req := &customerRequest{Type: client.INDIVIDUAL}
+	req := &customerRequest{Type: client.CUSTOMERTYPE_INDIVIDUAL}
 	if err := req.validate(); err == nil {
 		t.Error("expected error")
 	}
@@ -673,7 +673,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	}
 
 	// update status
-	if err := repo.updateCustomerStatus(cust.CustomerID, client.VERIFIED, "test comment"); err != nil {
+	if err := repo.updateCustomerStatus(cust.CustomerID, client.CUSTOMERSTATUS_VERIFIED, "test comment"); err != nil {
 		t.Fatal(err)
 	}
 
@@ -682,7 +682,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if customer.Status != client.VERIFIED {
+	if customer.Status != client.CUSTOMERSTATUS_VERIFIED {
 		t.Errorf("unexpected status: %s", customer.Status)
 	}
 }

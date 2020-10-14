@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
+
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 	"github.com/moov-io/customers/pkg/secrets"
@@ -75,8 +76,8 @@ func initAccountValidation(logger log.Logger, accounts Repository, validations v
 			moovhttp.Problem(w, err)
 			return
 		}
-		if !strings.EqualFold(string(account.Status), string(client.NONE)) {
-			moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.NONE, account.Status))
+		if !strings.EqualFold(string(account.Status), string(client.ACCOUNTSTATUS_NONE)) {
+			moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.ACCOUNTSTATUS_NONE, account.Status))
 			return
 		}
 
@@ -157,8 +158,8 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 			moovhttp.Problem(w, err)
 			return
 		}
-		if !strings.EqualFold(string(account.Status), string(client.NONE)) {
-			moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.NONE, account.Status))
+		if !strings.EqualFold(string(account.Status), string(client.ACCOUNTSTATUS_NONE)) {
+			moovhttp.Problem(w, fmt.Errorf("expected accountID=%s status to be '%s', but it is '%s'", accountID, client.ACCOUNTSTATUS_NONE, account.Status))
 			return
 		}
 
@@ -223,7 +224,7 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 			return
 		}
 
-		err = repo.updateAccountStatus(accountID, client.VALIDATED)
+		err = repo.updateAccountStatus(accountID, client.ACCOUNTSTATUS_VALIDATED)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return

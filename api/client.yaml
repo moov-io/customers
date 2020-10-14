@@ -1708,6 +1708,7 @@ components:
         - Unknown
         - ReceiveOnly
         - Verified
+        - Frozen
     CustomerMetadata:
       properties:
         metadata:

@@ -169,7 +169,7 @@ func validateCustomerType(t client.CustomerType) error {
 		return strings.ToLower(string(t))
 	}
 	switch norm(t) {
-	case norm(client.INDIVIDUAL), norm(client.BUSINESS):
+	case norm(client.CUSTOMERTYPE_INDIVIDUAL), norm(client.CUSTOMERTYPE_BUSINESS):
 		return nil
 	}
 	return fmt.Errorf("unknown type: %s", t)
@@ -194,7 +194,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 	}
 
 	if req.Status == "" {
-		req.Status = client.UNKNOWN
+		req.Status = client.CUSTOMERSTATUS_UNKNOWN
 	}
 
 	customer := &client.Customer{
@@ -459,7 +459,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, birthDate, client.UNKNOWN, c.Email, now, now, organization)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, birthDate, client.CUSTOMERSTATUS_UNKNOWN, c.Email, now, now, organization)
 	if err != nil {
 		return fmt.Errorf("CreateCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}

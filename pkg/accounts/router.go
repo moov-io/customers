@@ -98,7 +98,7 @@ func (req *CreateAccountRequest) validate() error {
 	at := func(t1, t2 client.AccountType) bool {
 		return strings.EqualFold(string(t1), string(t2))
 	}
-	if !at(req.Type, client.CHECKING) && !at(req.Type, client.SAVINGS) {
+	if !at(req.Type, client.ACCOUNTTYPE_CHECKING) && !at(req.Type, client.ACCOUNTTYPE_SAVINGS) {
 		return fmt.Errorf("invalid account type: %s", req.Type)
 	}
 
@@ -332,7 +332,7 @@ func updateAccountStatus(logger log.Logger, repo Repository) http.HandlerFunc {
 			return
 		}
 		switch req.Status {
-		case client.NONE, client.VALIDATED:
+		case client.ACCOUNTSTATUS_NONE, client.ACCOUNTSTATUS_VALIDATED:
 			// do nothing
 		default:
 			moovhttp.Problem(w, fmt.Errorf("invalid status: %s", req.Status))

@@ -14,6 +14,6 @@ type AccountType string
 
 // List of AccountType
 const (
-	CHECKING AccountType = "Checking"
-	SAVINGS  AccountType = "Savings"
+	ACCOUNTTYPE_CHECKING AccountType = "Checking"
+	ACCOUNTTYPE_SAVINGS  AccountType = "Savings"
 )
