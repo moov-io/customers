@@ -83,8 +83,7 @@ func main() {
 
 	// Setup database connection
 	conf := config.New()
-	err := conf.Load()
-	if err != nil {
+	if err := conf.Load(); err != nil {
 		logger.LogError("failed to load application config", err)
 		os.Exit(1)
 	}
