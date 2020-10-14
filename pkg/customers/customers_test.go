@@ -6,9 +6,11 @@ package customers
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -303,6 +305,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 		State:      "CA",
 		PostalCode: "90210",
 		Country:    "US",
+		Type:       "primary",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -322,7 +325,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 }
 
 func TestCustomers__addressValidate(t *testing.T) {
-	add := address{}
+	add := address{Type: "primary"}
 
 	add.State = "IA"
 	if err := add.validate(); err != nil {
@@ -338,7 +341,7 @@ func TestCustomers__addressValidate(t *testing.T) {
 func TestCustomers__CreateCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
 	phone := `{"number": "555.555.5555", "type": "mobile"}`
-	address := `{"type": "home", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
+	address := `{"type": "primary", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
 	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "birthDate": "1991-04-01", "ssn": "123456789", "type": "individual", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-organization", "test")
@@ -423,6 +426,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 				State:      "CA",
 				PostalCode: "90210",
 				Country:    "US",
+				Type:       "primary",
 			},
 		},
 	}
@@ -454,6 +458,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			State:      "CA",
 			PostalCode: "90210",
 			Country:    "US",
+			Type:       "primary",
 		},
 	}
 	payload, err := json.Marshal(&updateReq)
@@ -479,6 +484,38 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	want.CreatedAt = got.CreatedAt
 	want.LastModified = got.LastModified
 	require.Equal(t, want, got)
+
+	/* Error when settings two addresses as primary */
+	updateReq.Addresses = []address{
+		{
+			Address1:   "555 5th st",
+			City:       "real city",
+			State:      "CA",
+			PostalCode: "90210",
+			Country:    "US",
+			Type:       "primary",
+		},
+		{
+			Address1:   "444 4th st",
+			City:       "real city",
+			State:      "CA",
+			PostalCode: "90210",
+			Country:    "US",
+			Type:       "primary",
+		},
+	}
+	payload, err = json.Marshal(&updateReq)
+	require.NoError(t, err)
+	req = req.Clone(context.Background())
+	req.Body = ioutil.NopCloser(bytes.NewReader(payload))
+	w = httptest.NewRecorder()
+	router.ServeHTTP(w, req)
+	require.Equal(t, http.StatusBadRequest, w.Code)
+	var errResp struct {
+		ErrorMsg string `json:"error"`
+	}
+	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &errResp))
+	require.Contains(t, errResp.ErrorMsg, ErrAddressTypeDuplicate.Error())
 }
 
 func createTestCustomerRepository(t *testing.T) *sqlCustomerRepository {
@@ -700,7 +737,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// add an Address
+	// add an address
 	if err := repo.addCustomerAddress(cust.CustomerID, address{
 		Address1:   "123 1st st",
 		City:       "fake city",

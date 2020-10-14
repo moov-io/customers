@@ -2,6 +2,7 @@ package customers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -10,8 +11,11 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
 
-	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
+)
+
+var (
+	ErrAddressTypeDuplicate = errors.New("customer already has an address with type 'primary'")
 )
 
 func AddCustomerAddressRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository) {
@@ -29,19 +33,46 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
-		var req address
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		var reqAddr address
+		if err := json.NewDecoder(r.Body).Decode(&reqAddr); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		if err := repo.addCustomerAddress(customerID, req); err != nil {
+		cust, err := repo.GetCustomer(customerID)
+		if err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+		if cust == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		// todo: vince-10/12/2020: we need to perform this conversion for validation til we develop a clean separation layer between client and model structs
+		var addrs []address
+		for _, addr := range cust.Addresses {
+			addrs = append(addrs, address{
+				Type:       strings.ToLower(addr.Type),
+				Address1:   addr.Address1,
+				Address2:   addr.Address2,
+				City:       addr.City,
+				State:      addr.State,
+				PostalCode: addr.PostalCode,
+				Country:    addr.Country,
+			})
+		}
+		if err := validateAddresses(append(addrs, reqAddr)); err != nil {
+			moovhttp.Problem(w, err)
+			return
+		}
+
+		if err := repo.addCustomerAddress(customerID, reqAddr); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		logger.Log(fmt.Sprintf("added address for customer=%s", customerID))
-
 		respondWithCustomer(logger, w, customerID, requestID, repo)
 	}
 }
@@ -64,6 +95,21 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		if err := req.validate(); err != nil {
 			moovhttp.Problem(w, err)
 			return
+		}
+
+		if req.Type == "primary" {
+			cust, err := repo.GetCustomer(customerID)
+			if err != nil {
+				moovhttp.Problem(w, err)
+				return
+			}
+
+			for _, addr := range cust.Addresses {
+				if addr.Type == "primary" && addr.AddressID != addressId {
+					moovhttp.Problem(w, ErrAddressTypeDuplicate)
+					return
+				}
+			}
 		}
 
 		if err := repo.updateCustomerAddress(customerID, addressId, req); err != nil {
@@ -111,30 +157,6 @@ func getAddressId(w http.ResponseWriter, r *http.Request) string {
 }
 
 type updateCustomerAddressRequest struct {
-	Type       string `json:"type"`
-	Address1   string `json:"address1"`
-	Address2   string `json:"address2"`
-	City       string `json:"city"`
-	State      string `json:"state"`
-	PostalCode string `json:"postalCode"`
-	Country    string `json:"country"`
-	Validated  bool   `json:"validated"`
-}
-
-func (req *updateCustomerAddressRequest) validate() error {
-	switch strings.ToLower(req.Type) {
-	case "primary", "secondary":
-		return nil
-	default:
-		return fmt.Errorf("updateCustomerAddressRequest: unknown type: %s", req.Type)
-	}
-}
-
-func containsValidPrimaryAddress(addrs []client.CustomerAddress) bool {
-	for i := range addrs {
-		if strings.EqualFold(addrs[i].Type, "primary") && addrs[i].Validated {
-			return true
-		}
-	}
-	return false
+	address   `json:",inline"`
+	Validated bool `json:"validated"`
 }

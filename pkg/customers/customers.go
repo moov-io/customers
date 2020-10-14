@@ -140,6 +140,12 @@ type address struct {
 }
 
 func (add address) validate() error {
+	switch t := strings.ToLower(add.Type); t {
+	case "primary", "secondary":
+	default:
+		return fmt.Errorf("unknown type: %s", t)
+	}
+
 	if !usstates.Valid(add.State) {
 		return fmt.Errorf("create customer: invalid state=%s", add.State)
 	}
@@ -148,19 +154,18 @@ func (add address) validate() error {
 
 func (req customerRequest) validate() error {
 	if req.FirstName == "" || req.LastName == "" {
-		return errors.New("create customer: empty name field(s)")
+		return errors.New("invalid customer fields: empty name field(s)")
 	}
 	if err := validateCustomerType(req.Type); err != nil {
-		return fmt.Errorf("create customer: %v", err)
+		return fmt.Errorf("invalid customer type: %v", err)
 	}
 	if err := validateMetadata(req.Metadata); err != nil {
-		return fmt.Errorf("create customer: %v", err)
+		return fmt.Errorf("invalid customer metadata: %v", err)
 	}
-	for i := range req.Addresses {
-		if err := req.Addresses[i].validate(); err != nil {
-			return fmt.Errorf("address=%v validation failed: %v", req.Addresses[i], err)
-		}
+	if err := validateAddresses(req.Addresses); err != nil {
+		return fmt.Errorf("invalid customer addresses: %v", err)
 	}
+
 	return nil
 }
 
@@ -185,6 +190,25 @@ func validateMetadata(meta map[string]string) error {
 			return fmt.Errorf("metadata key %s value is too long", k)
 		}
 	}
+	return nil
+}
+
+func validateAddresses(addrs []address) error {
+	hasPrimaryAddr := false
+	for _, addr := range addrs {
+		if hasPrimaryAddr {
+			return ErrAddressTypeDuplicate
+		}
+
+		if err := addr.validate(); err != nil {
+			return fmt.Errorf("validating address: %v", err)
+		}
+
+		if addr.Type == "primary" {
+			hasPrimaryAddr = true
+		}
+	}
+
 	return nil
 }
 
