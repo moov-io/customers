@@ -50,9 +50,18 @@ func getCustomerAccounts(logger log.Logger, repo Repository, fedClient fed.Clien
 		w = route.Responder(logger, w, r)
 
 		customerID := route.GetCustomerID(w, r)
-		accounts, err := repo.getAccountsByCustomerID(customerID)
+		if customerID == "" {
+			return
+		}
+
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
+
+		accounts, err := repo.getAccounts(customerID, organization)
 		if err != nil {
-			moovhttp.Problem(w, err)
+			moovhttp.Problem(w, fmt.Errorf("getting accounts: %v", err))
 			return
 		}
 		accounts = decorateInstitutionDetails(accounts, fedClient)

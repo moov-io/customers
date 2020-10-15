@@ -36,21 +36,34 @@ func setupTestAccountRepository(t *testing.T) *testAccountRepository {
 }
 
 func TestRepository(t *testing.T) {
-	customerID, userID := base.ID(), base.ID()
-	repo := setupTestAccountRepository(t)
+	userID := base.ID()
+	logger := log.NewNopLogger()
+	db := database.CreateTestSqliteDB(t).DB
+	customerRepo := customers.NewCustomerRepo(logger, db)
+	accountRepo := NewRepo(logger, db)
+	organization := "test"
+
+	customer := &client.Customer{
+		CustomerID: base.ID(),
+		FirstName:  "jane",
+		LastName:   "doe",
+		Type:       client.CUSTOMERTYPE_INDIVIDUAL,
+	}
+	err := customerRepo.CreateCustomer(customer, organization)
+	require.NoError(t, err)
 
 	// look for account that does not exist
-	_, err := repo.getCustomerAccount(customerID, "xxx")
+	_, err = accountRepo.getCustomerAccount(customer.CustomerID, "xxx")
 	require.Error(t, err)
 
 	// initial read, find no accounts
-	accounts, err := repo.getAccountsByCustomerID(customerID)
+	accounts, err := accountRepo.getAccounts(customer.CustomerID, organization)
 	if len(accounts) != 0 || err != nil {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}
 
 	// create account
-	acct, err := repo.CreateCustomerAccount(customerID, userID, &CreateAccountRequest{
+	acct, err := accountRepo.CreateCustomerAccount(customer.CustomerID, userID, &CreateAccountRequest{
 		AccountNumber: "123",
 		RoutingNumber: "987654320",
 		Type:          client.ACCOUNTTYPE_CHECKING,
@@ -60,7 +73,7 @@ func TestRepository(t *testing.T) {
 	}
 
 	// read after creating
-	accounts, err = repo.getAccountsByCustomerID(customerID)
+	accounts, err = accountRepo.getAccounts(customer.CustomerID, organization)
 	if len(accounts) != 1 || err != nil {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}
@@ -69,10 +82,10 @@ func TestRepository(t *testing.T) {
 	}
 
 	// delete, expect no accounts
-	if err := repo.deactivateCustomerAccount(acct.AccountID); err != nil {
+	if err := accountRepo.deactivateCustomerAccount(acct.AccountID); err != nil {
 		t.Fatal(err)
 	}
-	accounts, err = repo.getAccountsByCustomerID(customerID)
+	accounts, err = accountRepo.getAccounts(customer.CustomerID, organization)
 	if len(accounts) != 0 || err != nil {
 		t.Fatalf("got accounts=%#v error=%v", accounts, err)
 	}

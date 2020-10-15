@@ -21,7 +21,7 @@ import (
 type Repository interface {
 	getCustomerAccount(customerID, accountID string) (*client.Account, error)
 	GetCustomerAccountsByIDs(accountIDs []string) ([]*client.Account, error)
-	getAccountsByCustomerID(customerID string) ([]*client.Account, error)
+	getAccounts(customerID string, organization string) ([]*client.Account, error)
 
 	CreateCustomerAccount(customerID, userID string, req *CreateAccountRequest) (*client.Account, error)
 	deactivateCustomerAccount(accountID string) error
@@ -111,15 +111,15 @@ func (r *sqlAccountRepository) getCustomerAccount(customerID, accountID string) 
 	return &a, nil
 }
 
-func (r *sqlAccountRepository) getAccountsByCustomerID(customerID string) ([]*client.Account, error) {
-	query := `select account_id from accounts where customer_id = ? and deleted_at is null;`
+func (r *sqlAccountRepository) getAccounts(customerID string, organization string) ([]*client.Account, error) {
+	query := `select a.account_id from accounts as a left outer join customers as c on a.customer_id = c.customer_id where a.customer_id = ? and c.organization = ? and a.deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(customerID)
+	rows, err := stmt.Query(customerID, organization)
 	if err != nil {
 		return nil, err
 	}

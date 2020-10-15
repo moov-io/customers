@@ -33,7 +33,7 @@ func (r *mockRepository) GetCustomerAccountsByIDs(accountIDs []string) ([]*clien
 	return r.Accounts, nil
 }
 
-func (r *mockRepository) getAccountsByCustomerID(customerID string) ([]*client.Account, error) {
+func (r *mockRepository) getAccounts(customerID string, organization string) ([]*client.Account, error) {
 	if r.Err != nil {
 		return nil, r.Err
 	}
