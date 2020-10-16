@@ -27,6 +27,9 @@ func updateCustomerStatus(logger log.Logger, repo CustomerRepository) http.Handl
 		}
 
 		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
 
 		var req client.UpdateCustomerStatus
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {

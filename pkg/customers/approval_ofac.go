@@ -115,6 +115,10 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo CustomerRepository) htt
 		}
 
 		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
+
 		result, err := repo.getLatestCustomerOFACSearch(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
@@ -138,6 +142,10 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 		}
 
 		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
+
 		cust, err := repo.GetCustomer(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)

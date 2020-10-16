@@ -65,6 +65,9 @@ func getCustomer(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 		}
 
 		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
 
 		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
@@ -405,6 +408,10 @@ func replaceCustomerMetadata(logger log.Logger, repo CustomerRepository) http.Ha
 			return
 		}
 		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
+
 		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return

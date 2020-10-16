@@ -44,6 +44,9 @@ func getCustomerAccounts(
 		accountIDsInput = strings.TrimSpace(accountIDsInput)
 		accountIDs := strings.Split(accountIDsInput, ",")
 		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
 
 		limit := 25
 		if len(accountIDs) > limit {
