@@ -25,10 +25,12 @@ func TestGetAccounts(t *testing.T) {
 	db := database.CreateTestSqliteDB(t).DB
 	customerRepo := customers.NewCustomerRepo(logger, db)
 	accountRepo := accounts.NewRepo(logger, db)
+	organization := "organization"
 	AddRoutes(log.NewNopLogger(), router, customerRepo, accountRepo)
 
 	// Check request without query parameters
 	req := httptest.NewRequest("GET", "/reports/accounts", nil)
+	req.Header.Set("x-organization", organization)
 	res := httptest.NewRecorder()
 	router.ServeHTTP(res, req)
 	require.Equal(t, http.StatusOK, res.Code)
@@ -45,7 +47,7 @@ func TestGetAccounts(t *testing.T) {
 			CustomerID: base.ID(),
 			FirstName:  fmt.Sprintf("%d", i),
 		}
-		err := customerRepo.CreateCustomer(cust, "test")
+		err := customerRepo.CreateCustomer(cust, organization)
 		require.NoError(t, err)
 
 		account, err := accountRepo.CreateCustomerAccount(
@@ -62,7 +64,7 @@ func TestGetAccounts(t *testing.T) {
 	q.Add("accountIDs", strings.Join(accountIDs, ","))
 	req.URL.RawQuery = q.Encode()
 	req = httptest.NewRequest("GET", req.URL.String(), nil)
-
+	req.Header.Set("x-organization", organization)
 	res = httptest.NewRecorder()
 	router.ServeHTTP(res, req)
 	require.Equal(t, http.StatusOK, res.Code)
