@@ -44,13 +44,14 @@ func createTestOFACSearcher(repo Repository, watchmanClient watchman.Client) *Ac
 
 func TestAccountRoutes(t *testing.T) {
 	customerID := base.ID()
+	org := "moov"
 
 	repo := setupTestAccountRepository(t)
-	setupCustomerWithOrganization(t, customerID, "moov", repo)
+	setupCustomerWithOrganization(t, customerID, org, repo)
 	handler := setupRouterWithTestAccountRepo(t, repo)
 
 	// first read, expect no accounts
-	accounts := httpReadAccounts(t, handler, customerID)
+	accounts := httpReadAccounts(t, handler, customerID, org)
 	if len(accounts) != 0 {
 		t.Errorf("got accounts: %v", accounts)
 	}
@@ -62,7 +63,7 @@ func TestAccountRoutes(t *testing.T) {
 	}
 
 	// re-read, find account
-	accounts = httpReadAccounts(t, handler, customerID)
+	accounts = httpReadAccounts(t, handler, customerID, org)
 	if len(accounts) != 1 || accounts[0].AccountID != account.AccountID {
 		t.Errorf("got accounts: %v", accounts)
 	}
@@ -74,7 +75,7 @@ func TestAccountRoutes(t *testing.T) {
 
 	// delete and expect no accounts
 	httpDeleteAccount(t, handler, customerID, account.AccountID)
-	accounts = httpReadAccounts(t, handler, customerID)
+	accounts = httpReadAccounts(t, handler, customerID, org)
 	if len(accounts) != 0 {
 		t.Errorf("got accounts: %v", accounts)
 	}
@@ -82,11 +83,12 @@ func TestAccountRoutes(t *testing.T) {
 
 func TestCreateAccountAndCheckAccountOfacSearch(t *testing.T) {
 	customerID := base.ID()
+	org := "moov"
 
 	handler := setupRouter(t)
 
 	// first read, expect no accounts
-	accounts := httpReadAccounts(t, handler, customerID)
+	accounts := httpReadAccounts(t, handler, customerID, org)
 	if len(accounts) != 0 {
 		t.Errorf("got accounts: %v", accounts)
 	}
@@ -106,11 +108,12 @@ func TestCreateAccountAndCheckAccountOfacSearch(t *testing.T) {
 
 func TestRefreshAccountAndCheckAccountOfacSearch(t *testing.T) {
 	customerID := base.ID()
+	org := "moov"
 
 	handler := setupRouter(t)
 
 	// first read, expect no accounts
-	accounts := httpReadAccounts(t, handler, customerID)
+	accounts := httpReadAccounts(t, handler, customerID, org)
 	if len(accounts) != 0 {
 		t.Errorf("got accounts: %v", accounts)
 	}
@@ -228,6 +231,7 @@ func TestRoutes__EmptyAccounts(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)
+	req.Header.Set("X-Organization", "test")
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
@@ -348,9 +352,10 @@ func setupCustomerWithOrganization(t *testing.T, customerID, organization string
 	return cust
 }
 
-func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string) []*client.Account {
+func httpReadAccounts(t *testing.T, handler *mux.Router, customerID string, organization string) []*client.Account {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts", customerID), nil)
+	req.Header.Set("X-Organization", organization)
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
