@@ -33,13 +33,18 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
+
 		var reqAddr address
 		if err := json.NewDecoder(r.Body).Decode(&reqAddr); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		cust, err := repo.GetCustomer(customerID)
+		cust, err := repo.GetCustomer(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -73,7 +78,7 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		}
 
 		logger.Log(fmt.Sprintf("added address for customer=%s", customerID))
-		respondWithCustomer(logger, w, customerID, requestID, repo)
+		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
 }
 
@@ -85,7 +90,13 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		if customerID == "" || addressId == "" {
 			return
 		}
+
 		requestID := moovhttp.GetRequestID(r)
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
+
 		var req updateCustomerAddressRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			moovhttp.Problem(w, err)
@@ -98,7 +109,7 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		}
 
 		if req.Type == "primary" {
-			cust, err := repo.GetCustomer(customerID)
+			cust, err := repo.GetCustomer(customerID, organization)
 			if err != nil {
 				moovhttp.Problem(w, err)
 				return
@@ -120,7 +131,7 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 
 		logger.Log(fmt.Sprintf("updating address=%s for customer=%s", addressId, customerID))
 
-		respondWithCustomer(logger, w, customerID, requestID, repo)
+		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
 }
 

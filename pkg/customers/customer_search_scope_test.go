@@ -29,12 +29,12 @@ func Setup(t *testing.T) Scope {
 	}
 }
 
-func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error) {
+func (scope *Scope) GetCustomers(query, organization string) ([]*client.Customer, error) {
 	router := mux.NewRouter()
 	AddCustomerRoutes(log.NewNopLogger(), router, scope.customerRepo, nil, nil)
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers"+query, nil)
-	req.Header.Set("X-Organization", "organization")
+	req.Header.Set("X-Organization", organization)
 	router.ServeHTTP(w, req)
 
 	var customers []*client.Customer
@@ -44,7 +44,7 @@ func (scope *Scope) GetCustomers(query string) ([]*client.Customer, error) {
 	return customers, nil
 }
 
-func (scope *Scope) CreateCustomers(count int, customerType client.CustomerType) []client.Customer {
+func (scope *Scope) CreateCustomers(count int, customerType client.CustomerType, organization string) []client.Customer {
 	var customers []client.Customer
 	for i := 0; i < count; i++ {
 		var firstName string
@@ -53,20 +53,20 @@ func (scope *Scope) CreateCustomers(count int, customerType client.CustomerType)
 		scope.fuzzer.Fuzz(&firstName)
 		scope.fuzzer.Fuzz(&lastName)
 		scope.fuzzer.Fuzz(&email)
-		customer := scope.CreateCustomer(firstName, lastName, email, customerType)
+		customer := scope.CreateCustomer(firstName, lastName, organization, email, customerType)
 		customers = append(customers, customer)
 	}
 	return customers
 }
 
-func (scope *Scope) CreateCustomer(firstName, lastName, email string, customerType client.CustomerType) client.Customer {
+func (scope *Scope) CreateCustomer(firstName, lastName, organization, email string, customerType client.CustomerType) client.Customer {
 	cust, _, _ := (customerRequest{
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
 		Type:      customerType,
 	}).asCustomer(testCustomerSSNStorage(scope.t))
-	if err := scope.customerRepo.CreateCustomer(cust, "organization"); err != nil {
+	if err := scope.customerRepo.CreateCustomer(cust, organization); err != nil {
 		scope.t.Error(err)
 	}
 	return *cust

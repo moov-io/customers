@@ -26,13 +26,18 @@ func updateCustomerStatus(logger log.Logger, repo CustomerRepository) http.Handl
 			return
 		}
 
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
+
 		var req client.UpdateCustomerStatus
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		cust, err := repo.GetCustomer(customerID)
+		cust, err := repo.GetCustomer(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -48,6 +53,6 @@ func updateCustomerStatus(logger log.Logger, repo CustomerRepository) http.Handl
 		}
 
 		requestID := moovhttp.GetRequestID(r)
-		respondWithCustomer(logger, w, customerID, requestID, repo)
+		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
 }

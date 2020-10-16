@@ -43,6 +43,10 @@ func getCustomerAccounts(
 		accountIDsInput := r.URL.Query().Get("accountIDs")
 		accountIDsInput = strings.TrimSpace(accountIDsInput)
 		accountIDs := strings.Split(accountIDsInput, ",")
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
 
 		limit := 25
 		if len(accountIDs) > limit {
@@ -59,7 +63,7 @@ func getCustomerAccounts(
 
 		results := make([]*client.ReportAccountResponse, 0)
 		for _, acc := range allAccounts {
-			cust, err := customerRepo.GetCustomer(acc.CustomerID)
+			cust, err := customerRepo.GetCustomer(acc.CustomerID, organization)
 			if err != nil {
 				logger.LogError("error getting customer", err)
 				moovhttp.Problem(w, err)
