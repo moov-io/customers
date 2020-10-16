@@ -637,8 +637,8 @@ func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customer
 
 func (r *sqlCustomerRepository) GetCustomer(customerID, organization string) (*client.Customer, error) {
 	custs, err := r.searchCustomers(SearchParams{
-		Count:       1,
-		CustomerIDs: []string{customerID},
+		Count:        1,
+		CustomerIDs:  []string{customerID},
 		Organization: organization,
 	})
 	if err != nil {

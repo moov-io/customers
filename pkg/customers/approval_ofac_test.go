@@ -54,10 +54,21 @@ func TestOFACSearcher__storeCustomerOFACSearch(t *testing.T) {
 	searcher := createTestOFACSearcher(repo, ofacClient)
 
 	customerID := base.ID()
+	organization := "organization"
+	customerRequest := customerRequest{
+		CustomerID: customerID,
+		FirstName:  "Jane",
+		LastName:   "Doe",
+	}
+	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
+	if err := repo.CreateCustomer(cust, organization); err != nil {
+		t.Fatal(err)
+	}
+
 	if err := searcher.storeCustomerOFACSearch(&client.Customer{CustomerID: customerID}, "requestID"); err != nil {
 		t.Fatal(err)
 	}
-	res, err := repo.getLatestCustomerOFACSearch(customerID)
+	res, err := repo.getLatestCustomerOFACSearch(customerID, organization)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,10 +102,22 @@ func TestOFACApproval__getLatest(t *testing.T) {
 		},
 	}
 
+	organization := "organization"
+	customerRequest := customerRequest{
+		CustomerID: customerID,
+		FirstName:  "Jane",
+		LastName:   "Doe",
+	}
+	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
+	if err := repo.CreateCustomer(cust, organization); err != nil {
+		t.Fatal(err)
+	}
+
 	AddOFACRoutes(logger, router, repo, nil)
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/ofac", customerID), nil)
+	req.Header.Set("X-Organization", organization)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -119,6 +142,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 	router := mux.NewRouter()
 
 	customerID := base.ID()
+	organization := "organization"
 
 	repo := &testCustomerRepository{
 		customer: &client.Customer{
@@ -139,6 +163,7 @@ func TestOFACApproval__refresh(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/refresh/ofac", customerID), nil)
+	req.Header.Set("x-organization", organization)
 	router.ServeHTTP(w, req)
 	w.Flush()
 

@@ -114,7 +114,8 @@ func getLatestCustomerOFACSearch(logger log.Logger, repo CustomerRepository) htt
 			return
 		}
 
-		result, err := repo.getLatestCustomerOFACSearch(customerID)
+		organization := route.GetOrganization(w, r)
+		result, err := repo.getLatestCustomerOFACSearch(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -136,7 +137,8 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		cust, err := repo.GetCustomer(customerID)
+		organization := route.GetOrganization(w, r)
+		cust, err := repo.GetCustomer(customerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -150,7 +152,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		result, err := repo.getLatestCustomerOFACSearch(customerID)
+		result, err := repo.getLatestCustomerOFACSearch(customerID, organization)
 		if err != nil {
 			logger.LogErrorF("error getting latest ofac search: %v", err)
 			moovhttp.Problem(w, err)

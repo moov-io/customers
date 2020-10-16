@@ -958,9 +958,9 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 
 	cust, _, _ := (customerRequest{
 		CustomerID: customerID,
-		FirstName: "Jane",
-		LastName:  "Doe",
-		Email:     "jane@example.com",
+		FirstName:  "Jane",
+		LastName:   "Doe",
+		Email:      "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
