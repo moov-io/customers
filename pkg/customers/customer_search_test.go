@@ -194,7 +194,8 @@ func TestRepository__searchCustomers(t *testing.T) {
 
 func TestCustomerSearchEmpty(t *testing.T) {
 	scope := Setup(t)
-	customers, _ := scope.GetCustomers("")
+	organization := "organization"
+	customers, _ := scope.GetCustomers("", organization)
 	if customers == nil {
 		t.Fatalf("expected allocated array:\n  %T %#v", customers, customers)
 	}
@@ -202,50 +203,55 @@ func TestCustomerSearchEmpty(t *testing.T) {
 
 func TestGet20MostRecentlyCreatedCustomersByDefault(t *testing.T) {
 	scope := Setup(t)
-	scope.CreateCustomers(100, client.CUSTOMERTYPE_INDIVIDUAL)
-	customers, _ := scope.GetCustomers("")
+	organization := "organization"
+	scope.CreateCustomers(100, client.CUSTOMERTYPE_INDIVIDUAL, organization)
+	customers, _ := scope.GetCustomers("", organization)
 	scope.assert.Equal(20, len(customers))
 }
 
 func TestGet10MostRecentlyCreatedCustomersByDefault(t *testing.T) {
 	scope := Setup(t)
-	scope.CreateCustomers(10, client.CUSTOMERTYPE_INDIVIDUAL)
-	customers, _ := scope.GetCustomers("")
+	organization := "organization"
+	scope.CreateCustomers(10, client.CUSTOMERTYPE_INDIVIDUAL, organization)
+	customers, _ := scope.GetCustomers("", organization)
 	scope.assert.Equal(10, len(customers))
 }
 
 func TestGet50MostRecentlyCreatedCustomersWhenSpecifyingLimit(t *testing.T) {
 	scope := Setup(t)
-	scope.CreateCustomers(100, client.CUSTOMERTYPE_INDIVIDUAL)
-	customers, _ := scope.GetCustomers("?count=50")
+	organization := "organization"
+	scope.CreateCustomers(100, client.CUSTOMERTYPE_INDIVIDUAL, organization)
+	customers, _ := scope.GetCustomers("?count=50", organization)
 	scope.assert.Equal(50, len(customers))
 }
 
 func TestGet100MostRecentlyCreatedCustomersWhenSpecifyingMoreThanAvailable(t *testing.T) {
 	scope := Setup(t)
-	scope.CreateCustomers(100, client.CUSTOMERTYPE_INDIVIDUAL)
-	customers, _ := scope.GetCustomers("?count=120")
+	organization := "organization"
+	scope.CreateCustomers(100, client.CUSTOMERTYPE_INDIVIDUAL, organization)
+	customers, _ := scope.GetCustomers("?count=120", organization)
 	scope.assert.Equal(100, len(customers))
 }
 
 func TestSearchCustomersWithVerifiedStatus(t *testing.T) {
 	// Create two customers. 1 with Unknown STATUS and 1 with Verified
 	scope := Setup(t)
-	customer := scope.CreateCustomer("John", "Doe", "john.doe@email.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	organization := "organization"
+	customer := scope.CreateCustomer("John", "Doe", organization, "john.doe@email.com", client.CUSTOMERTYPE_INDIVIDUAL)
 	if err := scope.customerRepo.updateCustomerStatus(customer.CustomerID, client.CUSTOMERSTATUS_VERIFIED, "test comment"); err != nil {
 		print(err)
 	}
-	scope.CreateCustomer("Jane", "Doe", "jane.doe@email.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	scope.CreateCustomer("Jane", "Doe", organization, "jane.doe@email.com", client.CUSTOMERTYPE_INDIVIDUAL)
 
 	// Should have 1 Verified Status
-	verifiedCustomers, _ := scope.GetCustomers("?status=Verified&count=20")
+	verifiedCustomers, _ := scope.GetCustomers("?status=Verified&count=20", organization)
 	scope.assert.Equal(1, len(verifiedCustomers))
 	for i := 0; i < len(verifiedCustomers); i++ {
 		scope.assert.Equal("Verified", string(verifiedCustomers[i].Status))
 	}
 
 	// Should have 1 Unknown Status
-	unknownStatusCustomers, _ := scope.GetCustomers("?status=Unknown&count=20")
+	unknownStatusCustomers, _ := scope.GetCustomers("?status=Unknown&count=20", organization)
 	scope.assert.Equal(1, len(unknownStatusCustomers))
 	for i := 0; i < len(unknownStatusCustomers); i++ {
 		scope.assert.Equal("Unknown", string(unknownStatusCustomers[i].Status))
@@ -258,40 +264,42 @@ func TestSearchCustomersByName(t *testing.T) {
 		logger: log.NewNopLogger(),
 		db:     database.CreateTestMySQLDB(t).DB,
 	}
-	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
-	_ = scope.CreateCustomer("John", "Doe", "jane.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	organization := "organization"
+	_ = scope.CreateCustomer("Jane", "Doe", organization, "jane.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	_ = scope.CreateCustomer("John", "Doe", organization, "jane.doe@gmail.com", client.CUSTOMERTYPE_BUSINESS)
 
-	customers, _ := scope.GetCustomers("?query=jane")
+	customers, _ := scope.GetCustomers("?query=jane", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=jane+doe")
+	customers, _ = scope.GetCustomers("?query=jane+doe", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=john")
+	customers, _ = scope.GetCustomers("?query=john", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=john+doe")
+	customers, _ = scope.GetCustomers("?query=john+doe", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=doe")
+	customers, _ = scope.GetCustomers("?query=doe", organization)
 	scope.assert.Equal(2, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=jim+doe")
+	customers, _ = scope.GetCustomers("?query=jim+doe", organization)
 	scope.assert.Equal(0, len(customers))
 }
 
 func TestSearchCustomersByEmail(t *testing.T) {
 	scope := Setup(t)
-	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
-	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	organization := "organization"
+	_ = scope.CreateCustomer("Jane", "Doe", organization, "jane.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	_ = scope.CreateCustomer("John", "Doe", organization, "john.doe@gmail.com", client.CUSTOMERTYPE_BUSINESS)
 
-	customers, _ := scope.GetCustomers("?email=jane.doe@gmail.com")
+	customers, _ := scope.GetCustomers("?email=jane.doe@gmail.com", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?email=john.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?email=john.doe@gmail.com", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?email=jim.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?email=jim.doe@gmail.com", organization)
 	scope.assert.Equal(0, len(customers))
 }
 
@@ -301,74 +309,78 @@ func TestSearchCustomersByNameAndEmail(t *testing.T) {
 		logger: log.NewNopLogger(),
 		db:     database.CreateTestMySQLDB(t).DB,
 	}
-	_ = scope.CreateCustomer("Jane", "Doe", "jane.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
-	_ = scope.CreateCustomer("John", "Doe", "john.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	organization := "organization"
+	_ = scope.CreateCustomer("Jane", "Doe", organization, "jane.doe@gmail.com", client.CUSTOMERTYPE_INDIVIDUAL)
+	_ = scope.CreateCustomer("John", "Doe", organization, "john.doe@gmail.com", client.CUSTOMERTYPE_BUSINESS)
 
-	customers, _ := scope.GetCustomers("?query=jane+doe&email=jane.doe@gmail.com")
+	customers, _ := scope.GetCustomers("?query=jane+doe&email=jane.doe@gmail.com", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=jane&email=jane.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?query=jane&email=jane.doe@gmail.com", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=john+doe&email=john.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?query=john+doe&email=john.doe@gmail.com", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=john&email=john.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?query=john&email=john.doe@gmail.com", organization)
 	scope.assert.Equal(1, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=jane+doe&email=jim.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?query=jane+doe&email=jim.doe@gmail.com", organization)
 	scope.assert.Equal(0, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=jane&email=jim.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?query=jane&email=jim.doe@gmail.com", organization)
 	scope.assert.Equal(0, len(customers))
 
-	customers, _ = scope.GetCustomers("?query=jim&email=jane.doe@gmail.com")
+	customers, _ = scope.GetCustomers("?query=jim&email=jane.doe@gmail.com", organization)
 	scope.assert.Equal(0, len(customers))
 }
 
 func TestSearchCustomersUsingPaging(t *testing.T) {
 	scope := Setup(t)
-	_ = scope.CreateCustomers(30, client.CUSTOMERTYPE_INDIVIDUAL)
+	organization := "organization"
+	_ = scope.CreateCustomers(30, client.CUSTOMERTYPE_INDIVIDUAL, organization)
 
 	// Get first page of 10
-	customers, _ := scope.GetCustomers("?skip=0&count=10")
+	customers, _ := scope.GetCustomers("?skip=0&count=10", organization)
 	scope.assert.Equal(10, len(customers))
 
 	// Get second page of 10
-	customers, _ = scope.GetCustomers("?skip=10&count=10")
+	customers, _ = scope.GetCustomers("?skip=10&count=10", organization)
 	scope.assert.Equal(10, len(customers))
 
 	// Get third page of 10
-	customers, _ = scope.GetCustomers("?skip=20&count=10")
+	customers, _ = scope.GetCustomers("?skip=20&count=10", organization)
 	scope.assert.Equal(10, len(customers))
 
 	// Should be no 4th page of 10
-	customers, _ = scope.GetCustomers("?skip=30&count=10")
+	customers, _ = scope.GetCustomers("?skip=30&count=10", organization)
 	scope.assert.Equal(0, len(customers))
 }
 
 func TestSearchCustomersUsingPagingFailure(t *testing.T) {
 	scope := Setup(t)
-	_ = scope.CreateCustomers(30, client.CUSTOMERTYPE_INDIVIDUAL)
+	organization := "organization"
+	_ = scope.CreateCustomers(30, client.CUSTOMERTYPE_INDIVIDUAL, organization)
 
-	customers, _ := scope.GetCustomers("?skip=123abc")
+	customers, _ := scope.GetCustomers("?skip=123abc", organization)
 	scope.assert.Equal(0, len(customers))
 
-	customers, _ = scope.GetCustomers("?count=123abc")
+	customers, _ = scope.GetCustomers("?count=123abc", organization)
 	scope.assert.Equal(0, len(customers))
 
-	customers, _ = scope.GetCustomers("?skip=123abc&count=123abc")
+	customers, _ = scope.GetCustomers("?skip=123abc&count=123abc", organization)
 	scope.assert.Equal(0, len(customers))
 }
 
 func TestSearchCustomersByType(t *testing.T) {
 	scope := Setup(t)
-	_ = scope.CreateCustomers(10, client.CUSTOMERTYPE_INDIVIDUAL)
-	_ = scope.CreateCustomers(20, client.CUSTOMERTYPE_BUSINESS)
+	organization := "organization"
+	_ = scope.CreateCustomers(10, client.CUSTOMERTYPE_INDIVIDUAL, organization)
+	_ = scope.CreateCustomers(20, client.CUSTOMERTYPE_BUSINESS, organization)
 
-	individualCustomers, _ := scope.GetCustomers("?type=individual")
+	individualCustomers, _ := scope.GetCustomers("?type=individual", organization)
 	scope.assert.Equal(10, len(individualCustomers))
 
-	businessCustomers, _ := scope.GetCustomers("?type=business")
+	businessCustomers, _ := scope.GetCustomers("?type=business", organization)
 	scope.assert.Equal(20, len(businessCustomers))
 }

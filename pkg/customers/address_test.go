@@ -24,7 +24,8 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.CreateCustomer(cust, "organization")
+	organization := "organization"
+	err := repo.CreateCustomer(cust, organization)
 	require.NoError(t, err)
 
 	addrPayload := address{
@@ -40,7 +41,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/addresses", cust.CustomerID), bytes.NewReader(payload))
-	req.Header.Set("x-organization", "test")
+	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -69,6 +70,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 	payload, err = json.Marshal(addrPayload)
 	require.NoError(t, err)
 	req = httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/addresses", cust.CustomerID), bytes.NewReader(payload))
+	req.Header.Set("x-organization", organization)
 	router.ServeHTTP(w, req)
 	require.Equal(t, http.StatusBadRequest, w.Code)
 	var errResp struct {
@@ -87,7 +89,8 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.CreateCustomer(cust, "organization")
+	organization := "organization"
+	err := repo.CreateCustomer(cust, organization)
 	require.NoError(t, err)
 
 	addrRequests := []address{
@@ -110,7 +113,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 	}
 	for _, req := range addrRequests {
 		require.NoError(t, repo.addCustomerAddress(cust.CustomerID, req))
-		cust, err = repo.GetCustomer(cust.CustomerID) // refresh customer object after updating address
+		cust, err = repo.GetCustomer(cust.CustomerID, organization) // refresh customer object after updating address
 		require.NoError(t, err)
 	}
 
@@ -146,7 +149,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 	req, err := http.NewRequest("PUT", url, bytes.NewReader(payload))
 	require.NoError(t, err)
 
-	req.Header.Set("x-organization", "test")
+	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 
 	res := httptest.NewRecorder()
@@ -182,6 +185,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 	url = fmt.Sprintf("/customers/%s/addresses/%s", cust.CustomerID, secondaryAddressID)
 
 	req, err = http.NewRequest("PUT", url, bytes.NewReader(payload))
+	req.Header.Set("x-organization", organization)
 	require.NoError(t, err)
 	router.ServeHTTP(res, req)
 	require.Equal(t, http.StatusBadRequest, res.Code)
@@ -201,7 +205,8 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.CreateCustomer(cust, "organization")
+	organization := "organization"
+	err := repo.CreateCustomer(cust, organization)
 	require.NoError(t, err)
 
 	address := address{
@@ -214,7 +219,7 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 	}
 	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
 
-	cust, err = repo.GetCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 	addressID := cust.Addresses[0].AddressID
 
@@ -224,14 +229,14 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 	url := fmt.Sprintf("/customers/%s/addresses/%s", cust.CustomerID, addressID)
 	req, err := http.NewRequest("DELETE", url, nil)
 	require.NoError(t, err)
-	req.Header.Set("x-organization", "test")
+	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 
 	res := httptest.NewRecorder()
 	router.ServeHTTP(res, req)
 	require.Equal(t, http.StatusNoContent, res.Code)
 
-	cust, err = repo.GetCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 	require.Empty(t, cust.Addresses)
 }
@@ -268,7 +273,8 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.CreateCustomer(cust, "organization")
+	organization := "organization"
+	err := repo.CreateCustomer(cust, organization)
 	require.NoError(t, err)
 
 	addrRequest := address{
@@ -281,7 +287,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 	}
 	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, addrRequest))
 
-	cust, err = repo.GetCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 
 	addressID := cust.Addresses[0].AddressID
@@ -299,7 +305,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 	err = repo.updateCustomerAddress(cust.CustomerID, addressID, updateReq)
 	require.NoError(t, err)
 
-	cust, err = repo.GetCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 
 	require.Len(t, cust.Addresses, 1)
@@ -327,7 +333,8 @@ func TestCustomerRepository__deleteCustomerAddress(t *testing.T) {
 		LastName:  "Doe",
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
-	err := repo.CreateCustomer(cust, "organization")
+	organization := "organization"
+	err := repo.CreateCustomer(cust, organization)
 	require.NoError(t, err)
 
 	address := address{
@@ -340,14 +347,14 @@ func TestCustomerRepository__deleteCustomerAddress(t *testing.T) {
 	}
 	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
 
-	cust, err = repo.GetCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 
 	addressID := cust.Addresses[0].AddressID
 	err = repo.deleteCustomerAddress(cust.CustomerID, addressID)
 	require.NoError(t, err)
 
-	cust, err = repo.GetCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 
 	require.Len(t, cust.Addresses, 0)
