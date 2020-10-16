@@ -64,7 +64,9 @@ func getCustomer(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
 			return
 		}
 
-		respondWithCustomer(logger, w, customerID, requestID, repo)
+		organization := route.GetOrganization(w, r)
+
+		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
 }
 
@@ -87,8 +89,8 @@ func deleteCustomer(logger log.Logger, repo CustomerRepository) func(http.Respon
 	}
 }
 
-func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID string, requestID string, repo CustomerRepository) {
-	cust, err := repo.GetCustomer(customerID)
+func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID, organization string, requestID string, repo CustomerRepository) {
+	cust, err := repo.GetCustomer(customerID, organization)
 	if err != nil {
 		logger.LogErrorF("getCustomer: lookup: %v", err)
 		moovhttp.Problem(w, err)
@@ -312,7 +314,7 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 
 		logger.Log(fmt.Sprintf("created customer=%s", cust.CustomerID))
 
-		cust, err = repo.GetCustomer(cust.CustomerID)
+		cust, err = repo.GetCustomer(cust.CustomerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -376,7 +378,7 @@ func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 		}
 
 		logger.Log(fmt.Sprintf("updated customer=%s", cust.CustomerID))
-		cust, err = repo.GetCustomer(cust.CustomerID)
+		cust, err = repo.GetCustomer(cust.CustomerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -402,6 +404,7 @@ func replaceCustomerMetadata(logger log.Logger, repo CustomerRepository) http.Ha
 			moovhttp.Problem(w, err)
 			return
 		}
+		organization := route.GetOrganization(w, r)
 		customerID, requestID := route.GetCustomerID(w, r), moovhttp.GetRequestID(r)
 		if customerID == "" {
 			return
@@ -411,12 +414,12 @@ func replaceCustomerMetadata(logger log.Logger, repo CustomerRepository) http.Ha
 			return
 		}
 
-		respondWithCustomer(logger, w, customerID, requestID, repo)
+		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
 }
 
 type CustomerRepository interface {
-	GetCustomer(customerID string) (*client.Customer, error)
+	GetCustomer(customerID, organization string) (*client.Customer, error)
 	CreateCustomer(c *client.Customer, organization string) error
 	updateCustomer(c *client.Customer, organization string) error
 	updateCustomerStatus(customerID string, status client.CustomerStatus, comment string) error
@@ -430,7 +433,7 @@ type CustomerRepository interface {
 	updateCustomerAddress(customerID, addressID string, req updateCustomerAddressRequest) error
 	deleteCustomerAddress(customerID string, addressID string) error
 
-	getLatestCustomerOFACSearch(customerID string) (*client.OfacSearch, error)
+	getLatestCustomerOFACSearch(customerID, organization string) (*client.OfacSearch, error)
 	saveCustomerOFACSearch(customerID string, result client.OfacSearch) error
 }
 
@@ -632,10 +635,11 @@ func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customer
 	return nil
 }
 
-func (r *sqlCustomerRepository) GetCustomer(customerID string) (*client.Customer, error) {
+func (r *sqlCustomerRepository) GetCustomer(customerID, organization string) (*client.Customer, error) {
 	custs, err := r.searchCustomers(SearchParams{
 		Count:       1,
 		CustomerIDs: []string{customerID},
+		Organization: organization,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("getting customer: %v", err)
@@ -767,15 +771,18 @@ func (r *sqlCustomerRepository) deleteCustomerAddress(customerID string, address
 	return err
 }
 
-func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*client.OfacSearch, error) {
-	query := `select entity_id, blocked, sdn_name, sdn_type, percentage_match, created_at from customer_ofac_searches where customer_id = ? order by created_at desc limit 1;`
+func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID, organization string) (*client.OfacSearch, error) {
+	query := `select entity_id, blocked, sdn_name, sdn_type, percentage_match, cos.created_at 
+from customer_ofac_searches as cos
+inner join customers as c on c.customer_id = cos.customer_id
+where cos.customer_id = ? and c.organization = ? order by cos.created_at desc limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, fmt.Errorf("getLatestCustomerOFACSearch: prepare: %v", err)
 	}
 	defer stmt.Close()
 
-	row := stmt.QueryRow(customerID)
+	row := stmt.QueryRow(customerID, organization)
 	var res client.OfacSearch
 	if err := row.Scan(&res.EntityID, &res.Blocked, &res.SdnName, &res.SdnType, &res.Match, &res.CreatedAt); err != nil {
 		if err == sql.ErrNoRows {

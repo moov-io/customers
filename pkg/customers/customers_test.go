@@ -41,7 +41,7 @@ type testCustomerRepository struct {
 	savedSearchResult *client.OfacSearch
 }
 
-func (r *testCustomerRepository) GetCustomer(customerID string) (*client.Customer, error) {
+func (r *testCustomerRepository) GetCustomer(customerID, organization string) (*client.Customer, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -94,7 +94,7 @@ func (r *testCustomerRepository) deleteCustomerAddress(customerID string, addres
 	return r.err
 }
 
-func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerID string) (*client.OfacSearch, error) {
+func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerID, organization string) (*client.OfacSearch, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
@@ -139,18 +139,19 @@ func TestCustomers__GetCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	organization := "organization"
 	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomer(cust, "organization"); err != nil {
+	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
 	}
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s", cust.CustomerID), nil)
-	req.Header.Set("x-organization", "test")
+	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -193,6 +194,7 @@ func TestCustomers__DeleteCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	organization := "organization"
 	cr := &customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
@@ -200,10 +202,10 @@ func TestCustomers__DeleteCustomer(t *testing.T) {
 	}
 	customer, _, _ := cr.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t,
-		repo.CreateCustomer(customer, "organization"),
+		repo.CreateCustomer(customer, organization),
 	)
 
-	got, err := repo.GetCustomer(customer.CustomerID)
+	got, err := repo.GetCustomer(customer.CustomerID, organization)
 	require.NoError(t, err)
 	require.NotNil(t, got)
 
@@ -217,23 +219,24 @@ func TestCustomers__DeleteCustomer(t *testing.T) {
 
 	require.Equal(t, http.StatusNoContent, w.Code)
 	require.Empty(t, w.Body)
-	got, err = repo.GetCustomer(customer.CustomerID)
+	got, err = repo.GetCustomer(customer.CustomerID, organization)
 	require.Error(t, err)
 	require.Nil(t, got)
 }
 
 func TestCustomerRepository__CreateCustomer(t *testing.T) {
+	organization := "organization"
 	check := func(t *testing.T, repo *sqlCustomerRepository) {
 		cust, _, _ := (customerRequest{
 			FirstName: "Jane",
 			LastName:  "Doe",
 			Email:     "jane@example.com",
 		}).asCustomer(testCustomerSSNStorage(t))
-		if err := repo.CreateCustomer(cust, "organization"); err != nil {
+		if err := repo.CreateCustomer(cust, organization); err != nil {
 			t.Fatal(err)
 		}
 
-		cust, err := repo.GetCustomer(cust.CustomerID)
+		cust, err := repo.GetCustomer(cust.CustomerID, organization)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -406,6 +409,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	organization := "organization"
 	createReq := &customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
@@ -432,10 +436,10 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	}
 	customer, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	require.NoError(t,
-		repo.CreateCustomer(customer, "organization"),
+		repo.CreateCustomer(customer, organization),
 	)
 
-	_, err := repo.GetCustomer(customer.CustomerID)
+	_, err := repo.GetCustomer(customer.CustomerID, organization)
 	require.NoError(t, err)
 
 	router := mux.NewRouter()
@@ -529,7 +533,8 @@ func TestCustomers__repository(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	cust, err := repo.GetCustomer(base.ID())
+	organization := "organization"
+	cust, err := repo.GetCustomer(base.ID(), organization)
 	if err == nil {
 		t.Errorf("expected not found error: %v", err)
 	}
@@ -558,7 +563,7 @@ func TestCustomers__repository(t *testing.T) {
 			},
 		},
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomer(cust, "organization"); err != nil {
+	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Error(err)
 	}
 	if cust == nil {
@@ -569,7 +574,7 @@ func TestCustomers__repository(t *testing.T) {
 	}
 
 	// read
-	cust, err = repo.GetCustomer(cust.CustomerID)
+	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	if err != nil {
 		t.Error(err)
 	}
@@ -641,6 +646,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	organization := "organization"
 	createReq := customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
@@ -662,7 +668,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		},
 	}
 	newCust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
-	err := repo.CreateCustomer(newCust, "organization")
+	err := repo.CreateCustomer(newCust, organization)
 	require.NoError(t, err)
 
 	updateReq := customerRequest{
@@ -684,7 +690,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 	}
 
 	updatedCust, _, _ := updateReq.asCustomer(testCustomerSSNStorage(t))
-	err = repo.updateCustomer(updatedCust, "organization")
+	err = repo.updateCustomer(updatedCust, organization)
 	require.NoError(t, err)
 
 	require.Equal(t, newCust.CustomerID, updatedCust.CustomerID)
@@ -700,12 +706,13 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	organization := "organization"
 	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomer(cust, "organization"); err != nil {
+	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
 	}
 
@@ -715,7 +722,7 @@ func TestCustomerRepository__updateCustomerStatus(t *testing.T) {
 	}
 
 	// read the status back
-	customer, err := repo.GetCustomer(cust.CustomerID)
+	customer, err := repo.GetCustomer(cust.CustomerID, organization)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -728,12 +735,13 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	organization := "organization"
 	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomer(cust, "organization"); err != nil {
+	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
 	}
 
@@ -750,7 +758,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 	}
 
 	// re-read
-	cust, err := repo.GetCustomer(cust.CustomerID)
+	cust, err := repo.GetCustomer(cust.CustomerID, organization)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -766,12 +774,13 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
+	organization := "organization"
 	cust, _, _ := (customerRequest{
 		FirstName: "Jane",
 		LastName:  "Doe",
 		Email:     "jane@example.com",
 	}).asCustomer(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomer(cust, "organization"); err != nil {
+	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
 	}
 
@@ -779,7 +788,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), body)
-	req.Header.Set("x-organization", "test")
+	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
@@ -945,8 +954,19 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	defer repo.close()
 
 	customerID := base.ID()
+	organization := "organization"
 
-	res, err := repo.getLatestCustomerOFACSearch(customerID)
+	cust, _, _ := (customerRequest{
+		CustomerID: customerID,
+		FirstName: "Jane",
+		LastName:  "Doe",
+		Email:     "jane@example.com",
+	}).asCustomer(testCustomerSSNStorage(t))
+	if err := repo.CreateCustomer(cust, organization); err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := repo.getLatestCustomerOFACSearch(customerID, organization)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -958,7 +978,7 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	if err := repo.saveCustomerOFACSearch(customerID, client.OfacSearch{EntityID: "14141"}); err != nil {
 		t.Fatal(err)
 	}
-	res, err = repo.getLatestCustomerOFACSearch(customerID)
+	res, err = repo.getLatestCustomerOFACSearch(customerID, organization)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -970,7 +990,7 @@ func TestCustomerRepository__OFAC(t *testing.T) {
 	if err := repo.saveCustomerOFACSearch(customerID, client.OfacSearch{EntityID: "777121"}); err != nil {
 		t.Fatal(err)
 	}
-	res, err = repo.getLatestCustomerOFACSearch(customerID)
+	res, err = repo.getLatestCustomerOFACSearch(customerID, organization)
 	if err != nil {
 		t.Fatal(err)
 	}
