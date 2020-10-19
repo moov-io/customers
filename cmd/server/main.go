@@ -21,7 +21,7 @@ import (
 	"github.com/moov-io/base/http/bind"
 
 	mainPkg "github.com/moov-io/customers"
-	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/base/database"
 
 	"github.com/moov-io/base/log"
 

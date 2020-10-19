@@ -13,7 +13,7 @@ import (
 	"github.com/moov-io/base/log"
 	"github.com/stretchr/testify/require"
 
-	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/base/database"
 	"github.com/moov-io/customers/pkg/accounts"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/customers"
