@@ -87,7 +87,7 @@ func findAccountsInBatches(logger log.Logger, db *sql.DB, updateFunc func(acc ac
 
 		for _, acc := range accounts {
 			if err := updateFunc(acc); err != nil {
-				return err
+				logger.LogErrorF("Failed to update account (%s): %v", acc.id, err)
 			}
 		}
 	}
