@@ -20,13 +20,14 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
 
-	mainPkg "github.com/moov-io/customers"
 	"github.com/moov-io/base/database"
+	mainPkg "github.com/moov-io/customers"
 
 	"github.com/moov-io/base/log"
 
 	"github.com/moov-io/customers/internal/util"
 	"github.com/moov-io/customers/pkg/accounts"
+	"github.com/moov-io/customers/pkg/config"
 	"github.com/moov-io/customers/pkg/configuration"
 	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/documents"
@@ -80,17 +81,19 @@ func main() {
 		logger.Log(fmt.Sprintf("sqlite version %s", sqliteVersion))
 	}
 
-	// Setup database connection
-	db, err := database.New(logger, os.Getenv("DATABASE_TYPE"))
+	conf := config.New()
+	if err := conf.Load(); err != nil {
+		logger.LogError("failed to load application config", err)
+		os.Exit(1)
+	}
+
+	ctx := context.TODO()
+	db, err := database.NewAndMigrate(ctx, logger, *conf.Database)
 	if err != nil {
 		logger.LogError("failed to connect to database", err)
 		os.Exit(1)
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			logger.LogError("failed to close database connection", err)
-		}
-	}()
+	defer db.Close()
 
 	accountsRepo := accounts.NewRepo(logger, db)
 	customerRepo := customers.NewCustomerRepo(logger, db)
