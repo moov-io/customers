@@ -83,14 +83,14 @@ func main() {
 
 	conf := config.New()
 	if err := conf.Load(); err != nil {
-		logger.LogError("failed to load application config", err)
+		logger.LogErrorf("failed to load application config: %v", err)
 		os.Exit(1)
 	}
 
 	ctx := context.TODO()
 	db, err := database.NewAndMigrate(ctx, logger, *conf.Database)
 	if err != nil {
-		logger.LogError("failed to connect to database", err)
+		logger.LogErrorf("failed to connect to database: %v", err)
 		os.Exit(1)
 	}
 	defer db.Close()
@@ -139,8 +139,7 @@ func main() {
 	documents.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
-	ctx := context.Background()
-	keeper, err := secrets.OpenSecretKeeper(ctx, "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
+	keeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
 	if err != nil {
 		panic(err)
 	}
@@ -221,7 +220,7 @@ func main() {
 	}
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.Set("phase", "shutdown").LogError("failed to shutdown server", err)
+			logger.Set("phase", "shutdown").LogErrorf("failed to shutdown server: %v", err)
 		}
 	}
 
@@ -230,12 +229,12 @@ func main() {
 		if certFile, keyFile := os.Getenv("HTTPS_CERT_FILE"), os.Getenv("HTTPS_KEY_FILE"); certFile != "" && keyFile != "" {
 			logger.Set("phase", "startup").Log(fmt.Sprintf("binding to %s for secure HTTP server", *httpAddr))
 			if err := serve.ListenAndServeTLS(certFile, keyFile); err != nil {
-				logger.LogError("failed to start TLS server", err)
+				logger.LogErrorf("failed to start TLS server: %v", err)
 			}
 		} else {
 			logger.Set("phase", "startup").Log(fmt.Sprintf("binding to %s for HTTP server", *httpAddr))
 			if err := serve.ListenAndServe(); err != nil {
-				logger.LogError("failed to start server", err)
+				logger.LogErrorf("failed to start server: %v", err)
 			}
 		}
 	}()
@@ -243,7 +242,7 @@ func main() {
 	// Block/Wait for an error
 	if err := <-errs; err != nil {
 		shutdownServer()
-		logger.LogError("service error", err)
+		logger.LogErrorf("service error: %v", err)
 	}
 }
 
