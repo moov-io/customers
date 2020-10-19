@@ -16,13 +16,7 @@ type account struct {
 	sha256AccountNumber    string
 }
 
-// RehashStoredAccountNumber performs following steps:
-// 1. Create sha256_account_number column in accounts table
-// 2. select encrypted_account_number from accounts where sha256_account_number is empty (in batches)
-// 3. decrypt account number
-// 4. hash acccount number using os.ENV("APP_SALT")
-// 5. update sha256_account_number
-// 6. update hashed_account_number with the same sha256_account_number value
+// RehashStoredAccountNumber generates SHA256 hash with salt for rows that need it
 func RehashStoredAccountNumber(logger log.Logger, db *sql.DB, appSalt string, keeper *secrets.StringKeeper) error {
 
 	err := findAccountsInBatches(logger, db, func(acc account) error {
