@@ -4,7 +4,7 @@ VERSION := $(shell grep -Eo '(v[0-9]+[\.][0-9]+[\.][0-9]+(-[a-zA-Z0-9]*)?)' vers
 USERID := $(shell id -u $$USER)
 GROUPID:= $(shell id -g $$USER)
 
-.PHONY: build build-server build-examples docker release check
+.PHONY: build build-server build-examples docker release check embed-migrations
 
 build: build-server
 
@@ -77,6 +77,9 @@ release: docker AUTHORS
 release-push:
 	docker push moov/customers:$(VERSION)
 	docker push moov/customers:latest
+
+embed-migrations:
+	pkger -o cmd/server
 
 # quay-push:
 # 	docker push quay.io/moov/customers:$(VERSION)
