@@ -124,7 +124,7 @@ func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 		}
 	}
 
-	logger = logger.WithKeyValue("package", "paygate")
+	logger = logger.Set("package", "paygate")
 	logger.Log(fmt.Sprintf("using %s for PayGate address", conf.BasePath))
 
 	return &moovClient{

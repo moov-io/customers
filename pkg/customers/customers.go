@@ -27,7 +27,7 @@ import (
 )
 
 func AddCustomerRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage, ofac *OFACSearcher) {
-	logger = logger.WithKeyValue("package", "customers")
+	logger = logger.Set("package", "customers")
 
 	r.Methods("GET").Path("/customers").HandlerFunc(searchCustomers(logger, repo))
 	r.Methods("GET").Path("/customers/{customerID}").HandlerFunc(getCustomer(logger, repo))
@@ -95,7 +95,7 @@ func deleteCustomer(logger log.Logger, repo CustomerRepository) func(http.Respon
 func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID, organization string, requestID string, repo CustomerRepository) {
 	cust, err := repo.GetCustomer(customerID, organization)
 	if err != nil {
-		logger.LogErrorF("getCustomer: lookup: %v", err)
+		logger.LogErrorf("getCustomer: lookup: %v", err)
 		moovhttp.Problem(w, err)
 		return
 	}
@@ -280,39 +280,39 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 			return
 		}
 		if err := req.validate(); err != nil {
-			logger.LogError("error validating new customer", err)
+			logger.LogErrorf("error validating new customer: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		cust, ssn, err := req.asCustomer(customerSSNStorage)
 		if err != nil {
-			logger.LogErrorF("problem transforming request into Customer=%s: %v", cust.CustomerID, err)
+			logger.LogErrorf("problem transforming request into Customer=%s: %v", cust.CustomerID, err)
 			moovhttp.Problem(w, err)
 			return
 		}
 		if ssn != nil {
 			err := customerSSNStorage.repo.saveCustomerSSN(ssn)
 			if err != nil {
-				logger.LogErrorF("problem saving SSN for Customer=%s: %v", cust.CustomerID, err)
+				logger.LogErrorf("problem saving SSN for Customer=%s: %v", cust.CustomerID, err)
 				moovhttp.Problem(w, fmt.Errorf("saveCustomerSSN: %v", err))
 				return
 			}
 		}
 		if err := repo.CreateCustomer(cust, organization); err != nil {
-			logger.LogErrorF("createCustomer: %v", err)
+			logger.LogErrorf("createCustomer: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 		if err := repo.replaceCustomerMetadata(cust.CustomerID, cust.Metadata); err != nil {
-			logger.LogErrorF("updating metadata for customer=%s failed: %v", cust.CustomerID, err)
+			logger.LogErrorf("updating metadata for customer=%s failed: %v", cust.CustomerID, err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		// Perform an OFAC search with the Customer information
 		if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
-			logger.LogErrorF("error with OFAC search for customer=%s: %v", cust.CustomerID, err)
+			logger.LogErrorf("error with OFAC search for customer=%s: %v", cust.CustomerID, err)
 		}
 
 		logger.Log(fmt.Sprintf("created customer=%s", cust.CustomerID))
@@ -349,33 +349,33 @@ func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 			return
 		}
 		if err := req.validate(); err != nil {
-			logger.LogError("error validating customer payload", err)
+			logger.LogErrorf("error validating customer payload: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		cust, ssn, err := req.asCustomer(customerSSNStorage)
 		if err != nil {
-			logger.LogErrorF("transforming request into Customer=%s: %v", cust.CustomerID, err)
+			logger.LogErrorf("transforming request into Customer=%s: %v", cust.CustomerID, err)
 			moovhttp.Problem(w, err)
 			return
 		}
 		if ssn != nil {
 			err := customerSSNStorage.repo.saveCustomerSSN(ssn)
 			if err != nil {
-				logger.LogErrorF("error saving SSN for Customer=%s: %v", cust.CustomerID, err)
+				logger.LogErrorf("error saving SSN for Customer=%s: %v", cust.CustomerID, err)
 				moovhttp.Problem(w, fmt.Errorf("saving customer's SSN: %v", err))
 				return
 			}
 		}
 		if err := repo.updateCustomer(cust, organization); err != nil {
-			logger.LogErrorF("error updating customer: %v", err)
+			logger.LogErrorf("error updating customer: %v", err)
 			moovhttp.Problem(w, fmt.Errorf("updating customer: %v", err))
 			return
 		}
 
 		if err := repo.replaceCustomerMetadata(cust.CustomerID, cust.Metadata); err != nil {
-			logger.LogErrorF("error updating metadata for customer=%s: %v", cust.CustomerID, err)
+			logger.LogErrorf("error updating metadata for customer=%s: %v", cust.CustomerID, err)
 			moovhttp.Problem(w, err)
 			return
 		}

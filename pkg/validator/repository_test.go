@@ -50,5 +50,9 @@ func createTestRepository(t *testing.T) Repository {
 
 	db := database.CreateTestMySQLDB(t)
 
+	t.Cleanup(func() {
+		db.Close()
+	})
+
 	return &sqlRepository{db.DB}
 }

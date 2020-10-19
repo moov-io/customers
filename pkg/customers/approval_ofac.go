@@ -98,7 +98,7 @@ func (s *OFACSearcher) storeCustomerOFACSearch(cust *client.Customer, requestID 
 }
 
 func AddOFACRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, ofac *OFACSearcher) {
-	logger = logger.WithKeyValue("package", "customers")
+	logger = logger.Set("package", "customers")
 
 	r.Methods("GET").Path("/customers/{customerID}/ofac").HandlerFunc(getLatestCustomerOFACSearch(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/refresh/ofac").HandlerFunc(refreshOFACSearch(logger, repo, ofac))
@@ -155,23 +155,23 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 		logger.Log(fmt.Sprintf("running live OFAC search for customer=%s", customerID))
 
 		if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
-			logger.LogErrorF("error refreshing ofac search: %v", err)
+			logger.LogErrorf("error refreshing ofac search: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		result, err := repo.getLatestCustomerOFACSearch(customerID, organization)
 		if err != nil {
-			logger.LogErrorF("error getting latest ofac search: %v", err)
+			logger.LogErrorf("error getting latest ofac search: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		if result.Blocked {
-			logger.LogErrorF("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
+			logger.LogErrorf("customer=%s matched against OFAC entity=%s with a score of %.2f - rejecting customer", cust.CustomerID, result.EntityID, result.Match)
 
 			if err := repo.updateCustomerStatus(cust.CustomerID, client.CUSTOMERSTATUS_REJECTED, "manual OFAC refresh"); err != nil {
-				logger.LogErrorF("error updating customer=%s error=%v", cust.CustomerID, err)
+				logger.LogErrorf("error updating customer=%s error=%v", cust.CustomerID, err)
 				moovhttp.Problem(w, err)
 				return
 			}

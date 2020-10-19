@@ -105,7 +105,7 @@ func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 		}
 	}
 
-	logger = logger.WithKeyValue("package", "fed")
+	logger = logger.Set("package", "fed")
 	logger.Log(fmt.Sprintf("using %s for FED address", conf.BasePath))
 
 	return &moovClient{

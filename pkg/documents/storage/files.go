@@ -22,7 +22,7 @@ import (
 )
 
 func AddFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSignerHMAC, bucketFactory BucketFunc) {
-	logger = logger.WithKeyValue("package", "storage")
+	logger = logger.Set("package", "storage")
 
 	if v := os.Getenv("FILEBLOB_BASE_URL"); v != "" {
 		u, err := url.Parse(v)
