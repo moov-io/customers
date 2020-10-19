@@ -24,7 +24,7 @@ require (
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible
 	github.com/mitchellh/mapstructure v1.3.3
 	github.com/moov-io/ach v1.4.4
-	github.com/moov-io/base v0.11.2-0.20201009172605-8a2f4aef9cc4
+	github.com/moov-io/base v0.13.1
 	github.com/moov-io/fed v0.5.1
 	github.com/moov-io/paygate v0.8.0
 	github.com/moov-io/watchman v0.15.1
