@@ -25,6 +25,7 @@ import (
 
 	"github.com/moov-io/base/log"
 
+	"github.com/moov-io/customers/internal"
 	"github.com/moov-io/customers/internal/util"
 	"github.com/moov-io/customers/pkg/accounts"
 	"github.com/moov-io/customers/pkg/config"
@@ -167,11 +168,19 @@ func main() {
 		Repo: accountsRepo, WatchmanClient: watchmanClient,
 	}
 
+	appSalt := os.Getenv("APP_SALT")
+
+	if os.Getenv("REHASH_ACCOUNTS") != "" {
+		if err := internal.RehashStoredAccountNumber(logger, db, appSalt, stringKeeper); err != nil {
+			panic(logger.LogErrorf("Failed to re-hash account numbers: %v", err))
+		}
+	}
+
 	// Setup business HTTP routes
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher)
+	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher, appSalt)
 	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)

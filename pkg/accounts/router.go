@@ -30,7 +30,7 @@ func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, valid
 	logger = logger.Set("package", "accounts")
 
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, accounts, fedClient))
-	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, accounts, fedClient, keeper, ofac))
+	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, accounts, fedClient, keeper, ofac, appSalt))
 	r.Methods("POST").Path("/customers/{customerID}/accounts/{accountID}/decrypt").HandlerFunc(decryptAccountNumber(logger, accounts, keeper, transitKeeper))
 	r.Methods("DELETE").Path("/customers/{customerID}/accounts/{accountID}").HandlerFunc(removeCustomerAccount(logger, accounts))
 
@@ -93,7 +93,7 @@ type CreateAccountRequest struct {
 	maskedAccountNumber    string
 }
 
-func (req *CreateAccountRequest) validate() error {
+func (req *CreateAccountRequest) Validate() error {
 	if req.HolderName == "" {
 		return errors.New("missing HolderName")
 	}
@@ -114,13 +114,13 @@ func (req *CreateAccountRequest) validate() error {
 	return nil
 }
 
-func (req *CreateAccountRequest) disfigure(keeper *secrets.StringKeeper) error {
+func (req *CreateAccountRequest) Disfigure(keeper *secrets.StringKeeper, appSalt string) error {
 	if enc, err := keeper.EncryptString(req.AccountNumber); err != nil {
 		return fmt.Errorf("problem encrypting account number: %v", err)
 	} else {
 		req.encryptedAccountNumber = enc
 	}
-	if v, err := hash.AccountNumber(req.AccountNumber); err != nil {
+	if v, err := hash.SHA256Hash(appSalt, req.AccountNumber); err != nil {
 		return fmt.Errorf("problem hashing account number: %v", err)
 	} else {
 		req.hashedAccountNumber = v
@@ -129,7 +129,7 @@ func (req *CreateAccountRequest) disfigure(keeper *secrets.StringKeeper) error {
 	return nil
 }
 
-func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Client, keeper *secrets.StringKeeper, ofac *AccountOfacSearcher) http.HandlerFunc {
+func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Client, keeper *secrets.StringKeeper, ofac *AccountOfacSearcher, appSalt string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -140,11 +140,11 @@ func createCustomerAccount(logger log.Logger, repo Repository, fedClient fed.Cli
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err := request.validate(); err != nil {
+		if err := request.Validate(); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
-		if err := request.disfigure(keeper); err != nil {
+		if err := request.Disfigure(keeper, appSalt); err != nil {
 			logger.LogErrorf("problem disfiguring account: %v", err)
 			moovhttp.Problem(w, err)
 			return

@@ -104,7 +104,7 @@ func TestRepository__getEncryptedAccountNumber(t *testing.T) {
 		RoutingNumber: "987654320",
 		Type:          client.ACCOUNTTYPE_CHECKING,
 	}
-	if err := req.disfigure(keeper); err != nil {
+	if err := req.Disfigure(keeper, "salt"); err != nil {
 		t.Fatal(err)
 	}
 	acct, err := repo.CreateCustomerAccount(customerID, userID, req)
@@ -147,7 +147,7 @@ func TestRepository__updateAccountStatus(t *testing.T) {
 		RoutingNumber: "987654320",
 		Type:          client.ACCOUNTTYPE_CHECKING,
 	}
-	if err := req.disfigure(keeper); err != nil {
+	if err := req.Disfigure(keeper, "salt"); err != nil {
 		t.Fatal(err)
 	}
 	acct, err := repo.CreateCustomerAccount(customerID, userID, req)
@@ -180,7 +180,7 @@ func TestRepositoryUnique(t *testing.T) {
 			RoutingNumber: "123456780",
 			Type:          client.ACCOUNTTYPE_SAVINGS,
 		}
-		if err := req.disfigure(keeper); err != nil {
+		if err := req.Disfigure(keeper, "salt"); err != nil {
 			t.Fatal(err)
 		}
 

@@ -139,7 +139,7 @@ func TestRefreshAccountAndCheckAccountOfacSearch(t *testing.T) {
 
 func TestAccountCreationRequest(t *testing.T) {
 	req := &CreateAccountRequest{}
-	if err := req.validate(); err == nil {
+	if err := req.Validate(); err == nil {
 		t.Error("expected error")
 	}
 
@@ -148,7 +148,7 @@ func TestAccountCreationRequest(t *testing.T) {
 	req.RoutingNumber = "987654320"
 	req.Type = client.ACCOUNTTYPE_SAVINGS
 
-	if err := req.validate(); err != nil {
+	if err := req.Validate(); err != nil {
 		t.Error(err)
 	}
 }
@@ -163,7 +163,7 @@ func TestGetAccountByID(t *testing.T) {
 	}
 
 	handler := mux.NewRouter()
-	RegisterRoutes(log.NewNopLogger(), handler, repo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(repo, nil))
+	RegisterRoutes(log.NewNopLogger(), handler, repo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(repo, nil), "salt")
 
 	type account struct { // wrapper to associate an account with its customerID
 		customerID string
@@ -211,7 +211,7 @@ func TestRoutes__DecryptAccountNumber(t *testing.T) {
 		RoutingNumber: "987654320",
 		Type:          client.ACCOUNTTYPE_CHECKING,
 	}
-	if err := req.disfigure(keeper); err != nil {
+	if err := req.Disfigure(keeper, "salt"); err != nil {
 		t.Fatal(err)
 	}
 	account, err := repo.CreateCustomerAccount(customerID, userID, req)
@@ -301,7 +301,7 @@ func setupRouter(t *testing.T) *mux.Router {
 		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
 	}
 
-	RegisterRoutes(log.NewNopLogger(), handler, accounts, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(accounts, nil))
+	RegisterRoutes(log.NewNopLogger(), handler, accounts, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(accounts, nil), "salt")
 
 	return handler
 }
@@ -316,7 +316,7 @@ func setupRouterWithTestAccountRepo(t *testing.T, testRepo *testAccountRepositor
 		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
 	}
 
-	RegisterRoutes(log.NewNopLogger(), handler, testRepo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(testRepo, nil))
+	RegisterRoutes(log.NewNopLogger(), handler, testRepo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(testRepo, nil), "salt")
 
 	return handler
 }
@@ -331,7 +331,7 @@ func setupRouterWithRepo(t *testing.T, repo *mockRepository) *mux.Router {
 		{Strategy: "test", Vendor: "moov"}: testvalidator.NewStrategy(),
 	}
 
-	RegisterRoutes(log.NewNopLogger(), handler, repo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(repo, nil))
+	RegisterRoutes(log.NewNopLogger(), handler, repo, validations, testFedClient, keeper, keeper, validationStrategies, createTestOFACSearcher(repo, nil), "salt")
 
 	return handler
 }
