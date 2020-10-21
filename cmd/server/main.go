@@ -20,13 +20,14 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/http/bind"
 
+	"github.com/moov-io/base/database"
 	mainPkg "github.com/moov-io/customers"
-	"github.com/moov-io/customers/internal/database"
 
 	"github.com/moov-io/base/log"
 
 	"github.com/moov-io/customers/internal/util"
 	"github.com/moov-io/customers/pkg/accounts"
+	"github.com/moov-io/customers/pkg/config"
 	"github.com/moov-io/customers/pkg/configuration"
 	"github.com/moov-io/customers/pkg/customers"
 	"github.com/moov-io/customers/pkg/documents"
@@ -63,8 +64,8 @@ func main() {
 		logger = log.NewDefaultLogger()
 	}
 
-	logger = logger.WithKeyValue("app", "customers")
-	logger.WithKeyValue("phase", "startup").Log(fmt.Sprintf("Starting moov-io/customers server version %s", mainPkg.Version))
+	logger = logger.Set("app", "customers")
+	logger.Set("phase", "startup").Logf("Starting moov-io/customers server version %s", mainPkg.Version)
 
 	// Channel for errors
 	errs := make(chan error)
@@ -77,20 +78,22 @@ func main() {
 
 	// Setup SQLite database
 	if sqliteVersion, _, _ := sqlite3.Version(); sqliteVersion != "" {
-		logger.Log(fmt.Sprintf("sqlite version %s", sqliteVersion))
+		logger.Logf("sqlite version %s", sqliteVersion)
 	}
 
-	// Setup database connection
-	db, err := database.New(logger, os.Getenv("DATABASE_TYPE"))
-	if err != nil {
-		logger.LogError("failed to connect to database", err)
+	conf := config.New()
+	if err := conf.Load(); err != nil {
+		logger.LogErrorf("failed to load application config: %v", err)
 		os.Exit(1)
 	}
-	defer func() {
-		if err := db.Close(); err != nil {
-			logger.LogError("failed to close database connection", err)
-		}
-	}()
+
+	ctx := context.TODO()
+	db, err := database.NewAndMigrate(ctx, logger, *conf.Database)
+	if err != nil {
+		logger.LogErrorf("failed to connect to database: %v", err)
+		os.Exit(1)
+	}
+	defer db.Close()
 
 	accountsRepo := accounts.NewRepo(logger, db)
 	customerRepo := customers.NewCustomerRepo(logger, db)
@@ -103,9 +106,9 @@ func main() {
 	adminServer := admin.NewServer(*adminAddr)
 	adminServer.AddVersionHandler(mainPkg.Version) // Setup 'GET /version'
 	go func() {
-		logger.Log(fmt.Sprintf("admin listening on %s", adminServer.BindAddr()))
+		logger.Logf("admin listening on %s", adminServer.BindAddr())
 		if err := adminServer.Listen(); err != nil {
-			logger.LogErrorF("problem starting admin http: %v", err)
+			logger.LogErrorf("problem starting admin http: %v", err)
 			errs <- err
 		}
 	}()
@@ -136,8 +139,7 @@ func main() {
 	documents.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
 	// Setup Customer SSN storage wrapper
-	ctx := context.Background()
-	keeper, err := secrets.OpenSecretKeeper(ctx, "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
+	keeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
 	if err != nil {
 		panic(err)
 	}
@@ -218,21 +220,21 @@ func main() {
 	}
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.WithKeyValue("phase", "shutdown").LogError("failed to shutdown server", err)
+			logger.Set("phase", "shutdown").LogErrorf("failed to shutdown server: %v", err)
 		}
 	}
 
 	// Start business logic HTTP server
 	go func() {
 		if certFile, keyFile := os.Getenv("HTTPS_CERT_FILE"), os.Getenv("HTTPS_KEY_FILE"); certFile != "" && keyFile != "" {
-			logger.WithKeyValue("phase", "startup").Log(fmt.Sprintf("binding to %s for secure HTTP server", *httpAddr))
+			logger.Set("phase", "startup").Logf("binding to %s for secure HTTP server", *httpAddr)
 			if err := serve.ListenAndServeTLS(certFile, keyFile); err != nil {
-				logger.LogError("failed to start TLS server", err)
+				logger.LogErrorf("failed to start TLS server: %v", err)
 			}
 		} else {
-			logger.WithKeyValue("phase", "startup").Log(fmt.Sprintf("binding to %s for HTTP server", *httpAddr))
+			logger.Set("phase", "startup").Logf("binding to %s for HTTP server", *httpAddr)
 			if err := serve.ListenAndServe(); err != nil {
-				logger.LogError("failed to start server", err)
+				logger.LogErrorf("failed to start server: %v", err)
 			}
 		}
 	}()
@@ -240,7 +242,7 @@ func main() {
 	// Block/Wait for an error
 	if err := <-errs; err != nil {
 		shutdownServer()
-		logger.LogError("service error", err)
+		logger.LogErrorf("service error: %v", err)
 	}
 }
 

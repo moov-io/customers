@@ -22,7 +22,7 @@ func AddRoutes(
 	customerRepo customers.CustomerRepository,
 	accountRepo accounts.Repository,
 ) {
-	logger = logger.WithKeyValue("package", "reports")
+	logger = logger.Set("package", "reports")
 
 	r.Methods("GET").Path("/reports/accounts").HandlerFunc(getCustomerAccounts(logger, customerRepo, accountRepo))
 }
@@ -56,7 +56,7 @@ func getCustomerAccounts(
 
 		allAccounts, err := accountRepo.GetCustomerAccountsByIDs(accountIDs)
 		if err != nil {
-			logger.LogError("error getting customers' accounts", err)
+			logger.LogErrorf("error getting customers' accounts: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -65,7 +65,7 @@ func getCustomerAccounts(
 		for _, acc := range allAccounts {
 			cust, err := customerRepo.GetCustomer(acc.CustomerID, organization)
 			if err != nil {
-				logger.LogError("error getting customer", err)
+				logger.LogErrorf("error getting customer: %v", err)
 				moovhttp.Problem(w, err)
 				return
 			}

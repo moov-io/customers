@@ -22,7 +22,7 @@ import (
 )
 
 func AddFileblobRoutes(logger log.Logger, r *mux.Router, signer *fileblob.URLSignerHMAC, bucketFactory BucketFunc) {
-	logger = logger.WithKeyValue("package", "storage")
+	logger = logger.Set("package", "storage")
 
 	if v := os.Getenv("FILEBLOB_BASE_URL"); v != "" {
 		u, err := url.Parse(v)
@@ -62,7 +62,7 @@ func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFac
 		}
 		defer rdr.Close()
 
-		logger.Log(fmt.Sprintf("proxying document=%s contentType=%s", key, rdr.ContentType()))
+		logger.Logf("proxying document=%s contentType=%s", key, rdr.ContentType())
 
 		w.Header().Set("Content-Disposition", "inline")
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", rdr.Size()))

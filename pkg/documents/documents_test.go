@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gocloud.dev/blob"
 
-	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/base/database"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/documents/storage"
 	"github.com/moov-io/customers/pkg/secrets"

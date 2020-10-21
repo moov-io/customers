@@ -53,7 +53,7 @@ func listAllowedContentTypes() string {
 }
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, bucketFunc storage.BucketFunc) {
-	logger = logger.WithKeyValue("package", "configuration")
+	logger = logger.Set("package", "configuration")
 
 	r.Methods("GET").Path("/configuration/customers").HandlerFunc(getOrganizationConfig(logger, repo))
 	r.Methods("PUT").Path("/configuration/customers").HandlerFunc(updateOrganizationConfig(logger, repo))
@@ -111,11 +111,11 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 			return
 		}
 
-		logger = logger.WithKeyValue("organization", organization)
+		logger = logger.Set("organization", organization)
 
 		bucket, err := bucketFactory()
 		if err != nil {
-			logger.LogError("problem retrieving logo image", err)
+			logger.LogErrorf("problem retrieving logo image: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -123,24 +123,20 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 
 		rdr, err := bucket.NewReader(r.Context(), makeDocumentKey(organization), nil)
 		if err != nil {
-			msg := "error retrieving logo file"
 			if gcerrors.Code(err) == gcerrors.NotFound {
-				msg = msg + " - file not found"
-				logger.LogError(msg, err)
+				logger.LogErrorf("logo file not found: %v", err)
 				http.NotFound(w, r)
 				return
 			}
 
-			logger.LogError(msg, err)
-			moovhttp.Problem(w, fmt.Errorf(msg))
+			moovhttp.Problem(w, logger.LogErrorf("error retrieving logo file: %v", err).Err())
 			return
 		}
 		defer rdr.Close()
 
 		fBytes, err := ioutil.ReadAll(rdr)
 		if err != nil || fBytes == nil {
-			logger.LogError("problem reading logo file", err)
-			moovhttp.Problem(w, fmt.Errorf("problem reading logo file - error=%v", err))
+			moovhttp.Problem(w, logger.LogErrorf("problem reading logo file: %v", err).Err())
 			return
 		}
 
@@ -160,7 +156,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 
 		file, _, err := r.FormFile("file")
 		if file == nil || err != nil {
-			logger.LogError(errMissingFile.Error(), err)
+			logger.LogErrorf("%s: %v", errMissingFile.Error(), err)
 			moovhttp.Problem(w, errMissingFile)
 			return
 		}
@@ -169,14 +165,14 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 		// Detect the content type by reading the first 512 bytes of r.Body (read into file as we expect a multipart request)
 		buf := make([]byte, 512)
 		if _, err := file.Read(buf); err != nil && err != io.EOF {
-			logger.LogError("problem reading file", err)
+			logger.LogErrorf("problem reading file: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
 		contentType := http.DetectContentType(buf)
 		if !allowedContentTypes[contentType] {
-			logger.WithKeyValue("contentType", contentType).
+			logger.Set("contentType", contentType).
 				Log("unsupported content type for logo image file")
 			moovhttp.Problem(w, errUnsupportedType)
 			return
@@ -184,7 +180,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 
 		bucket, err := bucketFactory()
 		if err != nil {
-			logger.LogError("problem uploading logo image", err)
+			logger.LogErrorf("problem uploading logo image: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -198,7 +194,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 			ContentType:        contentType,
 		})
 		if err != nil {
-			logger.LogError("problem uploading logo image", err)
+			logger.LogErrorf("problem uploading logo image: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -206,7 +202,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 
 		written, err := io.Copy(writer, io.LimitReader(io.MultiReader(bytes.NewReader(buf), file), maxImageSize))
 		if err != nil || written == 0 {
-			logger.LogError("problem uploading logo image", err)
+			logger.LogErrorf("problem uploading logo image: %v", err)
 			moovhttp.Problem(w, fmt.Errorf("problem writing file - wrote %d bytes with error=%v", written, err))
 			return
 		}

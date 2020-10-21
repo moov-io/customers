@@ -19,7 +19,7 @@ var (
 )
 
 func AddCustomerAddressRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository) {
-	logger = logger.WithKeyValue("package", "customers")
+	logger = logger.Set("package", "customers")
 
 	r.Methods("POST").Path("/customers/{customerID}/addresses").HandlerFunc(createCustomerAddress(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/addresses/{addressID}").HandlerFunc(updateCustomerAddress(logger, repo))
@@ -77,7 +77,7 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
-		logger.Log(fmt.Sprintf("added address for customer=%s", customerID))
+		logger.Logf("added address for customer=%s", customerID)
 		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
 }
@@ -124,12 +124,12 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		}
 
 		if err := repo.updateCustomerAddress(customerID, addressId, req); err != nil {
-			logger.LogErrorF("error updating customer's address: customer=%s address=%s: %v", customerID, addressId, err)
+			logger.LogErrorf("error updating customer's address: customer=%s address=%s: %v", customerID, addressId, err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		logger.Log(fmt.Sprintf("updating address=%s for customer=%s", addressId, customerID))
+		logger.Logf("updating address=%s for customer=%s", addressId, customerID)
 
 		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
@@ -146,12 +146,12 @@ func deleteCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 
 		err := repo.deleteCustomerAddress(customerID, addressId)
 		if err != nil {
-			logger.LogErrorF("error deleting customer's address: customer=%s address=%s: %v", customerID, addressId, err)
+			logger.LogErrorf("error deleting customer's address: customer=%s address=%s: %v", customerID, addressId, err)
 			moovhttp.Problem(w, err)
 			return
 		}
 
-		logger.Log(fmt.Sprintf("successfully deleted address=%s for customer=%s", addressId, customerID))
+		logger.Logf("successfully deleted address=%s for customer=%s", addressId, customerID)
 
 		w.WriteHeader(http.StatusNoContent)
 	}

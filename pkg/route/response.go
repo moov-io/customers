@@ -52,7 +52,7 @@ func (w *ResponseWriter) WriteHeader(code int) {
 	}
 
 	if requestID := GetRequestID(w.request); requestID != "" && w.log != nil {
-		w.log.WithMap(map[string]string{
+		w.log.With(log.Fields{
 			"method":    w.request.Method,
 			"path":      w.request.URL.Path,
 			"status":    strconv.Itoa(code),

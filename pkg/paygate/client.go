@@ -98,7 +98,7 @@ func (c *moovClient) InitiateMicroDeposits(userID string, destination client.Des
 		return fmt.Errorf("unexpected HTTP status: %s", resp.Status)
 	}
 
-	c.logger.Log(fmt.Sprintf("created microDepositID=%s for accountID=%s", micro.MicroDepositID, destination.AccountID))
+	c.logger.Logf("created microDepositID=%s for accountID=%s", micro.MicroDepositID, destination.AccountID)
 
 	return nil
 }
@@ -124,8 +124,8 @@ func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 		}
 	}
 
-	logger = logger.WithKeyValue("package", "paygate")
-	logger.Log(fmt.Sprintf("using %s for PayGate address", conf.BasePath))
+	logger = logger.Set("package", "paygate")
+	logger.Logf("using %s for PayGate address", conf.BasePath)
 
 	return &moovClient{
 		logger:     logger,

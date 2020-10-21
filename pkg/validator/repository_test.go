@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/moov-io/base"
-	"github.com/moov-io/customers/internal/database"
+	"github.com/moov-io/base/database"
 	"github.com/stretchr/testify/require"
 )
 
@@ -49,6 +49,10 @@ func createTestRepository(t *testing.T) Repository {
 	t.Helper()
 
 	db := database.CreateTestMySQLDB(t)
+
+	t.Cleanup(func() {
+		db.Close()
+	})
 
 	return &sqlRepository{db.DB}
 }
