@@ -785,10 +785,20 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	body := strings.NewReader(`{ "metadata": { "key": "bar"} }`)
+	payload := struct {
+		Metadata map[string]string `json:"metadata"`
+	}{
+		Metadata: map[string]string{
+			"key-1": "val-1",
+			"key-2": "val-2",
+			"key-3": "val-3",
+		},
+	}
+	b, err := json.Marshal(payload)
+	require.NoError(t, err)
 
 	w := httptest.NewRecorder()
-	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), body)
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/metadata", cust.CustomerID), bytes.NewReader(b))
 	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 
@@ -805,9 +815,7 @@ func TestCustomers__replaceCustomerMetadata(t *testing.T) {
 	if err := json.NewDecoder(w.Body).Decode(&customer); err != nil {
 		t.Fatal(err)
 	}
-	if customer.Metadata["key"] != "bar" {
-		t.Errorf("unknown Customer metadata: %#v", customer.Metadata)
-	}
+	require.Equal(t, payload.Metadata, customer.Metadata)
 
 	// sad path
 	repo2 := &testCustomerRepository{err: errors.New("bad error")}

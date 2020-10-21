@@ -708,7 +708,6 @@ func (r *sqlCustomerRepository) replaceCustomerMetadata(customerID string, metad
 	}
 	stmt.Close()
 
-	// Insert each k/v pair
 	query = `insert into customer_metadata (customer_id, meta_key, meta_value) values (?, ?, ?);`
 	stmt, err = tx.Prepare(query)
 	if err != nil {
