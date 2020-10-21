@@ -7,11 +7,12 @@
 
 The following environment variables can be set to configure behavior in Accounts.
 
-| Environment Variable | Description | Default |
-|-----|-----|-----|
-| `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty |
-| `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
-| `DATABASE_TYPE` | Which database option to use (Options: `sqlite`, `mysql`) | Default: `sqlite` |
+| Environment Variable | Description                                                                                                                          | Default           |
+|----------------------|--------------------------------------------------------------------------------------------------------------------------------------|-------------------|
+| `HTTPS_CERT_FILE`    | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty             |
+| `HTTPS_KEY_FILE`     | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`.                                                      | Empty             |
+| `DATABASE_TYPE`      | Which database option to use (Options: `sqlite`, `mysql`)                                                                            | Default: `sqlite` |
+| `APP_SALT`           | Provided salt is used for account number hashing. Should be a random string and should be keept in secret.                           |                   |
 
 #### Fed
 
