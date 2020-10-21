@@ -123,24 +123,20 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 
 		rdr, err := bucket.NewReader(r.Context(), makeDocumentKey(organization), nil)
 		if err != nil {
-			msg := "error retrieving logo file"
 			if gcerrors.Code(err) == gcerrors.NotFound {
-				msg = msg + " - file not found"
-				logger.LogErrorf("%s: %v", msg, err)
+				logger.LogErrorf("logo file not found: %v", err)
 				http.NotFound(w, r)
 				return
 			}
 
-			logger.LogErrorf("%s: %v", msg, err)
-			moovhttp.Problem(w, fmt.Errorf(msg))
+			moovhttp.Problem(w, logger.LogErrorf("error retrieving logo file: %v", err).Err())
 			return
 		}
 		defer rdr.Close()
 
 		fBytes, err := ioutil.ReadAll(rdr)
 		if err != nil || fBytes == nil {
-			logger.LogErrorf("problem reading logo file: %v", err)
-			moovhttp.Problem(w, fmt.Errorf("problem reading logo file - error=%v", err))
+			moovhttp.Problem(w, logger.LogErrorf("problem reading logo file: %v", err).Err())
 			return
 		}
 
