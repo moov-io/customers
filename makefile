@@ -79,7 +79,7 @@ release-push:
 	docker push moov/customers:latest
 
 embed-migrations:
-	pkger -o cmd/server
+	pkger -include /migrations -o cmd/server
 
 # quay-push:
 # 	docker push quay.io/moov/customers:$(VERSION)
