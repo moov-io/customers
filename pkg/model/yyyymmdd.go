@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	yyyymmddFormat = "2006-01-02"
+	YYYYMMDD_Format = "2006-01-02"
 )
 
 type YYYYMMDD string
@@ -26,10 +26,10 @@ func (d *YYYYMMDD) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return fmt.Errorf("YYMMDD: %v", err)
 	}
-	t, err := time.Parse(yyyymmddFormat, s)
+	t, err := time.Parse(YYYYMMDD_Format, s)
 	if err != nil {
 		return fmt.Errorf("YYMMDD: %v", err)
 	}
-	*d = YYYYMMDD(t.Format(yyyymmddFormat))
+	*d = YYYYMMDD(t.Format(YYYYMMDD_Format))
 	return nil
 }
