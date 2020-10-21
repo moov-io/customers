@@ -286,20 +286,22 @@ func (r *sqlCustomerRepository) getMetadata(customerIDs []string) (map[string]cl
 	}
 	defer rows.Close()
 
-	ret := make(map[string]client.CustomerMetadata)
+	result := make(map[string]client.CustomerMetadata)
+	m := client.CustomerMetadata{
+		Metadata: make(map[string]string),
+	}
+
 	for rows.Next() {
-		m := client.CustomerMetadata{
-			Metadata: make(map[string]string),
-		}
 		var customerID string
 		var k, v string
 		if err := rows.Scan(&customerID, &k, &v); err != nil {
 			return nil, fmt.Errorf("scanning row: %v", err)
 		}
 		m.Metadata[k] = v
-		ret[customerID] = m
+		result[customerID] = m
 	}
-	return ret, nil
+
+	return result, nil
 }
 
 func (r *sqlCustomerRepository) queryRowsByCustomerIDs(query string, customerIDs []string) (*sql.Rows, error) {
