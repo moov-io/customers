@@ -12,7 +12,6 @@ The following environment variables can be set to configure behavior in Accounts
 | `HTTPS_CERT_FILE`    | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic be over secure HTTP. | Empty             |
 | `HTTPS_KEY_FILE`     | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`.                                                      | Empty             |
 | `DATABASE_TYPE`      | Which database option to use (Options: `sqlite`, `mysql`)                                                                            | Default: `sqlite` |
-| `APP_SALT`           | Provided salt is used for account number hashing. Should be a random string and should be keept in secret.                           |                   |
 
 #### Fed
 
@@ -48,6 +47,8 @@ Customers has an endpoint which encrypts an account number for transit to anothe
 
 - `TRANSIT_LOCAL_BASE64_KEY`: A URI used to temporarily encrypt account numbers for transit over the network. This value needs to look like `base64key://value` where `value` is a base64 encoded 32 byte random key. Callers of endpoints that respond with encrypted values need this same key to decrypt.
   - Generate this key by running `./cmd/genkey/` and copying the `base64key://...` value
+- `APP_SALT`:  Provided salt is used for account number hashing. Should be a random string and should be keept in secret.
+
 
 #### Account Verification
 
