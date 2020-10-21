@@ -164,7 +164,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 			moovhttp.Problem(w, err)
 			return
 		}
-		logger.Log(fmt.Sprintf("uploading document=%s (content-type: %s)", doc.DocumentID, contentType))
+		logger.Logf("uploading document=%s (content-type: %s)", doc.DocumentID, contentType)
 
 		// Write our document from the request body
 		ctx, cancelFn := context.WithTimeout(context.TODO(), 60*time.Second)
@@ -184,7 +184,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 		}
 
 		documentKey := makeDocumentKey(customerID, doc.DocumentID)
-		logger.Log(fmt.Sprintf("writing %s", documentKey))
+		logger.Logf("writing %s", documentKey)
 
 		err = bucket.WriteAll(ctx, documentKey, encryptedDoc, &blob.WriterOptions{
 			ContentDisposition: "inline",

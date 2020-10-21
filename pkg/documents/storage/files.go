@@ -62,7 +62,7 @@ func proxyLocalFile(logger log.Logger, signer *fileblob.URLSignerHMAC, bucketFac
 		}
 		defer rdr.Close()
 
-		logger.Log(fmt.Sprintf("proxying document=%s contentType=%s", key, rdr.ContentType()))
+		logger.Logf("proxying document=%s contentType=%s", key, rdr.ContentType())
 
 		w.Header().Set("Content-Disposition", "inline")
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", rdr.Size()))

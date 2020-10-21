@@ -77,7 +77,7 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
-		logger.Log(fmt.Sprintf("added address for customer=%s", customerID))
+		logger.Logf("added address for customer=%s", customerID)
 		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
 }
@@ -129,7 +129,7 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
-		logger.Log(fmt.Sprintf("updating address=%s for customer=%s", addressId, customerID))
+		logger.Logf("updating address=%s for customer=%s", addressId, customerID)
 
 		respondWithCustomer(logger, w, customerID, organization, requestID, repo)
 	}
@@ -151,7 +151,7 @@ func deleteCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
-		logger.Log(fmt.Sprintf("successfully deleted address=%s for customer=%s", addressId, customerID))
+		logger.Logf("successfully deleted address=%s for customer=%s", addressId, customerID)
 
 		w.WriteHeader(http.StatusNoContent)
 	}

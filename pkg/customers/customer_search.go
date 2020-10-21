@@ -41,7 +41,7 @@ func searchCustomers(logger log.Logger, repo CustomerRepository) http.HandlerFun
 			return
 		}
 
-		logger.Log(fmt.Sprintf("found %d customers in search", len(customers)))
+		logger.Logf("found %d customers in search", len(customers))
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(http.StatusOK)

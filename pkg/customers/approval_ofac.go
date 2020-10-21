@@ -152,7 +152,7 @@ func refreshOFACSearch(logger log.Logger, repo CustomerRepository, ofac *OFACSea
 			return
 		}
 
-		logger.Log(fmt.Sprintf("running live OFAC search for customer=%s", customerID))
+		logger.Logf("running live OFAC search for customer=%s", customerID)
 
 		if err := ofac.storeCustomerOFACSearch(cust, requestID); err != nil {
 			logger.LogErrorf("error refreshing ofac search: %v", err)

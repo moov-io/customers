@@ -315,7 +315,7 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 			logger.LogErrorf("error with OFAC search for customer=%s: %v", cust.CustomerID, err)
 		}
 
-		logger.Log(fmt.Sprintf("created customer=%s", cust.CustomerID))
+		logger.Logf("created customer=%s", cust.CustomerID)
 
 		cust, err = repo.GetCustomer(cust.CustomerID, organization)
 		if err != nil {
@@ -380,7 +380,7 @@ func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 			return
 		}
 
-		logger.Log(fmt.Sprintf("updated customer=%s", cust.CustomerID))
+		logger.Logf("updated customer=%s", cust.CustomerID)
 		cust, err = repo.GetCustomer(cust.CustomerID, organization)
 		if err != nil {
 			moovhttp.Problem(w, err)

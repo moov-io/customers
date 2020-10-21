@@ -140,13 +140,13 @@ func (c *moovWatchmanClient) Search(ctx context.Context, name string, requestID 
 	// Take an Alt and find the SDN for it if that was the highest match
 	if len(search.SDNs) == 0 && len(search.AltNames) > 0 {
 		alt := search.AltNames[0]
-		c.logger.Log(fmt.Sprintf("Found AltName=%s,SDN=%s with no higher matched SDNs", alt.AlternateID, alt.EntityID))
+		c.logger.Logf("Found AltName=%s,SDN=%s with no higher matched SDNs", alt.AlternateID, alt.EntityID)
 		return c.altToSDN(ctx, search.AltNames[0], requestID)
 	}
 	// AltName matched higher than SDN names, so return the SDN of the matched AltName
 	if len(search.SDNs) > 0 && len(search.AltNames) > 0 && (search.AltNames[0].Match > 0.1) && search.AltNames[0].Match > search.SDNs[0].Match {
 		alt := search.AltNames[0]
-		c.logger.Log(fmt.Sprintf("AltName=%s,SDN=%s had higher match than SDN=%s", alt.AlternateID, alt.EntityID, search.SDNs[0].EntityID))
+		c.logger.Logf("AltName=%s,SDN=%s had higher match than SDN=%s", alt.AlternateID, alt.EntityID, search.SDNs[0].EntityID)
 		return c.altToSDN(ctx, alt, requestID)
 	}
 	// Return the SDN as Alts matched lower
@@ -175,7 +175,7 @@ func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 	}
 
 	logger = logger.Set("package", "watchman")
-	logger.Log(fmt.Sprintf("using %s for Watchman address", conf.BasePath))
+	logger.Logf("using %s for Watchman address", conf.BasePath)
 
 	return &moovWatchmanClient{
 		underlying: watchman.NewAPIClient(conf),

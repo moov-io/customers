@@ -71,7 +71,7 @@ func awsBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 		logger.LogErrorf("ERROR creating %s aws bucket: %v", bucketName, err)
 		return nil, err
 	}
-	logger.Log(fmt.Sprintf("created %s aws bucket: %T", bucketName, bucket))
+	logger.Logf("created %s aws bucket: %T", bucketName, bucket)
 	return bucket, nil
 }
 
@@ -110,6 +110,6 @@ func gcpBucket(ctx context.Context, logger log.Logger, bucketName string) (*blob
 		logger.LogErrorf("ERROR creating %s gcp bucket: %v", bucketName, err)
 		return nil, err
 	}
-	logger.Log(fmt.Sprintf("created %s gcp bucket: %v", bucketName, err))
+	logger.Logf("created %s gcp bucket: %v", bucketName, err)
 	return bucket, nil
 }
