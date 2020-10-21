@@ -1,4 +1,4 @@
-create table if not exists documents(
+create table documents(
   document_id varchar(40) primary key, 
   customer_id varchar(40), 
   type varchar(120), 

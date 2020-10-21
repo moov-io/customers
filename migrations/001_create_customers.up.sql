@@ -1,4 +1,4 @@
-create table if not exists customers (
+create table customers (
   customer_id varchar(40), 
   first_name varchar(40), 
   middle_name varchar(40), 

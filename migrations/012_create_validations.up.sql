@@ -1,4 +1,4 @@
-create table if not exists validations(
+create table validations(
   validation_id varchar(40) primary key, 
   account_id varchar(40), 
   status varchar(20), 

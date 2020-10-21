@@ -1,4 +1,4 @@
-create table if not exists customers_phones (
+create table customers_phones (
   customer_id VARCHAR(40), 
   number VARCHAR(20), 
   valid BOOLEAN, 

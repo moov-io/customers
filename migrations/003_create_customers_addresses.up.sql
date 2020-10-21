@@ -1,4 +1,4 @@
-create table if not exists customers_addresses(
+create table customers_addresses(
   address_id varchar(40) primary key, 
   customer_id varchar(40), 
   type SMALLINT, 

@@ -1,4 +1,4 @@
-create table if not exists accounts(
+create table accounts(
   account_id varchar(40) primary key, 
   customer_id varchar(40), 
   user_id varchar(40), 
