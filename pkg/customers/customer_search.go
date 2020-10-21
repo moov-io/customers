@@ -10,12 +10,14 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	moovhttp "github.com/moov-io/base/http"
 
 	"github.com/moov-io/base/log"
 
 	"github.com/moov-io/customers/pkg/client"
+	"github.com/moov-io/customers/pkg/model"
 	"github.com/moov-io/customers/pkg/route"
 )
 
@@ -103,7 +105,7 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 	}
 	for rows.Next() {
 		var c client.Customer
-		var birthDate *string
+		var birthDate *time.Time
 		err := rows.Scan(
 			&c.CustomerID,
 			&c.FirstName,
@@ -120,6 +122,9 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 		)
 		if err != nil {
 			return nil, err
+		}
+		if birthDate != nil {
+			c.BirthDate = birthDate.Format(model.YYYYMMDD_Format)
 		}
 		customers = append(customers, &c)
 	}

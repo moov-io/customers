@@ -449,6 +449,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	updateReq.FirstName = "Jim"
 	updateReq.LastName = "Smith"
 	updateReq.Email = "jim@google.com"
+	updateReq.BirthDate = "2020-01-01"
 	updateReq.Phones = []phone{
 		{
 			Number: "555.555.5555",
