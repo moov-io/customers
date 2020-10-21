@@ -12,7 +12,6 @@ import (
 type account struct {
 	id                     string
 	encryptedAccountNumber string
-	hashedAccountNumber    string
 	sha256AccountNumber    string
 }
 

@@ -13,7 +13,7 @@ import (
 )
 
 func TestRehashAccountNumber(t *testing.T) {
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestMySQLDB(t)
 	defer db.Close()
 
 	logger := log.NewNopLogger()
@@ -46,13 +46,12 @@ func TestRehashAccountNumber(t *testing.T) {
 
 	// test account numbers were re-hashed
 	for _, accountID := range createdAccountIDs {
-		row := db.DB.QueryRow(`select hashed_account_number, sha256_account_number from accounts where account_id = ?;`, accountID)
+		row := db.DB.QueryRow(`select sha256_account_number from accounts where account_id = ?;`, accountID)
 		require.NoError(t, row.Err())
 
 		var acc account
-		err := row.Scan(&acc.hashedAccountNumber, &acc.sha256AccountNumber)
+		err := row.Scan(&acc.sha256AccountNumber)
 		require.NoError(t, err)
 		require.NotEmpty(t, acc.sha256AccountNumber)
-		require.Equal(t, acc.sha256AccountNumber, acc.hashedAccountNumber)
 	}
 }

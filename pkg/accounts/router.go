@@ -89,7 +89,7 @@ type CreateAccountRequest struct {
 
 	// fields we compute from the inbound AccountNumber
 	encryptedAccountNumber string
-	hashedAccountNumber    string
+	sha256AccountNumber    string
 	maskedAccountNumber    string
 }
 
@@ -123,7 +123,7 @@ func (req *CreateAccountRequest) Disfigure(keeper *secrets.StringKeeper, appSalt
 	if v, err := hash.SHA256Hash(appSalt, req.AccountNumber); err != nil {
 		return fmt.Errorf("problem hashing account number: %v", err)
 	} else {
-		req.hashedAccountNumber = v
+		req.sha256AccountNumber = v
 	}
 	req.maskedAccountNumber = mask.AccountNumber(req.AccountNumber)
 	return nil
