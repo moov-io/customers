@@ -12,7 +12,6 @@ import (
 type account struct {
 	id                     string
 	encryptedAccountNumber string
-	sha256AccountNumber    string
 }
 
 // RehashStoredAccountNumber generates SHA256 hash with salt for rows that need it

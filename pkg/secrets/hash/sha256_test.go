@@ -13,5 +13,6 @@ func TestSHA256Hash(t *testing.T) {
 	require.Len(t, h, 64)
 
 	h2, err := SHA256Hash("new salt", "1234")
+	require.NoError(t, err)
 	require.NotEqual(t, h, h2)
 }

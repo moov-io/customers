@@ -46,6 +46,7 @@ func TestRehashAccountNumber(t *testing.T) {
 	// migration it is NULL
 	query := `update accounts set sha256_account_number = NULL;`
 	_, err := db.DB.Exec(query)
+	require.NoError(t, err)
 
 	// rehash account numbers
 	updatedRecordsCount, err := RehashStoredAccountNumber(logger, db.DB, "app salt", keeper)
