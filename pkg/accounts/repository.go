@@ -153,9 +153,9 @@ func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, 
 	}
 	query := `insert into accounts (
   account_id, customer_id, user_id, holder_name,
-  encrypted_account_number, hashed_account_number, sha256_account_number, masked_account_number,
+  encrypted_account_number, sha256_account_number, masked_account_number,
   routing_number, status, type, created_at
-) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return nil, err
@@ -169,7 +169,6 @@ func (r *sqlAccountRepository) CreateCustomerAccount(customerID, userID string, 
 		userID,
 		req.HolderName,
 		req.encryptedAccountNumber,
-		req.sha256AccountNumber,
 		req.sha256AccountNumber,
 		req.maskedAccountNumber,
 		account.RoutingNumber,

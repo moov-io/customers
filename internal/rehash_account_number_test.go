@@ -60,7 +60,7 @@ func TestRehashAccountNumber(t *testing.T) {
 		var sha256AccountNumber, hashedAccountNumber string
 		err := row.Scan(&hashedAccountNumber, &sha256AccountNumber)
 		require.NoError(t, err)
-		require.Equal(t, hashedAccountNumber, sha256AccountNumber)
 		require.NotEmpty(t, sha256AccountNumber)
+		require.Empty(t, hashedAccountNumber)
 	}
 }

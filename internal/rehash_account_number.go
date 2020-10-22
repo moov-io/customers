@@ -87,7 +87,8 @@ func findAccountsInBatches(logger log.Logger, db *sql.DB, updateFunc func(acc ac
 }
 
 func updateAccountSHA256Hash(accountID string, hash string, db *sql.DB) error {
-	query := `update accounts set hashed_account_number = ?, sha256_account_number = ? where account_id = ?;`
-	_, err := db.Exec(query, hash, hash, accountID)
+	// in addition clear old hashed account number
+	query := `update accounts set hashed_account_number = "", sha256_account_number = ? where account_id = ?;`
+	_, err := db.Exec(query, hash, accountID)
 	return err
 }

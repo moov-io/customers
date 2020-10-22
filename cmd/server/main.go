@@ -171,8 +171,10 @@ func main() {
 	appSalt := os.Getenv("APP_SALT")
 
 	if os.Getenv("REHASH_ACCOUNTS") != "" {
-		if err := internal.RehashStoredAccountNumber(logger, db, appSalt, stringKeeper); err != nil {
+		if count, err := internal.RehashStoredAccountNumber(logger, db, appSalt, stringKeeper); err != nil {
 			panic(logger.LogErrorf("Failed to re-hash account numbers: %v", err))
+		} else {
+			logger.Logf("Re-hashed %d account numbers", count)
 		}
 	}
 
