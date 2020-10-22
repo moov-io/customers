@@ -1,4 +1,4 @@
-[Moov PayGate](https://github.com/moov-io/paygate) is used by Customers to initiate micro-deposits with an Originating Depository Financial Institution (ODFI). These use a source account to send two credits and a withdraw from remote accounts as a part of account validation.
+[Moov PayGate](https://github.com/moov-io/paygate) is used by Customers to initiate micro-deposits with an Originating Depository Financial Institution (ODFI). In the account validation process, PayGate uses a source account to send two credits and one debit from remote accounts.
 
 ### Configuration
 

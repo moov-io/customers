@@ -1,17 +1,21 @@
 # Customers
-**Purpose** | **[Configuration](CONFIGURATION.md)** | **[Running](RUNNING.md)** | **[Client](../pkg/client/README.md)**
+**Home** | **[Configuration](configuration.md)** | **[Running](running.md)** | **[Client](https://github.com/moov-io/customers/blob/master/pkg/client/README.md)**
 
 ---
 
 ## Purpose
-
-The Customers project focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Also, Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
-
+This project focuses on verifying the identity of people who are legally able to hold and transfer currency in the United States. It provides services related to:
+ - [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC)
+ - [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP)
+ - [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks
+ - Verification workflows to comply with US federal law and ensure authentic transfers
+  
+The goal of this project is to provide objective, detailed due diligence on individuals and companies in the financial sector -- in a modernized and extensible way.
+ 
 **Dependencies**
-
 1. [Fed](./fed.md)
 1. [PayGate](./paygate.md)
-1. [Waatchman](./waatchman.md)
+1. [Watchman](./watchman.md)
 
 <!--
 **Extending Customers**
@@ -21,68 +25,60 @@ The Customers project focuses on solving authentic identification of humans who 
 -->
 
 ## Models
-
-Moov Customers has several models which are used throughout the HTTP endpoints. These are generated from the OpenAPI specification in the `github.com/moov-io/customers/pkg/client` Go package.
+This project contains several models used in the HTTP endpoints. These are generated from the OpenAPI specification in the [/pkg/client](./pkg/client/) Go package. The primary models used in this project are:
 
 ### Customer
+`Customer` represents an individual or business (sole proprietorship or corporation).
+For creating a `Customer`, see the [API documentation](https://moov-io.github.io/customers/api/#post-/customers). 
 
-`Customer` represents an individual or business (Sole-Proprietorships or Corporation). The data required for each will change with version v0.5.0 of Customers. See the [API documentation](https://moov-io.github.io/customers/api/#post-/customers) for creating a Customer.
+#### Customer Status and Approval
+
+Approval is represented by the `status` field of a `Customer` and can have the following values: `Deceased`, `Rejected`, `ReceiveOnly`, `Verified`, `Frozen`, `Unknown` (default) 
+Approvals can only be done manually, but we are aiming for automated approval. In order for a `Customer` to be approved into:
+ - `ReceiveOnly` requires an [OFAC search](https://github.com/moov-io/watchman) that results in a value below the specified threshold.
+ - `Verified` requires a valid Social Security Number (SSN) and an OFAC check.
 
 ### Account
-
-`Account` represents a demand-deposit account at a financial institution. The account number is encrypted. See the [API documentation](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/accounts) for creating an Account.
+`Account` represents a demand-deposit account at a financial institution. The account number is encrypted.
+For creating an `Account`, see the [API documentation](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/accounts).
 
 #### Account Validation
+In order to use an account for ACH transactions, it will need to be validated. This ensures access and authorization to the financial instrument. This project supports the following strategies that can be used for account validation:
 
-In order to use an account for ACH transactions, it will need to be validated. This is to ensure access and authorization to the financial instrument. Customers supports following strategies that can be used for account validation:
-
-* micro-deposits - two deposits of less than $0.50 (and an optional withdraw) are transferred to customer's bank account and then customer providing deposits amounts as verification
-* instant - some vendors like Plaid, MX, Yodelee provide the ability to verify customer's bank account instantly using their online banking credentials
+* micro-deposits - two deposits of less than $0.50 (and an optional withdraw) transferred to the customer's bank account
+* instant - some vendors like Plaid, MX, and Yodelee provide the ability to verify a customer's bank account instantly using their online banking credentials
 
 See more information on [how account validation strategies work](./account-validation.md).
 
+### Document
+`Document` represents a customer's document uploaded to persistent storage. All documents are encrypted.
+For uploading a `Document`, see the [API documentation](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/documents).
+
+
 ## Database Migrations
 
-Migrations allow us to evolve application database schema over time.  When
-appication starts it automatically checks database migrations and run them if
-needed to keep the database schema up to date. Information about the current
-schema version (the version of latest applied migration) is stored in the
-`schema_migrations` table.
+Migrations allow the application's database schema to evolve over time.  When an application starts, it automatically checks for database migrations and runs them if needed to keep the database schema up to date. Information about the current schema version (the latest applied migration) is stored in the `schema_migrations` table.
 
 ### Creating a Migration
 
-Migrations are stored as files in the [/migrations](./migrations) directory.
-Content of each file is passed to a database driver for execution. Migration
-file should consist of valid SQL queries. 
+Migrations are stored as files in the [/migrations](./migrations) directory. Contents of each file are executed by the database driver. The migration files should consist of valid SQL queries. The file names must adhere to the format: `{version}_{title}.up.sql`
 
-Migration file name have to follow the format: `{version}_{title}.up.sql`
-
-- `verision` of the migration should be represented as integer with 3 digits (with
-leading zeros: e.g., 007). All migrations are applied upward in order of
-increasing version number. You can find examples of different migrations in
-[./migrations](./migrations).
-- `title` should describe action of the migration, e.g.,
-  `create_accounts_table`, `add_name_to_accounts`.
-
+- `verision` of the migration should be represented as an integer with 3 digits (with leading zeros: e.g., 007). The migrations are applied in ascending order based on the version numbers. You can find examples of different migrations in [./migrations](./migrations).
+- `title` should describe what the migration is doing, e.g., `create_accounts_table`, `add_name_to_accounts`.
 
 ### Embedding Migrations
 
-We use [pkger](https://github.com/markbates/pkger) to embed migration files
-into our application. Please, [install
-it](https://github.com/markbates/pkger#installation) before you proceed.
+We use [pkger](https://github.com/markbates/pkger) to embed migration files into our application. Please [install it](https://github.com/markbates/pkger#installation) before you proceed.
 
-Running `make embed-migrations` will generate `cmd/server/pkged.go` file with
-encoded content of `/migrations` directory that will be included into
-application build. Please, commit generated file to the git repository.
+Running `make embed-migrations` will generate a `cmd/server/pkged.go` file with the encoded contents from the `/migrations` directory which will be included into application build. Make sure to commit the generated file to the git repository.
 
 ## Getting Help
-
  channel | info
  ------- | -------
-[Project Documentation](https://docs.moov.io/) | Our project documentation available online.
-Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
-[GitHub Issue](https://github.com/moov-io/customers/issues) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
-[moov-io slack](https://slack.moov.io/) | Join our slack channel to have an interactive discussion about the development of the project.
+[Project Documentation](https://docs.moov.io/) | Documentation of Moov's various open source projects.
+Issues [GitHub Issue](https://github.com/moov-io/customers/issues) | If you are able to reproduce a problem, please open a GitHub Issue under the project that caused the error.
+Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov's Twitter feed to get updates on our projects. You can also tweet us to ask questions or share comments.
+Slack [#moov-io](https://slack.moov.io/) | Join the slack channel to discuss with other contributors about the development of Moov's open source projects.
 
 ---
-**[Next - Configuration](CONFIGURATION.md)**
+**[Next - Configuration](configuration.md)**
