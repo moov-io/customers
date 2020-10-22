@@ -43,8 +43,8 @@ func TestRehashAccountNumber(t *testing.T) {
 	}
 
 	// clear sha256_account_number column as at time we run re-hash
-	// migration it is blank
-	query := `update accounts set sha256_account_number = '';`
+	// migration it is NULL
+	query := `update accounts set sha256_account_number = NULL;`
 	_, err := db.DB.Exec(query)
 
 	// rehash account numbers

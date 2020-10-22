@@ -44,19 +44,22 @@ func RehashStoredAccountNumber(logger log.Logger, db *sql.DB, appSalt string, ke
 
 // findAccountsInBatches will select all accounts with empty
 // sha256_account_number in 100 records batches
-// NOTE: if we don't set sha256_account_number of account in updateFunc it will
-// loop forever
 func findAccountsInBatches(logger log.Logger, db *sql.DB, updateFunc func(acc account) error) error {
 	// query 100 rows that should be rehashed
-	query := `select account_id, encrypted_account_number from accounts where sha256_account_number is NULL limit 100;`
+	query := `select account_id, encrypted_account_number from accounts where sha256_account_number is NULL and account_id > ? order by account_id limit 100;`
 	stmt, err := db.Prepare(query)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
+	// we need to start from pagerAccount that is less then any existing
+	// account_id we may have in DB which is empty value :)
+	pagerAccount := ""
+
 	for {
-		rows, err := stmt.Query()
+		// pagerAccount will be set to the last received row account_id
+		rows, err := stmt.Query(pagerAccount)
 		if err != nil {
 			return err
 		}
@@ -69,7 +72,7 @@ func findAccountsInBatches(logger log.Logger, db *sql.DB, updateFunc func(acc ac
 				rows.Close()
 				return err
 			}
-
+			pagerAccount = acc.id
 			accounts = append(accounts, acc)
 		}
 		rows.Close()
