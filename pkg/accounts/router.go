@@ -26,7 +26,7 @@ import (
 	"github.com/moov-io/base/log"
 )
 
-func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, validations validator.Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy, ofac *AccountOfacSearcher) {
+func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, validations validator.Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy, ofac *AccountOfacSearcher, appSalt string) {
 	logger = logger.Set("package", "accounts")
 
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, accounts, fedClient))
