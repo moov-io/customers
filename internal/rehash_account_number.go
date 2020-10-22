@@ -48,7 +48,7 @@ func RehashStoredAccountNumber(logger log.Logger, db *sql.DB, appSalt string, ke
 // loop forever
 func findAccountsInBatches(logger log.Logger, db *sql.DB, updateFunc func(acc account) error) error {
 	// query 100 rows that should be rehashed
-	query := `select account_id, encrypted_account_number from accounts where sha256_account_number = '' limit 100;`
+	query := `select account_id, encrypted_account_number from accounts where sha256_account_number is NULL limit 100;`
 	stmt, err := db.Prepare(query)
 	if err != nil {
 		return err
