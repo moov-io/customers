@@ -948,6 +948,7 @@ Optional parameters are passed through a pointer to a GetReportOfCustomerAccount
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+ **xOrganization** | **optional.String**| Value used to separate and identify models | 
  **accountIDs** | **optional.String**| A list of customer account IDs with a limit of 25 IDs. | 
 
 ### Return type

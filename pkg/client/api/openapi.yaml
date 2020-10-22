@@ -1838,6 +1838,15 @@ paths:
         schema:
           type: string
         style: simple
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Organization
+        required: false
+        schema:
+          type: string
+        style: simple
       - description: A list of customer account IDs with a limit of 25 IDs.
         example: f6eddffd,f6eddffe,f6eddfff
         explode: true

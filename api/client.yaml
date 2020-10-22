@@ -1522,6 +1522,12 @@ paths:
           example: rs4f9915
           schema:
             type: string
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
         - name: accountIDs
           in: query
           description: A list of customer account IDs with a limit of 25 IDs.

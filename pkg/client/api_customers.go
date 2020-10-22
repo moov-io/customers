@@ -1934,8 +1934,9 @@ func (a *CustomersApiService) GetLatestOFACSearch(ctx _context.Context, customer
 
 // GetReportOfCustomerAccountsOpts Optional parameters for the method 'GetReportOfCustomerAccounts'
 type GetReportOfCustomerAccountsOpts struct {
-	XRequestID optional.String
-	AccountIDs optional.String
+	XRequestID    optional.String
+	XOrganization optional.String
+	AccountIDs    optional.String
 }
 
 /*
@@ -1944,6 +1945,7 @@ Retrieves a list of customer and account information.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *GetReportOfCustomerAccountsOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
+ * @param "XOrganization" (optional.String) -  Value used to separate and identify models
  * @param "AccountIDs" (optional.String) -  A list of customer account IDs with a limit of 25 IDs.
 @return []ReportAccountResponse
 */
@@ -1985,6 +1987,9 @@ func (a *CustomersApiService) GetReportOfCustomerAccounts(ctx _context.Context, 
 	}
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
+	}
+	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
+		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
