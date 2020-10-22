@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/moov-io/base/database"
 	"github.com/moov-io/base/log"
-	"github.com/moov-io/customers/internal/database"
 	"github.com/moov-io/customers/pkg/accounts"
 	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/secrets"
@@ -23,7 +23,9 @@ func TestRehashAccountNumber(t *testing.T) {
 	var createdAccountIDs []string
 	repo := accounts.NewRepo(logger, db.DB)
 
-	for i := 0; i < 5; i++ {
+	const accountsCount = 5
+
+	for i := 0; i < accountsCount; i++ {
 		req := &accounts.CreateAccountRequest{
 			HolderName:    "John Doe",
 			AccountNumber: fmt.Sprintf("12345678%d", i),
@@ -40,18 +42,25 @@ func TestRehashAccountNumber(t *testing.T) {
 		createdAccountIDs = append(createdAccountIDs, acc.AccountID)
 	}
 
+	// clear sha256_account_number column as at time we run re-hash
+	// migration it is blank
+	query := `update accounts set sha256_account_number = '';`
+	_, err := db.DB.Exec(query)
+
 	// rehash account numbers
-	err := RehashStoredAccountNumber(logger, db.DB, "app salt", keeper)
+	updatedRecordsCount, err := RehashStoredAccountNumber(logger, db.DB, "app salt", keeper)
 	require.NoError(t, err)
+	require.Equal(t, accountsCount, updatedRecordsCount)
 
 	// test account numbers were re-hashed
 	for _, accountID := range createdAccountIDs {
-		row := db.DB.QueryRow(`select sha256_account_number from accounts where account_id = ?;`, accountID)
+		row := db.DB.QueryRow(`select hashed_account_number, sha256_account_number from accounts where account_id = ?;`, accountID)
 		require.NoError(t, row.Err())
 
-		var acc account
-		err := row.Scan(&acc.sha256AccountNumber)
+		var sha256AccountNumber, hashedAccountNumber string
+		err := row.Scan(&hashedAccountNumber, &sha256AccountNumber)
 		require.NoError(t, err)
-		require.NotEmpty(t, acc.sha256AccountNumber)
+		require.Equal(t, hashedAccountNumber, sha256AccountNumber)
+		require.NotEmpty(t, sha256AccountNumber)
 	}
 }

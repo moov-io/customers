@@ -16,7 +16,8 @@ type account struct {
 }
 
 // RehashStoredAccountNumber generates SHA256 hash with salt for rows that need it
-func RehashStoredAccountNumber(logger log.Logger, db *sql.DB, appSalt string, keeper *secrets.StringKeeper) error {
+func RehashStoredAccountNumber(logger log.Logger, db *sql.DB, appSalt string, keeper *secrets.StringKeeper) (int, error) {
+	updatedRecords := 0
 
 	err := findAccountsInBatches(logger, db, func(acc account) error {
 		accountNumber, err := keeper.DecryptString(acc.encryptedAccountNumber)
@@ -32,10 +33,13 @@ func RehashStoredAccountNumber(logger log.Logger, db *sql.DB, appSalt string, ke
 		if err := updateAccountSHA256Hash(acc.id, sha256Hash, db); err != nil {
 			return err
 		}
+
+		updatedRecords++
+
 		return nil
 	})
 
-	return err
+	return updatedRecords, err
 }
 
 // findAccountsInBatches will select all accounts with empty
@@ -76,7 +80,7 @@ func findAccountsInBatches(logger log.Logger, db *sql.DB, updateFunc func(acc ac
 
 		for _, acc := range accounts {
 			if err := updateFunc(acc); err != nil {
-				logger.LogErrorF("Failed to update account (%s): %v", acc.id, err)
+				logger.LogErrorf("Failed to update account (%s): %v", acc.id, err)
 			}
 		}
 	}
