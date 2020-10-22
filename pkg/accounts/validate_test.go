@@ -77,6 +77,7 @@ func TestRouter__AccountValidation(t *testing.T) {
 		req, err := http.NewRequest("GET", "/", nil)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Organization", organization)
 		req = mux.SetURLVars(req, map[string]string{
 			"customerID":   customerID,
 			"accountID":    acc.AccountID,
@@ -100,6 +101,7 @@ func TestRouter__AccountValidation(t *testing.T) {
 
 func TestRouter__InitAccountValidation(t *testing.T) {
 	customerID, userID := base.ID(), base.ID()
+	organization := "moov"
 	accounts := setupTestAccountRepository(t)
 	validations := &validator.MockRepository{}
 
@@ -137,6 +139,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", "/", body)
+		req.Header.Set("X-Organization", organization)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
@@ -160,6 +163,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", "/", body)
+		req.Header.Set("X-Organization", organization)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
@@ -183,6 +187,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", "/", body)
+		req.Header.Set("X-Organization", organization)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
@@ -236,6 +241,7 @@ func TestRouter__InitAccountValidation(t *testing.T) {
 
 		w := httptest.NewRecorder()
 		req, err := http.NewRequest("POST", "/", body)
+		req.Header.Set("X-Organization", organization)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
 		req = mux.SetURLVars(req, map[string]string{"customerID": customerID, "accountID": acc.AccountID})
@@ -292,6 +298,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("POST", "/", body)
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Organization", organization)
 		req = mux.SetURLVars(req, map[string]string{
 			"customerID":   customerID,
 			"accountID":    acc.AccountID,
@@ -310,6 +317,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("POST", "/", bytes.NewReader([]byte("{}")))
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Organization", organization)
 		req = mux.SetURLVars(req, map[string]string{
 			"customerID":   customerID,
 			"accountID":    acc.AccountID,
@@ -340,6 +348,7 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		req, err := http.NewRequest("POST", "/", bytes.NewReader([]byte("{}")))
 		require.NoError(t, err)
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("X-Organization", organization)
 		req = mux.SetURLVars(req, map[string]string{
 			"customerID":   customerID,
 			"accountID":    acc.AccountID,
@@ -462,8 +471,11 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		paygateClient := &paygate.MockClient{
 			Micro: &payclient.MicroDeposits{
 				MicroDepositID: base.ID(),
-				Amounts:        []string{"USD 0.03", "USD 0.07"},
-				Status:         payclient.PROCESSED,
+				Amounts: []payclient.Amount{
+					{Currency: "USD", Value: 3},
+					{Currency: "USD", Value: 7},
+				},
+				Status: payclient.PROCESSED,
 			},
 		}
 
@@ -486,7 +498,10 @@ func TestRouter__CompleteAccountValidation(t *testing.T) {
 		// build request with strategy params
 		params := &client.CompleteAccountValidationRequest{
 			VendorRequest: validator.VendorRequest{
-				"micro-deposits": []string{"USD 0.03", "USD 0.07"},
+				"micro-deposits": []payclient.Amount{
+					{Currency: "USD", Value: 3},
+					{Currency: "USD", Value: 7},
+				},
 			},
 		}
 

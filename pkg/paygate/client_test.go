@@ -21,9 +21,6 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-// GetMicroDeposits(accountID, userID string) (*client.MicroDeposits, error)
-// InitiateMicroDeposits(userID string, destination client.Destination) error
-
 type deployment struct {
 	res    *dockertest.Resource
 	client Client

@@ -2029,9 +2029,7 @@ components:
         micro-deposits:
           type: array
           items:
-            type: string
-          description: Amounts used to validate the account is owned by the customer.
-          example: ["USD 0.01", "USD 0.13"]
+            $ref: 'https://raw.githubusercontent.com/moov-io/paygate/master/api/client.yaml#/components/schemas/Amount'
       required:
         - strategy
     Disclaimer:

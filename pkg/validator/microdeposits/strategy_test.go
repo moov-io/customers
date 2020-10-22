@@ -21,7 +21,7 @@ func TestInitAccountValidation(t *testing.T) {
 		paygateClient := &paygate.MockClient{}
 		strategy := NewStrategy(paygateClient)
 
-		response, err := strategy.InitAccountValidation("userID", "accountID", "customerID")
+		response, err := strategy.InitAccountValidation("moov", "accountID", "customerID")
 		require.NoError(t, err)
 		require.Equal(t, &validator.VendorResponse{"result": "initiated"}, response)
 	})
@@ -30,12 +30,15 @@ func TestInitAccountValidation(t *testing.T) {
 		paygateClient := &paygate.MockClient{
 			Micro: &payclient.MicroDeposits{
 				MicroDepositID: base.ID(),
-				Amounts:        []string{"USD 0.03", "USD 0.07"},
-				Status:         payclient.PROCESSED,
+				Amounts: []payclient.Amount{
+					{Currency: "USD", Value: 3},
+					{Currency: "USD", Value: 7},
+				},
+				Status: payclient.PROCESSED,
 			},
 		}
 		strategy := NewStrategy(paygateClient)
-		_, err := strategy.InitAccountValidation("userID", "accountID", "customerID")
+		_, err := strategy.InitAccountValidation("moov", "accountID", "customerID")
 		require.Error(t, err, "micro-deposits were already created for accountID=accountID")
 	})
 }
@@ -44,15 +47,21 @@ func TestCompleteAccountValidation(t *testing.T) {
 	paygateClient := &paygate.MockClient{
 		Micro: &payclient.MicroDeposits{
 			MicroDepositID: base.ID(),
-			Amounts:        []string{"USD 0.03", "USD 0.07"},
-			Status:         payclient.PROCESSED,
+			Amounts: []payclient.Amount{
+				{Currency: "USD", Value: 3},
+				{Currency: "USD", Value: 7},
+			},
+			Status: payclient.PROCESSED,
 		},
 	}
 	strategy := NewStrategy(paygateClient)
 
 	// test successful completion
 	request := &validator.VendorRequest{
-		"micro-deposits": []string{"USD 0.03", "USD 0.07"},
+		"micro-deposits": []payclient.Amount{
+			{Currency: "USD", Value: 3},
+			{Currency: "USD", Value: 7},
+		},
 	}
 
 	account := &client.Account{
@@ -64,7 +73,7 @@ func TestCompleteAccountValidation(t *testing.T) {
 	t.Run("Test when micro-deposits were processed", func(t *testing.T) {
 		paygateClient.Micro.Status = payclient.PROCESSED
 
-		response, err := strategy.CompleteAccountValidation("userID", "customerID", account, accountNumber, request)
+		response, err := strategy.CompleteAccountValidation("moov", "customerID", account, accountNumber, request)
 		require.NoError(t, err)
 		require.Equal(t, &validator.VendorResponse{"result": "validated"}, response)
 	})
@@ -72,7 +81,7 @@ func TestCompleteAccountValidation(t *testing.T) {
 	t.Run("Test when micro-deposits status in not processed", func(t *testing.T) {
 		paygateClient.Micro.Status = payclient.PENDING
 
-		_, err := strategy.CompleteAccountValidation("userID", "customerID", account, accountNumber, request)
+		_, err := strategy.CompleteAccountValidation("moov", "customerID", account, accountNumber, request)
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "is in status: pending but expected to be in processed")
 	})

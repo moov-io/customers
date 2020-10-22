@@ -9,9 +9,10 @@
 
 package client
 
-// UpdateValidation struct for UpdateValidation
-type UpdateValidation struct {
-	// Validation strategy to use for the account.  micro-deposits:   Initiate two small credits to the account along with a later balancing debit. Only provide amounts to attempt validation.
-	Strategy      string   `json:"strategy"`
-	MicroDeposits []Amount `json:"micro-deposits,omitempty"`
+// Amount struct for Amount
+type Amount struct {
+	// A 3-letter ISO 4217 currency code
+	Currency string `json:"currency"`
+	// Quantity in the smallest unit of the specified currency. In USD this is cents, so $12.04 is 1204 and $0.99 would be 99.
+	Value int32 `json:"value"`
 }

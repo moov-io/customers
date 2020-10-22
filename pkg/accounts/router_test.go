@@ -413,6 +413,7 @@ func httpInitAccountValidation(t *testing.T, handler *mux.Router, customerID, ac
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/accounts/%s/validations", customerID, accountID), body)
+	req.Header.Set("X-Organization", "moov")
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
@@ -502,6 +503,7 @@ func httpDecryptAccountNumber(t *testing.T, handler *mux.Router, customerID, acc
 func httpReadAccountOfacSearch(t *testing.T, handler *mux.Router, customerID, accountID string) *client.OfacSearch {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/accounts/%s/ofac", customerID, accountID), nil)
+	req.Header.Set("X-Organization", "moov")
 	handler.ServeHTTP(w, req)
 	w.Flush()
 
@@ -519,6 +521,7 @@ func httpReadAccountOfacSearch(t *testing.T, handler *mux.Router, customerID, ac
 func httpRefreshAccountOfac(t *testing.T, handler *mux.Router, customerID, accountID string) *client.OfacSearch {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/accounts/%s/refresh/ofac", customerID, accountID), nil)
+	req.Header.Set("X-Organization", "moov")
 	handler.ServeHTTP(w, req)
 	w.Flush()
 

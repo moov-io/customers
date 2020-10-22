@@ -7,7 +7,6 @@ package microdeposits
 import (
 	"errors"
 	"fmt"
-	"sort"
 	"strings"
 
 	"github.com/mitchellh/mapstructure"
@@ -27,8 +26,8 @@ func NewStrategy(paygateClient paygate.Client) validator.Strategy {
 	}
 }
 
-func (t *microdepositsStrategy) InitAccountValidation(userID, accountID, customerID string) (*validator.VendorResponse, error) {
-	micro, err := t.client.GetMicroDeposits(accountID, userID)
+func (t *microdepositsStrategy) InitAccountValidation(organization, accountID, customerID string) (*validator.VendorResponse, error) {
+	micro, err := t.client.GetMicroDeposits(accountID, organization)
 	if err != nil {
 		return nil, fmt.Errorf("problem reading micro-deposits for accountID=%s: %v", accountID, err)
 	}
@@ -37,12 +36,12 @@ func (t *microdepositsStrategy) InitAccountValidation(userID, accountID, custome
 		return nil, fmt.Errorf("micro-deposits were already created for accountID=%s", accountID)
 	}
 
-	err = t.client.InitiateMicroDeposits(userID, client.Destination{
+	err = t.client.InitiateMicroDeposits(organization, client.Destination{
 		CustomerID: customerID,
 		AccountID:  accountID,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("problem initiating micro-deposits for accountID=%s: %v", accountID, err)
+		return nil, fmt.Errorf("validator: problem initiating micro-deposits for accountID=%s: %v", accountID, err)
 	}
 
 	return &validator.VendorResponse{
@@ -51,11 +50,11 @@ func (t *microdepositsStrategy) InitAccountValidation(userID, accountID, custome
 }
 
 type completeAccountValidationRequest struct {
-	MicroDeposits []string `json:"micro-deposits,omitempty" mapstructure:"micro-deposits"`
+	MicroDeposits []client.Amount `json:"micro-deposits" mapstructure:"micro-deposits"`
 }
 
-func (t *microdepositsStrategy) CompleteAccountValidation(userID, customerID string, account *customersclient.Account, accountID string, request *validator.VendorRequest) (*validator.VendorResponse, error) {
-	micro, err := t.client.GetMicroDeposits(accountID, userID)
+func (t *microdepositsStrategy) CompleteAccountValidation(organization, customerID string, account *customersclient.Account, accountID string, request *validator.VendorRequest) (*validator.VendorResponse, error) {
+	micro, err := t.client.GetMicroDeposits(accountID, organization)
 	if err != nil {
 		return nil, fmt.Errorf("problem reading micro-deposits for accountID=%s: %v", accountID, err)
 	}
@@ -86,20 +85,17 @@ func (t *microdepositsStrategy) CompleteAccountValidation(userID, customerID str
 	return nil, fmt.Errorf("microDepositID=%s is in status: %s but expected to be in %s", micro.MicroDepositID, micro.Status, client.PROCESSED)
 }
 
-func validateAmounts(micro *client.MicroDeposits, requestAmounts []string) error {
+func validateAmounts(micro *client.MicroDeposits, requestAmounts []client.Amount) error {
 	if len(requestAmounts) == 0 {
 		return errors.New("missing micro-deposits for validation")
 	}
-	sort.Strings(requestAmounts)
 
 	requiredAmounts := micro.Amounts
-	sort.Strings(requiredAmounts)
-
 	if len(requestAmounts) != len(requiredAmounts) {
 		return fmt.Errorf("invalid number of micro-deposits, got %d", len(requestAmounts))
 	}
 	for i := range requestAmounts {
-		if requestAmounts[i] != requiredAmounts[i] {
+		if (requestAmounts[i].Currency != requiredAmounts[i].Currency) || (requestAmounts[i].Value != requiredAmounts[i].Value) {
 			return errors.New("incorrect micro-deposit")
 		}
 	}
