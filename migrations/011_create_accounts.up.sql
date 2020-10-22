@@ -4,6 +4,7 @@ create table accounts(
   user_id varchar(40), 
   encrypted_account_number varchar(100), 
   hashed_account_number varchar(64), 
+  sha256_account_number varchar(64), 
   masked_account_number varchar(15), 
   routing_number varchar(10), 
   holder_name varchar(60) default '',
