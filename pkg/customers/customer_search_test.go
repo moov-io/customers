@@ -93,7 +93,7 @@ func TestRepository__searchCustomers(t *testing.T) {
 			Phones: []phone{
 				{
 					Number: "555-555-5555",
-					Type:   "primary",
+					Type:   "mobile",
 				},
 			},
 			Addresses: []address{

@@ -225,15 +225,18 @@ func (r *sqlCustomerRepository) getPhones(customerIDs []string) (map[string][]cl
 	for rows.Next() {
 		var p client.Phone
 		var customerID string
+		var phoneType PhoneType
+
 		err := rows.Scan(
 			&customerID,
 			&p.Number,
 			&p.Valid,
-			&p.Type,
+			&phoneType,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("scanning row: %v", err)
 		}
+		p.Type = phoneType.Common()
 		ret[customerID] = append(ret[customerID], p)
 	}
 

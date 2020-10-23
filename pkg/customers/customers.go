@@ -134,6 +134,11 @@ type phone struct {
 	Type   string `json:"type"`
 }
 
+func (p phone) validate() error {
+	_, err := phoneTypeToModel(p.Type)
+	return err
+}
+
 type address struct {
 	Type       string `json:"type"`
 	Address1   string `json:"address1"`
@@ -145,8 +150,7 @@ type address struct {
 }
 
 func (add address) validate() error {
-	addrType := strings.ToLower(add.Type)
-	_, err := addressTypeToModel(addrType)
+	_, err := addressTypeToModel(add.Type)
 	if err != nil {
 		return err
 	}
@@ -594,7 +598,12 @@ func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID 
 	defer stmt.Close()
 
 	for _, phone := range phones {
-		_, err := stmt.Exec(customerID, phone.Number, phone.Valid, phone.Type)
+		phoneType, err := phoneTypeToModel(phone.Type)
+		if err != nil {
+			return err
+		}
+
+		_, err = stmt.Exec(customerID, phone.Number, phone.Valid, phoneType)
 		if err != nil {
 			return fmt.Errorf("executing update on customer's phone: %v", err)
 		}
