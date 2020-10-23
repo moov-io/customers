@@ -5,5 +5,5 @@ create table account_ofac_searches(
   sdn_name varchar(40), 
   sdn_type integer, 
   percentage_match double precision (5, 2), 
-  created_at datetime
+  created_at datetime(6)
 );

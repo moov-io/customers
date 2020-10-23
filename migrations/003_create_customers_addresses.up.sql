@@ -9,6 +9,6 @@ create table customers_addresses(
   postal_code varchar(9), 
   country varchar(3), 
   validated BOOLEAN, 
-  deleted_at datetime,
+  deleted_at datetime(6),
   constraint customer_address unique (customer_id, address1)
 );

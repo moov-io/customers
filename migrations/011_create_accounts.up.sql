@@ -10,8 +10,8 @@ create table accounts(
   holder_name varchar(60) default '',
   status varchar(12), 
   type varchar(12), 
-  created_at datetime, 
-  deleted_at datetime,
+  created_at datetime(6), 
+  deleted_at datetime(6),
   constraint accounts_unique_to_customer unique (customer_id, sha256_account_number, routing_number)
 );
 
