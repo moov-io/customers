@@ -10,7 +10,7 @@ This project focuses on verifying the identity of people who are legally able to
  - [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks
  - Verification workflows to comply with US federal law and ensure authentic transfers
   
-The goal of this project is to provide objective, detailed due diligence on individuals and companies in the financial sector -- in a modernized and extensible way.
+The goal of this project is to provide objective, detailed due diligence on individuals and companies in the financial sector  — in a modernized and extensible way.
  
 **Dependencies**
 1. [Fed](./fed.md)
@@ -36,7 +36,9 @@ For creating a `Customer`, see the [API documentation](https://moov-io.github.io
 Approval is represented by the `status` field of a `Customer` and can have the following values: `Deceased`, `Rejected`, `ReceiveOnly`, `Verified`, `Frozen`, `Unknown` (default) 
 Approvals can only be done manually, but we are aiming for automated approval. In order for a `Customer` to be approved into:
  - `ReceiveOnly` requires an [OFAC search](https://github.com/moov-io/watchman) that results in a value below the specified threshold.
+    - This status is used to receive funds.
  - `Verified` requires a valid Social Security Number (SSN) and an OFAC check.
+    - This status is used to receive or send funds.
 
 ### Account
 `Account` represents a demand-deposit account at a financial institution. The account number is encrypted.
@@ -45,8 +47,8 @@ For creating an `Account`, see the [API documentation](https://moov-io.github.io
 #### Account Validation
 In order to use an account for ACH transactions, it will need to be validated. This ensures access and authorization to the financial instrument. This project supports the following strategies that can be used for account validation:
 
-* micro-deposits - two deposits of less than $0.50 (and an optional withdraw) transferred to the customer's bank account
-* instant - some vendors like Plaid, MX, and Yodelee provide the ability to verify a customer's bank account instantly using their online banking credentials
+* `micro-deposits` - Two deposits of less than $0.25 (and an optional withdraw) transferred to the customer's bank account
+* `instant` - Vendors like Plaid and MX provide the ability to verify a customer's bank account instantly using their online banking credentials
 
 See more information on [how account validation strategies work](./account-validation.md).
 
@@ -75,8 +77,8 @@ Running `make embed-migrations` will generate a `cmd/server/pkged.go` file with 
 ## Getting Help
  channel | info
  ------- | -------
-[Project Documentation](https://docs.moov.io/) | Documentation of Moov's various open source projects.
-Issues [GitHub Issue](https://github.com/moov-io/customers/issues) | If you are able to reproduce a problem, please open a GitHub Issue under the project that caused the error.
+Documentation [Moov Projects](https://docs.moov.io/) | Documentation of Moov's various open source projects.
+Issues [GitHub Issues](https://github.com/moov-io/customers/issues) | If you are able to reproduce a problem, please open a GitHub Issue under the related project.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov's Twitter feed to get updates on our projects. You can also tweet us to ask questions or share comments.
 Slack [#moov-io](https://slack.moov.io/) | Join the slack channel to discuss with other contributors about the development of Moov's open source projects.
 

@@ -24,7 +24,6 @@ Here is an example of an API call to initiate account validation:
 ```shell
 curl -X POST "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
  -H "Accept: application/json, application/json" \
- -H "X-Request-ID: rs4f9915" \
  -H "X-Organization: org342" \
  -H "Content-Type: application/json" \
  -d '{
@@ -39,7 +38,6 @@ To complete account validation, values of created micro-deposits should be provi
 ```shell
 curl -X PUT "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
  -H "Accept: application/json, application/json" \
- -H "X-Request-ID: rs4f9915" \
  -H "X-Organization: org342" \
  -H "Content-Type: application/json" \
  -d '{
@@ -77,7 +75,6 @@ Here is an example of the API call to initiate account validation:
 ```shell
 curl -X POST "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
  -H "Accept: application/json, application/json" \
- -H "X-Request-ID: rs4f9915" \
  -H "X-Organization: org342" \
  -H "Content-Type: application/json" \
  -d '{
@@ -146,7 +143,6 @@ When you get `public_token` to your app server from Plaid Link, you can complete
 ```bash
 curl -X PUT "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
  -H "Accept: application/json, application/json" \
- -H "X-Request-ID: rs4f9915" \
  -H "X-Organization: org342" \
  -H "Content-Type: application/json" \
  -d '{
@@ -190,7 +186,6 @@ Here is an example of the API call to initiate account validation:
 ```bash
 curl -X POST "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
  -H "Accept: application/json, application/json" \
- -H "X-Request-ID: rs4f9915" \
  -H "X-Organization: org342" \
  -H "Content-Type: application/json" \
  -d '{
@@ -265,7 +260,6 @@ When you get `user_guid` and `member_guid` to your app server from MX Connect, y
 ```bash
 curl -X PUT "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
  -H "Accept: application/json, application/json" \
- -H "X-Request-ID: rs4f9915" \
  -H "X-Organization: org342" \
  -H "Content-Type: application/json" \
  -d '{
