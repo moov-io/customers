@@ -145,10 +145,10 @@ type address struct {
 }
 
 func (add address) validate() error {
-	switch t := strings.ToLower(add.Type); t {
-	case "primary", "secondary":
-	default:
-		return fmt.Errorf("unknown type: %s", t)
+	addrType := strings.ToLower(add.Type)
+	_, err := addressTypeToModel(addrType)
+	if err != nil {
+		return err
 	}
 
 	if !usstates.Valid(add.State) {
@@ -209,7 +209,7 @@ func validateAddresses(addrs []address) error {
 			return fmt.Errorf("validating address: %v", err)
 		}
 
-		if addr.Type == "primary" {
+		if addr.Type == AddressType_Primary.Common() {
 			hasPrimaryAddr = true
 		}
 	}
@@ -246,6 +246,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			Type:   req.Phones[i].Type,
 		})
 	}
+
 	for i := range req.Addresses {
 		customer.Addresses = append(customer.Addresses, client.CustomerAddress{
 			AddressID:  base.ID(),
@@ -255,6 +256,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			State:      req.Addresses[i].State,
 			PostalCode: req.Addresses[i].PostalCode,
 			Country:    req.Addresses[i].Country,
+			Type:       req.Addresses[i].Type,
 		})
 	}
 	if req.SSN != "" {
@@ -633,7 +635,12 @@ func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customer
 	defer stmt.Close()
 
 	for _, addr := range addresses {
-		_, err := stmt.Exec(addr.AddressID, customerID, addr.Type, addr.Address1, addr.Address2, addr.City, addr.State, addr.PostalCode, addr.Country, addr.Validated)
+		addrType, err := addressTypeToModel(addr.Type)
+		if err != nil {
+			return err
+		}
+
+		_, err = stmt.Exec(addr.AddressID, customerID, addrType, addr.Address1, addr.Address2, addr.City, addr.State, addr.PostalCode, addr.Country, addr.Validated)
 		if err != nil {
 			return fmt.Errorf("executing query: %v", err)
 		}
@@ -733,7 +740,12 @@ func (r *sqlCustomerRepository) addCustomerAddress(customerID string, req addres
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(base.ID(), customerID, req.Type, req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false); err != nil {
+	addrType, err := addressTypeToModel(req.Type)
+	if err != nil {
+		return err
+	}
+
+	if _, err := stmt.Exec(base.ID(), customerID, addrType, req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false); err != nil {
 		return fmt.Errorf("createCustomerAddress: exec: %v", err)
 	}
 	return nil
@@ -748,8 +760,13 @@ func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID stri
 	}
 	defer stmt.Close()
 
+	addrType, err := addressTypeToModel(req.Type)
+	if err != nil {
+		return err
+	}
+
 	_, err = stmt.Exec(
-		req.Type,
+		addrType,
 		req.Address1,
 		req.Address2,
 		req.City,

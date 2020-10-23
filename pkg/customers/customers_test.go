@@ -430,7 +430,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 				State:      "CA",
 				PostalCode: "90210",
 				Country:    "US",
-				Type:       "primary",
+				Type:       "secondary",
 			},
 		},
 	}

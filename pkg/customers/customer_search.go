@@ -255,10 +255,12 @@ func (r *sqlCustomerRepository) getAddresses(customerIDs []string) (map[string][
 	for rows.Next() {
 		var a client.CustomerAddress
 		var customerID string
+		var addrType AddressType
+
 		if err := rows.Scan(
 			&customerID,
 			&a.AddressID,
-			&a.Type,
+			&addrType,
 			&a.Address1,
 			&a.Address2,
 			&a.City,
@@ -269,6 +271,7 @@ func (r *sqlCustomerRepository) getAddresses(customerIDs []string) (map[string][
 		); err != nil {
 			return nil, fmt.Errorf("scanning row: %v", err)
 		}
+		a.Type = addrType.Common()
 		ret[customerID] = append(ret[customerID], a)
 	}
 

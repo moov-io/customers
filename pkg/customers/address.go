@@ -14,6 +14,40 @@ import (
 	"github.com/moov-io/customers/pkg/route"
 )
 
+type AddressType int
+
+const (
+	AddressType_Primary   AddressType = 1
+	AddressType_Secondary AddressType = 2
+)
+
+func (a AddressType) Common() string {
+	switch a {
+	case AddressType_Primary:
+		return "primary"
+	case AddressType_Secondary:
+		return "secondary"
+	}
+	return ""
+}
+
+func (a AddressType) String() string {
+	return fmt.Sprintf("'%s'", a.Common())
+}
+
+func addressTypeToModel(v string) (AddressType, error) {
+	m := map[string]AddressType{
+		"primary":   AddressType_Primary,
+		"secondary": AddressType_Secondary,
+	}
+
+	addrType, ok := m[v]
+	if !ok {
+		return 0, fmt.Errorf("unknown addresss type: %s", v)
+	}
+	return addrType, nil
+}
+
 var (
 	ErrAddressTypeDuplicate = errors.New("customer already has an address with type 'primary'")
 )
@@ -108,7 +142,7 @@ func updateCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 			return
 		}
 
-		if req.Type == "primary" {
+		if req.Type == AddressType_Primary.Common() {
 			cust, err := repo.GetCustomer(customerID, organization)
 			if err != nil {
 				moovhttp.Problem(w, err)
