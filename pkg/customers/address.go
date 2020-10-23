@@ -11,6 +11,7 @@ import (
 	moovhttp "github.com/moov-io/base/http"
 	"github.com/moov-io/base/log"
 
+	"github.com/moov-io/customers/pkg/client"
 	"github.com/moov-io/customers/pkg/route"
 )
 
@@ -58,7 +59,7 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		var addrs []address
 		for _, addr := range cust.Addresses {
 			addrs = append(addrs, address{
-				Type:       strings.ToLower(addr.Type),
+				Type:       addr.Type,
 				Address1:   addr.Address1,
 				Address2:   addr.Address2,
 				City:       addr.City,
@@ -172,11 +173,11 @@ type updateCustomerAddressRequest struct {
 	Validated bool `json:"validated"`
 }
 
-func addressTypeToModel(v string) (AddressType, error) {
-	v = strings.ToLower(v)
-	m := map[string]AddressType{
-		"primary":   AddressType_Primary,
-		"secondary": AddressType_Secondary,
+func addressTypeToModel(v client.AddressType) (AddressType, error) {
+	v = client.AddressType(strings.ToLower(string(v)))
+	m := map[client.AddressType]AddressType{
+		client.ADDRESSTYPE_PRIMARY:   AddressType_Primary,
+		client.ADDRESSTYPE_SECONDARY: AddressType_Secondary,
 	}
 
 	addrType, ok := m[v]
@@ -193,12 +194,12 @@ const (
 	AddressType_Secondary AddressType = 2
 )
 
-func (a AddressType) Common() string {
+func (a AddressType) Common() client.AddressType {
 	switch a {
 	case AddressType_Primary:
-		return "primary"
+		return client.ADDRESSTYPE_PRIMARY
 	case AddressType_Secondary:
-		return "secondary"
+		return client.ADDRESSTYPE_SECONDARY
 	}
 	return ""
 }

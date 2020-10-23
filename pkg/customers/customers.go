@@ -130,8 +130,8 @@ type customerRequest struct {
 }
 
 type phone struct {
-	Number string `json:"number"`
-	Type   string `json:"type"`
+	Number string           `json:"number"`
+	Type   client.PhoneType `json:"type"`
 }
 
 func (p phone) validate() error {
@@ -140,13 +140,13 @@ func (p phone) validate() error {
 }
 
 type address struct {
-	Type       string `json:"type"`
-	Address1   string `json:"address1"`
-	Address2   string `json:"address2,omitempty"`
-	City       string `json:"city"`
-	State      string `json:"state"`
-	PostalCode string `json:"postalCode"` // TODO(adam): validate against US postal codes
-	Country    string `json:"country"`
+	Type       client.AddressType `json:"type"`
+	Address1   string             `json:"address1"`
+	Address2   string             `json:"address2,omitempty"`
+	City       string             `json:"city"`
+	State      string             `json:"state"`
+	PostalCode string             `json:"postalCode"` // TODO(adam): validate against US postal codes
+	Country    string             `json:"country"`
 }
 
 func (add address) validate() error {
@@ -173,6 +173,9 @@ func (req customerRequest) validate() error {
 	}
 	if err := validateAddresses(req.Addresses); err != nil {
 		return fmt.Errorf("invalid customer addresses: %v", err)
+	}
+	if err := validatePhones(req.Phones); err != nil {
+		return fmt.Errorf("invalid customer phones: %v", err)
 	}
 
 	return nil
@@ -215,6 +218,16 @@ func validateAddresses(addrs []address) error {
 
 		if addr.Type == AddressType_Primary.Common() {
 			hasPrimaryAddr = true
+		}
+	}
+
+	return nil
+}
+
+func validatePhones(phones []phone) error {
+	for _, p := range phones {
+		if err := p.validate(); err != nil {
+			return fmt.Errorf("validating phone: %v", err)
 		}
 	}
 

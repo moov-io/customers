@@ -296,7 +296,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 
 	req.Phones = append(req.Phones, phone{
 		Number: "123.456.7890",
-		Type:   "Checking",
+		Type:   "mobile",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)

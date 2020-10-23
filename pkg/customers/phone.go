@@ -3,14 +3,16 @@ package customers
 import (
 	"fmt"
 	"strings"
+
+	"github.com/moov-io/customers/pkg/client"
 )
 
-func phoneTypeToModel(v string) (PhoneType, error) {
-	v = strings.ToLower(v)
-	m := map[string]PhoneType{
-		"home":   PhoneType_Home,
-		"mobile": PhoneType_Mobile,
-		"work":   PhoneType_Work,
+func phoneTypeToModel(v client.PhoneType) (PhoneType, error) {
+	v = client.PhoneType(strings.ToLower(string(v)))
+	m := map[client.PhoneType]PhoneType{
+		client.PHONETYPE_HOME:   PhoneType_Home,
+		client.PHONETYPE_MOBILE: PhoneType_Mobile,
+		client.PHONETYPE_WORK:   PhoneType_Work,
 	}
 
 	phoneType, ok := m[v]
@@ -28,14 +30,14 @@ const (
 	PhoneType_Work   PhoneType = 3
 )
 
-func (a PhoneType) Common() string {
+func (a PhoneType) Common() client.PhoneType {
 	switch a {
 	case PhoneType_Home:
-		return "home"
+		return client.PHONETYPE_HOME
 	case PhoneType_Mobile:
-		return "mobile"
+		return client.PHONETYPE_MOBILE
 	case PhoneType_Work:
-		return "work"
+		return client.PHONETYPE_WORK
 	}
 	return ""
 }

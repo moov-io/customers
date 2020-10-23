@@ -1781,11 +1781,7 @@ components:
           description: phone number
           example: "+1.818.555.1212"
         type:
-          type: string
-          enum:
-            - Home
-            - Mobile
-            - Work
+          $ref: '#/components/schemas/PhoneType'
       required:
         - number
         - type
@@ -1799,15 +1795,18 @@ components:
           type: boolean
           description: phone number has been validated to connect with customer
         type:
-          type: string
-          enum:
-            - Home
-            - Mobile
-            - Work
+          $ref: '#/components/schemas/PhoneType'
       required:
         - number
         - valid
         - type
+    PhoneType:
+      type: string
+      description: phone type
+      enum:
+        - home
+        - mobile
+        - work
     CreateCustomerAddress:
       type: object
       properties:
@@ -1852,10 +1851,7 @@ components:
           description: Unique identifier for this Address
           example: 851233a1
         type:
-          type: string
-          enum: # TODO(adam): What about adding Previous?
-            - Primary
-            - Secondary
+          $ref: "#/components/Schemas/AddressType"
         address1:
           type: string
           description: First line of the address
@@ -1886,6 +1882,12 @@ components:
         - state
         - postalCode
         - country
+    AddressType:
+      type: string
+      description: address type
+      enum:
+        - primary
+        - secondary
     AccountStatus:
       type: string
       description: Enumeration if this account has been validated through micro-deposits or another available strategy.

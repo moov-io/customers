@@ -12,8 +12,8 @@ package client
 // CustomerAddress struct for CustomerAddress
 type CustomerAddress struct {
 	// Unique identifier for this Address
-	AddressID string `json:"addressID"`
-	Type      string `json:"type"`
+	AddressID string      `json:"addressID"`
+	Type      AddressType `json:"type"`
 	// First line of the address
 	Address1 string `json:"address1"`
 	// Second line of the address
