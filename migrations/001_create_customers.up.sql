@@ -10,8 +10,8 @@ create table customers (
   email varchar(120), 
   type varchar(25),
   organization varchar(40) not null,
-  created_at datetime(6), 
-  last_modified datetime(6), 
-  deleted_at datetime(6), 
+  created_at datetime(3), 
+  last_modified datetime(3), 
+  deleted_at datetime(3), 
   primary key (customer_id)
 );

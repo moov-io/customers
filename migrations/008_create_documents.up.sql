@@ -3,6 +3,6 @@ create table documents(
   customer_id varchar(40), 
   type varchar(120), 
   content_type varchar(40), 
-  uploaded_at datetime(6),
-  deleted_at datetime(6)
+  uploaded_at datetime(3),
+  deleted_at datetime(3)
 );

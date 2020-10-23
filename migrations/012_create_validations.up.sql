@@ -4,6 +4,6 @@ create table validations(
   status varchar(20), 
   strategy varchar(20), 
   vendor varchar(20), 
-  created_at datetime(6), 
-  updated_at datetime(6)
+  created_at datetime(3), 
+  updated_at datetime(3)
 );
