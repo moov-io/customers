@@ -12,11 +12,11 @@ package client
 // CustomerRepresentative struct for CustomerRepresentative
 type CustomerRepresentative struct {
 	// Unique identifier for this Representative
-	RepresentativeID string `json:"representativeID,omitempty"`
+	RepresentativeID string `json:"representativeID"`
 	// Given Name or First Name
-	FirstName string `json:"firstName,omitempty"`
+	FirstName string `json:"firstName"`
 	// Surname or Last Name
-	LastName string `json:"lastName,omitempty"`
+	LastName string `json:"lastName"`
 	// Job title of this representative
 	JobTitle string `json:"jobTitle,omitempty"`
 	// Legal date of birth

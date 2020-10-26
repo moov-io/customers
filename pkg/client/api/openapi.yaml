@@ -2763,6 +2763,9 @@ components:
             $ref: '#/components/schemas/CreateAddress'
           minimum: 1
           type: array
+      required:
+      - firstName
+      - lastName
     CustomerRepresentative:
       example:
         firstName: Mary
@@ -2825,6 +2828,10 @@ components:
             $ref: '#/components/schemas/CreateAddress'
           minimum: 1
           type: array
+      required:
+      - firstName
+      - lastName
+      - representativeID
     AccountStatus:
       description: Enumeration if this account has been validated through micro-deposits
         or another available strategy.
