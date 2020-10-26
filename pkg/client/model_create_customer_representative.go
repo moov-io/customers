@@ -9,10 +9,18 @@
 
 package client
 
-// CreatePhone struct for CreatePhone
-type CreatePhone struct {
-	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType"`
-	Type      string    `json:"type"`
+// CreateCustomerRepresentative struct for CreateCustomerRepresentative
+type CreateCustomerRepresentative struct {
+	// Given Name or First Name
+	FirstName string `json:"firstName"`
+	// Surname or Last Name
+	LastName string `json:"lastName"`
+	// Job title of this representative
+	JobTitle string `json:"jobTitle,omitempty"`
+	// Legal date of birth
+	BirthDate string `json:"birthDate,omitempty"`
+	// Customer Representative's Social Security Number (SSN)
+	SSN       string          `json:"SSN,omitempty"`
+	Phones    []CreatePhone   `json:"phones,omitempty"`
+	Addresses []CreateAddress `json:"addresses,omitempty"`
 }

@@ -9,10 +9,20 @@
 
 package client
 
-// CreatePhone struct for CreatePhone
-type CreatePhone struct {
-	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType"`
+// UpdateAddress struct for UpdateAddress
+type UpdateAddress struct {
+	// Attribute of address
 	Type      string    `json:"type"`
+	OwnerType OwnerType `json:"ownerType"`
+	// If this address has been confirmed with the Customer
+	Validated bool `json:"validated,omitempty"`
+	// First line of the address
+	Address1 string `json:"address1"`
+	// Second line of the address
+	Address2 string `json:"address2,omitempty"`
+	City     string `json:"city"`
+	// two charcer code of US state
+	State      string `json:"state"`
+	PostalCode string `json:"postalCode"`
+	Country    string `json:"country"`
 }

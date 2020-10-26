@@ -2485,6 +2485,13 @@ components:
       - individual
       - business
       type: string
+    OwnerType:
+      description: The type of individual owner of a resource, such as SSN, phone,
+        or address
+      enum:
+      - customer
+      - representative
+      type: string
     CustomerStatus:
       description: State of the customer
       enum:
@@ -2539,6 +2546,8 @@ components:
           - primary
           - secondary
           type: string
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         validated:
           default: false
           description: If this address has been confirmed with the Customer
@@ -2566,6 +2575,7 @@ components:
       - address1
       - city
       - country
+      - ownerType
       - postalCode
       - state
       - type
@@ -2578,6 +2588,8 @@ components:
           description: phone number
           example: +1.818.555.1212
           type: string
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         type:
           enum:
           - Home
@@ -2586,6 +2598,7 @@ components:
           type: string
       required:
       - number
+      - ownerType
       - type
     Phone:
       example:
@@ -2597,6 +2610,8 @@ components:
           description: phone number
           example: +1.818.555.1212
           type: string
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         valid:
           description: phone number has been validated to connect with customer
           type: boolean
@@ -2608,6 +2623,7 @@ components:
           type: string
       required:
       - number
+      - ownerType
       - type
       - valid
     CreateAddress:
@@ -2625,6 +2641,8 @@ components:
           - Primary
           - Secondary
           type: string
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         address1:
           description: First line of the address
           type: string
@@ -2650,6 +2668,7 @@ components:
       - address1
       - city
       - country
+      - ownerType
       - postalCode
       - state
       - type
@@ -2675,6 +2694,8 @@ components:
           - Primary
           - Secondary
           type: string
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         address1:
           description: First line of the address
           type: string
@@ -2702,6 +2723,7 @@ components:
       - addressID
       - city
       - country
+      - ownerType
       - postalCode
       - state
       - type

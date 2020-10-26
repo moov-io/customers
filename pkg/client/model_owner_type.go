@@ -9,10 +9,11 @@
 
 package client
 
-// CreatePhone struct for CreatePhone
-type CreatePhone struct {
-	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType"`
-	Type      string    `json:"type"`
-}
+// OwnerType The type of individual owner of a resource, such as SSN, phone, or address
+type OwnerType string
+
+// List of OwnerType
+const (
+	OWNERTYPE_CUSTOMER       OwnerType = "customer"
+	OWNERTYPE_REPRESENTATIVE OwnerType = "representative"
+)

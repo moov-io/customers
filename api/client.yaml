@@ -2017,6 +2017,12 @@ components:
       enum:
         - individual
         - business
+    OwnerType:
+      type: string
+      description: The type of individual owner of a resource, such as SSN, phone, or address
+      enum:
+        - customer
+        - representative
     CustomerStatus:
       type: string
       description: State of the customer
@@ -2056,6 +2062,8 @@ components:
           enum:
             - primary
             - secondary
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         validated:
           type: boolean
           default: false
@@ -2081,6 +2089,7 @@ components:
             - US
       required:
         - type
+        - ownerType
         - address1
         - city
         - state
@@ -2092,6 +2101,8 @@ components:
           type: string
           description: phone number
           example: "+1.818.555.1212"
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         type:
           type: string
           enum:
@@ -2100,6 +2111,7 @@ components:
             - Work
       required:
         - number
+        - ownerType
         - type
     Phone:
       properties:
@@ -2107,6 +2119,8 @@ components:
           type: string
           description: phone number
           example: "+1.818.555.1212"
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         valid:
           type: boolean
           description: phone number has been validated to connect with customer
@@ -2118,6 +2132,7 @@ components:
             - Work
       required:
         - number
+        - ownerType
         - valid
         - type
     CreateAddress:
@@ -2128,6 +2143,8 @@ components:
           enum:
             - Primary
             - Secondary
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         address1:
           type: string
           description: First line of the address
@@ -2151,6 +2168,7 @@ components:
             - US
       required:
         - type
+        - ownerType
         - address1
         - city
         - state
@@ -2168,6 +2186,8 @@ components:
           enum: # TODO(adam): What about adding Previous?
             - Primary
             - Secondary
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         address1:
           type: string
           description: First line of the address
@@ -2193,6 +2213,7 @@ components:
       required:
         - addressID
         - type
+        - ownerType
         - address1
         - city
         - state
