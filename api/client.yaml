@@ -1620,6 +1620,138 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives/{representativeID}/address:
+    post:
+      tags: [Customers]
+      summary: Add customer representative address
+      description: Add an Address onto an existing Customer representative record
+      operationId: addCustomerRepresentativeAddress
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer to add the address onto
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: representativeID of the Customer representative for whom to add the address
+          required: true
+          schema:
+            type: string
+            example: b210a9d6-d755-4455-9bd2-9577ea7e7643
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddress'
+      responses:
+        '200':
+          description: A customer representative object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerRepresentative'
+        '400':
+          description: Customer representative address was not added, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives/{representativeID}/addresses/{addressID}:
+    put:
+      tags: [Customers]
+      summary: Update customer representative's address
+      description: Updates the specified customer representative address
+      operationId: updateCustomerRepresentativeAddress
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Customer Representative ID
+          required: true
+          schema:
+            type: string
+            example: b946a9d6-d755-4455-9bd2-9577ea7f0623
+        - name: addressID
+          in: path
+          description: Address ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAddress'
+      responses:
+        '200':
+          description: Updated Customer representative address
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+    delete:
+      tags: [Customers]
+      summary: Delete a customer representative's address
+      description: Deletes a customer representative's address
+      operationId: deleteCustomerRepresentativeAddress
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Customer Representative ID
+          required: true
+          schema:
+            type: string
+            example: b946a9d6-d755-4455-9bd2-9577ea7f0623
+        - name: addressID
+          in: path
+          description: Address ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      responses:
+        '204':
+          description: Successfully deleted the customer representative's address
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+
   /reports/accounts:
     get:
       tags: [Customers]
