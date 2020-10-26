@@ -1510,6 +1510,116 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives:
+    post:
+      tags: [Customers]
+      summary: Add customer representative
+      description: Add a Customer representative
+      operationId: addCustomerRepresentative
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer for whom to add the representative
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRepresentative'
+      responses:
+        '200':
+          description: A customer object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Customer representative was not added, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives/{representativeID}:
+    put:
+      tags: [Customers]
+      summary: Update customer representative
+      description: Updates the specified customer representative
+      operationId: updateCustomerRepresentative
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Representative ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomerRepresentative'
+      responses:
+        '200':
+          description: Updated Customer representative
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+    delete:
+      tags: [Customers]
+      summary: Delete a customer's representative
+      description: Deletes a customer's representative
+      operationId: deleteCustomerRepresentative
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Representative ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      responses:
+        '204':
+          description: Successfully deleted the customer representative
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /reports/accounts:
     get:
       tags: [Customers]
@@ -1886,6 +1996,72 @@ components:
         - state
         - postalCode
         - country
+    CreateCustomerRepresentative:
+      properties:
+        firstName:
+          type: string
+          description: Given Name or First Name
+          example: Mary
+        lastName:
+          type: string
+          description: Surname or Last Name
+          example: Smith
+        jobTitle:
+          type: string
+          description: Job title of this representative
+          example: Chief Executive Officer
+        birthDate:
+          type: string
+          description: Legal date of birth
+          example: '2016-08-29'
+        SSN:
+          type: string
+          description: Customer Representative's Social Security Number (SSN)
+          example: 111-11-1111
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+        addresses:
+          type: array
+          minimum: 1
+          items:
+            $ref: '#/components/schemas/CreateAddress'
+    CustomerRepresentative:
+      properties:
+        representativeID:
+          type: string
+          description: Unique identifier for this Representative
+          example: b280b9d9
+        firstName:
+          type: string
+          description: Given Name or First Name
+          example: Mary
+        lastName:
+          type: string
+          description: Surname or Last Name
+          example: Smith
+        jobTitle:
+          type: string
+          description: Job title of this representative
+          example: Chief Executive Officer
+        birthDate:
+          type: string
+          description: Legal date of birth
+          example: '2016-08-29'
+        SSN:
+          type: string
+          description: Customer Representative's Social Security Number (SSN)
+          example: 111-11-1111
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+        addresses:
+          type: array
+          minimum: 1
+          items:
+            $ref: '#/components/schemas/CreateAddress'
     AccountStatus:
       type: string
       description: Enumeration if this account has been validated through micro-deposits or another available strategy.
