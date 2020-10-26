@@ -2229,6 +2229,9 @@ components:
           minimum: 1
           items:
             $ref: '#/components/schemas/CreateAddress'
+      required:
+        - firstName
+        - lastName
     CustomerRepresentative:
       properties:
         representativeID:
@@ -2264,6 +2267,10 @@ components:
           minimum: 1
           items:
             $ref: '#/components/schemas/CreateAddress'
+      required:
+        - representativeID
+        - firstName
+        - lastName
     AccountStatus:
       type: string
       description: Enumeration if this account has been validated through micro-deposits or another available strategy.
