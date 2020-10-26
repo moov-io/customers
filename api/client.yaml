@@ -1581,7 +1581,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCustomerRepresentative'
+              $ref: '#/components/schemas/CreateCustomerRepresentative'
       responses:
         '200':
           description: Updated Customer representative

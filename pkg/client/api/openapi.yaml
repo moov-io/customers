@@ -492,7 +492,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCustomerAddress'
+              $ref: '#/components/schemas/CreateAddress'
         required: true
       responses:
         "200":
@@ -571,7 +571,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCustomerAddress'
+              $ref: '#/components/schemas/UpdateAddress'
         required: true
       responses:
         "200":
@@ -1823,6 +1823,294 @@ paths:
       summary: Refresh Customer OFAC search
       tags:
       - Customers
+  /customers/{customerID}/representatives:
+    post:
+      description: Add a Customer representative
+      operationId: addCustomerRepresentative
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Organization
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer for whom to add the representative
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRepresentative'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+          description: A customer object
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer representative was not added, see error(s)
+      summary: Add customer representative
+      tags:
+      - Customers
+  /customers/{customerID}/representatives/{representativeID}:
+    delete:
+      description: Deletes a customer's representative
+      operationId: deleteCustomerRepresentative
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Representative ID
+        explode: false
+        in: path
+        name: representativeID
+        required: true
+        schema:
+          example: 1d62e297-9727-4084-a902-1031da932c9e
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Successfully deleted the customer representative
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Delete a customer's representative
+      tags:
+      - Customers
+    put:
+      description: Updates the specified customer representative
+      operationId: updateCustomerRepresentative
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Representative ID
+        explode: false
+        in: path
+        name: representativeID
+        required: true
+        schema:
+          example: 1d62e297-9727-4084-a902-1031da932c9e
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRepresentative'
+        required: true
+      responses:
+        "200":
+          description: Updated Customer representative
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Update customer representative
+      tags:
+      - Customers
+  /customers/{customerID}/representatives/{representativeID}/address:
+    post:
+      description: Add an Address onto an existing Customer representative record
+      operationId: addCustomerRepresentativeAddress
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Value used to separate and identify models
+        example: org342
+        explode: false
+        in: header
+        name: X-Organization
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer to add the address onto
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: representativeID of the Customer representative for whom to add
+          the address
+        explode: false
+        in: path
+        name: representativeID
+        required: true
+        schema:
+          example: b210a9d6-d755-4455-9bd2-9577ea7e7643
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddress'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerRepresentative'
+          description: A customer representative object
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Customer representative address was not added, see error(s)
+      summary: Add customer representative address
+      tags:
+      - Customers
+  /customers/{customerID}/representatives/{representativeID}/addresses/{addressID}:
+    delete:
+      description: Deletes a customer representative's address
+      operationId: deleteCustomerRepresentativeAddress
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Customer Representative ID
+        explode: false
+        in: path
+        name: representativeID
+        required: true
+        schema:
+          example: b946a9d6-d755-4455-9bd2-9577ea7f0623
+          type: string
+        style: simple
+      - description: Address ID
+        explode: false
+        in: path
+        name: addressID
+        required: true
+        schema:
+          example: 1d62e297-9727-4084-a902-1031da932c9e
+          type: string
+        style: simple
+      responses:
+        "204":
+          description: Successfully deleted the customer representative's address
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Delete a customer representative's address
+      tags:
+      - Customers
+    put:
+      description: Updates the specified customer representative address
+      operationId: updateCustomerRepresentativeAddress
+      parameters:
+      - description: Customer ID
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          type: string
+        style: simple
+      - description: Customer Representative ID
+        explode: false
+        in: path
+        name: representativeID
+        required: true
+        schema:
+          example: b946a9d6-d755-4455-9bd2-9577ea7f0623
+          type: string
+        style: simple
+      - description: Address ID
+        explode: false
+        in: path
+        name: addressID
+        required: true
+        schema:
+          example: 1d62e297-9727-4084-a902-1031da932c9e
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAddress'
+        required: true
+      responses:
+        "200":
+          description: Updated Customer representative address
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: See error message
+      summary: Update customer representative's address
+      tags:
+      - Customers
   /reports/accounts:
     get:
       description: Retrieves a list of customer and account information.
@@ -1891,8 +2179,8 @@ components:
       - primaryAccount
     CreateCustomer:
       example:
-        firstName: Robert
         lastName: Smith
+        website: http://google.com
         addresses:
         - country: US
           address2: address2
@@ -1911,16 +2199,25 @@ components:
         metadata:
           paygateID: 23beb5fd
         nickName: Bob
+        businessName: Alphabet Inc.
+        dateBusinessEstablished: 2016-08-29
         phones:
         - number: +1.818.555.1212
           type: Home
         - number: +1.818.555.1212
           type: Home
-        middleName: Flex
+        ein: 77-0493581
         suffix: suffix
         birthDate: 2016-08-29
-        email: email
         SSN: 111-11-1111
+        firstName: Robert
+        doingBusinessAs: Google
+        sicCode: "7"
+        duns: 15-048-3782
+        middleName: Flex
+        businessType: businessType
+        email: email
+        naicsCode: "32"
       properties:
         firstName:
           description: Given Name or First Name
@@ -1945,6 +2242,36 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/CustomerType'
+        businessName:
+          description: Business Name for business type customers
+          example: Alphabet Inc.
+          type: string
+        doingBusinessAs:
+          description: Doing Business As (DBA) name for business type customers
+          example: Google
+          type: string
+        businessType:
+          description: Business Type for business type customers - "Individual, sole
+            proprietor, or single-member LLC", "Corporation", "Nonprofit organization",
+            "Partnership", "Limited Liability Company"
+          type: string
+        ein:
+          description: Employer Identification Number (EIN) for business type customers
+          example: 77-0493581
+          type: string
+        duns:
+          description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type
+            customers
+          example: 15-048-3782
+          type: string
+        sicCode:
+          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: "7"
+          type: string
+        naicsCode:
+          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: "32"
+          type: string
         birthDate:
           description: Legal date of birth
           example: 2016-08-29
@@ -1957,13 +2284,21 @@ components:
           description: Customer Social Security Number (SSN)
           example: 111-11-1111
           type: string
+        website:
+          description: Company Website for business type customers
+          example: http://google.com
+          type: string
+        dateBusinessEstablished:
+          description: Date business was established for business type customers
+          example: 2016-08-29
+          type: string
         phones:
           items:
             $ref: '#/components/schemas/CreatePhone'
           type: array
         addresses:
           items:
-            $ref: '#/components/schemas/CreateCustomerAddress'
+            $ref: '#/components/schemas/CreateAddress'
           minimum: 1
           type: array
         metadata:
@@ -1983,6 +2318,7 @@ components:
     Customer:
       example:
         lastName: Smith
+        website: http://google.com
         addresses:
         - country: US
           validated: true
@@ -2005,6 +2341,8 @@ components:
         metadata:
           paygateID: 23beb5fd
         nickName: Bob
+        businessName: Alphabet Inc.
+        dateBusinessEstablished: 2016-08-29
         phones:
         - valid: true
           number: +1.818.555.1212
@@ -2012,14 +2350,20 @@ components:
         - valid: true
           number: +1.818.555.1212
           type: Home
+        ein: 77-0493581
         suffix: suffix
         birthDate: 2016-08-29
         firstName: Robert
         createdAt: 2016-08-29T09:12:33.001Z
+        doingBusinessAs: Google
+        sicCode: "7"
         customerID: e210a9d6
+        duns: 15-048-3782
         middleName: Flex
         lastModified: 2016-08-29T09:12:33.001Z
+        businessType: businessType
         email: email
+        naicsCode: "32"
       properties:
         customerID:
           description: The unique identifier for the customer who owns the account
@@ -2048,6 +2392,36 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/CustomerType'
+        businessName:
+          description: Business Name for business type customers
+          example: Alphabet Inc.
+          type: string
+        doingBusinessAs:
+          description: Doing Business As (DBA) name for business type customers
+          example: Google
+          type: string
+        businessType:
+          description: Business Type for business type customers - "Individual, sole
+            proprietor, or single-member LLC", "Corporation", "Nonprofit organization",
+            "Partnership", "Limited Liability Company"
+          type: string
+        ein:
+          description: Employer Identification Number (EIN) for business type customers
+          example: 77-0493581
+          type: string
+        duns:
+          description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type
+            customers
+          example: 15-048-3782
+          type: string
+        sicCode:
+          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: "7"
+          type: string
+        naicsCode:
+          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: "32"
+          type: string
         birthDate:
           description: Legal date of birth
           example: 2016-08-29
@@ -2058,13 +2432,21 @@ components:
           description: Primary email address of customer name@domain.com
           maximum: 500
           type: string
+        website:
+          description: Company Website for business type customers
+          example: http://google.com
+          type: string
+        dateBusinessEstablished:
+          description: Date business was established for business type customers
+          example: 2016-08-29
+          type: string
         phones:
           items:
             $ref: '#/components/schemas/Phone'
           type: array
         addresses:
           items:
-            $ref: '#/components/schemas/CustomerAddress'
+            $ref: '#/components/schemas/Address'
           type: array
         metadata:
           additionalProperties:
@@ -2140,7 +2522,7 @@ components:
           $ref: '#/components/schemas/CustomerStatus'
       required:
       - status
-    UpdateCustomerAddress:
+    UpdateAddress:
       example:
         country: US
         validated: false
@@ -2228,7 +2610,7 @@ components:
       - number
       - type
       - valid
-    CreateCustomerAddress:
+    CreateAddress:
       example:
         country: US
         address2: address2
@@ -2272,7 +2654,7 @@ components:
       - state
       - type
       type: object
-    CustomerAddress:
+    Address:
       example:
         country: US
         validated: true
@@ -2324,6 +2706,125 @@ components:
       - state
       - type
       type: object
+    CreateCustomerRepresentative:
+      example:
+        firstName: Mary
+        lastName: Smith
+        addresses:
+        - country: US
+          address2: address2
+          city: Denver
+          address1: address1
+          postalCode: postalCode
+          state: CO
+          type: Primary
+        - country: US
+          address2: address2
+          city: Denver
+          address1: address1
+          postalCode: postalCode
+          state: CO
+          type: Primary
+        jobTitle: Chief Executive Officer
+        phones:
+        - number: +1.818.555.1212
+          type: Home
+        - number: +1.818.555.1212
+          type: Home
+        birthDate: 2016-08-29
+        SSN: 111-11-1111
+      properties:
+        firstName:
+          description: Given Name or First Name
+          example: Mary
+          type: string
+        lastName:
+          description: Surname or Last Name
+          example: Smith
+          type: string
+        jobTitle:
+          description: Job title of this representative
+          example: Chief Executive Officer
+          type: string
+        birthDate:
+          description: Legal date of birth
+          example: 2016-08-29
+          type: string
+        SSN:
+          description: Customer Representative's Social Security Number (SSN)
+          example: 111-11-1111
+          type: string
+        phones:
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+          type: array
+        addresses:
+          items:
+            $ref: '#/components/schemas/CreateAddress'
+          minimum: 1
+          type: array
+    CustomerRepresentative:
+      example:
+        firstName: Mary
+        lastName: Smith
+        addresses:
+        - country: US
+          address2: address2
+          city: Denver
+          address1: address1
+          postalCode: postalCode
+          state: CO
+          type: Primary
+        - country: US
+          address2: address2
+          city: Denver
+          address1: address1
+          postalCode: postalCode
+          state: CO
+          type: Primary
+        jobTitle: Chief Executive Officer
+        representativeID: b280b9d9
+        phones:
+        - number: +1.818.555.1212
+          type: Home
+        - number: +1.818.555.1212
+          type: Home
+        birthDate: 2016-08-29
+        SSN: 111-11-1111
+      properties:
+        representativeID:
+          description: Unique identifier for this Representative
+          example: b280b9d9
+          type: string
+        firstName:
+          description: Given Name or First Name
+          example: Mary
+          type: string
+        lastName:
+          description: Surname or Last Name
+          example: Smith
+          type: string
+        jobTitle:
+          description: Job title of this representative
+          example: Chief Executive Officer
+          type: string
+        birthDate:
+          description: Legal date of birth
+          example: 2016-08-29
+          type: string
+        SSN:
+          description: Customer Representative's Social Security Number (SSN)
+          example: 111-11-1111
+          type: string
+        phones:
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+          type: array
+        addresses:
+          items:
+            $ref: '#/components/schemas/CreateAddress'
+          minimum: 1
+          type: array
     AccountStatus:
       description: Enumeration if this account has been validated through micro-deposits
         or another available strategy.
@@ -2808,6 +3309,7 @@ components:
           status: validated
         Customer:
           lastName: Smith
+          website: http://google.com
           addresses:
           - country: US
             validated: true
@@ -2830,6 +3332,8 @@ components:
           metadata:
             paygateID: 23beb5fd
           nickName: Bob
+          businessName: Alphabet Inc.
+          dateBusinessEstablished: 2016-08-29
           phones:
           - valid: true
             number: +1.818.555.1212
@@ -2837,14 +3341,20 @@ components:
           - valid: true
             number: +1.818.555.1212
             type: Home
+          ein: 77-0493581
           suffix: suffix
           birthDate: 2016-08-29
           firstName: Robert
           createdAt: 2016-08-29T09:12:33.001Z
+          doingBusinessAs: Google
+          sicCode: "7"
           customerID: e210a9d6
+          duns: 15-048-3782
           middleName: Flex
           lastModified: 2016-08-29T09:12:33.001Z
+          businessType: businessType
           email: email
+          naicsCode: "32"
       properties:
         Customer:
           $ref: '#/components/schemas/Customer'
