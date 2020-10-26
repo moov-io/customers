@@ -12,19 +12,17 @@ package client
 // CustomerRepresentative struct for CustomerRepresentative
 type CustomerRepresentative struct {
 	// Unique identifier for this Representative
-	RepresentativeID string `json:"representativeID"`
+	RepresentativeID string `json:"representativeID,omitempty"`
 	// Given Name or First Name
-	FirstName string `json:"firstName"`
+	FirstName string `json:"firstName,omitempty"`
 	// Surname or Last Name
-	LastName string `json:"lastName"`
+	LastName string `json:"lastName,omitempty"`
 	// Job title of this representative
 	JobTitle string `json:"jobTitle,omitempty"`
 	// Legal date of birth
-	BirthDate string         `json:"birthDate,omitempty"`
+	BirthDate string `json:"birthDate,omitempty"`
 	// Customer Representative's Social Security Number (SSN)
-	SSN       string                  `json:"SSN,omitempty"`
-	// Customer Representative's addresses (zero, one, or many)
-	Addresses []Address `json:"addresses,omitempty"`
-	// Customer Representative's phone numbers (zero, one, or many)
-	Phones    []Phone           `json:"phones,omitempty"`
+	SSN       string          `json:"SSN,omitempty"`
+	Phones    []CreatePhone   `json:"phones,omitempty"`
+	Addresses []CreateAddress `json:"addresses,omitempty"`
 }
