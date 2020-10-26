@@ -50,10 +50,10 @@ Read through the [project docs](docs/README.md) over here to get an understandin
 
  channel | info
  ------- | -------
- [Project Documentation](https://docs.moov.io/) | Our project documentation available online.
-Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov.IO's Twitter feed to get updates on our project(s). You can also tweet us questions or just share blogs or stories.
-[GitHub Issue](https://github.com/moov-io/customers/issues) | If you are able to reproduce a problem please open a GitHub Issue under the specific project that caused the error.
-[moov-io slack](https://slack.moov.io/) | Join our slack channel to have an interactive discussion about the development of the project.
+ [Documentation](https://moov-io.github.io/customers) | Project documentation for our community.
+ [GitHub Issues](https://github.com/moov-io/customers/issues) | Public tracker of issues with our community. Please open a GitHub Issue if you're able to reproduce problems or to request features.
+Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov's Twitter feed to get updates on our projects. You can also tweet us to ask questions or share comments.
+Slack [#moov-io](https://slack.moov.io/) | Join the slack channel to discuss with other contributors about the development of Moov's open source projects.
 
 ## Contributing
 
