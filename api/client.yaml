@@ -414,7 +414,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCustomerAddress'
+              $ref: '#/components/schemas/CreateAddress'
       responses:
         '200':
           description: A customer object
@@ -454,7 +454,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCustomerAddress'
+              $ref: '#/components/schemas/UpdateAddress'
       responses:
         '200':
           description: Updated Customer address
@@ -1831,6 +1831,33 @@ components:
           description: Customers name suffix. "Jr", "PH.D."
         type:
           $ref: '#/components/schemas/CustomerType'
+        businessName:
+          type: string
+          description: Business Name for business type customers
+          example: Alphabet Inc.
+        doingBusinessAs:
+          type: string
+          description: Doing Business As (DBA) name for business type customers
+          example: Google
+        businessType:
+          type: string
+          description: Business Type for business type customers - "Individual, sole proprietor, or single-member LLC", "Corporation", "Nonprofit organization", "Partnership", "Limited Liability Company"
+        ein:
+          type: string
+          description: Employer Identification Number (EIN) for business type customers
+          example: 77-0493581
+        duns:
+          type: string
+          description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers
+          example: 15-048-3782
+        sicCode:
+          type: string
+          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 07
+        naicsCode:
+          type: string
+          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 32
         birthDate:
           type: string
           description: Legal date of birth
@@ -1843,6 +1870,14 @@ components:
           type: string
           description: Customer Social Security Number (SSN)
           example: 111-11-1111
+        website:
+          type: string
+          description: Company Website for business type customers
+          example: http://google.com
+        dateBusinessEstablished:
+          type: string
+          description: Date business was established for business type customers
+          example: '2016-08-29'
         phones:
           type: array
           items:
@@ -1851,7 +1886,7 @@ components:
           type: array
           minimum: 1
           items:
-            $ref: '#/components/schemas/CreateCustomerAddress'
+            $ref: '#/components/schemas/CreateAddress'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -1894,6 +1929,33 @@ components:
           description: Customers name suffix. "Jr", "PH.D."
         type:
           $ref: '#/components/schemas/CustomerType'
+        businessName:
+          type: string
+          description: Business Name for business type customers
+          example: Alphabet Inc.
+        doingBusinessAs:
+          type: string
+          description: Doing Business As (DBA) name for business type customers
+          example: Google
+        businessType:
+          type: string
+          description: Business Type for business type customers - "Individual, sole proprietor, or single-member LLC", "Corporation", "Nonprofit organization", "Partnership", "Limited Liability Company"
+        ein:
+          type: string
+          description: Employer Identification Number (EIN) for business type customers
+          example: 77-0493581
+        duns:
+          type: string
+          description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers
+          example: 15-048-3782
+        sicCode:
+          type: string
+          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 07
+        naicsCode:
+          type: string
+          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 32
         birthDate:
           type: string
           description: Legal date of birth
@@ -1904,6 +1966,14 @@ components:
           type: string
           maximum: 500
           description: Primary email address of customer name@domain.com
+        website:
+          type: string
+          description: Company Website for business type customers
+          example: http://google.com
+        dateBusinessEstablished:
+          type: string
+          description: Date business was established for business type customers
+          example: '2016-08-29'
         phones:
           type: array
           items:
@@ -1911,7 +1981,7 @@ components:
         addresses:
           type: array
           items:
-            $ref: '#/components/schemas/CustomerAddress'
+            $ref: '#/components/schemas/Address'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -1978,7 +2048,7 @@ components:
           $ref: '#/components/schemas/CustomerStatus'
       required:
         - status
-    UpdateCustomerAddress:
+    UpdateAddress:
       properties:
         type:
           type: string
@@ -2050,7 +2120,7 @@ components:
         - number
         - valid
         - type
-    CreateCustomerAddress:
+    CreateAddress:
       type: object
       properties:
         type:
@@ -2086,7 +2156,7 @@ components:
         - state
         - postalCode
         - country
-    CustomerAddress:
+    Address:
       type: object
       properties:
         addressID:
