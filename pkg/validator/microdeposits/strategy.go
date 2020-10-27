@@ -16,6 +16,10 @@ import (
 	"github.com/moov-io/paygate/pkg/client"
 )
 
+var (
+	errInvalidMicroDeposit = errors.New("incorrect micro-deposit")
+)
+
 type microdepositsStrategy struct {
 	client paygate.Client
 }
@@ -94,11 +98,20 @@ func validateAmounts(micro *client.MicroDeposits, requestAmounts []client.Amount
 	if len(requestAmounts) != len(requiredAmounts) {
 		return fmt.Errorf("invalid number of micro-deposits, got %d", len(requestAmounts))
 	}
+
+	matched := 0
 	for i := range requestAmounts {
-		if (requestAmounts[i].Currency != requiredAmounts[i].Currency) || (requestAmounts[i].Value != requiredAmounts[i].Value) {
-			return errors.New("incorrect micro-deposit")
+		for j := range requiredAmounts {
+			if (requestAmounts[i].Currency == requiredAmounts[j].Currency) && (requestAmounts[i].Value == requiredAmounts[j].Value) {
+				// micro-deposit matched, so check the next
+				matched++
+				break
+			}
 		}
 	}
 
-	return nil
+	if matched > 0 && matched == len(requiredAmounts) {
+		return nil
+	}
+	return errInvalidMicroDeposit
 }

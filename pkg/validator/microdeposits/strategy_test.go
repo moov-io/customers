@@ -86,3 +86,64 @@ func TestCompleteAccountValidation(t *testing.T) {
 		require.Contains(t, err.Error(), "is in status: pending but expected to be in processed")
 	})
 }
+
+func TestValidateAmountsErr(t *testing.T) {
+	micro := &payclient.MicroDeposits{
+		MicroDepositID: base.ID(),
+		Amounts: []payclient.Amount{
+			{Currency: "USD", Value: 3},
+			{Currency: "USD", Value: 7},
+		},
+		Status: payclient.PROCESSED,
+	}
+	requestAmounts := []payclient.Amount{
+		{Currency: "GBP", Value: 1},
+	}
+
+	if err := validateAmounts(micro, nil); err == nil {
+		t.Error(err)
+	}
+
+	if err := validateAmounts(micro, requestAmounts); err == nil {
+		t.Error(err)
+	}
+
+	requestAmounts = append(requestAmounts, payclient.Amount{Currency: "USD", Value: 3})
+	if err := validateAmounts(micro, requestAmounts); err != errInvalidMicroDeposit {
+		t.Error(err)
+	}
+
+	requestAmounts = []payclient.Amount{
+		{Currency: "USD", Value: 3},
+		{Currency: "USD", Value: 8}, // invalid
+	}
+	if err := validateAmounts(micro, requestAmounts); err == nil {
+		t.Error(err)
+	}
+
+	micro.Amounts = []payclient.Amount{
+		{Currency: "USD", Value: 3},
+	}
+	if err := validateAmounts(micro, requestAmounts); err == nil {
+		t.Error(err)
+	}
+}
+
+func TestValidateAmounts(t *testing.T) {
+	micro := &payclient.MicroDeposits{
+		MicroDepositID: base.ID(),
+		Amounts: []payclient.Amount{
+			{Currency: "USD", Value: 3},
+			{Currency: "USD", Value: 7},
+		},
+		Status: payclient.PROCESSED,
+	}
+	requestAmounts := []payclient.Amount{
+		{Currency: "USD", Value: 3},
+		{Currency: "USD", Value: 7},
+	}
+
+	if err := validateAmounts(micro, requestAmounts); err != nil {
+		t.Error(err)
+	}
+}
