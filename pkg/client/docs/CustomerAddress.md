@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **AddressID** | **string** | Unique identifier for this Address | 
-**Type** | **string** |  | 
+**Type** | [**AddressType**](AddressType.md) |  | 
 **Address1** | **string** | First line of the address | 
 **Address2** | **string** | Second line of the address | [optional] 
 **City** | **string** |  | 

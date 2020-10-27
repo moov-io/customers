@@ -9,9 +9,11 @@
 
 package client
 
-// CreatePhone struct for CreatePhone
-type CreatePhone struct {
-	// phone number
-	Number string    `json:"number"`
-	Type   PhoneType `json:"type"`
-}
+// AddressType address type
+type AddressType string
+
+// List of AddressType
+const (
+	ADDRESSTYPE_PRIMARY   AddressType = "primary"
+	ADDRESSTYPE_SECONDARY AddressType = "secondary"
+)

@@ -14,6 +14,6 @@ type Phone struct {
 	// phone number
 	Number string `json:"number"`
 	// phone number has been validated to connect with customer
-	Valid bool   `json:"valid"`
-	Type  string `json:"type"`
+	Valid bool      `json:"valid"`
+	Type  PhoneType `json:"type"`
 }

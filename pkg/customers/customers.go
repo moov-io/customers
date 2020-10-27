@@ -130,25 +130,39 @@ type customerRequest struct {
 }
 
 type phone struct {
-	Number string `json:"number"`
-	Type   string `json:"type"`
+	Number string           `json:"number"`
+	Type   client.PhoneType `json:"type"`
+}
+
+func (p *phone) validate() error {
+	p.Type = client.PhoneType(strings.ToLower(string(p.Type)))
+
+	switch p.Type {
+	case client.PHONETYPE_HOME, client.PHONETYPE_MOBILE, client.PHONETYPE_WORK:
+	default:
+		return fmt.Errorf("unknown type: %s", p.Type)
+	}
+
+	return nil
 }
 
 type address struct {
-	Type       string `json:"type"`
-	Address1   string `json:"address1"`
-	Address2   string `json:"address2,omitempty"`
-	City       string `json:"city"`
-	State      string `json:"state"`
-	PostalCode string `json:"postalCode"` // TODO(adam): validate against US postal codes
-	Country    string `json:"country"`
+	Type       client.AddressType `json:"type"`
+	Address1   string             `json:"address1"`
+	Address2   string             `json:"address2,omitempty"`
+	City       string             `json:"city"`
+	State      string             `json:"state"`
+	PostalCode string             `json:"postalCode"` // TODO(adam): validate against US postal codes
+	Country    string             `json:"country"`
 }
 
-func (add address) validate() error {
-	switch t := strings.ToLower(add.Type); t {
-	case "primary", "secondary":
+func (add *address) validate() error {
+	add.Type = client.AddressType(strings.ToLower(string(add.Type)))
+
+	switch add.Type {
+	case client.ADDRESSTYPE_PRIMARY, client.ADDRESSTYPE_SECONDARY:
 	default:
-		return fmt.Errorf("unknown type: %s", t)
+		return fmt.Errorf("unknown type: %s", add.Type)
 	}
 
 	if !usstates.Valid(add.State) {
@@ -169,6 +183,9 @@ func (req customerRequest) validate() error {
 	}
 	if err := validateAddresses(req.Addresses); err != nil {
 		return fmt.Errorf("invalid customer addresses: %v", err)
+	}
+	if err := validatePhones(req.Phones); err != nil {
+		return fmt.Errorf("invalid customer phone: %v", err)
 	}
 
 	return nil
@@ -217,6 +234,16 @@ func validateAddresses(addrs []address) error {
 	return nil
 }
 
+func validatePhones(phones []phone) error {
+	for _, p := range phones {
+		if err := p.validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *SSN, error) {
 	if req.CustomerID == "" {
 		req.CustomerID = base.ID()
@@ -255,6 +282,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			State:      req.Addresses[i].State,
 			PostalCode: req.Addresses[i].PostalCode,
 			Country:    req.Addresses[i].Country,
+			Type:       req.Addresses[i].Type,
 		})
 	}
 	if req.SSN != "" {
