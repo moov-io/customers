@@ -11,11 +11,20 @@ Name | Type | Description | Notes
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **Type** | [**CustomerType**](CustomerType.md) |  | 
+**BusinessName** | **string** | Business Name for business type customers | [optional] 
+**DoingBusinessAs** | **string** | Doing Business As (DBA) name for business type customers | [optional] 
+**BusinessType** | **string** | Business Type for business type customers - \&quot;Individual, sole proprietor, or single-member LLC\&quot;, \&quot;Corporation\&quot;, \&quot;Nonprofit organization\&quot;, \&quot;Partnership\&quot;, \&quot;Limited Liability Company\&quot; | [optional] 
+**Ein** | **string** | Employer Identification Number (EIN) for business type customers | [optional] 
+**Duns** | **string** | Dun &amp; Bradstreet D-U-N-S Number (D-U-N-S) for business type customers | [optional] 
+**SicCode** | **string** | SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid&#x3D;1627409140) | [optional] 
+**NaicsCode** | **string** | NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid&#x3D;1627409140) | [optional] 
 **BirthDate** | **string** | Legal date of birth | [optional] 
 **Status** | [**CustomerStatus**](CustomerStatus.md) |  | 
 **Email** | **string** | Primary email address of customer name@domain.com | 
+**Website** | **string** | Company Website for business type customers | [optional] 
+**DateBusinessEstablished** | **string** | Date business was established for business type customers | [optional] 
 **Phones** | [**[]Phone**](Phone.md) |  | [optional] 
-**Addresses** | [**[]CustomerAddress**](CustomerAddress.md) |  | [optional] 
+**Addresses** | [**[]Address**](Address.md) |  | [optional] 
 **Metadata** | **map[string]string** | Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer. | [optional] 
 **CreatedAt** | [**time.Time**](time.Time.md) |  | 
 **LastModified** | [**time.Time**](time.Time.md) | Last time the object was modified | 

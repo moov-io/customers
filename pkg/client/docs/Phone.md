@@ -5,6 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Number** | **string** | phone number | 
+**OwnerType** | [**OwnerType**](OwnerType.md) |  | 
 **Valid** | **bool** | phone number has been validated to connect with customer | 
 **Type** | [**PhoneType**](PhoneType.md) |  | 
 
