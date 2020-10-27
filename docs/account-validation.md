@@ -1,101 +1,89 @@
 # Account Validation
 
-Moov Customers project supports following strategies and vendors to validate accounts:
+This project supports the following strategies and vendors to validate accounts:
 
-* micro-deposits validation with Moov [PayGate](./account-validation.md#micro-deposits-validation-with-moov-paygate)
-* instant validation with [Plaid](./account-validation.md#instant-validation-with-plaid)
-* instant validation with [MX](./account-validation.md#instant-validation-with-mx)
+* micro-deposits validation with Moov [PayGate](#micro-deposits-validation-with-moov-paygate)
+* instant validation with [Plaid](#instant-validation-with-plaid)
+* instant validation with [MX](#instant-validation-with-mx)
 
-Please, check [API reference](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/accounts/{accountID}/validate) for more details on account validation API.
+For details on the account validation API, check the [API reference](https://moov-io.github.io/customers/api/#post-/customers/{customerID}/accounts/{accountID}/validations).
 
-[What is Instant Account Validation: MX.com](https://www.mx.com/moneysummit/what-is-instant-account-verification)
+For more information on how instant account validation works, read [What is Instant Account Validation](https://www.mx.com/moneysummit/what-is-instant-account-verification)
 
 ## Micro-deposits Validation with Moov PayGate
 
-In order to validate Account two micro-depoists under $0.50 will be created with a balanced withdraw. Account validation with micro-deposits strategy consists of two steps:
+In order to validate an account, two micro-deposits under $0.50 will be transferred to the customer's bank account.
 
-1. Initiate Account Validation
-2. Complete Account Validation
-
-To use this strategy PayGate should be [configured](../README.md#paygate#paygate).
-
-### Configuration
-
-To use this strategy you have to set `PAYGATE_ENDPOINT` and `PAYGATE_DEBUG_CALLS` environment variable.
+To use this strategy, [configure PayGate](./configuration.md#paygate) and follow the steps below:
 
 ### 1. Initiate Account Validation
 
-During this step Moov Customers creates two micro-deposits for the account via Moov [Paygate](https://github.com/moov-io/paygate).
+In this step, Moov Customers creates two micro-deposits for the account through Moov [Paygate](https://github.com/moov-io/paygate).
 
-Here is an example of API call to initiate account validation:
-
+Here is an example of an API call to initiate account validation:
 ```shell
-curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
--H "Expect:" \
--H 'Content-Type: application/json; charset=utf-8' \
--d @- <<'EOF'
-{
-  "strategy":"micro-deposits",
-  "vendor":"moov"
-}
-EOF
+curl -X POST "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
+ -H "Accept: application/json, application/json" \
+ -H "X-Organization: org342" \
+ -H "Content-Type: application/json" \
+ -d '{
+        "strategy":"micro-deposits",
+        "vendor":"moov"
+     }' 
 ```
 
 ### 2. Complete Account Validation
 
 To complete account validation, values of created micro-deposits should be provided in the following API call:
-
 ```shell
-curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
--H "Expect:" \
--H 'Content-Type: application/json; charset=utf-8' \
--d @- <<'EOF'
-{
-  "strategy":"micro-deposits",
-  "vendor":"moov",
-  "vendor_request":{
-    "micro-deposits":[
-      "USD 0.20",
-      "USD 0.34"
-    ]
-  }
-}
-EOF
+curl -X PUT "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
+ -H "Accept: application/json, application/json" \
+ -H "X-Organization: org342" \
+ -H "Content-Type: application/json" \
+ -d '{
+         "strategy":"micro-deposits",
+         "vendor":"moov",
+         "vendor_request":{
+            "micro-deposits":[
+               "USD 0.03",
+               "USD 0.07"
+            ]
+         }
+      }' 
 ```
 
 ## Instant Validation with Plaid
 
-Moov Customers is integrated with [Plaid Auth](https://plaid.com/products/auth/) allowing our users to instantly authenticate bank accounts for payments and set up ACH transfers. See [the configuration](../README.md#configuration) for the Plaid validation strategy.
+Moov Customers is integrated with [Plaid Auth](https://plaid.com/products/auth/) allowing our users to instantly authenticate bank accounts for payments and set up ACH transfers. Check out the [configuration guide](./configuration.md#Plaid) for setting up account validation with Plaid.
 
 ### How it Works
 
-Moov Customers makes required calls to Plaid API while you have to configure and add [Plaid Link](https://plaid.com/docs-beta/link/) to your application or website. Plaid Link is a drop-in module that provides a secure authentication flow for financial institutions that Plaid supports. Link makes it secure and easy for users to connect their bank accounts to Plaid.
+Moov Customers interacts with Plaid's API after you have configured and added [Plaid Link](https://plaid.com/docs-beta/link/) to your application or website. Plaid Link is a drop-in module that provides a secure authentication flow for financial institutions supported by Plaid. Plaid Link makes it easy for users to securely connect their bank accounts to Plaid.
 
 The diagram below shows how account verification with Plaid works:
 
 ![moov plaid IAV flow](./images/plaid-flow.svg)
 
-1. Make a request to Initiate Account Validation and get `link_token` for Plaid Link from the response
-2. Open Plaid Link with link_token for your customer.
-3. Make request to Complete Account Validation by providing `public_token` received from Plaid Link in the onSuccess callback.
+1. Make a request to initiate account validation and get a `link_token` for Plaid Link from the response.
+2. Open Plaid Link using the `link_token` for your customer.
+3. Make a request to complete account validation by providing a `public_token` from Plaid Link in the `onSuccess` callback.
 
 ### 1. Initiate Account Validation
 
-Here is an example of API call to initiate account validation:
+Here is an example of the API call to initiate account validation:
 
-```bash
-curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
--H "Expect:" \
--H 'Content-Type: application/json; charset=utf-8' \
--d @- <<'EOF'
-{
-  "strategy":"instant",
-  "vendor":"plaid"
-}
-EOF
+```shell
+curl -X POST "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
+ -H "Accept: application/json, application/json" \
+ -H "X-Organization: org342" \
+ -H "Content-Type: application/json" \
+ -d '{
+        "strategy":"instant",
+        "vendor":"plaid"
+     }' 
 ```
 
-The response contains link_token that should be used to open Plaid Link:
+The response contains the `link_token` used to open Plaid Link:
 
 ```json
 {
@@ -108,7 +96,7 @@ The response contains link_token that should be used to open Plaid Link:
 
 ### 2. Open Plaid Link
 
-Please, find more details on the [Plaid Link documentation website](https://plaid.com/docs-beta/link/). Here we provide a simplified example of how Plaid Link may be used:
+See more details on the [Plaid Link documentation website](https://plaid.com/docs-beta/link/). Here we provide a simplified example of how Plaid Link may be used:
 
 ```html
 <html>
@@ -150,21 +138,20 @@ Please, find more details on the [Plaid Link documentation website](https://plai
 
 ### 3. Complete Account Validation
 
-When you get public_token to your app server from Plaid Link you can compelte account validation by making API request to Moov Customers. Here is an example of API call:
+When you get `public_token` to your app server from Plaid Link, you can complete account validation by making an API request to Moov Customers. Here is an example:
 
 ```bash
-curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
--H "Expect:" \
--H 'Content-Type: application/json; charset=utf-8' \
--d @- <<'EOF'
-{
-  "strategy":"instant",
-  "vendor":"plaid",
-  "vendor_request":{
-    "public_token":"public-sandbox-59eb4718-93d8-41a0-a338-xxxxxxx"
-  }
-}
-EOF
+curl -X PUT "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
+ -H "Accept: application/json, application/json" \
+ -H "X-Organization: org342" \
+ -H "Content-Type: application/json" \
+ -d '{
+        "strategy":"instant",
+        "vendor":"plaid",
+        "vendor_request":{
+           "public_token":"public-sandbox-59eb4718-93d8-41a0-a338-000000000000"
+        }
+     }' \
 ```
 
 The response with validation result:
@@ -178,37 +165,36 @@ The response with validation result:
 ```
 ## Instant Validation with MX
 
-Moov Customers is integrated with [MX Platform API](https://www.mx.com/products/platform-api/) allowing our users to instantly authenticate bank accounts for payments and set up ACH transfers. See [the configuration](../README.md#configuration) for the MX validation strategy.
+Moov Customers is integrated with the [MX Platform API](https://www.mx.com/products/platform-api/) which allows our users to instantly authenticate bank accounts for payments and set up ACH transfers. Check out the [configuration guide](./configuration.md#MX-Atrium) for setting up account validation with MX.
 
 ### How it Works
 
-Moov Customers makes required calls to MX Platform API while you have to configure and add [MX Connect widget](https://atrium.mx.com/docs#mx-connect-widget) by embedding it in a [website with an iframe](https://atrium.mx.com/docs#embedding-in-a-website) or a mobile application with a [WebView](https://atrium.mx.com/docs#embedding-in-webviews). MX Connect is a ready-made and embeddable application that allows you to quickly perform account verification of your customers.
+Moov Customers interacts with the MX Platform API after you have configured and added [MX Connect widget](https://atrium.mx.com/docs#mx-connect-widget) by embedding it in a [website with an iframe](https://atrium.mx.com/docs#embedding-in-a-website) or a mobile application with a [WebView](https://atrium.mx.com/docs#embedding-in-webviews). MX Connect is a ready-made and embeddable application that allows you to quickly perform account verification of your customers.
 
 The diagram below shows how account verification with MX works:
 
 ![moov MX IAV flow](./images/mx-flow.svg)
 
-1. Make a request to Initiate Account Validation and get `connect_widget_url` for MX Connect widget from the response
+1. Make a request to initiate account validation and get a `connect_widget_url` for the MX Connect widget from the response.
 2. Open MX Connect for your customer.
-3. Make request to Complete Account Validation by providing `user_guid` and `member_guid` received from MX Connect in the onSuccess callback.
+3. Make request to complete account validation by providing `user_guid` and `member_guid` from MX Connect in the `onSuccess` callback.
 
 ### 1. Initiate Account Validation
 
-Here is an example of API call to initiate account validation:
+Here is an example of the API call to initiate account validation:
 
 ```bash
-curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
--H "Expect:" \
--H 'Content-Type: application/json; charset=utf-8' \
--d @- <<'EOF'
-{
-  "strategy":"instant",
-  "vendor":"mx"
-}
-EOF
+curl -X POST "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
+ -H "Accept: application/json, application/json" \
+ -H "X-Organization: org342" \
+ -H "Content-Type: application/json" \
+ -d '{
+        "strategy":"instant",
+        "vendor":"mx"
+     }' 
 ```
 
-The response contains connect_widget_url that should be used to open MX Connect:
+The response contains `connect_widget_url` used to open MX Connect:
 
 ```json
 {
@@ -220,7 +206,7 @@ The response contains connect_widget_url that should be used to open MX Connect:
 
 ### 2. Open MX Connect Widget
 
-Please, find more details on [how to setup and configure MX Connect](https://atrium.mx.com/docs#mx-connect-widget). Here we provide a simplified example of how MX Connect widget may be used:
+Find more details on [how to setup and configure MX Connect](https://atrium.mx.com/docs#mx-connect-widget). Here we provide a simplified example of how MX Connect widget may be used:
 
 ```html
 <html>
@@ -269,22 +255,21 @@ Please, find more details on [how to setup and configure MX Connect](https://atr
 
 ### 3. Complete Account Validation
 
-When you get `user_guid` and `member_guid` to your app server from MX Connect can compelte account validation by making API request to Moov Customers. Here is an example of API call:
+When you get `user_guid` and `member_guid` to your app server from MX Connect, you can complete account validation by making an API request to Moov Customers. Here is an example:
 
 ```bash
-curl "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validate" \
--H "Expect:" \
--H 'Content-Type: application/json; charset=utf-8' \
--d @- <<'EOF'
-{
-  "strategy":"instant",
-  "vendor":"plaid",
-  "vendor_request":{
-    "user_guid":"USR-d6a55e69-8711-4b21-b594-2538551231231",
-    "member_guid":"MBR-1c38dad9-e699-4f01-baf7-d91231231231"
-  }
-}
-EOF
+curl -X PUT "http://localhost:8087/customers/51dd8cdd/accounts/b74d7c51/validations" \
+ -H "Accept: application/json, application/json" \
+ -H "X-Organization: org342" \
+ -H "Content-Type: application/json" \
+ -d '{
+        "strategy":"instant",
+        "vendor":"mx",
+        "vendor_request":{
+           "user_guid":"USR-d6a55e69-8711-4b21-b594-2538551231231",
+           "member_guid":"MBR-1c38dad9-e699-4f01-baf7-d91231231231"
+        }
+     }' \
 ```
 
 The response with validation result

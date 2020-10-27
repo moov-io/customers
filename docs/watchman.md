@@ -1,4 +1,4 @@
-[Moov Watchman](https://github.com/moov-io/watchman) is used by Customers to compare Customer information against Anit-Money Laundering (AML) and sanction lists provided by various government agencies. The primary list checked is OFAC as a component of Know Your Customer (KYC). These checks are required of all US businesses.
+[Moov Watchman](https://github.com/moov-io/watchman) is used by Customers to compare customer information against Anit-Money Laundering (AML) and sanction lists provided by various government agencies. The primary list checked is the Office of Foreign Asset Control (OFAC) list managed by the U.S. Treasury as a component of Know Your Customer (KYC). These checks are required of all US businesses.
 
 ### Configuration
 
@@ -6,7 +6,7 @@ Watchman offers a few [environment variables](https://github.com/moov-io/watchma
 
 ### OFAC Checks
 
-As required by United States law and NACHA guidelines all transfers are checked against the Office of Foreign Asset Control (OFAC) lists for sanctioned individuals and entities to combat fraud, terrorism and unlawful monetary transfers outside of the United States. Customers uses Watchman to perform these checks.
+As required by United States law and NACHA guidelines all transfers are checked against the OFAC lists for sanctioned individuals and entities to combat fraud, terrorism and unlawful monetary transfers outside of the United States. Customers uses Watchman to perform these checks.
 
 ### OFAC Searches
 

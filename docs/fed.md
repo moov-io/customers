@@ -6,4 +6,4 @@ Fed offers a few [environment variables](https://github.com/moov-io/fed#configur
 
 ### Data files
 
-When running Fed on your systems it's advised you obtain data files from your Financial Institution. The included files are not the latest available, but current files are licensed.
+When running Fed on your systems, we advise you to obtain data files from your financial institution. Although the included files are licensed, they are not the latest available.
