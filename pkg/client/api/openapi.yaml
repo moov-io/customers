@@ -1913,9 +1913,7 @@ components:
         nickName: Bob
         phones:
         - number: +1.818.555.1212
-          type: Home
         - number: +1.818.555.1212
-          type: Home
         middleName: Flex
         suffix: suffix
         birthDate: 2016-08-29
@@ -1991,7 +1989,6 @@ components:
           address1: address1
           postalCode: postalCode
           state: state
-          type: Primary
           addressID: 851233a1
         - country: US
           validated: true
@@ -2000,7 +1997,6 @@ components:
           address1: address1
           postalCode: postalCode
           state: state
-          type: Primary
           addressID: 851233a1
         metadata:
           paygateID: 23beb5fd
@@ -2008,10 +2004,8 @@ components:
         phones:
         - valid: true
           number: +1.818.555.1212
-          type: Home
         - valid: true
           number: +1.818.555.1212
-          type: Home
         suffix: suffix
         birthDate: 2016-08-29
         firstName: Robert
@@ -2190,18 +2184,13 @@ components:
     CreatePhone:
       example:
         number: +1.818.555.1212
-        type: Home
       properties:
         number:
           description: phone number
           example: +1.818.555.1212
           type: string
         type:
-          enum:
-          - Home
-          - Mobile
-          - Work
-          type: string
+          $ref: '#/components/schemas/PhoneType'
       required:
       - number
       - type
@@ -2209,7 +2198,6 @@ components:
       example:
         valid: true
         number: +1.818.555.1212
-        type: Home
       properties:
         number:
           description: phone number
@@ -2219,15 +2207,18 @@ components:
           description: phone number has been validated to connect with customer
           type: boolean
         type:
-          enum:
-          - Home
-          - Mobile
-          - Work
-          type: string
+          $ref: '#/components/schemas/PhoneType'
       required:
       - number
       - type
       - valid
+    PhoneType:
+      description: phone type
+      enum:
+      - home
+      - mobile
+      - work
+      type: string
     CreateCustomerAddress:
       example:
         country: US
@@ -2281,7 +2272,6 @@ components:
         address1: address1
         postalCode: postalCode
         state: state
-        type: Primary
         addressID: 851233a1
       properties:
         addressID:
@@ -2289,10 +2279,7 @@ components:
           example: 851233a1
           type: string
         type:
-          enum:
-          - Primary
-          - Secondary
-          type: string
+          $ref: '#/components/Schemas/AddressType'
         address1:
           description: First line of the address
           type: string
@@ -2324,6 +2311,12 @@ components:
       - state
       - type
       type: object
+    AddressType:
+      description: address type
+      enum:
+      - primary
+      - secondary
+      type: string
     AccountStatus:
       description: Enumeration if this account has been validated through micro-deposits
         or another available strategy.
@@ -2816,7 +2809,6 @@ components:
             address1: address1
             postalCode: postalCode
             state: state
-            type: Primary
             addressID: 851233a1
           - country: US
             validated: true
@@ -2825,7 +2817,6 @@ components:
             address1: address1
             postalCode: postalCode
             state: state
-            type: Primary
             addressID: 851233a1
           metadata:
             paygateID: 23beb5fd
@@ -2833,10 +2824,8 @@ components:
           phones:
           - valid: true
             number: +1.818.555.1212
-            type: Home
           - valid: true
             number: +1.818.555.1212
-            type: Home
           suffix: suffix
           birthDate: 2016-08-29
           firstName: Robert

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
@@ -58,7 +57,7 @@ func createCustomerAddress(logger log.Logger, repo CustomerRepository) http.Hand
 		var addrs []address
 		for _, addr := range cust.Addresses {
 			addrs = append(addrs, address{
-				Type:       strings.ToLower(addr.Type),
+				Type:       addr.Type,
 				Address1:   addr.Address1,
 				Address2:   addr.Address2,
 				City:       addr.City,

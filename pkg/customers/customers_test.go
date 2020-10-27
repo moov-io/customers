@@ -296,7 +296,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 
 	req.Phones = append(req.Phones, phone{
 		Number: "123.456.7890",
-		Type:   "Checking",
+		Type:   "mobile",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -420,7 +420,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
-				Type:   "cell",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
@@ -453,7 +453,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	updateReq.Phones = []phone{
 		{
 			Number: "555.555.5555",
-			Type:   "cell",
+			Type:   "mobile",
 		},
 	}
 	updateReq.Addresses = []address{
@@ -551,7 +551,7 @@ func TestCustomers__repository(t *testing.T) {
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
-				Type:   "Checking",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
@@ -655,7 +655,7 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
-				Type:   "Checking",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
@@ -680,12 +680,14 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		Phones: []phone{
 			{
 				Number: "555.555.5555",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
 			{
 				Address1: "555 5th st",
 				City:     "real city",
+				Type:     "primary",
 			},
 		},
 	}
@@ -753,6 +755,7 @@ func TestCustomersRepository__addCustomerAddress(t *testing.T) {
 		State:      "CA",
 		PostalCode: "90210",
 		Country:    "US",
+		Type:       "primary",
 	},
 	); err != nil {
 		t.Fatal(err)
@@ -1018,7 +1021,7 @@ func mockCustomerRequest() customerRequest {
 
 	p := phone{}
 	p.Number = "123-456-7892"
-	p.Type = "cell"
+	p.Type = "mobile"
 	c.Phones = append(c.Phones, p)
 
 	a := address{}
