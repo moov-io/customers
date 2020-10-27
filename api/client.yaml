@@ -430,7 +430,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCustomerAddress'
+              $ref: '#/components/schemas/CreateAddress'
       responses:
         '200':
           description: A customer object
@@ -470,7 +470,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateCustomerAddress'
+              $ref: '#/components/schemas/UpdateAddress'
       responses:
         '200':
           description: Updated Customer address
@@ -1530,6 +1530,248 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives:
+    post:
+      tags: [Customers]
+      summary: Add customer representative
+      description: Add a Customer representative
+      operationId: addCustomerRepresentative
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer for whom to add the representative
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRepresentative'
+      responses:
+        '200':
+          description: A customer object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Customer representative was not added, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives/{representativeID}:
+    put:
+      tags: [Customers]
+      summary: Update customer representative
+      description: Updates the specified customer representative
+      operationId: updateCustomerRepresentative
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Representative ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerRepresentative'
+      responses:
+        '200':
+          description: Updated Customer representative
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+    delete:
+      tags: [Customers]
+      summary: Delete a customer's representative
+      description: Deletes a customer's representative
+      operationId: deleteCustomerRepresentative
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Representative ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      responses:
+        '204':
+          description: Successfully deleted the customer representative
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives/{representativeID}/address:
+    post:
+      tags: [Customers]
+      summary: Add customer representative address
+      description: Add an Address onto an existing Customer representative record
+      operationId: addCustomerRepresentativeAddress
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: org342
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer to add the address onto
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: representativeID of the Customer representative for whom to add the address
+          required: true
+          schema:
+            type: string
+            example: b210a9d6-d755-4455-9bd2-9577ea7e7643
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAddress'
+      responses:
+        '200':
+          description: A customer representative object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerRepresentative'
+        '400':
+          description: Customer representative address was not added, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/representatives/{representativeID}/addresses/{addressID}:
+    put:
+      tags: [Customers]
+      summary: Update customer representative's address
+      description: Updates the specified customer representative address
+      operationId: updateCustomerRepresentativeAddress
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Customer Representative ID
+          required: true
+          schema:
+            type: string
+            example: b946a9d6-d755-4455-9bd2-9577ea7f0623
+        - name: addressID
+          in: path
+          description: Address ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAddress'
+      responses:
+        '200':
+          description: Updated Customer representative address
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+    delete:
+      tags: [Customers]
+      summary: Delete a customer representative's address
+      description: Deletes a customer representative's address
+      operationId: deleteCustomerRepresentativeAddress
+      parameters:
+        - name: customerID
+          in: path
+          description: Customer ID
+          required: true
+          schema:
+            type: string
+            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+        - name: representativeID
+          in: path
+          description: Customer Representative ID
+          required: true
+          schema:
+            type: string
+            example: b946a9d6-d755-4455-9bd2-9577ea7f0623
+        - name: addressID
+          in: path
+          description: Address ID
+          required: true
+          schema:
+            type: string
+            example: 1d62e297-9727-4084-a902-1031da932c9e
+      responses:
+        '204':
+          description: Successfully deleted the customer representative's address
+        '400':
+          description: See error message
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+
   /reports/accounts:
     get:
       tags: [Reports]
@@ -1610,6 +1852,33 @@ components:
           description: Customers name suffix. "Jr", "PH.D."
         type:
           $ref: '#/components/schemas/CustomerType'
+        businessName:
+          type: string
+          description: Business Name for business type customers
+          example: Alphabet Inc.
+        doingBusinessAs:
+          type: string
+          description: Doing Business As (DBA) name for business type customers
+          example: Google
+        businessType:
+          type: string
+          description: Business Type for business type customers - "Individual, sole proprietor, or single-member LLC", "Corporation", "Nonprofit organization", "Partnership", "Limited Liability Company"
+        ein:
+          type: string
+          description: Employer Identification Number (EIN) for business type customers
+          example: 77-0493581
+        duns:
+          type: string
+          description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers
+          example: 15-048-3782
+        sicCode:
+          type: string
+          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 07
+        naicsCode:
+          type: string
+          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 32
         birthDate:
           type: string
           description: Legal date of birth
@@ -1622,6 +1891,14 @@ components:
           type: string
           description: Customer Social Security Number (SSN)
           example: 111-11-1111
+        website:
+          type: string
+          description: Company Website for business type customers
+          example: http://google.com
+        dateBusinessEstablished:
+          type: string
+          description: Date business was established for business type customers
+          example: '2016-08-29'
         phones:
           type: array
           items:
@@ -1630,7 +1907,7 @@ components:
           type: array
           minimum: 1
           items:
-            $ref: '#/components/schemas/CreateCustomerAddress'
+            $ref: '#/components/schemas/CreateAddress'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -1673,6 +1950,33 @@ components:
           description: Customers name suffix. "Jr", "PH.D."
         type:
           $ref: '#/components/schemas/CustomerType'
+        businessName:
+          type: string
+          description: Business Name for business type customers
+          example: Alphabet Inc.
+        doingBusinessAs:
+          type: string
+          description: Doing Business As (DBA) name for business type customers
+          example: Google
+        businessType:
+          type: string
+          description: Business Type for business type customers - "Individual, sole proprietor, or single-member LLC", "Corporation", "Nonprofit organization", "Partnership", "Limited Liability Company"
+        ein:
+          type: string
+          description: Employer Identification Number (EIN) for business type customers
+          example: 77-0493581
+        duns:
+          type: string
+          description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers
+          example: 15-048-3782
+        sicCode:
+          type: string
+          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 07
+        naicsCode:
+          type: string
+          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+          example: 32
         birthDate:
           type: string
           description: Legal date of birth
@@ -1683,6 +1987,14 @@ components:
           type: string
           maximum: 500
           description: Primary email address of customer name@domain.com
+        website:
+          type: string
+          description: Company Website for business type customers
+          example: http://google.com
+        dateBusinessEstablished:
+          type: string
+          description: Date business was established for business type customers
+          example: '2016-08-29'
         phones:
           type: array
           items:
@@ -1690,7 +2002,7 @@ components:
         addresses:
           type: array
           items:
-            $ref: '#/components/schemas/CustomerAddress'
+            $ref: '#/components/schemas/Address'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -1726,6 +2038,12 @@ components:
       enum:
         - individual
         - business
+    OwnerType:
+      type: string
+      description: The type of individual owner of a resource, such as SSN, phone, or address
+      enum:
+        - customer
+        - representative
     CustomerStatus:
       type: string
       description: State of the customer
@@ -1757,7 +2075,7 @@ components:
           $ref: '#/components/schemas/CustomerStatus'
       required:
         - status
-    UpdateCustomerAddress:
+    UpdateAddress:
       properties:
         type:
           type: string
@@ -1765,6 +2083,8 @@ components:
           enum:
             - primary
             - secondary
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         validated:
           type: boolean
           default: false
@@ -1790,6 +2110,7 @@ components:
             - US
       required:
         - type
+        - ownerType
         - address1
         - city
         - state
@@ -1801,10 +2122,13 @@ components:
           type: string
           description: phone number
           example: "+1.818.555.1212"
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         type:
           $ref: '#/components/schemas/PhoneType'
       required:
         - number
+        - ownerType
         - type
     Phone:
       properties:
@@ -1812,6 +2136,8 @@ components:
           type: string
           description: phone number
           example: "+1.818.555.1212"
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         valid:
           type: boolean
           description: phone number has been validated to connect with customer
@@ -1819,6 +2145,7 @@ components:
           $ref: '#/components/schemas/PhoneType'
       required:
         - number
+        - ownerType
         - valid
         - type
     PhoneType:
@@ -1828,7 +2155,7 @@ components:
         - home
         - mobile
         - work
-    CreateCustomerAddress:
+    CreateAddress:
       type: object
       properties:
         type:
@@ -1836,6 +2163,8 @@ components:
           enum:
             - Primary
             - Secondary
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         address1:
           type: string
           description: First line of the address
@@ -1859,12 +2188,13 @@ components:
             - US
       required:
         - type
+        - ownerType
         - address1
         - city
         - state
         - postalCode
         - country
-    CustomerAddress:
+    Address:
       type: object
       properties:
         addressID:
@@ -1873,6 +2203,8 @@ components:
           example: 851233a1
         type:
           $ref: '#/components/schemas/AddressType'
+        ownerType:
+          $ref: '#/components/schemas/OwnerType'
         address1:
           type: string
           description: First line of the address
@@ -1898,6 +2230,7 @@ components:
       required:
         - addressID
         - type
+        - ownerType
         - address1
         - city
         - state
@@ -1909,6 +2242,79 @@ components:
       enum:
         - primary
         - secondary
+    CreateCustomerRepresentative:
+      properties:
+        firstName:
+          type: string
+          description: Given Name or First Name
+          example: Mary
+        lastName:
+          type: string
+          description: Surname or Last Name
+          example: Smith
+        jobTitle:
+          type: string
+          description: Job title of this representative
+          example: Chief Executive Officer
+        birthDate:
+          type: string
+          description: Legal date of birth
+          example: '2016-08-29'
+        SSN:
+          type: string
+          description: Customer Representative's Social Security Number (SSN)
+          example: 111-11-1111
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+        addresses:
+          type: array
+          minimum: 1
+          items:
+            $ref: '#/components/schemas/CreateAddress'
+      required:
+        - firstName
+        - lastName
+    CustomerRepresentative:
+      properties:
+        representativeID:
+          type: string
+          description: Unique identifier for this Representative
+          example: b280b9d9
+        firstName:
+          type: string
+          description: Given Name or First Name
+          example: Mary
+        lastName:
+          type: string
+          description: Surname or Last Name
+          example: Smith
+        jobTitle:
+          type: string
+          description: Job title of this representative
+          example: Chief Executive Officer
+        birthDate:
+          type: string
+          description: Legal date of birth
+          example: '2016-08-29'
+        SSN:
+          type: string
+          description: Customer Representative's Social Security Number (SSN)
+          example: 111-11-1111
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreatePhone'
+        addresses:
+          type: array
+          minimum: 1
+          items:
+            $ref: '#/components/schemas/CreateAddress'
+      required:
+        - representativeID
+        - firstName
+        - lastName
     AccountStatus:
       type: string
       description: Enumeration if this account has been validated through micro-deposits or another available strategy.
