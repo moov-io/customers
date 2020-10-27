@@ -54,9 +54,16 @@ Class | Method | HTTP request | Description
 *ConfigurationApi* | [**UpdateOrganizationConfiguration**](docs/ConfigurationApi.md#updateorganizationconfiguration) | **Put** /configuration/customers | Update Organization Configuration
 *ConfigurationApi* | [**UploadOrganizationLogo**](docs/ConfigurationApi.md#uploadorganizationlogo) | **Put** /configuration/logo | Update Organization Logo
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add Customer Address
+*CustomersApi* | [**AddCustomerRepresentative**](docs/CustomersApi.md#addcustomerrepresentative) | **Post** /customers/{customerID}/representatives | Add customer representative
+*CustomersApi* | [**AddCustomerRepresentativeAddress**](docs/CustomersApi.md#addcustomerrepresentativeaddress) | **Post** /customers/{customerID}/representatives/{representativeID}/address | Add customer representative address
+*CustomersApi* | [**CompleteAccountValidation**](docs/CustomersApi.md#completeaccountvalidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create Customer
 *CustomersApi* | [**DeleteCustomer**](docs/CustomersApi.md#deletecustomer) | **Delete** /customers/{customerID} | Delete Customer
 *CustomersApi* | [**DeleteCustomerAddress**](docs/CustomersApi.md#deletecustomeraddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
+*CustomersApi* | [**DeleteCustomerDocument**](docs/CustomersApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
+*CustomersApi* | [**DeleteCustomerRepresentative**](docs/CustomersApi.md#deletecustomerrepresentative) | **Delete** /customers/{customerID}/representatives/{representativeID} | Delete a customer&#39;s representative
+*CustomersApi* | [**DeleteCustomerRepresentativeAddress**](docs/CustomersApi.md#deletecustomerrepresentativeaddress) | **Delete** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Delete a customer representative&#39;s address
+*CustomersApi* | [**GetAccountValidation**](docs/CustomersApi.md#getaccountvalidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Get Customer
 *CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers Service
@@ -66,13 +73,9 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**UpdateCustomer**](docs/CustomersApi.md#updatecustomer) | **Put** /customers/{customerID} | Update Customer
 *CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer Status
-*DisclaimersApi* | [**AcceptDisclaimer**](docs/DisclaimersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
-*DisclaimersApi* | [**GetCustomerDisclaimers**](docs/DisclaimersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get Customer Disclaimers
-*DocumentsApi* | [**DeleteCustomerDocument**](docs/DocumentsApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
-*DocumentsApi* | [**GetCustomerDocumentContents**](docs/DocumentsApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get Customer Document
-*DocumentsApi* | [**GetCustomerDocuments**](docs/DocumentsApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get Customer Documents
-*DocumentsApi* | [**UploadCustomerDocument**](docs/DocumentsApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
-*ReportsApi* | [**GetReportOfCustomerAccounts**](docs/ReportsApi.md#getreportofcustomeraccounts) | **Get** /reports/accounts | Create Report of Accounts
+*CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
+*CustomersApi* | [**UpdateCustomerRepresentative**](docs/CustomersApi.md#updatecustomerrepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update customer representative
+*CustomersApi* | [**UpdateCustomerRepresentativeAddress**](docs/CustomersApi.md#updatecustomerrepresentativeaddress) | **Put** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Update customer representative&#39;s address
 
 
 ## Documentation For Models
@@ -81,17 +84,19 @@ Class | Method | HTTP request | Description
  - [AccountStatus](docs/AccountStatus.md)
  - [AccountType](docs/AccountType.md)
  - [AccountValidationResponse](docs/AccountValidationResponse.md)
+ - [Address](docs/Address.md)
  - [AddressType](docs/AddressType.md)
  - [Amount](docs/Amount.md)
  - [CompleteAccountValidationRequest](docs/CompleteAccountValidationRequest.md)
  - [CompleteAccountValidationResponse](docs/CompleteAccountValidationResponse.md)
  - [CreateAccount](docs/CreateAccount.md)
+ - [CreateAddress](docs/CreateAddress.md)
  - [CreateCustomer](docs/CreateCustomer.md)
- - [CreateCustomerAddress](docs/CreateCustomerAddress.md)
+ - [CreateCustomerRepresentative](docs/CreateCustomerRepresentative.md)
  - [CreatePhone](docs/CreatePhone.md)
  - [Customer](docs/Customer.md)
- - [CustomerAddress](docs/CustomerAddress.md)
  - [CustomerMetadata](docs/CustomerMetadata.md)
+ - [CustomerRepresentative](docs/CustomerRepresentative.md)
  - [CustomerStatus](docs/CustomerStatus.md)
  - [CustomerType](docs/CustomerType.md)
  - [Disclaimer](docs/Disclaimer.md)
@@ -103,12 +108,13 @@ Class | Method | HTTP request | Description
  - [InstitutionDetails](docs/InstitutionDetails.md)
  - [OfacSearch](docs/OfacSearch.md)
  - [OrganizationConfiguration](docs/OrganizationConfiguration.md)
+ - [OwnerType](docs/OwnerType.md)
  - [Phone](docs/Phone.md)
  - [PhoneType](docs/PhoneType.md)
  - [ReportAccountResponse](docs/ReportAccountResponse.md)
  - [TransitAccountNumber](docs/TransitAccountNumber.md)
  - [UpdateAccountStatus](docs/UpdateAccountStatus.md)
- - [UpdateCustomerAddress](docs/UpdateCustomerAddress.md)
+ - [UpdateAddress](docs/UpdateAddress.md)
  - [UpdateCustomerStatus](docs/UpdateCustomerStatus.md)
  - [UpdateValidation](docs/UpdateValidation.md)
 

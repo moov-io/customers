@@ -28,13 +28,31 @@ type Customer struct {
 	// Customers name suffix. \"Jr\", \"PH.D.\"
 	Suffix string       `json:"suffix,omitempty"`
 	Type   CustomerType `json:"type"`
+	// Business Name for business type customers
+	BusinessName string `json:"businessName,omitempty"`
+	// Doing Business As (DBA) name for business type customers
+	DoingBusinessAs string `json:"doingBusinessAs,omitempty"`
+	// Business Type for business type customers - \"Individual, sole proprietor, or single-member LLC\", \"Corporation\", \"Nonprofit organization\", \"Partnership\", \"Limited Liability Company\"
+	BusinessType string `json:"businessType,omitempty"`
+	// Employer Identification Number (EIN) for business type customers
+	Ein string `json:"ein,omitempty"`
+	// Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers
+	Duns string `json:"duns,omitempty"`
+	// SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+	SicCode string `json:"sicCode,omitempty"`
+	// NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+	NaicsCode string `json:"naicsCode,omitempty"`
 	// Legal date of birth
 	BirthDate string         `json:"birthDate,omitempty"`
 	Status    CustomerStatus `json:"status"`
 	// Primary email address of customer name@domain.com
-	Email     string            `json:"email"`
-	Phones    []Phone           `json:"phones,omitempty"`
-	Addresses []CustomerAddress `json:"addresses,omitempty"`
+	Email string `json:"email"`
+	// Company Website for business type customers
+	Website string `json:"website,omitempty"`
+	// Date business was established for business type customers
+	DateBusinessEstablished string    `json:"dateBusinessEstablished,omitempty"`
+	Phones                  []Phone   `json:"phones,omitempty"`
+	Addresses               []Address `json:"addresses,omitempty"`
 	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 	Metadata  map[string]string `json:"metadata,omitempty"`
 	CreatedAt time.Time         `json:"createdAt"`
