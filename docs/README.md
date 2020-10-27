@@ -9,9 +9,9 @@ This project focuses on verifying the identity of people who are legally able to
  - [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP)
  - [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks
  - Verification workflows to comply with US federal law and ensure authentic transfers
-  
+
 The goal of this project is to provide objective, detailed due diligence on individuals and companies in the financial sector  — in a modernized and extensible way.
- 
+
 **Dependencies**
 1. [Fed](./fed.md)
 1. [PayGate](./paygate.md)
@@ -29,11 +29,11 @@ This project contains several models used in the HTTP endpoints. These are gener
 
 ### Customer
 `Customer` represents an individual or business (sole proprietorship or corporation).
-For creating a `Customer`, see the [API documentation](https://moov-io.github.io/customers/api/#post-/customers). 
+For creating a `Customer`, see the [API documentation](https://moov-io.github.io/customers/api/#post-/customers).
 
 #### Customer Status and Approval
 
-Approval is represented by the `status` field of a `Customer` and can have the following values: `Deceased`, `Rejected`, `ReceiveOnly`, `Verified`, `Frozen`, `Unknown` (default) 
+Approval is represented by the `status` field of a `Customer` and can have the following values: `Deceased`, `Rejected`, `ReceiveOnly`, `Verified`, `Frozen`, `Unknown` (default)
 Approvals can only be done manually, but we are aiming for automated approval. In order for a `Customer` to be approved into:
  - `ReceiveOnly` requires an [OFAC search](https://github.com/moov-io/watchman) that results in a value below the specified threshold.
     - This status is used to receive funds.
@@ -75,10 +75,11 @@ We use [pkger](https://github.com/markbates/pkger) to embed migration files into
 Running `make embed-migrations` will generate a `cmd/server/pkged.go` file with the encoded contents from the `/migrations` directory which will be included into application build. Make sure to commit the generated file to the git repository.
 
 ## Getting Help
+
  channel | info
  ------- | -------
-Documentation [Moov Projects](https://docs.moov.io/) | Documentation of Moov's various open source projects.
-Issues [GitHub Issues](https://github.com/moov-io/customers/issues) | If you are able to reproduce a problem, please open a GitHub Issue under the related project.
+[Documentation](https://moov-io.github.io/customers) | Project documentation for our community.
+[GitHub Issues](https://github.com/moov-io/customers/issues) | Public tracker of issues with our community. Please open a GitHub Issue if you're able to reproduce problems or to request features.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov's Twitter feed to get updates on our projects. You can also tweet us to ask questions or share comments.
 Slack [#moov-io](https://slack.moov.io/) | Join the slack channel to discuss with other contributors about the development of Moov's open source projects.
 

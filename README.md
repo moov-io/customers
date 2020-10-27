@@ -12,7 +12,7 @@ This project focuses on verifying the identity of people who are legally able to
  - [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP)
  - [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks
  - Verification workflows to comply with US federal law and ensure authentic transfers
-  
+
 The goal of this project is to provide objective, detailed due diligence on individuals and companies in the financial sector — in a modernized and extensible way.
 
 If you believe you have identified a security vulnerability please responsibly report the issue as via email to security@moov.io. Please do not post it to a public issue tracker.
@@ -50,8 +50,8 @@ Read through the [project docs](docs/README.md) over here to get an understandin
 
  channel | info
  ------- | -------
- [Documentation](https://moov-io.github.io/customers) | Project documentation for our community.
- [GitHub Issues](https://github.com/moov-io/customers/issues) | Public tracker of issues with our community. Please open a GitHub Issue if you're able to reproduce problems or to request features.
+[Documentation](https://moov-io.github.io/customers) | Project documentation for our community.
+[GitHub Issues](https://github.com/moov-io/customers/issues) | Public tracker of issues with our community. Please open a GitHub Issue if you're able to reproduce problems or to request features.
 Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov's Twitter feed to get updates on our projects. You can also tweet us to ask questions or share comments.
 Slack [#moov-io](https://slack.moov.io/) | Join the slack channel to discuss with other contributors about the development of Moov's open source projects.
 
