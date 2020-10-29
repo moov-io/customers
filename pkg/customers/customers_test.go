@@ -39,6 +39,9 @@ type testCustomerRepository struct {
 	createdCustomer   *client.Customer
 	updatedStatus     client.CustomerStatus
 	savedSearchResult *client.OfacSearch
+
+	customerRepresentative			*client.CustomerRepresentative
+	createdCustomerRepresentative	*client.CustomerRepresentative
 }
 
 func (r *testCustomerRepository) GetCustomer(customerID, organization string) (*client.Customer, error) {
@@ -107,6 +110,35 @@ func (r *testCustomerRepository) getLatestCustomerOFACSearch(customerID, organiz
 func (r *testCustomerRepository) saveCustomerOFACSearch(customerID string, result client.OfacSearch) error {
 	r.savedSearchResult = &result
 	return r.err
+}
+
+func (r *testCustomerRepository) GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
+	return r.customerRepresentative, nil
+}
+
+func (r *testCustomerRepository) CreateCustomerRepresentative(c *client.CustomerRepresentative) error {
+	return r.err
+}
+
+func (r *testCustomerRepository) updateCustomerRepresentative(c *client.CustomerRepresentative) error {
+	return r.err
+}
+
+func (r *testCustomerRepository) deleteCustomerRepresentative(representativeID string) error {
+	return r.err
+}
+
+func (r *testCustomerRepository) searchCustomerRepresentatives(params RepresentativeSearchParams) ([]*client.CustomerRepresentative, error) {
+	if r.err != nil {
+		return nil, r.err
+	}
+	if r.customerRepresentative != nil {
+		return []*client.CustomerRepresentative{r.customerRepresentative}, nil
+	}
+	return nil, nil
 }
 
 func TestCustomers__formatCustomerName(t *testing.T) {

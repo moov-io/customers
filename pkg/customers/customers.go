@@ -464,9 +464,16 @@ type CustomerRepository interface {
 
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
 
-	addCustomerAddress(customerID string, address address) error
-	updateCustomerAddress(customerID, addressID string, req updateCustomerAddressRequest) error
-	deleteCustomerAddress(customerID string, addressID string) error
+	GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error)
+	CreateCustomerRepresentative(c *client.CustomerRepresentative) error
+	updateCustomerRepresentative(c *client.CustomerRepresentative) error
+	deleteCustomerRepresentative(representativeID string) error
+
+	searchCustomerRepresentatives(params RepresentativeSearchParams) ([]*client.CustomerRepresentative, error)
+
+	addAddress(ownerID string, ownerType client.OwnerType, address address) error
+	updateAddress(ownerID, addressID string, ownerType client.OwnerType, req updateAddressRequest) error
+	deleteAddress(ownerID string, ownerType client.OwnerType, addressID string) error
 
 	getLatestCustomerOFACSearch(customerID, organization string) (*client.OfacSearch, error)
 	saveCustomerOFACSearch(customerID string, result client.OfacSearch) error

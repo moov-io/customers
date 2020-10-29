@@ -184,6 +184,7 @@ func main() {
 	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher, appSalt)
 	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
+	customers.AddCustomerRepresentativeRoutes(logger, router, customerRepo, customerSSNStorage)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
 
 	docsStorageProvider := util.Or(os.Getenv("DOCUMENTS_STORAGE_PROVIDER"), "file")
