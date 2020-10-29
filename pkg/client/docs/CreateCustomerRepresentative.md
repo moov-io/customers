@@ -4,6 +4,7 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**CustomerID** | **string** | The unique identifier for the customer the representative belongs to | 
 **FirstName** | **string** | Given Name or First Name | 
 **LastName** | **string** | Surname or Last Name | 
 **JobTitle** | **string** | Job title of this representative | [optional] 

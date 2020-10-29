@@ -71,9 +71,9 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update Customer Metadata
 *CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Search Customers
 *CustomersApi* | [**UpdateCustomer**](docs/CustomersApi.md#updatecustomer) | **Put** /customers/{customerID} | Update Customer
-*CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer Status
 *CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
+*CustomersApi* | [**UpdateAddress**](docs/CustomersApi.md#updateaddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customer&#39;s address
 *CustomersApi* | [**UpdateCustomerRepresentative**](docs/CustomersApi.md#updatecustomerrepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update customer representative
 *CustomersApi* | [**UpdateCustomerRepresentativeAddress**](docs/CustomersApi.md#updatecustomerrepresentativeaddress) | **Put** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Update customer representative&#39;s address
 
@@ -86,7 +86,7 @@ Class | Method | HTTP request | Description
  - [AccountValidationResponse](docs/AccountValidationResponse.md)
  - [Address](docs/Address.md)
  - [AddressType](docs/AddressType.md)
- - [Amount](docs/Amount.md)
+ - [BusinessType](docs/BusinessType.md)
  - [CompleteAccountValidationRequest](docs/CompleteAccountValidationRequest.md)
  - [CompleteAccountValidationResponse](docs/CompleteAccountValidationResponse.md)
  - [CreateAccount](docs/CreateAccount.md)
