@@ -7,6 +7,7 @@ package customers
 import (
 	"database/sql"
 	"fmt"
+	"github.com/moov-io/customers/pkg/client"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -17,42 +18,44 @@ import (
 )
 
 type SSN struct {
-	customerID string
-	encrypted  string
-	masked     string
+	ownerID   string
+	ownerType client.OwnerType
+	encrypted string
+	masked    string
 }
 
 func (s *SSN) String() string {
-	return fmt.Sprintf("SSN: customerID=%s masked=%s", s.customerID, s.masked)
+	return fmt.Sprintf("SSN: ownerId=%s ownerType=%s masked=%s", s.ownerID, s.ownerType, s.masked)
 }
 
 type ssnStorage struct {
 	keeper *secrets.StringKeeper
-	repo   CustomerSSNRepository
+	repo   SSNRepository
 }
 
-func NewSSNStorage(keeper *secrets.StringKeeper, repo CustomerSSNRepository) *ssnStorage {
+func NewSSNStorage(keeper *secrets.StringKeeper, repo SSNRepository) *ssnStorage {
 	return &ssnStorage{
 		keeper: keeper,
 		repo:   repo,
 	}
 }
 
-func (s *ssnStorage) encryptRaw(customerID, raw string) (*SSN, error) {
+func (s *ssnStorage) encryptRaw(ownerID string, ownerType client.OwnerType, raw string) (*SSN, error) {
 	defer func() {
 		raw = ""
 	}()
-	if customerID == "" || raw == "" {
-		return nil, fmt.Errorf("missing customer=%s and/or SSN", customerID)
+	if ownerID == "" || raw == "" {
+		return nil, fmt.Errorf("missing parent=%s and/or SSN", ownerID)
 	}
 	encrypted, err := s.keeper.EncryptString(raw)
 	if err != nil {
-		return nil, fmt.Errorf("ssnStorage: encrypt customer=%s: %v", customerID, err)
+		return nil, fmt.Errorf("ssnStorage: encrypt owner=%s: %v", ownerID, err)
 	}
 	return &SSN{
-		customerID: customerID,
-		encrypted:  encrypted,
-		masked:     maskSSN(raw),
+		ownerID:   ownerID,
+		ownerType: ownerType,
+		encrypted: encrypted,
+		masked:    maskSSN(raw),
 	}, nil
 }
 
@@ -67,55 +70,55 @@ func maskSSN(s string) string {
 	}
 }
 
-type CustomerSSNRepository interface {
-	saveCustomerSSN(*SSN) error
-	getCustomerSSN(customerID string) (*SSN, error)
+type SSNRepository interface {
+	saveSSN(*SSN) error
+	getSSN(ownerID string, ownerType client.OwnerType) (*SSN, error)
 }
 
-func NewCustomerSSNRepository(logger log.Logger, db *sql.DB) CustomerSSNRepository {
-	return &sqlCustomerSSNRepository{
+func NewCustomerSSNRepository(logger log.Logger, db *sql.DB) SSNRepository {
+	return &sqlSSNRepository{
 		db:     db,
 		logger: logger,
 	}
 }
 
-type sqlCustomerSSNRepository struct {
+type sqlSSNRepository struct {
 	db     *sql.DB
 	logger log.Logger
 }
 
 //
 
-func (r *sqlCustomerSSNRepository) saveCustomerSSN(ssn *SSN) error {
-	query := `replace into customer_ssn (customer_id, ssn, ssn_masked, created_at) values (?, ?, ?, ?);`
+func (r *sqlSSNRepository) saveSSN(ssn *SSN) error {
+	query := `replace into ssn (owner_id, owner_type, ssn, ssn_masked, created_at) values (?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("sqlCustomerSSNRepository: saveCustomerSSN prepare: %v", err)
+		return fmt.Errorf("sqlSSNRepository: saveSSN prepare: %v", err)
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(ssn.customerID, ssn.encrypted, ssn.masked, time.Now()); err != nil {
-		return fmt.Errorf("sqlCustomerSSNRepository: saveCustomerSSN: exec: %v", err)
+	if _, err := stmt.Exec(ssn.ownerID, string(ssn.ownerType), ssn.encrypted, ssn.masked, time.Now()); err != nil {
+		return fmt.Errorf("sqlSSNRepository: saveSSN: exec: %v", err)
 	}
 	return nil
 }
 
-func (r *sqlCustomerSSNRepository) getCustomerSSN(customerID string) (*SSN, error) {
-	query := `select ssn, ssn_masked from customer_ssn where customer_id = ? limit 1;`
+func (r *sqlSSNRepository) getSSN(ownerID string, ownerType client.OwnerType) (*SSN, error) {
+	query := `select ssn, ssn_masked from ssn where owner_id = ? and owner_type = ? limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return nil, fmt.Errorf("sqlCustomerSSNRepository: getCustomerSSN prepare: %v", err)
+		return nil, fmt.Errorf("sqlSSNRepository: getSSN prepare: %v", err)
 	}
 	defer stmt.Close()
 
-	row := stmt.QueryRow(customerID)
+	row := stmt.QueryRow(ownerID, string(ownerType))
 
-	ssn := SSN{customerID: customerID}
+	ssn := SSN{ownerID: ownerID, ownerType: ownerType}
 	if err := row.Scan(&ssn.encrypted, &ssn.masked); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil // not found
 		}
-		return nil, fmt.Errorf("sqlCustomerSSNRepository: getCustomerSSN scan: %v", err)
+		return nil, fmt.Errorf("sqlSSNRepository: getSSN scan: %v", err)
 	}
 	return &ssn, nil
 }

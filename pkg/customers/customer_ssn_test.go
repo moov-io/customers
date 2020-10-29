@@ -6,6 +6,7 @@ package customers
 
 import (
 	"encoding/base64"
+	"github.com/moov-io/customers/pkg/client"
 	"testing"
 
 	"github.com/moov-io/base/database"
@@ -29,11 +30,11 @@ type testCustomerSSNRepository struct {
 	ssn *SSN
 }
 
-func (r *testCustomerSSNRepository) saveCustomerSSN(*SSN) error {
+func (r *testCustomerSSNRepository) saveSSN(*SSN) error {
 	return r.err
 }
 
-func (r *testCustomerSSNRepository) getCustomerSSN(customerID string) (*SSN, error) {
+func (r *testCustomerSSNRepository) getSSN(ownerID string, ownerType client.OwnerType) (*SSN, error) {
 	if r.ssn != nil {
 		return r.ssn, nil
 	}
@@ -43,21 +44,21 @@ func (r *testCustomerSSNRepository) getCustomerSSN(customerID string) (*SSN, err
 func TestCustomerSSNStorage(t *testing.T) {
 	storage := testCustomerSSNStorage(t)
 
-	if _, err := storage.encryptRaw("", ""); err == nil {
+	if _, err := storage.encryptRaw("", client.OWNERTYPE_CUSTOMER, ""); err == nil {
 		t.Errorf("expected error")
 	}
-	if _, err := storage.encryptRaw(base.ID(), ""); err == nil {
+	if _, err := storage.encryptRaw(base.ID(), client.OWNERTYPE_CUSTOMER, ""); err == nil {
 		t.Errorf("expected error")
 	}
 
 	// encrypt SSN
 	customerID := base.ID()
-	ssn, err := storage.encryptRaw(customerID, "123456789")
+	ssn, err := storage.encryptRaw(customerID, client.OWNERTYPE_CUSTOMER, "123456789")
 	if err != nil {
 		t.Error(err)
 	}
-	if ssn.customerID != customerID {
-		t.Errorf("ssn.customerID=%s", ssn.customerID)
+	if ssn.ownerID != customerID {
+		t.Errorf("ssn.ownerID=%s", ssn.ownerID)
 	}
 	if ssn.masked != "1#######9" {
 		t.Errorf("ssn.masked=%s", ssn.masked)
@@ -74,21 +75,22 @@ func TestCustomerSSNStorage(t *testing.T) {
 
 func TestCustomerSSNRepository(t *testing.T) {
 	customerID := base.ID()
-	check := func(t *testing.T, customerSSNRepo *sqlCustomerSSNRepository) {
+	ownerType := client.OWNERTYPE_CUSTOMER
+	check := func(t *testing.T, customerSSNRepo *sqlSSNRepository) {
 
-		if ssn, err := customerSSNRepo.getCustomerSSN(customerID); ssn != nil || err != nil {
+		if ssn, err := customerSSNRepo.getSSN(customerID, ownerType); ssn != nil || err != nil {
 			t.Fatalf("ssn=%v error=%v", ssn, err)
 		}
 
 		// write
 		bs := base64.StdEncoding.EncodeToString([]byte("123456789"))
-		ssn := &SSN{customerID: customerID, encrypted: bs, masked: "1#######9"}
-		if err := customerSSNRepo.saveCustomerSSN(ssn); err != nil {
+		ssn := &SSN{ownerID: customerID, ownerType: ownerType, encrypted: bs, masked: "1#######9"}
+		if err := customerSSNRepo.saveSSN(ssn); err != nil {
 			t.Fatal(err)
 		}
 
 		// read again
-		ssn, err := customerSSNRepo.getCustomerSSN(customerID)
+		ssn, err := customerSSNRepo.getSSN(customerID, ownerType)
 		if ssn == nil || err != nil {
 			t.Fatalf("ssn=%v error=%v", ssn, err)
 		}
@@ -107,10 +109,10 @@ func TestCustomerSSNRepository(t *testing.T) {
 	// SQLite tests
 	sqliteDB := database.CreateTestSqliteDB(t)
 	defer sqliteDB.Close()
-	check(t, &sqlCustomerSSNRepository{sqliteDB.DB, log.NewNopLogger()})
+	check(t, &sqlSSNRepository{sqliteDB.DB, log.NewNopLogger()})
 
 	// MySQL tests
 	mysqlDB := database.CreateTestMySQLDB(t)
 	defer mysqlDB.Close()
-	check(t, &sqlCustomerSSNRepository{mysqlDB.DB, log.NewNopLogger()})
+	check(t, &sqlSSNRepository{mysqlDB.DB, log.NewNopLogger()})
 }

@@ -322,7 +322,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		})
 	}
 	if req.SSN != "" {
-		ssn, err := storage.encryptRaw(customer.CustomerID, req.SSN)
+		ssn, err := storage.encryptRaw(customer.CustomerID, client.OWNERTYPE_CUSTOMER, req.SSN)
 		return customer, ssn, err
 	}
 	return customer, nil, nil
@@ -356,7 +356,7 @@ func createCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 			return
 		}
 		if ssn != nil {
-			err := customerSSNStorage.repo.saveCustomerSSN(ssn)
+			err := customerSSNStorage.repo.saveSSN(ssn)
 			if err != nil {
 				logger.LogErrorf("problem saving SSN for Customer=%s: %v", cust.CustomerID, err)
 				moovhttp.Problem(w, fmt.Errorf("saveCustomerSSN: %v", err))
@@ -425,7 +425,7 @@ func updateCustomer(logger log.Logger, repo CustomerRepository, customerSSNStora
 			return
 		}
 		if ssn != nil {
-			err := customerSSNStorage.repo.saveCustomerSSN(ssn)
+			err := customerSSNStorage.repo.saveSSN(ssn)
 			if err != nil {
 				logger.LogErrorf("error saving SSN for Customer=%s: %v", cust.CustomerID, err)
 				moovhttp.Problem(w, fmt.Errorf("saving customer's SSN: %v", err))
