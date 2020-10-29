@@ -93,11 +93,13 @@ func TestRepository__searchCustomers(t *testing.T) {
 				{
 					Number: "555-555-5555",
 					Type:   "primary",
+					OwnerType: 	"customer",
 				},
 			},
 			Addresses: []address{
 				{
 					Type:       "primary",
+					OwnerType:	"customer",
 					Address1:   "123 Cool St.",
 					City:       "San Francisco",
 					State:      "CA",

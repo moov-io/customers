@@ -15,7 +15,7 @@ import (
 	"github.com/moov-io/customers/pkg/client"
 )
 
-func TestCustomers__addCustomerAddress(t *testing.T) {
+func TestCustomers__addAddress(t *testing.T) {
 	db := createTestCustomerRepository(t)
 	repo := NewCustomerRepo(log.NewNopLogger(), db.db)
 
@@ -35,6 +35,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 		PostalCode: "12345",
 		Country:    "USA",
 		Type:       "primary",
+		OwnerType:  "customer",
 	}
 	payload, err := json.Marshal(addrPayload)
 	require.NoError(t, err)
@@ -52,9 +53,10 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 	var customerResp *client.Customer
 	require.NoError(t, json.Unmarshal(w.Body.Bytes(), &customerResp))
 	got := customerResp.Addresses[0]
-	want := client.CustomerAddress{
+	want := client.Address{
 		AddressID:  got.AddressID,
 		Type:       addrPayload.Type,
+		OwnerType:  client.OWNERTYPE_CUSTOMER,
 		Address1:   addrPayload.Address1,
 		Address2:   addrPayload.Address2,
 		City:       addrPayload.City,
@@ -80,7 +82,7 @@ func TestCustomers__addCustomerAddress(t *testing.T) {
 	require.Contains(t, errResp.ErrorMsg, ErrAddressTypeDuplicate.Error())
 }
 
-func TestCustomers__updateCustomerAddress(t *testing.T) {
+func TestCustomers__updateAddress(t *testing.T) {
 	db := createTestCustomerRepository(t)
 	repo := NewCustomerRepo(log.NewNopLogger(), db.db)
 
@@ -112,7 +114,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 		},
 	}
 	for _, req := range addrRequests {
-		require.NoError(t, repo.addCustomerAddress(cust.CustomerID, req))
+		require.NoError(t, repo.addAddress(cust.CustomerID, client.OWNERTYPE_CUSTOMER, req))
 		cust, err = repo.GetCustomer(cust.CustomerID, organization) // refresh customer object after updating address
 		require.NoError(t, err)
 	}
@@ -128,9 +130,10 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 		}
 	}
 
-	updateReq := updateCustomerAddressRequest{
+	updateReq := updateAddressRequest{
 		address: address{
 			Type:       "primary",
+			OwnerType:  "customer",
 			Address1:   "555 5th st",
 			City:       "Denver",
 			State:      "CO",
@@ -159,15 +162,16 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 	var customerResp *client.Customer
 	require.NoError(t, json.Unmarshal(res.Body.Bytes(), &customerResp))
 
-	var got client.CustomerAddress
+	var got client.Address
 	for _, a := range customerResp.Addresses {
 		if a.AddressID == primaryAddressID {
 			got = a
 		}
 	}
-	want := client.CustomerAddress{
+	want := client.Address{
 		AddressID:  got.AddressID,
 		Type:       updateReq.Type,
+		OwnerType:  updateReq.OwnerType,
 		Address1:   updateReq.Address1,
 		Address2:   updateReq.Address2,
 		City:       updateReq.City,
@@ -196,7 +200,7 @@ func TestCustomers__updateCustomerAddress(t *testing.T) {
 	require.Contains(t, errResp.ErrorMsg, ErrAddressTypeDuplicate.Error())
 }
 
-func TestCustomers__deleteCustomerAddress(t *testing.T) {
+func TestCustomers__deleteAddress(t *testing.T) {
 	db := createTestCustomerRepository(t)
 	repo := NewCustomerRepo(log.NewNopLogger(), db.db)
 
@@ -217,7 +221,7 @@ func TestCustomers__deleteCustomerAddress(t *testing.T) {
 		Country:    "USA",
 		Type:       "primary",
 	}
-	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
+	require.NoError(t, repo.addAddress(cust.CustomerID, client.OWNERTYPE_CUSTOMER, address))
 
 	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
@@ -246,7 +250,7 @@ func TestCustomers__updateCustomerAddressFailure(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("GET", "/customers/foo/address/bar", nil)
-	updateCustomerAddress(log.NewNopLogger(), repo)(w, req)
+	updateAddress(log.NewNopLogger(), client.OWNERTYPE_CUSTOMER, repo)(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusBadRequest {
@@ -256,7 +260,7 @@ func TestCustomers__updateCustomerAddressFailure(t *testing.T) {
 	// try the proper HTTP verb
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest("PUT", "/customers/foo/address/bar", nil)
-	updateCustomerAddress(log.NewNopLogger(), repo)(w, req)
+	updateAddress(log.NewNopLogger(), client.OWNERTYPE_CUSTOMER, repo)(w, req)
 	w.Flush()
 
 	if w.Code != http.StatusBadRequest {
@@ -264,7 +268,7 @@ func TestCustomers__updateCustomerAddressFailure(t *testing.T) {
 	}
 }
 
-func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
+func TestCustomerRepository__updateAddress(t *testing.T) {
 	db := createTestCustomerRepository(t)
 	repo := NewCustomerRepo(log.NewNopLogger(), db.db)
 
@@ -285,15 +289,16 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 		Country:    "USA",
 		Type:       "primary",
 	}
-	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, addrRequest))
+	require.NoError(t, repo.addAddress(cust.CustomerID, client.OWNERTYPE_CUSTOMER, addrRequest))
 
 	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 
 	addressID := cust.Addresses[0].AddressID
-	updateReq := updateCustomerAddressRequest{
+	updateReq := updateAddressRequest{
 		address: address{
 			Type:       "primary",
+			OwnerType:  "customer",
 			Address1:   "555 5th st",
 			City:       "Denver",
 			State:      "CO",
@@ -302,16 +307,17 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 		},
 		Validated: true,
 	}
-	err = repo.updateCustomerAddress(cust.CustomerID, addressID, updateReq)
+	err = repo.updateAddress(cust.CustomerID, addressID, client.OWNERTYPE_CUSTOMER, updateReq)
 	require.NoError(t, err)
 
 	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 
 	require.Len(t, cust.Addresses, 1)
-	want := client.CustomerAddress{
+	want := client.Address{
 		AddressID:  addressID,
 		Type:       updateReq.Type,
+		OwnerType:  updateReq.OwnerType,
 		Address1:   updateReq.Address1,
 		Address2:   updateReq.Address2,
 		City:       updateReq.City,
@@ -324,7 +330,7 @@ func TestCustomerRepository__updateCustomerAddress(t *testing.T) {
 	require.Equal(t, want, got)
 }
 
-func TestCustomerRepository__deleteCustomerAddress(t *testing.T) {
+func TestCustomerRepository__deleteAddress(t *testing.T) {
 	db := createTestCustomerRepository(t)
 	repo := NewCustomerRepo(log.NewNopLogger(), db.db)
 
@@ -345,13 +351,13 @@ func TestCustomerRepository__deleteCustomerAddress(t *testing.T) {
 		Country:    "USA",
 		Type:       "primary",
 	}
-	require.NoError(t, repo.addCustomerAddress(cust.CustomerID, address))
+	require.NoError(t, repo.addAddress(cust.CustomerID, client.OWNERTYPE_CUSTOMER, address))
 
 	cust, err = repo.GetCustomer(cust.CustomerID, organization)
 	require.NoError(t, err)
 
 	addressID := cust.Addresses[0].AddressID
-	err = repo.deleteCustomerAddress(cust.CustomerID, addressID)
+	err = repo.deleteAddress(cust.CustomerID, client.OWNERTYPE_CUSTOMER, addressID)
 	require.NoError(t, err)
 
 	cust, err = repo.GetCustomer(cust.CustomerID, organization)

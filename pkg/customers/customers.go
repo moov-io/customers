@@ -139,12 +139,14 @@ type customerRequest struct {
 }
 
 type phone struct {
-	Number string           `json:"number"`
-	Type   client.PhoneType `json:"type"`
+	Number    string           `json:"number"`
+	Type      client.PhoneType `json:"type"`
+	OwnerType client.OwnerType `json:"ownerType"`
 }
 
 func (p *phone) validate() error {
 	p.Type = client.PhoneType(strings.ToLower(string(p.Type)))
+	p.OwnerType = client.OwnerType(strings.ToLower(string(p.OwnerType)))
 
 	switch p.Type {
 	case client.PHONETYPE_HOME, client.PHONETYPE_MOBILE, client.PHONETYPE_WORK:
@@ -152,11 +154,18 @@ func (p *phone) validate() error {
 		return fmt.Errorf("unknown type: %s", p.Type)
 	}
 
+	switch p.OwnerType {
+	case client.OWNERTYPE_CUSTOMER, client.OWNERTYPE_REPRESENTATIVE:
+	default:
+		return fmt.Errorf("unknown owner type: %s", p.OwnerType)
+	}
+
 	return nil
 }
 
 type address struct {
 	Type       client.AddressType `json:"type"`
+	OwnerType  client.OwnerType	  `json:"ownerType"`
 	Address1   string             `json:"address1"`
 	Address2   string             `json:"address2,omitempty"`
 	City       string             `json:"city"`
@@ -167,11 +176,18 @@ type address struct {
 
 func (add *address) validate() error {
 	add.Type = client.AddressType(strings.ToLower(string(add.Type)))
+	add.OwnerType = client.OwnerType(strings.ToLower(string(add.OwnerType)))
 
 	switch add.Type {
 	case client.ADDRESSTYPE_PRIMARY, client.ADDRESSTYPE_SECONDARY:
 	default:
 		return fmt.Errorf("unknown type: %s", add.Type)
+	}
+
+	switch add.OwnerType {
+	case client.OWNERTYPE_CUSTOMER, client.OWNERTYPE_REPRESENTATIVE:
+	default:
+		return fmt.Errorf("unknown owner type: %s", add.OwnerType)
 	}
 
 	if !usstates.Valid(add.State) {
@@ -287,12 +303,13 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 
 	for i := range req.Phones {
 		customer.Phones = append(customer.Phones, client.Phone{
-			Number: req.Phones[i].Number,
-			Type:   req.Phones[i].Type,
+			Number: 	req.Phones[i].Number,
+			Type:   	req.Phones[i].Type,
+			OwnerType: 	req.Phones[i].OwnerType,
 		})
 	}
 	for i := range req.Addresses {
-		customer.Addresses = append(customer.Addresses, client.CustomerAddress{
+		customer.Addresses = append(customer.Addresses, client.Address{
 			AddressID:  base.ID(),
 			Address1:   req.Addresses[i].Address1,
 			Address2:   req.Addresses[i].Address2,
@@ -301,6 +318,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			PostalCode: req.Addresses[i].PostalCode,
 			Country:    req.Addresses[i].Country,
 			Type:       req.Addresses[i].Type,
+			OwnerType:  req.Addresses[i].OwnerType,
 		})
 	}
 	if req.SSN != "" {
@@ -546,17 +564,17 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, birthDate, client.CUSTOMERSTATUS_UNKNOWN, c.Email, now, now, organization)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.Ein, c.Duns, c.SicCode, c.NaicsCode, birthDate, client.CUSTOMERSTATUS_UNKNOWN, c.Email, c.Website, c.DateBusinessEstablished, now, now, organization)
 	if err != nil {
 		return fmt.Errorf("CreateCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
 
-	err = r.updatePhonesByCustomerID(tx, c.CustomerID, c.Phones)
+	err = r.updatePhonesByOwnerID(tx, c.CustomerID, client.OWNERTYPE_CUSTOMER, c.Phones)
 	if err != nil {
 		return fmt.Errorf("updating customer's phones: %v", err)
 	}
 
-	err = r.updateAddressesByCustomerID(tx, c.CustomerID, c.Addresses)
+	err = r.updateAddressesByOwnerID(tx, c.CustomerID, client.OWNERTYPE_CUSTOMER, c.Addresses)
 	if err != nil {
 		return fmt.Errorf("updating customer's addresses: %v", err)
 	}
@@ -598,12 +616,12 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 		return fmt.Errorf("no records to update with customer id=%s", c.CustomerID)
 	}
 
-	err = r.updatePhonesByCustomerID(tx, c.CustomerID, c.Phones)
+	err = r.updatePhonesByOwnerID(tx, c.CustomerID, client.OWNERTYPE_CUSTOMER, c.Phones)
 	if err != nil {
 		return fmt.Errorf("updating customer's phones: %v", err)
 	}
 
-	err = r.updateAddressesByCustomerID(tx, c.CustomerID, c.Addresses)
+	err = r.updateAddressesByOwnerID(tx, c.CustomerID, client.OWNERTYPE_CUSTOMER, c.Addresses)
 	if err != nil {
 		return fmt.Errorf("updating customer's addresses: %v", err)
 	}
@@ -614,10 +632,10 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 	return nil
 }
 
-func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID string, phones []client.Phone) error {
-	deleteQuery := `delete from customers_phones where customer_id = ?`
+func (r *sqlCustomerRepository) updatePhonesByOwnerID(tx *sql.Tx, ownerID string, ownerType client.OwnerType, phones []client.Phone) error {
+	deleteQuery := `delete from phones where owner_id = ? and owner_type = ?`
 	var args []interface{}
-	args = append(args, customerID)
+	args = append(args, ownerID, ownerType)
 	if len(phones) > 0 {
 		deleteQuery = fmt.Sprintf("%s and number not in (?%s)", deleteQuery, strings.Repeat(",?", len(phones)-1))
 		for _, p := range phones {
@@ -637,7 +655,7 @@ func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID 
 		return fmt.Errorf("executing query: %v", err)
 	}
 
-	replaceQuery := `replace into customers_phones (customer_id, number, valid, type) values (?, ?, ?, ?);`
+	replaceQuery := `replace into phones (owner_id, owner_type, number, valid, type) values (?, ?, ?, ?, ?);`
 	stmt, err = tx.Prepare(replaceQuery)
 	if err != nil {
 		return fmt.Errorf("preparing query: %v", err)
@@ -645,7 +663,7 @@ func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID 
 	defer stmt.Close()
 
 	for _, phone := range phones {
-		_, err := stmt.Exec(customerID, phone.Number, phone.Valid, phone.Type)
+		_, err := stmt.Exec(ownerID, string(ownerType), phone.Number, phone.Valid, phone.Type)
 		if err != nil {
 			return fmt.Errorf("executing update on customer's phone: %v", err)
 		}
@@ -654,10 +672,10 @@ func (r *sqlCustomerRepository) updatePhonesByCustomerID(tx *sql.Tx, customerID 
 	return nil
 }
 
-func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customerID string, addresses []client.CustomerAddress) error {
-	deleteQuery := `delete from customers_addresses where customer_id = ?`
+func (r *sqlCustomerRepository) updateAddressesByOwnerID(tx *sql.Tx, ownerID string, ownerType client.OwnerType, addresses []client.Address) error {
+	deleteQuery := `delete from addresses where owner_id = ? and owner_type = ?`
 	var args []interface{}
-	args = append(args, customerID)
+	args = append(args, ownerID, ownerType)
 	if len(addresses) > 0 {
 		deleteQuery = fmt.Sprintf("%s and address1 not in (?%s)", deleteQuery, strings.Repeat(",?", len(addresses)-1))
 		for _, a := range addresses {
@@ -677,8 +695,7 @@ func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customer
 		panic(err)
 	}
 
-	replaceQuery := `replace into customers_addresses(address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?,
-	?, ?);`
+	replaceQuery := `replace into addresses(address_id, owner_id, owner_type, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err = tx.Prepare(replaceQuery)
 	if err != nil {
 		return fmt.Errorf("preparing query: %v", err)
@@ -686,7 +703,7 @@ func (r *sqlCustomerRepository) updateAddressesByCustomerID(tx *sql.Tx, customer
 	defer stmt.Close()
 
 	for _, addr := range addresses {
-		_, err := stmt.Exec(addr.AddressID, customerID, addr.Type, addr.Address1, addr.Address2, addr.City, addr.State, addr.PostalCode, addr.Country, addr.Validated)
+		_, err := stmt.Exec(addr.AddressID, ownerID, string(ownerType), addr.Type, addr.Address1, addr.Address2, addr.City, addr.State, addr.PostalCode, addr.Country, addr.Validated)
 		if err != nil {
 			return fmt.Errorf("executing query: %v", err)
 		}
@@ -778,26 +795,26 @@ func (r *sqlCustomerRepository) replaceCustomerMetadata(customerID string, metad
 	return nil
 }
 
-func (r *sqlCustomerRepository) addCustomerAddress(customerID string, req address) error {
-	query := `insert into customers_addresses (address_id, customer_id, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+func (r *sqlCustomerRepository) addAddress(ownerID string, ownerType client.OwnerType, req address) error {
+	query := `insert into addresses (address_id, owner_id, owner_type, type, address1, address2, city, state, postal_code, country, validated) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("createCustomerAddress: prepare: %v", err)
+		return fmt.Errorf("addAddress: prepare: %v", err)
 	}
 	defer stmt.Close()
 
-	if _, err := stmt.Exec(base.ID(), customerID, req.Type, req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false); err != nil {
-		return fmt.Errorf("createCustomerAddress: exec: %v", err)
+	if _, err := stmt.Exec(base.ID(), ownerID, string(ownerType), req.Type, req.Address1, req.Address2, req.City, req.State, req.PostalCode, req.Country, false); err != nil {
+		return fmt.Errorf("addAddress: exec: %v", err)
 	}
 	return nil
 }
 
-func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID string, req updateCustomerAddressRequest) error {
-	query := `update customers_addresses set type = ?, address1 = ?, address2 = ?, city = ?, state = ?, postal_code = ?, country = ?,
-	validated = ? where customer_id = ? and address_id = ? and deleted_at is null;`
+func (r *sqlCustomerRepository) updateAddress(ownerID, addressID string, ownerType client.OwnerType, req updateAddressRequest) error {
+	query := `update addresses set type = ?, address1 = ?, address2 = ?, city = ?, state = ?, postal_code = ?, country = ?,
+	validated = ? where owner_id = ? and owner_type = ? and address_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
-		return fmt.Errorf("updateCustomerAddress: prepare: %v", err)
+		return fmt.Errorf("updateAddress: prepare: %v", err)
 	}
 	defer stmt.Close()
 
@@ -810,23 +827,24 @@ func (r *sqlCustomerRepository) updateCustomerAddress(customerID, addressID stri
 		req.PostalCode,
 		req.Country,
 		req.Validated,
-		customerID,
+		ownerID,
+		string(ownerType),
 		addressID)
 	if err != nil {
-		return fmt.Errorf("updateCustomerAddress: exec: %v", err)
+		return fmt.Errorf("updateAddress: exec: %v", err)
 	}
 	return nil
 }
 
-func (r *sqlCustomerRepository) deleteCustomerAddress(customerID string, addressID string) error {
-	query := `update customers_addresses set deleted_at = ? where customer_id = ? and address_id = ? and deleted_at is null;`
+func (r *sqlCustomerRepository) deleteAddress(ownerID string, ownerType client.OwnerType, addressID string) error {
+	query := `update addresses set deleted_at = ? where owner_id = ? and owner_type = ? and address_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(time.Now(), customerID, addressID)
+	_, err = stmt.Exec(time.Now(), ownerID, string(ownerType), addressID)
 	return err
 }
 
