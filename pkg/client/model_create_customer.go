@@ -25,9 +25,8 @@ type CreateCustomer struct {
 	// Business Name for business type customers
 	BusinessName string `json:"businessName,omitempty"`
 	// Doing Business As (DBA) name for business type customers
-	DoingBusinessAs string `json:"doingBusinessAs,omitempty"`
-	// Business Type for business type customers - \"Individual, sole proprietor, or single-member LLC\", \"Corporation\", \"Nonprofit organization\", \"Partnership\", \"Limited Liability Company\"
-	BusinessType string `json:"businessType,omitempty"`
+	DoingBusinessAs string       `json:"doingBusinessAs,omitempty"`
+	BusinessType    BusinessType `json:"businessType,omitempty"`
 	// Employer Identification Number (EIN) for business type customers
 	Ein string `json:"ein,omitempty"`
 	// Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers

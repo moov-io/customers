@@ -1861,8 +1861,7 @@ components:
           description: Doing Business As (DBA) name for business type customers
           example: Google
         businessType:
-          type: string
-          description: Business Type for business type customers - "Individual, sole proprietor, or single-member LLC", "Corporation", "Nonprofit organization", "Partnership", "Limited Liability Company"
+          $ref: '#/components/schemas/BusinessType'
         ein:
           type: string
           description: Employer Identification Number (EIN) for business type customers
@@ -1959,8 +1958,7 @@ components:
           description: Doing Business As (DBA) name for business type customers
           example: Google
         businessType:
-          type: string
-          description: Business Type for business type customers - "Individual, sole proprietor, or single-member LLC", "Corporation", "Nonprofit organization", "Partnership", "Limited Liability Company"
+          $ref: '#/components/schemas/BusinessType'
         ein:
           type: string
           description: Employer Identification Number (EIN) for business type customers
@@ -2038,6 +2036,15 @@ components:
       enum:
         - individual
         - business
+    BusinessType:
+      type: string
+      description: The type of business for business customers
+      enum:
+        - individual, sole proprietor, or single-member LLC
+        - corporation
+        - non-profit organization
+        - partnership
+        - limited liability company
     OwnerType:
       type: string
       description: The type of individual owner of a resource, such as SSN, phone, or address

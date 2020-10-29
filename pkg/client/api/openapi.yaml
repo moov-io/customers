@@ -2239,7 +2239,6 @@ components:
         sicCode: "7"
         duns: 15-048-3782
         middleName: Flex
-        businessType: businessType
         email: email
         naicsCode: "32"
       properties:
@@ -2275,10 +2274,7 @@ components:
           example: Google
           type: string
         businessType:
-          description: Business Type for business type customers - "Individual, sole
-            proprietor, or single-member LLC", "Corporation", "Nonprofit organization",
-            "Partnership", "Limited Liability Company"
-          type: string
+          $ref: '#/components/schemas/BusinessType'
         ein:
           description: Employer Identification Number (EIN) for business type customers
           example: 77-0493581
@@ -2381,7 +2377,6 @@ components:
         duns: 15-048-3782
         middleName: Flex
         lastModified: 2016-08-29T09:12:33.001Z
-        businessType: businessType
         email: email
         naicsCode: "32"
       properties:
@@ -2421,10 +2416,7 @@ components:
           example: Google
           type: string
         businessType:
-          description: Business Type for business type customers - "Individual, sole
-            proprietor, or single-member LLC", "Corporation", "Nonprofit organization",
-            "Partnership", "Limited Liability Company"
-          type: string
+          $ref: '#/components/schemas/BusinessType'
         ein:
           description: Employer Identification Number (EIN) for business type customers
           example: 77-0493581
@@ -2504,6 +2496,15 @@ components:
       enum:
       - individual
       - business
+      type: string
+    BusinessType:
+      description: The type of business for business customers
+      enum:
+      - individual, sole proprietor, or single-member LLC
+      - corporation
+      - non-profit organization
+      - partnership
+      - limited liability company
       type: string
     OwnerType:
       description: The type of individual owner of a resource, such as SSN, phone,
@@ -3419,7 +3420,6 @@ components:
           duns: 15-048-3782
           middleName: Flex
           lastModified: 2016-08-29T09:12:33.001Z
-          businessType: businessType
           email: email
           naicsCode: "32"
       properties:
