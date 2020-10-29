@@ -11,6 +11,8 @@ package client
 
 // CreateCustomerRepresentative struct for CreateCustomerRepresentative
 type CreateCustomerRepresentative struct {
+	// The unique identifier for the customer the representative belongs to
+	CustomerID string `json:"customerID"`
 	// Given Name or First Name
 	FirstName string `json:"firstName"`
 	// Surname or Last Name

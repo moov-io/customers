@@ -474,7 +474,7 @@ paths:
   /customers/{customerID}/address:
     post:
       description: Add an Address onto an existing Customer record
-      operationId: addCustomerAddress
+      operationId: addAddress
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -529,7 +529,7 @@ paths:
   /customers/{customerID}/addresses/{addressID}:
     delete:
       description: Deletes a customer's address
-      operationId: deleteCustomerAddress
+      operationId: deleteAddress
       parameters:
       - description: Customer ID
         explode: false
@@ -563,7 +563,7 @@ paths:
       - Customers
     put:
       description: Updates the specified customer address
-      operationId: updateCustomerAddress
+      operationId: updateAddress
       parameters:
       - description: Customer ID
         explode: false
@@ -2767,12 +2767,18 @@ components:
           state: CO
           type: Primary
         jobTitle: Chief Executive Officer
+        customerID: e210a9d6
         phones:
         - number: +1.818.555.1212
         - number: +1.818.555.1212
         birthDate: 2016-08-29
         SSN: 111-11-1111
       properties:
+        customerID:
+          description: The unique identifier for the customer the representative belongs
+            to
+          example: e210a9d6
+          type: string
         firstName:
           description: Given Name or First Name
           example: Mary
@@ -2803,32 +2809,40 @@ components:
           minimum: 1
           type: array
       required:
+      - customerID
       - firstName
       - lastName
     CustomerRepresentative:
       example:
         firstName: Mary
         lastName: Smith
+        createdAt: 2016-08-29T09:12:33.001Z
         addresses:
         - country: US
+          validated: true
           address2: address2
-          city: Denver
+          city: city
           address1: address1
           postalCode: postalCode
-          state: CO
-          type: Primary
+          state: state
+          addressID: 851233a1
         - country: US
+          validated: true
           address2: address2
-          city: Denver
+          city: city
           address1: address1
           postalCode: postalCode
-          state: CO
-          type: Primary
+          state: state
+          addressID: 851233a1
         jobTitle: Chief Executive Officer
         representativeID: b280b9d9
+        customerID: e210a9d6
         phones:
-        - number: +1.818.555.1212
-        - number: +1.818.555.1212
+        - valid: true
+          number: +1.818.555.1212
+        - valid: true
+          number: +1.818.555.1212
+        lastModified: 2016-08-29T09:12:33.001Z
         birthDate: 2016-08-29
         SSN: 111-11-1111
       properties:
@@ -2836,6 +2850,11 @@ components:
           description: Unique identifier for this Representative
           example: b280b9d9
           type: string
+        customerID:
+          description: The unique identifier for the customer the representative belongs
+            to
+          example: e210a9d6
+          type: string
         firstName:
           description: Given Name or First Name
           example: Mary
@@ -2852,21 +2871,33 @@ components:
           description: Legal date of birth
           example: 2016-08-29
           type: string
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        lastModified:
+          description: Last time the object was modified
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
         SSN:
           description: Customer Representative's Social Security Number (SSN)
           example: 111-11-1111
           type: string
         phones:
           items:
-            $ref: '#/components/schemas/CreatePhone'
+            $ref: '#/components/schemas/Phone'
           type: array
         addresses:
           items:
-            $ref: '#/components/schemas/CreateAddress'
+            $ref: '#/components/schemas/Address'
           minimum: 1
           type: array
       required:
+      - createdAt
+      - customerID
       - firstName
+      - lastModified
       - lastName
       - representativeID
     AccountStatus:

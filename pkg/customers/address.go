@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/moov-io/customers/pkg/client"
 	"net/http"
 
 	"github.com/gorilla/mux"

@@ -404,7 +404,7 @@ paths:
       tags: [Customers]
       summary: Add Customer Address
       description: Add an Address onto an existing Customer record
-      operationId: addCustomerAddress
+      operationId: addAddress
       parameters:
         - name: X-Request-ID
           in: header
@@ -449,7 +449,7 @@ paths:
       tags: [Customers]
       summary: Update Customer Address
       description: Updates the specified customer address
-      operationId: updateCustomerAddress
+      operationId: updateAddress
       parameters:
         - name: customerID
           in: path
@@ -484,7 +484,7 @@ paths:
       tags: [Customers]
       summary: Delete Customer Address
       description: Deletes a customer's address
-      operationId: deleteCustomerAddress
+      operationId: deleteAddress
       parameters:
         - name: customerID
           in: path
@@ -2244,6 +2244,10 @@ components:
         - secondary
     CreateCustomerRepresentative:
       properties:
+        customerID:
+          type: string
+          description: The unique identifier for the customer the representative belongs to
+          example: e210a9d6
         firstName:
           type: string
           description: Given Name or First Name
@@ -2274,6 +2278,7 @@ components:
           items:
             $ref: '#/components/schemas/CreateAddress'
       required:
+        - customerID
         - firstName
         - lastName
     CustomerRepresentative:
@@ -2282,6 +2287,10 @@ components:
           type: string
           description: Unique identifier for this Representative
           example: b280b9d9
+        customerID:
+          type: string
+          description: The unique identifier for the customer the representative belongs to
+          example: e210a9d6
         firstName:
           type: string
           description: Given Name or First Name
@@ -2298,6 +2307,15 @@ components:
           type: string
           description: Legal date of birth
           example: '2016-08-29'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        lastModified:
+          type: string
+          format: date-time
+          description: Last time the object was modified
+          example: '2016-08-29T09:12:33.001Z'
         SSN:
           type: string
           description: Customer Representative's Social Security Number (SSN)
@@ -2305,16 +2323,19 @@ components:
         phones:
           type: array
           items:
-            $ref: '#/components/schemas/CreatePhone'
+            $ref: '#/components/schemas/Phone'
         addresses:
           type: array
           minimum: 1
           items:
-            $ref: '#/components/schemas/CreateAddress'
+            $ref: '#/components/schemas/Address'
       required:
         - representativeID
+        - customerID
         - firstName
         - lastName
+        - createdAt
+        - lastModified
     AccountStatus:
       type: string
       description: Enumeration if this account has been validated through micro-deposits or another available strategy.
