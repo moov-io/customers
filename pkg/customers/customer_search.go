@@ -114,9 +114,18 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 			&c.NickName,
 			&c.Suffix,
 			&c.Type,
+			&c.BusinessName,
+			&c.DoingBusinessAs,
+			&c.BusinessType,
+			&c.Ein,
+			&c.Duns,
+			&c.SicCode,
+			&c.NaicsCode,
 			&birthDate,
 			&c.Status,
 			&c.Email,
+			&c.Website,
+			&c.DateBusinessEstablished,
 			&c.CreatedAt,
 			&c.LastModified,
 		)
@@ -162,7 +171,7 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 
 func buildSearchQuery(params SearchParams) (string, []interface{}) {
 	var args []interface{}
-	query := `select customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified
+	query := `select customer_id, first_name, middle_name, last_name, nick_name, suffix, type, business_name, doing_business_as, business_type, ein, duns, sic_code, naics_code, birth_date, status, email, website, date_business_established, created_at, last_modified
 from customers where deleted_at is null`
 
 	if params.Organization != "" {

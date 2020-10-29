@@ -113,20 +113,29 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID, o
 // TODO(adam): What GDPR implications does this information have? IIRC if any EU citizen uses
 // this software we have to fully comply.
 type customerRequest struct {
-	CustomerID string                `json:"-"`
-	FirstName  string                `json:"firstName"`
-	MiddleName string                `json:"middleName"`
-	LastName   string                `json:"lastName"`
-	NickName   string                `json:"nickName"`
-	Suffix     string                `json:"suffix"`
-	Type       client.CustomerType   `json:"type"`
-	BirthDate  model.YYYYMMDD        `json:"birthDate"`
-	Status     client.CustomerStatus `json:"-"`
-	Email      string                `json:"email"`
-	SSN        string                `json:"SSN"`
-	Phones     []phone               `json:"phones"`
-	Addresses  []address             `json:"addresses"`
-	Metadata   map[string]string     `json:"metadata"`
+	CustomerID 					string				  `json:"-"`
+	FirstName  					string                `json:"firstName"`
+	MiddleName 					string                `json:"middleName"`
+	LastName   					string                `json:"lastName"`
+	NickName   					string                `json:"nickName"`
+	Suffix     					string                `json:"suffix"`
+	Type       					client.CustomerType   `json:"type"`
+	BusinessName				string			 	  `json:"businessName"`
+	DoingBusinessAs				string			 	  `json:"doingBusinessAs"`
+	BusinessType				client.BusinessType	  `json:"businessType"`
+	Ein							string			 	  `json:"ein"`
+	Duns						string			 	  `json:"duns"`
+	SicCode						string			 	  `json:"sicCode"`
+	NaicsCode					string			 	  `json:"naicsCode"`
+	BirthDate  					model.YYYYMMDD        `json:"birthDate"`
+	Status     					client.CustomerStatus `json:"-"`
+	Email      					string                `json:"email"`
+	Website    					string                `json:"website"`
+	DateBusinessEstablished    	string                `json:"dateBusinessEstablished"`
+	SSN        					string                `json:"SSN"`
+	Phones     					[]phone               `json:"phones"`
+	Addresses  					[]address             `json:"addresses"`
+	Metadata   					map[string]string     `json:"metadata"`
 }
 
 type phone struct {
@@ -254,17 +263,26 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 	}
 
 	customer := &client.Customer{
-		CustomerID: req.CustomerID,
-		FirstName:  req.FirstName,
-		MiddleName: req.MiddleName,
-		LastName:   req.LastName,
-		NickName:   req.NickName,
-		Suffix:     req.Suffix,
-		Type:       req.Type,
-		BirthDate:  string(req.BirthDate),
-		Email:      req.Email,
-		Status:     req.Status,
-		Metadata:   req.Metadata,
+		CustomerID: 				req.CustomerID,
+		FirstName:  				req.FirstName,
+		MiddleName: 				req.MiddleName,
+		LastName:   				req.LastName,
+		NickName:   				req.NickName,
+		Suffix:     				req.Suffix,
+		Type:       				req.Type,
+		BusinessName: 				req.BusinessName,
+		DoingBusinessAs: 			req.DoingBusinessAs,
+		BusinessType: 				req.BusinessType,
+		Ein: 						req.Ein,
+		Duns: 						req.Duns,
+		SicCode: 					req.SicCode,
+		NaicsCode: 					req.NaicsCode,
+		BirthDate:  				string(req.BirthDate),
+		Email:      				req.Email,
+		Website: 					req.Website,
+		DateBusinessEstablished: 	req.DateBusinessEstablished,
+		Status:     				req.Status,
+		Metadata:   				req.Metadata,
 	}
 
 	for i := range req.Phones {
@@ -514,8 +532,8 @@ func (r *sqlCustomerRepository) CreateCustomer(c *client.Customer, organization 
 	}
 
 	// Insert customer record
-	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified, organization)
-values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
+	query := `insert into customers (customer_id, first_name, middle_name, last_name, nick_name, suffix, type, business_name, doing_business_as, business_type, ein, duns, sic_code, naics_code, birth_date, status, email, website, date_business_established, created_at, last_modified, organization)
+values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -556,8 +574,8 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 	}
 	defer tx.Rollback()
 
-	query := `update customers set first_name = ?, middle_name = ?, last_name = ?, nick_name = ?, suffix = ?, type = ?, birth_date = ?, status = ?, email =?,
-	last_modified = ?,
+	query := `update customers set first_name = ?, middle_name = ?, last_name = ?, nick_name = ?, suffix = ?, type = ?, business_name = ?, doing_business_as = ?, business_type = ?, ein = ?, duns = ?, sic_code = ?, naics_code = ?, birth_date = ?, status = ?, email =?,
+	website = ?, date_business_established = ?, last_modified = ?,
 	organization = ? where customer_id = ? and deleted_at is null;`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -566,7 +584,7 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 	defer stmt.Close()
 
 	now := time.Now()
-	res, err := stmt.Exec(c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BirthDate, c.Status, c.Email, now, organization, c.CustomerID)
+	res, err := stmt.Exec(c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.Ein, c.Duns, c.SicCode, c.NaicsCode, c.BirthDate, c.Status, c.Email, c.Website, c.DateBusinessEstablished, now, organization, c.CustomerID)
 	if err != nil {
 		return fmt.Errorf("updating customer: %v", err)
 	}
