@@ -6,5 +6,6 @@ CREATE TABLE if not exists customer_representatives (
     job_title varchar(50),
     birth_date datetime,
     created_at datetime,
+    last_modified datetime,
     deleted_at datetime
 );
