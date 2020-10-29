@@ -12,9 +12,9 @@ package client
 // Address struct for Address
 type Address struct {
 	// Unique identifier for this Address
-	AddressID string    `json:"addressID"`
-	Type      string    `json:"type"`
-	OwnerType OwnerType `json:"ownerType"`
+	AddressID string      `json:"addressID"`
+	Type      AddressType `json:"type"`
+	OwnerType OwnerType   `json:"ownerType"`
 	// First line of the address
 	Address1 string `json:"address1"`
 	// Second line of the address

@@ -9,10 +9,14 @@
 
 package client
 
-// CreatePhone struct for CreatePhone
-type CreatePhone struct {
-	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType"`
-	Type      PhoneType `json:"type"`
-}
+// BusinessType The type of business for business customers
+type BusinessType string
+
+// List of BusinessType
+const (
+	BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC BusinessType = "individual, sole proprietor, or single-member LLC"
+	BUSINESSTYPE_CORPORATION                                     BusinessType = "corporation"
+	BUSINESSTYPE_NON_PROFIT_ORGANIZATION                         BusinessType = "non-profit organization"
+	BUSINESSTYPE_PARTNERSHIP                                     BusinessType = "partnership"
+	BUSINESSTYPE_LIMITED_LIABILITY_COMPANY                       BusinessType = "limited liability company"
+)

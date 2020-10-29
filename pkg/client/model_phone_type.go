@@ -9,10 +9,12 @@
 
 package client
 
-// CreatePhone struct for CreatePhone
-type CreatePhone struct {
-	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType"`
-	Type      PhoneType `json:"type"`
-}
+// PhoneType phone type
+type PhoneType string
+
+// List of PhoneType
+const (
+	PHONETYPE_HOME   PhoneType = "home"
+	PHONETYPE_MOBILE PhoneType = "mobile"
+	PHONETYPE_WORK   PhoneType = "work"
+)

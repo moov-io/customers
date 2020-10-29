@@ -458,7 +458,7 @@ paths:
   /customers/{customerID}/address:
     post:
       description: Add an Address onto an existing Customer record
-      operationId: addCustomerAddress
+      operationId: addAddress
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -513,7 +513,7 @@ paths:
   /customers/{customerID}/addresses/{addressID}:
     delete:
       description: Deletes a customer's address
-      operationId: deleteCustomerAddress
+      operationId: deleteAddress
       parameters:
       - description: Customer ID
         explode: false
@@ -547,7 +547,7 @@ paths:
       - Customers
     put:
       description: Updates the specified customer address
-      operationId: updateCustomerAddress
+      operationId: updateAddress
       parameters:
       - description: Customer ID
         explode: false
@@ -2203,9 +2203,7 @@ components:
         dateBusinessEstablished: 2016-08-29
         phones:
         - number: +1.818.555.1212
-          type: Home
         - number: +1.818.555.1212
-          type: Home
         ein: 77-0493581
         suffix: suffix
         birthDate: 2016-08-29
@@ -2215,7 +2213,6 @@ components:
         sicCode: "7"
         duns: 15-048-3782
         middleName: Flex
-        businessType: businessType
         email: email
         naicsCode: "32"
       properties:
@@ -2251,10 +2248,7 @@ components:
           example: Google
           type: string
         businessType:
-          description: Business Type for business type customers - "Individual, sole
-            proprietor, or single-member LLC", "Corporation", "Nonprofit organization",
-            "Partnership", "Limited Liability Company"
-          type: string
+          $ref: '#/components/schemas/BusinessType'
         ein:
           description: Employer Identification Number (EIN) for business type customers
           example: 77-0493581
@@ -2327,7 +2321,6 @@ components:
           address1: address1
           postalCode: postalCode
           state: state
-          type: Primary
           addressID: 851233a1
         - country: US
           validated: true
@@ -2336,7 +2329,6 @@ components:
           address1: address1
           postalCode: postalCode
           state: state
-          type: Primary
           addressID: 851233a1
         metadata:
           paygateID: 23beb5fd
@@ -2346,10 +2338,8 @@ components:
         phones:
         - valid: true
           number: +1.818.555.1212
-          type: Home
         - valid: true
           number: +1.818.555.1212
-          type: Home
         ein: 77-0493581
         suffix: suffix
         birthDate: 2016-08-29
@@ -2361,7 +2351,6 @@ components:
         duns: 15-048-3782
         middleName: Flex
         lastModified: 2016-08-29T09:12:33.001Z
-        businessType: businessType
         email: email
         naicsCode: "32"
       properties:
@@ -2401,10 +2390,7 @@ components:
           example: Google
           type: string
         businessType:
-          description: Business Type for business type customers - "Individual, sole
-            proprietor, or single-member LLC", "Corporation", "Nonprofit organization",
-            "Partnership", "Limited Liability Company"
-          type: string
+          $ref: '#/components/schemas/BusinessType'
         ein:
           description: Employer Identification Number (EIN) for business type customers
           example: 77-0493581
@@ -2484,6 +2470,15 @@ components:
       enum:
       - individual
       - business
+      type: string
+    BusinessType:
+      description: The type of business for business customers
+      enum:
+      - individual, sole proprietor, or single-member LLC
+      - corporation
+      - non-profit organization
+      - partnership
+      - limited liability company
       type: string
     OwnerType:
       description: The type of individual owner of a resource, such as SSN, phone,
@@ -2582,7 +2577,6 @@ components:
     CreatePhone:
       example:
         number: +1.818.555.1212
-        type: Home
       properties:
         number:
           description: phone number
@@ -2591,11 +2585,7 @@ components:
         ownerType:
           $ref: '#/components/schemas/OwnerType'
         type:
-          enum:
-          - Home
-          - Mobile
-          - Work
-          type: string
+          $ref: '#/components/schemas/PhoneType'
       required:
       - number
       - ownerType
@@ -2604,7 +2594,6 @@ components:
       example:
         valid: true
         number: +1.818.555.1212
-        type: Home
       properties:
         number:
           description: phone number
@@ -2616,16 +2605,19 @@ components:
           description: phone number has been validated to connect with customer
           type: boolean
         type:
-          enum:
-          - Home
-          - Mobile
-          - Work
-          type: string
+          $ref: '#/components/schemas/PhoneType'
       required:
       - number
       - ownerType
       - type
       - valid
+    PhoneType:
+      description: phone type
+      enum:
+      - home
+      - mobile
+      - work
+      type: string
     CreateAddress:
       example:
         country: US
@@ -2682,7 +2674,6 @@ components:
         address1: address1
         postalCode: postalCode
         state: state
-        type: Primary
         addressID: 851233a1
       properties:
         addressID:
@@ -2690,10 +2681,7 @@ components:
           example: 851233a1
           type: string
         type:
-          enum:
-          - Primary
-          - Secondary
-          type: string
+          $ref: '#/components/Schemas/AddressType'
         ownerType:
           $ref: '#/components/schemas/OwnerType'
         address1:
@@ -2728,6 +2716,12 @@ components:
       - state
       - type
       type: object
+    AddressType:
+      description: address type
+      enum:
+      - primary
+      - secondary
+      type: string
     CreateCustomerRepresentative:
       example:
         firstName: Mary
@@ -2748,14 +2742,18 @@ components:
           state: CO
           type: Primary
         jobTitle: Chief Executive Officer
+        customerID: e210a9d6
         phones:
         - number: +1.818.555.1212
-          type: Home
         - number: +1.818.555.1212
-          type: Home
         birthDate: 2016-08-29
         SSN: 111-11-1111
       properties:
+        customerID:
+          description: The unique identifier for the customer the representative belongs
+            to
+          example: e210a9d6
+          type: string
         firstName:
           description: Given Name or First Name
           example: Mary
@@ -2786,34 +2784,40 @@ components:
           minimum: 1
           type: array
       required:
+      - customerID
       - firstName
       - lastName
     CustomerRepresentative:
       example:
         firstName: Mary
         lastName: Smith
+        createdAt: 2016-08-29T09:12:33.001Z
         addresses:
         - country: US
+          validated: true
           address2: address2
-          city: Denver
+          city: city
           address1: address1
           postalCode: postalCode
-          state: CO
-          type: Primary
+          state: state
+          addressID: 851233a1
         - country: US
+          validated: true
           address2: address2
-          city: Denver
+          city: city
           address1: address1
           postalCode: postalCode
-          state: CO
-          type: Primary
+          state: state
+          addressID: 851233a1
         jobTitle: Chief Executive Officer
         representativeID: b280b9d9
+        customerID: e210a9d6
         phones:
-        - number: +1.818.555.1212
-          type: Home
-        - number: +1.818.555.1212
-          type: Home
+        - valid: true
+          number: +1.818.555.1212
+        - valid: true
+          number: +1.818.555.1212
+        lastModified: 2016-08-29T09:12:33.001Z
         birthDate: 2016-08-29
         SSN: 111-11-1111
       properties:
@@ -2821,6 +2825,11 @@ components:
           description: Unique identifier for this Representative
           example: b280b9d9
           type: string
+        customerID:
+          description: The unique identifier for the customer the representative belongs
+            to
+          example: e210a9d6
+          type: string
         firstName:
           description: Given Name or First Name
           example: Mary
@@ -2837,21 +2846,33 @@ components:
           description: Legal date of birth
           example: 2016-08-29
           type: string
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        lastModified:
+          description: Last time the object was modified
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
         SSN:
           description: Customer Representative's Social Security Number (SSN)
           example: 111-11-1111
           type: string
         phones:
           items:
-            $ref: '#/components/schemas/CreatePhone'
+            $ref: '#/components/schemas/Phone'
           type: array
         addresses:
           items:
-            $ref: '#/components/schemas/CreateAddress'
+            $ref: '#/components/schemas/Address'
           minimum: 1
           type: array
       required:
+      - createdAt
+      - customerID
       - firstName
+      - lastModified
       - lastName
       - representativeID
     AccountStatus:
@@ -3347,7 +3368,6 @@ components:
             address1: address1
             postalCode: postalCode
             state: state
-            type: Primary
             addressID: 851233a1
           - country: US
             validated: true
@@ -3356,7 +3376,6 @@ components:
             address1: address1
             postalCode: postalCode
             state: state
-            type: Primary
             addressID: 851233a1
           metadata:
             paygateID: 23beb5fd
@@ -3366,10 +3385,8 @@ components:
           phones:
           - valid: true
             number: +1.818.555.1212
-            type: Home
           - valid: true
             number: +1.818.555.1212
-            type: Home
           ein: 77-0493581
           suffix: suffix
           birthDate: 2016-08-29
@@ -3381,7 +3398,6 @@ components:
           duns: 15-048-3782
           middleName: Flex
           lastModified: 2016-08-29T09:12:33.001Z
-          businessType: businessType
           email: email
           naicsCode: "32"
       properties:
