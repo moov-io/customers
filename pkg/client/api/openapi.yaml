@@ -2757,8 +2757,6 @@ components:
           - primary
           - secondary
           type: string
-        ownerType:
-          $ref: '#/components/schemas/OwnerType'
         validated:
           default: false
           description: If this address has been confirmed with the Customer
@@ -2798,8 +2796,6 @@ components:
           description: phone number
           example: +1.818.555.1212
           type: string
-        ownerType:
-          $ref: '#/components/schemas/OwnerType'
         type:
           $ref: '#/components/schemas/PhoneType'
       required:
@@ -2849,8 +2845,6 @@ components:
           - Primary
           - Secondary
           type: string
-        ownerType:
-          $ref: '#/components/schemas/OwnerType'
         address1:
           description: First line of the address
           type: string

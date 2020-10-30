@@ -2289,8 +2289,6 @@ components:
           enum:
             - primary
             - secondary
-        ownerType:
-          $ref: '#/components/schemas/OwnerType'
         validated:
           type: boolean
           default: false
@@ -2328,8 +2326,6 @@ components:
           type: string
           description: phone number
           example: "+1.818.555.1212"
-        ownerType:
-          $ref: '#/components/schemas/OwnerType'
         type:
           $ref: '#/components/schemas/PhoneType'
       required:
@@ -2369,8 +2365,6 @@ components:
           enum:
             - Primary
             - Secondary
-        ownerType:
-          $ref: '#/components/schemas/OwnerType'
         address1:
           type: string
           description: First line of the address

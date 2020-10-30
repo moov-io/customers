@@ -11,8 +11,7 @@ package client
 
 // CreateAddress struct for CreateAddress
 type CreateAddress struct {
-	Type      string    `json:"type"`
-	OwnerType OwnerType `json:"ownerType"`
+	Type string `json:"type"`
 	// First line of the address
 	Address1 string `json:"address1"`
 	// Second line of the address

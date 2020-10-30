@@ -12,7 +12,6 @@ package client
 // CreatePhone struct for CreatePhone
 type CreatePhone struct {
 	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType"`
-	Type      PhoneType `json:"type"`
+	Number string    `json:"number"`
+	Type   PhoneType `json:"type"`
 }
