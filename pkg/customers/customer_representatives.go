@@ -22,7 +22,7 @@ import (
 	"github.com/moov-io/base/log"
 )
 
-func AddCustomerRepresentativeRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage,) {
+func AddCustomerRepresentativeRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage) {
 	logger = logger.Set("package", "customers")
 
 	r.Methods("GET").Path("/customers/{customerID}/representatives").HandlerFunc(searchCustomerRepresentatives(logger, repo))
@@ -82,15 +82,15 @@ func respondWithCustomerRepresentative(logger log.Logger, w http.ResponseWriter,
 
 // customerRepresentativeRequest holds the information for creating a Customer Representative from the HTTP api
 type customerRepresentativeRequest struct {
-	RepresentativeID 			string				  `json:"-"`
-	CustomerID 					string				  `json:"customerID"`
-	FirstName  					string                `json:"firstName"`
-	LastName   					string                `json:"lastName"`
-	JobTitle					string				  `json:"jobTitle"`
-	BirthDate  					model.YYYYMMDD        `json:"birthDate"`
-	SSN        					string                `json:"SSN"`
-	Phones     					[]phone               `json:"phones"`
-	Addresses  					[]address             `json:"addresses"`
+	RepresentativeID string         `json:"-"`
+	CustomerID       string         `json:"customerID"`
+	FirstName        string         `json:"firstName"`
+	LastName         string         `json:"lastName"`
+	JobTitle         string         `json:"jobTitle"`
+	BirthDate        model.YYYYMMDD `json:"birthDate"`
+	SSN              string         `json:"SSN"`
+	Phones           []phone        `json:"phones"`
+	Addresses        []address      `json:"addresses"`
 }
 
 func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
@@ -216,8 +216,8 @@ func (req customerRepresentativeRequest) validate() error {
 
 func (r *sqlCustomerRepository) GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error) {
 	reps, err := r.searchCustomerRepresentatives(RepresentativeSearchParams{
-		Count:        		1,
-		RepresentativeIDs:  []string{representativeID},
+		Count:             1,
+		RepresentativeIDs: []string{representativeID},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("getting customer representative: %v", err)
@@ -335,18 +335,18 @@ func (req customerRepresentativeRequest) asCustomerRepresentative(storage *ssnSt
 	}
 
 	representative := &client.CustomerRepresentative{
-		RepresentativeID: 			req.RepresentativeID,
-		CustomerID: 				req.CustomerID,
-		FirstName:  				req.FirstName,
-		LastName:   				req.LastName,
-		BirthDate:  				string(req.BirthDate),
+		RepresentativeID: req.RepresentativeID,
+		CustomerID:       req.CustomerID,
+		FirstName:        req.FirstName,
+		LastName:         req.LastName,
+		BirthDate:        string(req.BirthDate),
 	}
 
 	for i := range req.Phones {
 		representative.Phones = append(representative.Phones, client.Phone{
-			Number: 	req.Phones[i].Number,
-			Type:   	req.Phones[i].Type,
-			OwnerType: 	req.Phones[i].OwnerType,
+			Number:    req.Phones[i].Number,
+			Type:      req.Phones[i].Type,
+			OwnerType: req.Phones[i].OwnerType,
 		})
 	}
 	for i := range req.Addresses {

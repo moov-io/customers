@@ -40,8 +40,8 @@ type testCustomerRepository struct {
 	updatedStatus     client.CustomerStatus
 	savedSearchResult *client.OfacSearch
 
-	customerRepresentative			*client.CustomerRepresentative
-	createdCustomerRepresentative	*client.CustomerRepresentative
+	customerRepresentative        *client.CustomerRepresentative
+	createdCustomerRepresentative *client.CustomerRepresentative
 }
 
 func (r *testCustomerRepository) GetCustomer(customerID, organization string) (*client.Customer, error) {
@@ -327,9 +327,9 @@ func TestCustomers__customerRequest(t *testing.T) {
 	}
 
 	req.Phones = append(req.Phones, phone{
-		Number: 	"123.456.7890",
-		Type:   	"mobile",
-		OwnerType: 	"customer",
+		Number:    "123.456.7890",
+		Type:      "mobile",
+		OwnerType: "customer",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -342,7 +342,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:	"customer",
+		OwnerType:  "customer",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -453,9 +453,9 @@ func TestCustomers__updateCustomer(t *testing.T) {
 		SSN:       "123456789",
 		Phones: []phone{
 			{
-				Number: "123.456.7890",
-				Type:   "mobile",
-				OwnerType:	"customer",
+				Number:    "123.456.7890",
+				Type:      "mobile",
+				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -466,7 +466,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 				PostalCode: "90210",
 				Country:    "US",
 				Type:       "primary",
-				OwnerType:	"customer",
+				OwnerType:  "customer",
 			},
 		},
 	}
@@ -488,9 +488,9 @@ func TestCustomers__updateCustomer(t *testing.T) {
 	updateReq.BirthDate = "2020-01-01"
 	updateReq.Phones = []phone{
 		{
-			Number: 	"555.555.5555",
-			Type:   	"mobile",
-			OwnerType:  "customer",
+			Number:    "555.555.5555",
+			Type:      "mobile",
+			OwnerType: "customer",
 		},
 	}
 	updateReq.Addresses = []address{
@@ -590,9 +590,9 @@ func TestCustomers__repository(t *testing.T) {
 		Email:     "jane@example.com",
 		Phones: []phone{
 			{
-				Number: 	"123.456.7890",
-				Type:   	"mobile",
-				OwnerType:	"customer",
+				Number:    "123.456.7890",
+				Type:      "mobile",
+				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -695,9 +695,9 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		Email:     "jane@example.com",
 		Phones: []phone{
 			{
-				Number: 	"123.456.7890",
-				Type:   	"mobile",
-				OwnerType:	"customer",
+				Number:    "123.456.7890",
+				Type:      "mobile",
+				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -721,17 +721,17 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		Email:      "jim@google.com",
 		Phones: []phone{
 			{
-				Number: 	"555.555.5555",
-				Type:   	"mobile",
-				OwnerType:	"customer",
+				Number:    "555.555.5555",
+				Type:      "mobile",
+				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
 			{
-				Address1: 	"555 5th st",
-				City:     	"real city",
-				Type:     	"primary",
-				OwnerType:	"customer",
+				Address1:  "555 5th st",
+				City:      "real city",
+				Type:      "primary",
+				OwnerType: "customer",
 			},
 		},
 	}
@@ -800,7 +800,7 @@ func TestCustomersRepository__addAddress(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:	"customer",
+		OwnerType:  "customer",
 	},
 	); err != nil {
 		t.Fatal(err)

@@ -51,10 +51,10 @@ func searchCustomerRepresentatives(logger log.Logger, repo CustomerRepository) h
 }
 
 type RepresentativeSearchParams struct {
-	Query        		string
-	Skip         		int64
-	Count        		int64
-	RepresentativeIDs  	[]string
+	Query             string
+	Skip              int64
+	Count             int64
+	RepresentativeIDs []string
 }
 
 func parseRepresentativeSearchParams(r *http.Request) (RepresentativeSearchParams, error) {
@@ -63,7 +63,7 @@ func parseRepresentativeSearchParams(r *http.Request) (RepresentativeSearchParam
 		return strings.ToLower(strings.TrimSpace(queryParams.Get(key)))
 	}
 	params := RepresentativeSearchParams{
-		Query:  getQueryParam("query"),
+		Query: getQueryParam("query"),
 	}
 	representativeIDsInput := getQueryParam("representativeIDs")
 	if representativeIDsInput != "" {

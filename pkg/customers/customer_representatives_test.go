@@ -31,12 +31,12 @@ import (
 func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCustomerRepository) (string, *client.Customer, *client.CustomerRepresentative) {
 	organization := "best-business"
 	cust, _, _ := (customerRequest{
-		FirstName: "Jane",
-		LastName:  "Doe",
-		Email:     "jane@example.com",
+		FirstName:    "Jane",
+		LastName:     "Doe",
+		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein: "123-456-789",
+		Ein:          "123-456-789",
 	}).asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
@@ -44,9 +44,9 @@ func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCusto
 
 	rep, _, _ := (customerRepresentativeRequest{
 		CustomerID: cust.CustomerID,
-		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		FirstName:  "Jane",
+		LastName:   "Doe",
+		JobTitle:   "CEO",
 	}).asCustomerRepresentative(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomerRepresentative(rep); err != nil {
 		t.Fatal(err)
@@ -55,15 +55,15 @@ func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCusto
 	return organization, cust, rep
 }
 
-func setupMockCustomer(t *testing.T, repo *sqlCustomerRepository) (*client.Customer) {
+func setupMockCustomer(t *testing.T, repo *sqlCustomerRepository) *client.Customer {
 	organization := "best-business"
 	cust, _, _ := (customerRequest{
-		FirstName: "Jane",
-		LastName:  "Doe",
-		Email:     "jane@example.com",
+		FirstName:    "Jane",
+		LastName:     "Doe",
+		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein: "123-456-789",
+		Ein:          "123-456-789",
 	}).asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
@@ -210,9 +210,9 @@ func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 	}
 
 	req.Phones = append(req.Phones, phone{
-		Number: 	"123.456.7890",
-		Type:   	"mobile",
-		OwnerType: 	"customer",
+		Number:    "123.456.7890",
+		Type:      "mobile",
+		OwnerType: "customer",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -225,7 +225,7 @@ func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:	client.OWNERTYPE_REPRESENTATIVE,
+		OwnerType:  client.OWNERTYPE_REPRESENTATIVE,
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -319,12 +319,12 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 
 	organization := "best-business"
 	createReq := &customerRequest{
-		FirstName: "Jane",
-		LastName:  "Doe",
-		Email:     "jane@example.com",
+		FirstName:    "Jane",
+		LastName:     "Doe",
+		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein: "123-456-789",
+		Ein:          "123-456-789",
 	}
 	cust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
@@ -333,14 +333,14 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 
 	createRepresentativeReq := &customerRepresentativeRequest{
 		CustomerID: cust.CustomerID,
-		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		FirstName:  "Jane",
+		LastName:   "Doe",
+		JobTitle:   "CEO",
 		Phones: []phone{
 			{
-				Number: "123.456.7890",
-				Type:   "mobile",
-				OwnerType:  "representative",
+				Number:    "123.456.7890",
+				Type:      "mobile",
+				OwnerType: "representative",
 			},
 		},
 		Addresses: []address{
@@ -372,9 +372,9 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	updateReq.BirthDate = "2020-01-01"
 	updateReq.Phones = []phone{
 		{
-			Number: 	"555.555.5555",
-			Type:   	"mobile",
-			OwnerType:  "representative",
+			Number:    "555.555.5555",
+			Type:      "mobile",
+			OwnerType: "representative",
 		},
 	}
 	updateReq.Addresses = []address{
@@ -420,7 +420,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
-			OwnerType: 	"representative",
+			OwnerType:  "representative",
 		},
 		{
 			Address1:   "444 4th st",
@@ -429,7 +429,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
-			OwnerType:	"representative",
+			OwnerType:  "representative",
 		},
 	}
 	payload, err = json.Marshal(&updateReq)
@@ -452,12 +452,12 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 
 	organization := "best-business"
 	createReq := &customerRequest{
-		FirstName: "Jane",
-		LastName:  "Doe",
-		Email:     "jane@example.com",
+		FirstName:    "Jane",
+		LastName:     "Doe",
+		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein: "123-456-789",
+		Ein:          "123-456-789",
 	}
 	cust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
@@ -466,9 +466,9 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 
 	createRepresentativeReq := &customerRepresentativeRequest{
 		CustomerID: cust.CustomerID,
-		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		FirstName:  "Jane",
+		LastName:   "Doe",
+		JobTitle:   "CEO",
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
@@ -483,7 +483,7 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 				PostalCode: "90210",
 				Country:    "US",
 				Type:       "primary",
-				OwnerType:	"customer",
+				OwnerType:  "customer",
 			},
 		},
 	}
@@ -493,22 +493,22 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 
 	updateReq := customerRepresentativeRequest{
 		RepresentativeID: rep.RepresentativeID,
-		CustomerID: cust.CustomerID,
-		FirstName:  "Jim",
-		LastName:   "Smith",
+		CustomerID:       cust.CustomerID,
+		FirstName:        "Jim",
+		LastName:         "Smith",
 		Phones: []phone{
 			{
-				Number: 	"555.555.5555",
-				Type:   	"mobile",
-				OwnerType:	"customer",
+				Number:    "555.555.5555",
+				Type:      "mobile",
+				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
 			{
-				Address1: 	"555 5th st",
-				City:     	"real city",
-				Type:     	"primary",
-				OwnerType:	"customer",
+				Address1:  "555 5th st",
+				City:      "real city",
+				Type:      "primary",
+				OwnerType: "customer",
 			},
 		},
 	}
@@ -531,12 +531,12 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 
 	organization := "best-business"
 	createReq := &customerRequest{
-		FirstName: "Jane",
-		LastName:  "Doe",
-		Email:     "jane@example.com",
+		FirstName:    "Jane",
+		LastName:     "Doe",
+		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein: "123-456-789",
+		Ein:          "123-456-789",
 	}
 	cust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
@@ -545,9 +545,9 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 
 	createRepresentativeReq := &customerRepresentativeRequest{
 		CustomerID: cust.CustomerID,
-		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		FirstName:  "Jane",
+		LastName:   "Doe",
+		JobTitle:   "CEO",
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
@@ -568,7 +568,7 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:	"representative",
+		OwnerType:  "representative",
 	},
 	); err != nil {
 		t.Fatal(err)
@@ -629,4 +629,3 @@ func TestCustomerRepresentatives__BadReq(t *testing.T) {
 		t.Errorf("Expected SSN error received %s", w.Body.String())
 	}
 }
-

@@ -81,13 +81,12 @@ func createAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 			return
 		}
 
-
 		// todo: vince-10/12/2020: we need to perform this conversion for validation til we develop a clean separation layer between client and model structs
 		var addrs []address
 		for _, addr := range addresses {
 			addrs = append(addrs, address{
 				Type:       addr.Type,
-				OwnerType:	addr.OwnerType,
+				OwnerType:  addr.OwnerType,
 				Address1:   addr.Address1,
 				Address2:   addr.Address2,
 				City:       addr.City,

@@ -91,15 +91,15 @@ func TestRepository__searchCustomers(t *testing.T) {
 			Email:     fmt.Sprintf("jane-%d@moov.com", i),
 			Phones: []phone{
 				{
-					Number: "555-555-5555",
-					Type:   "primary",
-					OwnerType: 	"customer",
+					Number:    "555-555-5555",
+					Type:      "primary",
+					OwnerType: "customer",
 				},
 			},
 			Addresses: []address{
 				{
 					Type:       "primary",
-					OwnerType:	"customer",
+					OwnerType:  "customer",
 					Address1:   "123 Cool St.",
 					City:       "San Francisco",
 					State:      "CA",

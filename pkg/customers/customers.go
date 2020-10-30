@@ -113,29 +113,29 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID, o
 // TODO(adam): What GDPR implications does this information have? IIRC if any EU citizen uses
 // this software we have to fully comply.
 type customerRequest struct {
-	CustomerID 					string				  `json:"-"`
-	FirstName  					string                `json:"firstName"`
-	MiddleName 					string                `json:"middleName"`
-	LastName   					string                `json:"lastName"`
-	NickName   					string                `json:"nickName"`
-	Suffix     					string                `json:"suffix"`
-	Type       					client.CustomerType   `json:"type"`
-	BusinessName				string			 	  `json:"businessName"`
-	DoingBusinessAs				string			 	  `json:"doingBusinessAs"`
-	BusinessType				client.BusinessType	  `json:"businessType"`
-	EIN							string			 	  `json:"EIN"`
-	DUNS						string			 	  `json:"duns"`
-	SICCode						string			 	  `json:"sicCode"`
-	NAICSCode					string			 	  `json:"naicsCode"`
-	BirthDate  					model.YYYYMMDD        `json:"birthDate"`
-	Status     					client.CustomerStatus `json:"-"`
-	Email      					string                `json:"email"`
-	Website    					string                `json:"website"`
-	DateBusinessEstablished    	string                `json:"dateBusinessEstablished"`
-	SSN        					string                `json:"SSN"`
-	Phones     					[]phone               `json:"phones"`
-	Addresses  					[]address             `json:"addresses"`
-	Metadata   					map[string]string     `json:"metadata"`
+	CustomerID              string                `json:"-"`
+	FirstName               string                `json:"firstName"`
+	MiddleName              string                `json:"middleName"`
+	LastName                string                `json:"lastName"`
+	NickName                string                `json:"nickName"`
+	Suffix                  string                `json:"suffix"`
+	Type                    client.CustomerType   `json:"type"`
+	BusinessName            string                `json:"businessName"`
+	DoingBusinessAs         string                `json:"doingBusinessAs"`
+	BusinessType            client.BusinessType   `json:"businessType"`
+	EIN                     string                `json:"EIN"`
+	DUNS                    string                `json:"duns"`
+	SICCode                 string                `json:"sicCode"`
+	NAICSCode               string                `json:"naicsCode"`
+	BirthDate               model.YYYYMMDD        `json:"birthDate"`
+	Status                  client.CustomerStatus `json:"-"`
+	Email                   string                `json:"email"`
+	Website                 string                `json:"website"`
+	DateBusinessEstablished string                `json:"dateBusinessEstablished"`
+	SSN                     string                `json:"SSN"`
+	Phones                  []phone               `json:"phones"`
+	Addresses               []address             `json:"addresses"`
+	Metadata                map[string]string     `json:"metadata"`
 }
 
 type phone struct {
@@ -165,7 +165,7 @@ func (p *phone) validate() error {
 
 type address struct {
 	Type       client.AddressType `json:"type"`
-	OwnerType  client.OwnerType	  `json:"ownerType"`
+	OwnerType  client.OwnerType   `json:"ownerType"`
 	Address1   string             `json:"address1"`
 	Address2   string             `json:"address2,omitempty"`
 	City       string             `json:"city"`
@@ -279,33 +279,33 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 	}
 
 	customer := &client.Customer{
-		CustomerID: 				req.CustomerID,
-		FirstName:  				req.FirstName,
-		MiddleName: 				req.MiddleName,
-		LastName:   				req.LastName,
-		NickName:   				req.NickName,
-		Suffix:     				req.Suffix,
-		Type:       				req.Type,
-		BusinessName: 				req.BusinessName,
-		DoingBusinessAs: 			req.DoingBusinessAs,
-		BusinessType: 				req.BusinessType,
-		EIN: 						req.EIN,
-		DUNS: 						req.DUNS,
-		SICCode: 					req.SICCode,
-		NAICSCode: 					req.NAICSCode,
-		BirthDate:  				string(req.BirthDate),
-		Email:      				req.Email,
-		Website: 					req.Website,
-		DateBusinessEstablished: 	req.DateBusinessEstablished,
-		Status:     				req.Status,
-		Metadata:   				req.Metadata,
+		CustomerID:              req.CustomerID,
+		FirstName:               req.FirstName,
+		MiddleName:              req.MiddleName,
+		LastName:                req.LastName,
+		NickName:                req.NickName,
+		Suffix:                  req.Suffix,
+		Type:                    req.Type,
+		BusinessName:            req.BusinessName,
+		DoingBusinessAs:         req.DoingBusinessAs,
+		BusinessType:            req.BusinessType,
+		EIN:                     req.EIN,
+		DUNS:                    req.DUNS,
+		SICCode:                 req.SICCode,
+		NAICSCode:               req.NAICSCode,
+		BirthDate:               string(req.BirthDate),
+		Email:                   req.Email,
+		Website:                 req.Website,
+		DateBusinessEstablished: req.DateBusinessEstablished,
+		Status:                  req.Status,
+		Metadata:                req.Metadata,
 	}
 
 	for i := range req.Phones {
 		customer.Phones = append(customer.Phones, client.Phone{
-			Number: 	req.Phones[i].Number,
-			Type:   	req.Phones[i].Type,
-			OwnerType: 	req.Phones[i].OwnerType,
+			Number:    req.Phones[i].Number,
+			Type:      req.Phones[i].Type,
+			OwnerType: req.Phones[i].OwnerType,
 		})
 	}
 	for i := range req.Addresses {
