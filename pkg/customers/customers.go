@@ -124,9 +124,9 @@ type customerRequest struct {
 	DoingBusinessAs         string                `json:"doingBusinessAs"`
 	BusinessType            client.BusinessType   `json:"businessType"`
 	EIN                     string                `json:"EIN"`
-	DUNS                    string                `json:"duns"`
-	SICCode                 string                `json:"sicCode"`
-	NAICSCode               string                `json:"naicsCode"`
+	DUNS                    string                `json:"DUNS"`
+	SICCode                 client.SicCode        `json:"sicCode"`
+	NAICSCode               client.NaicsCode      `json:"naicsCode"`
 	BirthDate               model.YYYYMMDD        `json:"birthDate"`
 	Status                  client.CustomerStatus `json:"-"`
 	Email                   string                `json:"email"`

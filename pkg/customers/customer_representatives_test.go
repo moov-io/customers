@@ -36,7 +36,7 @@ func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCusto
 		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein:          "123-456-789",
+		EIN:          "123-456-789",
 	}).asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
@@ -63,7 +63,7 @@ func setupMockCustomer(t *testing.T, repo *sqlCustomerRepository) *client.Custom
 		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein:          "123-456-789",
+		EIN:          "123-456-789",
 	}).asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
@@ -324,7 +324,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein:          "123-456-789",
+		EIN:          "123-456-789",
 	}
 	cust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
@@ -457,7 +457,7 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein:          "123-456-789",
+		EIN:          "123-456-789",
 	}
 	cust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
@@ -536,7 +536,7 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 		Email:        "jane@example.com",
 		BusinessName: "Best Business",
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		Ein:          "123-456-789",
+		EIN:          "123-456-789",
 	}
 	cust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
