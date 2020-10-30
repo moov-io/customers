@@ -123,10 +123,10 @@ type customerRequest struct {
 	BusinessName				string			 	  `json:"businessName"`
 	DoingBusinessAs				string			 	  `json:"doingBusinessAs"`
 	BusinessType				client.BusinessType	  `json:"businessType"`
-	Ein							string			 	  `json:"ein"`
-	Duns						string			 	  `json:"duns"`
-	SicCode						string			 	  `json:"sicCode"`
-	NaicsCode					string			 	  `json:"naicsCode"`
+	EIN							string			 	  `json:"EIN"`
+	DUNS						string			 	  `json:"duns"`
+	SICCode						string			 	  `json:"sicCode"`
+	NAICSCode					string			 	  `json:"naicsCode"`
 	BirthDate  					model.YYYYMMDD        `json:"birthDate"`
 	Status     					client.CustomerStatus `json:"-"`
 	Email      					string                `json:"email"`
@@ -289,10 +289,10 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		BusinessName: 				req.BusinessName,
 		DoingBusinessAs: 			req.DoingBusinessAs,
 		BusinessType: 				req.BusinessType,
-		Ein: 						req.Ein,
-		Duns: 						req.Duns,
-		SicCode: 					req.SicCode,
-		NaicsCode: 					req.NaicsCode,
+		EIN: 						req.EIN,
+		DUNS: 						req.DUNS,
+		SICCode: 					req.SICCode,
+		NAICSCode: 					req.NAICSCode,
 		BirthDate:  				string(req.BirthDate),
 		Email:      				req.Email,
 		Website: 					req.Website,
@@ -564,7 +564,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.Ein, c.Duns, c.SicCode, c.NaicsCode, birthDate, client.CUSTOMERSTATUS_UNKNOWN, c.Email, c.Website, c.DateBusinessEstablished, now, now, organization)
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.EIN, c.DUNS, c.SICCode, c.NAICSCode, birthDate, client.CUSTOMERSTATUS_UNKNOWN, c.Email, c.Website, c.DateBusinessEstablished, now, now, organization)
 	if err != nil {
 		return fmt.Errorf("CreateCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}
@@ -602,7 +602,7 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 	defer stmt.Close()
 
 	now := time.Now()
-	res, err := stmt.Exec(c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.Ein, c.Duns, c.SicCode, c.NaicsCode, c.BirthDate, c.Status, c.Email, c.Website, c.DateBusinessEstablished, now, organization, c.CustomerID)
+	res, err := stmt.Exec(c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.EIN, c.DUNS, c.SICCode, c.NAICSCode, c.BirthDate, c.Status, c.Email, c.Website, c.DateBusinessEstablished, now, organization, c.CustomerID)
 	if err != nil {
 		return fmt.Errorf("updating customer: %v", err)
 	}

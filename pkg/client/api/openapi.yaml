@@ -2230,17 +2230,15 @@ components:
         phones:
         - number: +1.818.555.1212
         - number: +1.818.555.1212
-        ein: 77-0493581
+        EIN: 77-0493581
         suffix: suffix
         birthDate: 2016-08-29
         SSN: 111-11-1111
         firstName: Robert
         doingBusinessAs: Google
-        sicCode: "7"
-        duns: 15-048-3782
+        DUNS: 15-048-3782
         middleName: Flex
         email: email
-        naicsCode: "32"
       properties:
         firstName:
           description: Given Name or First Name
@@ -2275,23 +2273,19 @@ components:
           type: string
         businessType:
           $ref: '#/components/schemas/BusinessType'
-        ein:
+        EIN:
           description: Employer Identification Number (EIN) for business type customers
           example: 77-0493581
           type: string
-        duns:
+        DUNS:
           description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type
             customers
           example: 15-048-3782
           type: string
-        sicCode:
-          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
-          example: "7"
-          type: string
-        naicsCode:
-          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
-          example: "32"
-          type: string
+        SICCode:
+          $ref: '#/components/schemas/SICCode'
+        NAICSCode:
+          $ref: '#/components/schemas/NAICSCode'
         birthDate:
           description: Legal date of birth
           example: 2016-08-29
@@ -2366,19 +2360,17 @@ components:
           number: +1.818.555.1212
         - valid: true
           number: +1.818.555.1212
-        ein: 77-0493581
+        EIN: 77-0493581
         suffix: suffix
         birthDate: 2016-08-29
         firstName: Robert
         createdAt: 2016-08-29T09:12:33.001Z
         doingBusinessAs: Google
-        sicCode: "7"
+        DUNS: 15-048-3782
         customerID: e210a9d6
-        duns: 15-048-3782
         middleName: Flex
         lastModified: 2016-08-29T09:12:33.001Z
         email: email
-        naicsCode: "32"
       properties:
         customerID:
           description: The unique identifier for the customer who owns the account
@@ -2417,23 +2409,19 @@ components:
           type: string
         businessType:
           $ref: '#/components/schemas/BusinessType'
-        ein:
+        EIN:
           description: Employer Identification Number (EIN) for business type customers
           example: 77-0493581
           type: string
-        duns:
+        DUNS:
           description: Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type
             customers
           example: 15-048-3782
           type: string
-        sicCode:
-          description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
-          example: "7"
-          type: string
-        naicsCode:
-          description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
-          example: "32"
-          type: string
+        SICCode:
+          $ref: '#/components/schemas/SICCode'
+        NAICSCode:
+          $ref: '#/components/schemas/NAICSCode'
         birthDate:
           description: Legal date of birth
           example: 2016-08-29
@@ -2523,6 +2511,234 @@ components:
       - Verified
       - Frozen
       type: string
+    SICCode:
+      description: SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+      enum:
+      - "1"
+      - "2"
+      - "7"
+      - "8.0"
+      - "9.0"
+      - "10"
+      - "12"
+      - "13"
+      - "14"
+      - "15"
+      - "16"
+      - "17"
+      - "20"
+      - "21"
+      - "22"
+      - "23"
+      - "24"
+      - "25"
+      - "26"
+      - "27"
+      - "28"
+      - "29"
+      - "30"
+      - "31"
+      - "32"
+      - "33"
+      - "34"
+      - "35"
+      - "36"
+      - "37"
+      - "38"
+      - "39"
+      - "40"
+      - "41"
+      - "42"
+      - "43"
+      - "44"
+      - "45"
+      - "46"
+      - "47"
+      - "48"
+      - "49"
+      - "50"
+      - "51"
+      - "52"
+      - "53"
+      - "54"
+      - "55"
+      - "56"
+      - "57"
+      - "58"
+      - "59"
+      - "60"
+      - "61"
+      - "62"
+      - "63"
+      - "64"
+      - "65"
+      - "67"
+      - "70"
+      - "72"
+      - "73"
+      - "75"
+      - "76"
+      - "78"
+      - "79"
+      - "80"
+      - "81"
+      - "82"
+      - "83"
+      - "84"
+      - "86"
+      - "87"
+      - "88"
+      - "89"
+      - "91"
+      - "92"
+      - "93"
+      - "94"
+      - "95"
+      - "96"
+      - "97"
+      - "98"
+      - "99"
+      type: string
+      x-enum-values:
+      - Agricultural Production – Crops
+      - Agricultural Production – Livestock
+      - Agricultural Services
+      - Forestry
+      - Fishing, Hunting, & Trapping
+      - Metal, Mining
+      - Coal Mining
+      - Oil & Gas Extraction
+      - Nonmetallic Minerals, Except Fuels
+      - General Building Contractors
+      - Heavy Construction, Except Building
+      - Special Trade Contractors
+      - Food & Kindred Products
+      - Tobacco Products
+      - Textile Mill Products
+      - Apparel & Other Textile Products
+      - Lumber & Wood Products
+      - Furniture & Fixtures
+      - Paper & Allied Products
+      - Printing & Publishing
+      - Chemical & Allied Products
+      - Petroleum & Coal Products
+      - Rubber & Miscellaneous Plastics Products
+      - Leather & Leather Products
+      - Stone, Clay, & Glass Products
+      - Primary Metal Industries
+      - Fabricated Metal Products
+      - Industrial Machinery & Equipment
+      - Electronic & Other Electric Equipment
+      - Transportation Equipment
+      - Instruments & Related Products
+      - Miscellaneous Manufacturing Industries
+      - Railroad Transportation
+      - Local & Interurban Passenger Transit
+      - Trucking & Warehousing
+      - U.S. Postal Service
+      - Water Transportation
+      - Transportation by Air
+      - Pipelines, Except Natural Gas
+      - Transportation Services
+      - Communications
+      - Electric, Gas, & Sanitary Services
+      - Wholesale Trade – Durable Goods
+      - Wholesale Trade – Nondurable Goods
+      - Building Materials & Gardening Supplies
+      - General Merchandise Stores
+      - Food Stores
+      - Automative Dealers & Service Stations
+      - Apparel & Accessory Stores
+      - Furniture & Homefurnishings Stores
+      - Eating & Drinking Places
+      - Miscellaneous Retail
+      - Depository Institutions
+      - Nondepository Institutions
+      - Security & Commodity Brokers
+      - Insurance Carriers
+      - Insurance Agents, Brokers, & Service
+      - Real Estate
+      - Holding & Other Investment Offices
+      - Hotels & Other Lodging Places
+      - Personal Services
+      - Business Services
+      - Auto Repair, Services, & Parking
+      - Miscellaneous Repair Services
+      - Motion Pictures
+      - Amusement & Recreation Services
+      - Health Services
+      - Legal Services
+      - Educational Services
+      - Social Services
+      - Museums, Botanical, Zoological Gardens
+      - Membership Organizations
+      - Engineering & Management Services
+      - Private Households
+      - Services, Not Elsewhere Classified
+      - Executive, Legislative, & General
+      - Justice, Public Order, & Safety
+      - Finance, Taxation, & Monetary Policy
+      - Administration of Human Resources
+      - Environmental Quality & Housing
+      - Administration of Economic Programs
+      - National Security & International Affairs
+      - Zoological Gardens
+      - Non-Classifiable Establishments
+    NAICSCode:
+      description: NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+      enum:
+      - "11"
+      - "21"
+      - "22"
+      - "23"
+      - "31"
+      - "32"
+      - "33"
+      - "42"
+      - "44"
+      - "45"
+      - "48"
+      - "49"
+      - "51"
+      - "52"
+      - "53"
+      - "54"
+      - "55"
+      - "56"
+      - "61"
+      - "62"
+      - "71"
+      - "72"
+      - "81"
+      - "92"
+      - "99"
+      type: string
+      x-enum-values:
+      - Agriculture, forestry, fishing and hunting
+      - Mining
+      - Utilities
+      - Construction
+      - Manufacturing
+      - Manufacturing
+      - Manufacturing
+      - Wholesale trade
+      - Retail trade
+      - Retail trade
+      - Transportation and warehousing
+      - Transportation and warehousing
+      - Information
+      - Finance and insurance
+      - Real estate and rental and leasing
+      - Professional, scientific, and technical services
+      - Management of companies and enterprises
+      - Administrative and support and waste management and remediation services
+      - Education services
+      - Health care and social assistance
+      - Arts, entertainment, and recreation
+      - Accommodation and food services
+      - Other services, except public administration
+      - Public administration
+      - Unclassified
     CustomerMetadata:
       example:
         metadata:
@@ -3409,19 +3625,17 @@ components:
             number: +1.818.555.1212
           - valid: true
             number: +1.818.555.1212
-          ein: 77-0493581
+          EIN: 77-0493581
           suffix: suffix
           birthDate: 2016-08-29
           firstName: Robert
           createdAt: 2016-08-29T09:12:33.001Z
           doingBusinessAs: Google
-          sicCode: "7"
+          DUNS: 15-048-3782
           customerID: e210a9d6
-          duns: 15-048-3782
           middleName: Flex
           lastModified: 2016-08-29T09:12:33.001Z
           email: email
-          naicsCode: "32"
       properties:
         Customer:
           $ref: '#/components/schemas/Customer'

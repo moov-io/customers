@@ -14,10 +14,10 @@ Name | Type | Description | Notes
 **BusinessName** | **string** | Business Name for business type customers | [optional] 
 **DoingBusinessAs** | **string** | Doing Business As (DBA) name for business type customers | [optional] 
 **BusinessType** | [**BusinessType**](BusinessType.md) |  | [optional] 
-**Ein** | **string** | Employer Identification Number (EIN) for business type customers | [optional] 
-**Duns** | **string** | Dun &amp; Bradstreet D-U-N-S Number (D-U-N-S) for business type customers | [optional] 
-**SicCode** | **string** | SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid&#x3D;1627409140) | [optional] 
-**NaicsCode** | **string** | NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid&#x3D;1627409140) | [optional] 
+**EIN** | **string** | Employer Identification Number (EIN) for business type customers | [optional] 
+**DUNS** | **string** | Dun &amp; Bradstreet D-U-N-S Number (D-U-N-S) for business type customers | [optional] 
+**SICCode** | [**SicCode**](SICCode.md) |  | [optional] 
+**NAICSCode** | [**NaicsCode**](NAICSCode.md) |  | [optional] 
 **BirthDate** | **string** | Legal date of birth | [optional] 
 **Status** | [**CustomerStatus**](CustomerStatus.md) |  | 
 **Email** | **string** | Primary email address of customer name@domain.com | 

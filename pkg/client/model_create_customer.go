@@ -28,13 +28,11 @@ type CreateCustomer struct {
 	DoingBusinessAs string       `json:"doingBusinessAs,omitempty"`
 	BusinessType    BusinessType `json:"businessType,omitempty"`
 	// Employer Identification Number (EIN) for business type customers
-	Ein string `json:"ein,omitempty"`
+	EIN string `json:"EIN,omitempty"`
 	// Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers
-	Duns string `json:"duns,omitempty"`
-	// SIC Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
-	SicCode string `json:"sicCode,omitempty"`
-	// NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
-	NaicsCode string `json:"naicsCode,omitempty"`
+	DUNS      string    `json:"DUNS,omitempty"`
+	SICCode   SicCode   `json:"SICCode,omitempty"`
+	NAICSCode NaicsCode `json:"NAICSCode,omitempty"`
 	// Legal date of birth
 	BirthDate string `json:"birthDate,omitempty"`
 	// Primary email address of customer name@domain.com
