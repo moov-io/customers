@@ -5,7 +5,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Type** | **string** | Attribute of address | 
-**OwnerType** | [**OwnerType**](OwnerType.md) |  | 
 **Validated** | **bool** | If this address has been confirmed with the Customer | [optional] [default to false]
 **Address1** | **string** | First line of the address | 
 **Address2** | **string** | Second line of the address | [optional] 

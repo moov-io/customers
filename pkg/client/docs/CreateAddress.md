@@ -5,7 +5,6 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **Type** | **string** |  | 
-**OwnerType** | [**OwnerType**](OwnerType.md) |  | 
 **Address1** | **string** | First line of the address | 
 **Address2** | **string** | Second line of the address | [optional] 
 **City** | **string** |  | 

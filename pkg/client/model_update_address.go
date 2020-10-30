@@ -12,8 +12,7 @@ package client
 // UpdateAddress struct for UpdateAddress
 type UpdateAddress struct {
 	// Attribute of address
-	Type      string    `json:"type"`
-	OwnerType OwnerType `json:"ownerType"`
+	Type string `json:"type"`
 	// If this address has been confirmed with the Customer
 	Validated bool `json:"validated,omitempty"`
 	// First line of the address
