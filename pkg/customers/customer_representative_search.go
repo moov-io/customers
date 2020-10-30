@@ -5,7 +5,6 @@
 package customers
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -169,24 +168,4 @@ from customer_representatives where deleted_at is null`
 	}
 	query += ";"
 	return query, args
-}
-
-func (r *sqlCustomerRepository) queryRowsByCustomerRepresentativeIDs(query string, representativeIDs []string) (*sql.Rows, error) {
-	stmt, err := r.db.Prepare(query)
-	if err != nil {
-		return nil, fmt.Errorf("preparing query: %v", err)
-	}
-	defer stmt.Close()
-
-	var args []interface{}
-	for _, id := range representativeIDs {
-		args = append(args, id)
-	}
-
-	rows, err := stmt.Query(args...)
-	if err != nil {
-		return nil, fmt.Errorf("executing query: %v", err)
-	}
-
-	return rows, nil
 }

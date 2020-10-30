@@ -40,8 +40,7 @@ type testCustomerRepository struct {
 	updatedStatus     client.CustomerStatus
 	savedSearchResult *client.OfacSearch
 
-	customerRepresentative        *client.CustomerRepresentative
-	createdCustomerRepresentative *client.CustomerRepresentative
+	customerRepresentative *client.CustomerRepresentative
 }
 
 func (r *testCustomerRepository) GetCustomer(customerID, organization string) (*client.Customer, error) {
