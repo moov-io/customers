@@ -36,7 +36,7 @@ paths:
   /configuration/customers:
     get:
       description: Retrieve current configuration for the provided organization.
-      operationId: getConfiguration
+      operationId: getOrganizationConfiguration
       parameters:
       - description: Value used to separate and identify models
         example: de2c99f3
@@ -59,7 +59,7 @@ paths:
       - Configuration
     put:
       description: Update the configuration for the provided organization.
-      operationId: updateConfiguration
+      operationId: updateOrganizationConfiguration
       parameters:
       - description: Value used to separate and identify models
         example: de2c99f3

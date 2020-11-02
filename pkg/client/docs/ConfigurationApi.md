@@ -4,16 +4,16 @@ All URIs are relative to *http://localhost:8087*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**GetConfiguration**](ConfigurationApi.md#GetConfiguration) | **Get** /configuration/customers | Get Organization Configuration
+[**GetOrganizationConfiguration**](ConfigurationApi.md#GetOrganizationConfiguration) | **Get** /configuration/customers | Get Organization Configuration
 [**GetOrganizationLogo**](ConfigurationApi.md#GetOrganizationLogo) | **Get** /configuration/logo | Get Organization Logo
-[**UpdateConfiguration**](ConfigurationApi.md#UpdateConfiguration) | **Put** /configuration/customers | Update Organization Configuration
+[**UpdateOrganizationConfiguration**](ConfigurationApi.md#UpdateOrganizationConfiguration) | **Put** /configuration/customers | Update Organization Configuration
 [**UploadOrganizationLogo**](ConfigurationApi.md#UploadOrganizationLogo) | **Put** /configuration/logo | Update Organization Logo
 
 
 
-## GetConfiguration
+## GetOrganizationConfiguration
 
-> OrganizationConfiguration GetConfiguration(ctx, optional)
+> OrganizationConfiguration GetOrganizationConfiguration(ctx, optional)
 
 Get Organization Configuration
 
@@ -25,11 +25,11 @@ Retrieve current configuration for the provided organization.
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
- **optional** | ***GetConfigurationOpts** | optional parameters | nil if no parameters
+ **optional** | ***GetOrganizationConfigurationOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
 
-Optional parameters are passed through a pointer to a GetConfigurationOpts struct
+Optional parameters are passed through a pointer to a GetOrganizationConfigurationOpts struct
 
 
 Name | Type | Description  | Notes
@@ -88,9 +88,9 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## UpdateConfiguration
+## UpdateOrganizationConfiguration
 
-> OrganizationConfiguration UpdateConfiguration(ctx, organizationConfiguration, optional)
+> OrganizationConfiguration UpdateOrganizationConfiguration(ctx, organizationConfiguration, optional)
 
 Update Organization Configuration
 
@@ -103,11 +103,11 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **organizationConfiguration** | [**OrganizationConfiguration**](OrganizationConfiguration.md)|  | 
- **optional** | ***UpdateConfigurationOpts** | optional parameters | nil if no parameters
+ **optional** | ***UpdateOrganizationConfigurationOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
 
-Optional parameters are passed through a pointer to a UpdateConfigurationOpts struct
+Optional parameters are passed through a pointer to a UpdateOrganizationConfigurationOpts struct
 
 
 Name | Type | Description  | Notes
