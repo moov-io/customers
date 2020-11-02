@@ -4,37 +4,37 @@ All URIs are relative to *http://localhost:8087*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
-[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add customer address
+[**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
+[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add Customer Address
 [**CompleteAccountValidation**](CustomersApi.md#CompleteAccountValidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
-[**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create customer
+[**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create Customer
 [**CreateCustomerAccount**](CustomersApi.md#CreateCustomerAccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
 [**DecryptAccountNumber**](CustomersApi.md#DecryptAccountNumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
-[**DeleteCustomer**](CustomersApi.md#DeleteCustomer) | **Delete** /customers/{customerID} | Delete Customer by ID
-[**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
-[**DeleteCustomerAddress**](CustomersApi.md#DeleteCustomerAddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete a customer&#39;s address
-[**DeleteCustomerDocument**](CustomersApi.md#DeleteCustomerDocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete a customer&#39;s document
+[**DeleteCustomer**](CustomersApi.md#DeleteCustomer) | **Delete** /customers/{customerID} | Delete Customer
+[**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts/{accountID} | Delete Customer Account
+[**DeleteCustomerAddress**](CustomersApi.md#DeleteCustomerAddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
+[**DeleteCustomerDocument**](CustomersApi.md#DeleteCustomerDocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
 [**GetAccountValidation**](CustomersApi.md#GetAccountValidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
-[**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Retrieve customer
-[**GetCustomerAccountByID**](CustomersApi.md#GetCustomerAccountByID) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account by ID
+[**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Get Customer
+[**GetCustomerAccountByID**](CustomersApi.md#GetCustomerAccountByID) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account
 [**GetCustomerAccounts**](CustomersApi.md#GetCustomerAccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
-[**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
-[**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
-[**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get customer documents
-[**GetLatestAccountOFACSearch**](CustomersApi.md#GetLatestAccountOFACSearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC search
+[**GetCustomerDisclaimers**](CustomersApi.md#GetCustomerDisclaimers) | **Get** /customers/{customerID}/disclaimers | Get Customer Disclaimers
+[**GetCustomerDocumentContents**](CustomersApi.md#GetCustomerDocumentContents) | **Get** /customers/{customerID}/documents/{documentID} | Get Customer Document
+[**GetCustomerDocuments**](CustomersApi.md#GetCustomerDocuments) | **Get** /customers/{customerID}/documents | Get Customer Documents
+[**GetLatestAccountOFACSearch**](CustomersApi.md#GetLatestAccountOFACSearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC Search
 [**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
-[**GetReportOfCustomerAccounts**](CustomersApi.md#GetReportOfCustomerAccounts) | **Get** /reports/accounts | 
+[**GetReportOfCustomerAccounts**](CustomersApi.md#GetReportOfCustomerAccounts) | **Get** /reports/accounts | Create Report of Accounts
 [**InitAccountValidation**](CustomersApi.md#InitAccountValidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
-[**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers
-[**RefreshAccountOFACSearch**](CustomersApi.md#RefreshAccountOFACSearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC search
+[**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers Service
+[**RefreshAccountOFACSearch**](CustomersApi.md#RefreshAccountOFACSearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC Search
 [**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
-[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
-[**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Get customers
+[**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update Customer Metadata
+[**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Search Customers
 [**UpdateAccountStatus**](CustomersApi.md#UpdateAccountStatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
-[**UpdateCustomer**](CustomersApi.md#UpdateCustomer) | **Put** /customers/{customerID} | Update customer
-[**UpdateCustomerAddress**](CustomersApi.md#UpdateCustomerAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customer&#39;s address
-[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update customer status
-[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload document
+[**UpdateCustomer**](CustomersApi.md#UpdateCustomer) | **Put** /customers/{customerID} | Update Customer
+[**UpdateCustomerAddress**](CustomersApi.md#UpdateCustomerAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
+[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update Customer Status
+[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
 
 
 
@@ -42,7 +42,7 @@ Method | HTTP request | Description
 
 > Disclaimer AcceptDisclaimer(ctx, customerID, disclaimerID, optional)
 
-Accept customer disclaimer
+Accept Customer Disclaimer
 
 Accept a disclaimer for the given customer which could include a document also
 
@@ -90,7 +90,7 @@ No authorization required
 
 > Customer AddCustomerAddress(ctx, customerID, createCustomerAddress, optional)
 
-Add customer address
+Add Customer Address
 
 Add an Address onto an existing Customer record
 
@@ -188,7 +188,7 @@ No authorization required
 
 > Customer CreateCustomer(ctx, createCustomer, optional)
 
-Create customer
+Create Customer
 
 Create a Customer object from the given details of a human or business
 
@@ -330,7 +330,7 @@ No authorization required
 
 > DeleteCustomer(ctx, customerID, optional)
 
-Delete Customer by ID
+Delete Customer
 
 Remove a given Customer
 
@@ -374,7 +374,7 @@ No authorization required
 
 ## DeleteCustomerAccount
 
-> DeleteCustomerAccount(ctx, customerID, optional)
+> DeleteCustomerAccount(ctx, customerID, accountID, optional)
 
 Delete Customer Account
 
@@ -387,6 +387,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| customerID of the Customer to remove an Account | 
+**accountID** | **string**| accountID of the Account | 
  **optional** | ***DeleteCustomerAccountOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -396,6 +397,7 @@ Optional parameters are passed through a pointer to a DeleteCustomerAccountOpts 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
  **xOrganization** | **optional.String**| Value used to separate and identify models | 
@@ -422,7 +424,7 @@ No authorization required
 
 > DeleteCustomerAddress(ctx, customerID, addressID)
 
-Delete a customer's address
+Delete Customer Address
 
 Deletes a customer's address
 
@@ -457,9 +459,9 @@ No authorization required
 
 > DeleteCustomerDocument(ctx, customerID, documentID, optional)
 
-Delete a customer's document
+Delete Customer Document
 
-Remove a customer's document
+Remove Customer Document
 
 ### Required Parameters
 
@@ -554,9 +556,9 @@ No authorization required
 
 > Customer GetCustomer(ctx, customerID, optional)
 
-Retrieve customer
+Get Customer
 
-Get the Customer object and metadata for the customerID.
+Retrieve the Customer object and metadata for the customerID.
 
 ### Required Parameters
 
@@ -600,7 +602,7 @@ No authorization required
 
 > Account GetCustomerAccountByID(ctx, customerID, accountID, optional)
 
-Get Customer Account by ID
+Get Customer Account
 
 Retrieve an account by ID for the given customer.
 
@@ -694,7 +696,7 @@ No authorization required
 
 > []Disclaimer GetCustomerDisclaimers(ctx, customerID, optional)
 
-Get customer disclaimers
+Get Customer Disclaimers
 
 Get active disclaimers for the given customer
 
@@ -740,7 +742,7 @@ No authorization required
 
 > *os.File GetCustomerDocumentContents(ctx, customerID, documentID, optional)
 
-Get customer document
+Get Customer Document
 
 Retrieve the referenced document
 
@@ -788,7 +790,7 @@ No authorization required
 
 > []Document GetCustomerDocuments(ctx, customerID, optional)
 
-Get customer documents
+Get Customer Documents
 
 Get documents for a customer
 
@@ -834,7 +836,7 @@ No authorization required
 
 > OfacSearch GetLatestAccountOFACSearch(ctx, customerID, accountID, optional)
 
-Latest Account OFAC search
+Latest Account OFAC Search
 
 Get the latest OFAC search for an Account
 
@@ -928,7 +930,7 @@ No authorization required
 
 > []ReportAccountResponse GetReportOfCustomerAccounts(ctx, optional)
 
-
+Create Report of Accounts
 
 Retrieves a list of customer and account information.
 
@@ -1023,7 +1025,7 @@ No authorization required
 
 > Ping(ctx, )
 
-Ping Customers
+Ping Customers Service
 
 Check the Customers service to check if running
 
@@ -1053,7 +1055,7 @@ No authorization required
 
 > OfacSearch RefreshAccountOFACSearch(ctx, customerID, accountID, optional)
 
-Refresh Account OFAC search
+Refresh Account OFAC Search
 
 Refresh OFAC search for a given Account
 
@@ -1147,7 +1149,7 @@ No authorization required
 
 > Customer ReplaceCustomerMetadata(ctx, customerID, customerMetadata, optional)
 
-Update customer metadata
+Update Customer Metadata
 
 Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 
@@ -1195,7 +1197,7 @@ No authorization required
 
 > []Customer SearchCustomers(ctx, optional)
 
-Get customers
+Search Customers
 
 Search for customers using different filter parameters
 
@@ -1280,7 +1282,7 @@ No authorization required
 
 > Customer UpdateCustomer(ctx, customerID, createCustomer, optional)
 
-Update customer
+Update Customer
 
 Update a Customer object
 
@@ -1328,7 +1330,7 @@ No authorization required
 
 > UpdateCustomerAddress(ctx, customerID, addressID, updateCustomerAddress)
 
-Update customer's address
+Update Customer Address
 
 Updates the specified customer address
 
@@ -1364,7 +1366,7 @@ No authorization required
 
 > Customer UpdateCustomerStatus(ctx, customerID, updateCustomerStatus, optional)
 
-Update customer status
+Update Customer Status
 
 Update the status for a customer, which can only be updated by authenticated users with permissions.
 
@@ -1412,7 +1414,7 @@ No authorization required
 
 > Document UploadCustomerDocument(ctx, customerID, type_, file, optional)
 
-Upload document
+Upload Customer Document
 
 Upload a document for the given customer
 

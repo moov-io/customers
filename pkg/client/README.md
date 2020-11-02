@@ -38,41 +38,41 @@ All URIs are relative to *http://localhost:8087*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*ConfigurationApi* | [**GetConfiguration**](docs/ConfigurationApi.md#getconfiguration) | **Get** /configuration/customers | Get Configuration
-*ConfigurationApi* | [**GetOrganizationLogo**](docs/ConfigurationApi.md#getorganizationlogo) | **Get** /configuration/logo | Get organization logo
-*ConfigurationApi* | [**UpdateConfiguration**](docs/ConfigurationApi.md#updateconfiguration) | **Put** /configuration/customers | Update Configuration
-*ConfigurationApi* | [**UploadOrganizationLogo**](docs/ConfigurationApi.md#uploadorganizationlogo) | **Put** /configuration/logo | Upload organization logo
-*CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept customer disclaimer
-*CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add customer address
+*ConfigurationApi* | [**GetConfiguration**](docs/ConfigurationApi.md#getconfiguration) | **Get** /configuration/customers | Get Organization Configuration
+*ConfigurationApi* | [**GetOrganizationLogo**](docs/ConfigurationApi.md#getorganizationlogo) | **Get** /configuration/logo | Get Organization Logo
+*ConfigurationApi* | [**UpdateConfiguration**](docs/ConfigurationApi.md#updateconfiguration) | **Put** /configuration/customers | Update Organization Configuration
+*ConfigurationApi* | [**UploadOrganizationLogo**](docs/ConfigurationApi.md#uploadorganizationlogo) | **Put** /configuration/logo | Update Organization Logo
+*CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
+*CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add Customer Address
 *CustomersApi* | [**CompleteAccountValidation**](docs/CustomersApi.md#completeaccountvalidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
-*CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create customer
+*CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create Customer
 *CustomersApi* | [**CreateCustomerAccount**](docs/CustomersApi.md#createcustomeraccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
 *CustomersApi* | [**DecryptAccountNumber**](docs/CustomersApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
-*CustomersApi* | [**DeleteCustomer**](docs/CustomersApi.md#deletecustomer) | **Delete** /customers/{customerID} | Delete Customer by ID
-*CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts | Delete Customer Account
-*CustomersApi* | [**DeleteCustomerAddress**](docs/CustomersApi.md#deletecustomeraddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete a customer&#39;s address
-*CustomersApi* | [**DeleteCustomerDocument**](docs/CustomersApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete a customer&#39;s document
+*CustomersApi* | [**DeleteCustomer**](docs/CustomersApi.md#deletecustomer) | **Delete** /customers/{customerID} | Delete Customer
+*CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts/{accountID} | Delete Customer Account
+*CustomersApi* | [**DeleteCustomerAddress**](docs/CustomersApi.md#deletecustomeraddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
+*CustomersApi* | [**DeleteCustomerDocument**](docs/CustomersApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
 *CustomersApi* | [**GetAccountValidation**](docs/CustomersApi.md#getaccountvalidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
-*CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Retrieve customer
-*CustomersApi* | [**GetCustomerAccountByID**](docs/CustomersApi.md#getcustomeraccountbyid) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account by ID
+*CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Get Customer
+*CustomersApi* | [**GetCustomerAccountByID**](docs/CustomersApi.md#getcustomeraccountbyid) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account
 *CustomersApi* | [**GetCustomerAccounts**](docs/CustomersApi.md#getcustomeraccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
-*CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get customer disclaimers
-*CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get customer document
-*CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get customer documents
-*CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC search
+*CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get Customer Disclaimers
+*CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get Customer Document
+*CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get Customer Documents
+*CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC Search
 *CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
-*CustomersApi* | [**GetReportOfCustomerAccounts**](docs/CustomersApi.md#getreportofcustomeraccounts) | **Get** /reports/accounts | 
+*CustomersApi* | [**GetReportOfCustomerAccounts**](docs/CustomersApi.md#getreportofcustomeraccounts) | **Get** /reports/accounts | Create Report of Accounts
 *CustomersApi* | [**InitAccountValidation**](docs/CustomersApi.md#initaccountvalidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
-*CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers
-*CustomersApi* | [**RefreshAccountOFACSearch**](docs/CustomersApi.md#refreshaccountofacsearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC search
+*CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers Service
+*CustomersApi* | [**RefreshAccountOFACSearch**](docs/CustomersApi.md#refreshaccountofacsearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC Search
 *CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
-*CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update customer metadata
-*CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Get customers
+*CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update Customer Metadata
+*CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Search Customers
 *CustomersApi* | [**UpdateAccountStatus**](docs/CustomersApi.md#updateaccountstatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
-*CustomersApi* | [**UpdateCustomer**](docs/CustomersApi.md#updatecustomer) | **Put** /customers/{customerID} | Update customer
-*CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customer&#39;s address
-*CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update customer status
-*CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload document
+*CustomersApi* | [**UpdateCustomer**](docs/CustomersApi.md#updatecustomer) | **Put** /customers/{customerID} | Update Customer
+*CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
+*CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer Status
+*CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
 
 
 ## Documentation For Models

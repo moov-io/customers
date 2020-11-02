@@ -28,7 +28,7 @@ paths:
   /ping:
     get:
       tags: [Customers]
-      summary: Ping Customers
+      summary: Ping Customers Service
       description: Check the Customers service to check if running
       operationId: ping
       responses:
@@ -38,14 +38,14 @@ paths:
   /configuration/customers:
     get:
       tags: [Configuration]
-      summary: Get Configuration
+      summary: Get Organization Configuration
       description: Retrieve current configuration for the provided organization.
       operationId: getConfiguration
       parameters:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
       responses:
@@ -57,14 +57,14 @@ paths:
                 $ref: '#/components/schemas/OrganizationConfiguration'
     put:
       tags: [Configuration]
-      summary: Update Configuration
+      summary: Update Organization Configuration
       description: Update the configuration for the provided organization.
       operationId: updateConfiguration
       parameters:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
       requestBody:
@@ -89,14 +89,14 @@ paths:
   /configuration/logo:
     get:
       tags: [Configuration]
-      summary: Get organization logo
+      summary: Get Organization Logo
       description: Retrieve the organization's logo
       operationId: getOrganizationLogo
       parameters:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           required: true
           schema:
             type: string
@@ -128,14 +128,14 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     put:
       tags: [Configuration]
-      summary: Upload organization logo
+      summary: Update Organization Logo
       description: Upload an organization's logo, or update it if it already exists
       operationId: uploadOrganizationLogo
       parameters:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           required: true
           schema:
             type: string
@@ -169,7 +169,7 @@ paths:
   /customers:
     get:
       tags: [Customers]
-      summary: Get customers
+      summary: Search Customers
       description: Search for customers using different filter parameters
       operationId: searchCustomers
       parameters:
@@ -231,7 +231,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     post:
       tags: [Customers]
-      summary: Create customer
+      summary: Create Customer
       description: Create a Customer object from the given details of a human or business
       operationId: createCustomer
       parameters:
@@ -244,7 +244,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
       requestBody:
@@ -269,8 +269,8 @@ paths:
   /customers/{customerID}:
     get:
       tags: [Customers]
-      summary: Retrieve customer
-      description: Get the Customer object and metadata for the customerID.
+      summary: Get Customer
+      description: Retrieve the Customer object and metadata for the customerID.
       operationId: getCustomer
       parameters:
         - name: X-Request-ID
@@ -282,7 +282,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -309,7 +309,7 @@ paths:
           description: No Customer with the specified customerID was found
     delete:
       tags: [Customers]
-      summary: Delete Customer by ID
+      summary: Delete Customer
       description: Remove a given Customer
       operationId: deleteCustomer
       parameters:
@@ -322,11 +322,10 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - description: customerID of the Customer to be deleted
-          explode: false
           in: path
           name: customerID
           required: true
@@ -341,7 +340,7 @@ paths:
           description: Failed to delete customer, see error(s)
     put:
       tags: [Customers]
-      summary: Update customer
+      summary: Update Customer
       description: Update a Customer object
       operationId: updateCustomer
       parameters:
@@ -354,7 +353,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -386,7 +385,7 @@ paths:
   /customers/{customerID}/address:
     post:
       tags: [Customers]
-      summary: Add customer address
+      summary: Add Customer Address
       description: Add an Address onto an existing Customer record
       operationId: addCustomerAddress
       parameters:
@@ -399,7 +398,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -431,7 +430,7 @@ paths:
   /customers/{customerID}/addresses/{addressID}:
     put:
       tags: [Customers]
-      summary: Update customer's address
+      summary: Update Customer Address
       description: Updates the specified customer address
       operationId: updateCustomerAddress
       parameters:
@@ -466,7 +465,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     delete:
       tags: [Customers]
-      summary: Delete a customer's address
+      summary: Delete Customer Address
       description: Deletes a customer's address
       operationId: deleteCustomerAddress
       parameters:
@@ -497,7 +496,7 @@ paths:
   /customers/{customerID}/metadata:
     put:
       tags: [Customers]
-      summary: Update customer metadata
+      summary: Update Customer Metadata
       description: Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
       operationId: replaceCustomerMetadata
       parameters:
@@ -510,7 +509,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -542,7 +541,7 @@ paths:
   /customers/{customerID}/status:
     put:
       tags: [Customers]
-      summary: Update customer status
+      summary: Update Customer Status
       description: Update the status for a customer, which can only be updated by authenticated users with permissions.
       operationId: updateCustomerStatus
       parameters:
@@ -555,7 +554,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -600,7 +599,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -638,7 +637,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -667,42 +666,10 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-    delete:
-      tags: [Customers]
-      summary: Delete Customer Account
-      description: Remove an account from the given Customer
-      operationId: deleteCustomerAccount
-      parameters:
-        - name: X-Request-ID
-          in: header
-          description: Optional requestID allows application developer to trace requests through the systems logs
-          example: rs4f9915
-          schema:
-            type: string
-        - name: X-Organization
-          in: header
-          description: Value used to separate and identify models
-          example: org342
-          schema:
-            type: string
-        - name: customerID
-          in: path
-          description: customerID of the Customer to remove an Account
-          required: true
-          schema:
-            type: string
-            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-      responses:
-        '200':
-          description: Account removed form customer
-        '400':
-          description: Failed to get accounts, see error(s)
-          content:
-            application/json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}:
     get:
+      tags: [Customers]
+      summary: Get Customer Account
       description: Retrieve an account by ID for the given customer.
       operationId: getCustomerAccountByID
       parameters:
@@ -715,20 +682,18 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - description: customerID of the Customer to get an Account for
-          explode: false
           in: path
           name: customerID
           required: true
           schema:
-            example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+            example: e210a9d6
             type: string
           style: simple
         - description: accountID of the Account
-          explode: false
           in: path
           name: accountID
           required: true
@@ -749,9 +714,48 @@ paths:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
           description: Failed to get accounts, see error(s)
-      summary: Get Customer Account by ID
-      tags:
-        - Customers
+    delete:
+      tags: [Customers]
+      summary: Delete Customer Account
+      description: Remove an account from the given Customer
+      operationId: deleteCustomerAccount
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: de2c99f3
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer to remove an Account
+          required: true
+          schema:
+            type: string
+            example: e210a9d6
+        - description: accountID of the Account
+          in: path
+          name: accountID
+          required: true
+          schema:
+            example: b74d7c51
+            type: string
+          style: simple
+      responses:
+        '200':
+          description: Account removed form customer
+        '400':
+          description: Failed to get accounts, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/decrypt:
     post:
       tags: [Customers]
@@ -769,7 +773,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -799,71 +803,10 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-  /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
-    get:
-      tags: [Customers]
-      summary: Get Account Validation
-      description: |
-        Get information about account validation strategy, status, etc.
-      operationId: getAccountValidation
-      parameters:
-        - name: X-Request-ID
-          in: header
-          description: Optional requestID allows application developer to trace requests through the systems logs
-          example: rs4f9915
-          schema:
-            type: string
-        - name: X-Organization
-          in: header
-          description: Value used to separate and identify models
-          example: org342
-          schema:
-            type: string
-        - name: customerID
-          in: path
-          description: customerID of the Customer the accountID belongs to
-          required: true
-          schema:
-            type: string
-            example: 51dd8cdd
-        - name: accountID
-          in: path
-          description: accountID of the Account to validate
-          required: true
-          schema:
-            type: string
-            example: b74d7c51
-        - name: validationID
-          in: path
-          description: ID of the Validation
-          required: true
-          schema:
-            type: string
-            example: b74d7c51
-      responses:
-        '200':
-          description: Account validation information
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AccountValidationResponse'
-              example:
-                validationID: b74d7c51
-                strategy: instant
-                vendor: plaid
-                status: completed
-                createdAt: "2020-08-25T13:07:19Z"
-                updatedAt: "2020-08-25T13:09:22Z"
-        '400':
-          description: Failed to initiate account validation, see error(s)
-          content:
-            application/json:
-              schema:
-                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/ofac:
     get:
       tags: [Customers]
-      summary: Latest Account OFAC search
+      summary: Latest Account OFAC Search
       description: Get the latest OFAC search for an Account
       operationId: getLatestAccountOFACSearch
       parameters:
@@ -876,7 +819,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -909,7 +852,7 @@ paths:
   /customers/{customerID}/accounts/{accountID}/refresh/ofac:
     put:
       tags: [Customers]
-      summary: Refresh Account OFAC search
+      summary: Refresh Account OFAC Search
       description: Refresh OFAC search for a given Account
       operationId: refreshAccountOFACSearch
       parameters:
@@ -922,7 +865,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1009,7 +952,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1096,7 +1039,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1163,10 +1106,71 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
+  /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
+    get:
+      tags: [Customers]
+      summary: Get Account Validation
+      description: |
+        Get information about account validation strategy, status, etc.
+      operationId: getAccountValidation
+      parameters:
+        - name: X-Request-ID
+          in: header
+          description: Optional requestID allows application developer to trace requests through the systems logs
+          example: rs4f9915
+          schema:
+            type: string
+        - name: X-Organization
+          in: header
+          description: Value used to separate and identify models
+          example: de2c99f3
+          schema:
+            type: string
+        - name: customerID
+          in: path
+          description: customerID of the Customer the accountID belongs to
+          required: true
+          schema:
+            type: string
+            example: 51dd8cdd
+        - name: accountID
+          in: path
+          description: accountID of the Account to validate
+          required: true
+          schema:
+            type: string
+            example: b74d7c51
+        - name: validationID
+          in: path
+          description: ID of the Validation
+          required: true
+          schema:
+            type: string
+            example: b74d7c51
+      responses:
+        '200':
+          description: Account validation information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountValidationResponse'
+              example:
+                validationID: b74d7c51
+                strategy: instant
+                vendor: plaid
+                status: completed
+                createdAt: "2020-08-25T13:07:19Z"
+                updatedAt: "2020-08-25T13:09:22Z"
+        '400':
+          description: Failed to initiate account validation, see error(s)
+          content:
+            application/json:
+              schema:
+                $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     get:
       tags: [Customers]
-      summary: Get customer disclaimers
+      summary: Get Customer Disclaimers
       description: Get active disclaimers for the given customer
       operationId: getCustomerDisclaimers
       parameters:
@@ -1179,7 +1183,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1205,7 +1209,7 @@ paths:
   /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
       tags: [Customers]
-      summary: Accept customer disclaimer
+      summary: Accept Customer Disclaimer
       description: Accept a disclaimer for the given customer which could include a document also
       operationId: acceptDisclaimer
       parameters:
@@ -1218,7 +1222,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1251,7 +1255,7 @@ paths:
   /customers/{customerID}/documents:
     post:
       tags: [Customers]
-      summary: Upload document
+      summary: Upload Customer Document
       description: Upload a document for the given customer
       operationId: uploadCustomerDocument
       parameters:
@@ -1264,7 +1268,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1307,7 +1311,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     get:
       tags: [Customers]
-      summary: Get customer documents
+      summary: Get Customer Documents
       description: Get documents for a customer
       operationId: getCustomerDocuments
       parameters:
@@ -1320,7 +1324,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1346,7 +1350,7 @@ paths:
   /customers/{customerID}/documents/{documentID}:
     get:
       tags: [Customers]
-      summary: Get customer document
+      summary: Get Customer Document
       description: Retrieve the referenced document
       operationId: getCustomerDocumentContents
       parameters:
@@ -1359,7 +1363,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1395,7 +1399,9 @@ paths:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     delete:
-      description: Remove a customer's document
+      tags: [Customers]
+      summary: Delete Customer Document
+      description: Remove Customer Document
       operationId: deleteCustomerDocument
       parameters:
         - name: X-Request-ID
@@ -1429,9 +1435,6 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-      summary: Delete a customer's document
-      tags:
-        - Customers
   /customers/{customerID}/ofac:
     get:
       tags: [Customers]
@@ -1448,7 +1451,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1487,7 +1490,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: customerID
@@ -1513,6 +1516,7 @@ paths:
   /reports/accounts:
     get:
       tags: [Customers]
+      summary: Create Report of Accounts
       description: Retrieves a list of customer and account information.
       operationId: getReportOfCustomerAccounts
       parameters:
@@ -1525,7 +1529,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
-          example: org342
+          example: de2c99f3
           schema:
             type: string
         - name: accountIDs
