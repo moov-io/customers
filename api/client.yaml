@@ -1851,7 +1851,7 @@ components:
           description: Unique identifier for this Address
           example: 851233a1
         type:
-          $ref: '#/components/Schemas/AddressType'
+          $ref: '#/components/schemas/AddressType'
         address1:
           type: string
           description: First line of the address
