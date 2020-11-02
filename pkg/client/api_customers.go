@@ -34,7 +34,7 @@ type AcceptDisclaimerOpts struct {
 }
 
 /*
-AcceptDisclaimer Accept customer disclaimer
+AcceptDisclaimer Accept Customer Disclaimer
 Accept a disclaimer for the given customer which could include a document also
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to accept a disclaimer
@@ -139,7 +139,7 @@ type AddCustomerAddressOpts struct {
 }
 
 /*
-AddCustomerAddress Add customer address
+AddCustomerAddress Add Customer Address
 Add an Address onto an existing Customer record
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to add the address onto
@@ -352,7 +352,7 @@ type CreateCustomerOpts struct {
 }
 
 /*
-CreateCustomer Create customer
+CreateCustomer Create Customer
 Create a Customer object from the given details of a human or business
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param createCustomer
@@ -664,7 +664,7 @@ type DeleteCustomerOpts struct {
 }
 
 /*
-DeleteCustomer Delete Customer by ID
+DeleteCustomer Delete Customer
 Remove a given Customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to be deleted
@@ -750,11 +750,12 @@ DeleteCustomerAccount Delete Customer Account
 Remove an account from the given Customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to remove an Account
+ * @param accountID accountID of the Account
  * @param optional nil or *DeleteCustomerAccountOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
  * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 */
-func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, customerID string, localVarOptionals *DeleteCustomerAccountOpts) (*_nethttp.Response, error) {
+func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, customerID string, accountID string, localVarOptionals *DeleteCustomerAccountOpts) (*_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
@@ -764,8 +765,10 @@ func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, custom
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"accountID"+"}", _neturl.QueryEscape(parameterToString(accountID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -831,7 +834,7 @@ func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, custom
 }
 
 /*
-DeleteCustomerAddress Delete a customer's address
+DeleteCustomerAddress Delete Customer Address
 Deletes a customer&#39;s address
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
@@ -915,8 +918,8 @@ type DeleteCustomerDocumentOpts struct {
 }
 
 /*
-DeleteCustomerDocument Delete a customer's document
-Remove a customer&#39;s document
+DeleteCustomerDocument Delete Customer Document
+Remove Customer Document
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID ID of the customer that owns the document
  * @param documentID ID of the document
@@ -1113,8 +1116,8 @@ type GetCustomerOpts struct {
 }
 
 /*
-GetCustomer Retrieve customer
-Get the Customer object and metadata for the customerID.
+GetCustomer Get Customer
+Retrieve the Customer object and metadata for the customerID.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID that identifies this Customer
  * @param optional nil or *GetCustomerOpts - Optional Parameters:
@@ -1216,7 +1219,7 @@ type GetCustomerAccountByIDOpts struct {
 }
 
 /*
-GetCustomerAccountByID Get Customer Account by ID
+GetCustomerAccountByID Get Customer Account
 Retrieve an account by ID for the given customer.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to get an Account for
@@ -1423,7 +1426,7 @@ type GetCustomerDisclaimersOpts struct {
 }
 
 /*
-GetCustomerDisclaimers Get customer disclaimers
+GetCustomerDisclaimers Get Customer Disclaimers
 Get active disclaimers for the given customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to get disclaimers
@@ -1525,7 +1528,7 @@ type GetCustomerDocumentContentsOpts struct {
 }
 
 /*
-GetCustomerDocumentContents Get customer document
+GetCustomerDocumentContents Get Customer Document
 Retrieve the referenced document
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to get a Document
@@ -1630,7 +1633,7 @@ type GetCustomerDocumentsOpts struct {
 }
 
 /*
-GetCustomerDocuments Get customer documents
+GetCustomerDocuments Get Customer Documents
 Get documents for a customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to get all Documents
@@ -1732,7 +1735,7 @@ type GetLatestAccountOFACSearchOpts struct {
 }
 
 /*
-GetLatestAccountOFACSearch Latest Account OFAC search
+GetLatestAccountOFACSearch Latest Account OFAC Search
 Get the latest OFAC search for an Account
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer
@@ -1940,7 +1943,7 @@ type GetReportOfCustomerAccountsOpts struct {
 }
 
 /*
-GetReportOfCustomerAccounts Method for GetReportOfCustomerAccounts
+GetReportOfCustomerAccounts Create Report of Accounts
 Retrieves a list of customer and account information.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *GetReportOfCustomerAccountsOpts - Optional Parameters:
@@ -2145,7 +2148,7 @@ func (a *CustomersApiService) InitAccountValidation(ctx _context.Context, custom
 }
 
 /*
-Ping Ping Customers
+Ping Ping Customers Service
 Check the Customers service to check if running
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 */
@@ -2215,7 +2218,7 @@ type RefreshAccountOFACSearchOpts struct {
 }
 
 /*
-RefreshAccountOFACSearch Refresh Account OFAC search
+RefreshAccountOFACSearch Refresh Account OFAC Search
 Refresh OFAC search for a given Account
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to refresh OFAC search
@@ -2422,7 +2425,7 @@ type ReplaceCustomerMetadataOpts struct {
 }
 
 /*
-ReplaceCustomerMetadata Update customer metadata
+ReplaceCustomerMetadata Update Customer Metadata
 Replace the metadata object for a customer. Metadata is a map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to add the metadata onto
@@ -2532,7 +2535,7 @@ type SearchCustomersOpts struct {
 }
 
 /*
-SearchCustomers Get customers
+SearchCustomers Search Customers
 Search for customers using different filter parameters
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *SearchCustomersOpts - Optional Parameters:
@@ -2744,7 +2747,7 @@ type UpdateCustomerOpts struct {
 }
 
 /*
-UpdateCustomer Update customer
+UpdateCustomer Update Customer
 Update a Customer object
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID that identifies this Customer
@@ -2843,7 +2846,7 @@ func (a *CustomersApiService) UpdateCustomer(ctx _context.Context, customerID st
 }
 
 /*
-UpdateCustomerAddress Update customer's address
+UpdateCustomerAddress Update Customer Address
 Updates the specified customer address
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
@@ -2931,7 +2934,7 @@ type UpdateCustomerStatusOpts struct {
 }
 
 /*
-UpdateCustomerStatus Update customer status
+UpdateCustomerStatus Update Customer Status
 Update the status for a customer, which can only be updated by authenticated users with permissions.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to update the CustomerStatus
@@ -3036,7 +3039,7 @@ type UploadCustomerDocumentOpts struct {
 }
 
 /*
-UploadCustomerDocument Upload document
+UploadCustomerDocument Upload Customer Document
 Upload a document for the given customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to add a document

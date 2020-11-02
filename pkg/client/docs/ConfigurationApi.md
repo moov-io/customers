@@ -4,10 +4,10 @@ All URIs are relative to *http://localhost:8087*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**GetConfiguration**](ConfigurationApi.md#GetConfiguration) | **Get** /configuration/customers | Get Configuration
-[**GetOrganizationLogo**](ConfigurationApi.md#GetOrganizationLogo) | **Get** /configuration/logo | Get organization logo
-[**UpdateConfiguration**](ConfigurationApi.md#UpdateConfiguration) | **Put** /configuration/customers | Update Configuration
-[**UploadOrganizationLogo**](ConfigurationApi.md#UploadOrganizationLogo) | **Put** /configuration/logo | Upload organization logo
+[**GetConfiguration**](ConfigurationApi.md#GetConfiguration) | **Get** /configuration/customers | Get Organization Configuration
+[**GetOrganizationLogo**](ConfigurationApi.md#GetOrganizationLogo) | **Get** /configuration/logo | Get Organization Logo
+[**UpdateConfiguration**](ConfigurationApi.md#UpdateConfiguration) | **Put** /configuration/customers | Update Organization Configuration
+[**UploadOrganizationLogo**](ConfigurationApi.md#UploadOrganizationLogo) | **Put** /configuration/logo | Update Organization Logo
 
 
 
@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 > OrganizationConfiguration GetConfiguration(ctx, optional)
 
-Get Configuration
+Get Organization Configuration
 
 Retrieve current configuration for the provided organization.
 
@@ -58,7 +58,7 @@ No authorization required
 
 > *os.File GetOrganizationLogo(ctx, xOrganization)
 
-Get organization logo
+Get Organization Logo
 
 Retrieve the organization's logo
 
@@ -92,7 +92,7 @@ No authorization required
 
 > OrganizationConfiguration UpdateConfiguration(ctx, organizationConfiguration, optional)
 
-Update Configuration
+Update Organization Configuration
 
 Update the configuration for the provided organization.
 
@@ -137,7 +137,7 @@ No authorization required
 
 > OrganizationConfiguration UploadOrganizationLogo(ctx, xOrganization, file)
 
-Upload organization logo
+Update Organization Logo
 
 Upload an organization's logo, or update it if it already exists
 

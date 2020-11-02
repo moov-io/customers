@@ -30,7 +30,7 @@ paths:
       responses:
         "200":
           description: Service is running properly
-      summary: Ping Customers
+      summary: Ping Customers Service
       tags:
       - Customers
   /configuration/customers:
@@ -39,7 +39,7 @@ paths:
       operationId: getConfiguration
       parameters:
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -54,7 +54,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/OrganizationConfiguration'
           description: Configuration was successfully updated
-      summary: Get Configuration
+      summary: Get Organization Configuration
       tags:
       - Configuration
     put:
@@ -62,7 +62,7 @@ paths:
       operationId: updateConfiguration
       parameters:
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -89,7 +89,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Configuration was not updated, see error(s)
-      summary: Update Configuration
+      summary: Update Organization Configuration
       tags:
       - Configuration
   /configuration/logo:
@@ -98,7 +98,7 @@ paths:
       operationId: getOrganizationLogo
       parameters:
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -132,7 +132,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Failed to retrieve image file, see error(s)
-      summary: Get organization logo
+      summary: Get Organization Logo
       tags:
       - Configuration
     put:
@@ -140,7 +140,7 @@ paths:
       operationId: uploadOrganizationLogo
       parameters:
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -176,7 +176,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Configuration was not updated, see error(s)
-      summary: Upload organization logo
+      summary: Update Organization Logo
       tags:
       - Configuration
   /customers:
@@ -262,7 +262,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customers were not retrieved, see error(s)
-      summary: Get customers
+      summary: Search Customers
       tags:
       - Customers
     post:
@@ -280,7 +280,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -307,7 +307,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer was not created, see error(s)
-      summary: Create customer
+      summary: Create Customer
       tags:
       - Customers
   /customers/{customerID}:
@@ -326,7 +326,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -348,11 +348,11 @@ paths:
           description: Customer removed from customers
         "400":
           description: Failed to delete customer, see error(s)
-      summary: Delete Customer by ID
+      summary: Delete Customer
       tags:
       - Customers
     get:
-      description: Get the Customer object and metadata for the customerID.
+      description: Retrieve the Customer object and metadata for the customerID.
       operationId: getCustomer
       parameters:
       - description: Optional requestID allows application developer to trace requests
@@ -366,7 +366,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -398,7 +398,7 @@ paths:
           description: Problem getting customer, see error(s)
         "404":
           description: No Customer with the specified customerID was found
-      summary: Retrieve customer
+      summary: Get Customer
       tags:
       - Customers
     put:
@@ -416,7 +416,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -452,7 +452,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer was not updated, see error(s)
-      summary: Update customer
+      summary: Update Customer
       tags:
       - Customers
   /customers/{customerID}/address:
@@ -471,7 +471,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -507,7 +507,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer address was not updated, see error(s)
-      summary: Add customer address
+      summary: Add Customer Address
       tags:
       - Customers
   /customers/{customerID}/addresses/{addressID}:
@@ -542,7 +542,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Delete a customer's address
+      summary: Delete Customer Address
       tags:
       - Customers
     put:
@@ -582,7 +582,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Update customer's address
+      summary: Update Customer Address
       tags:
       - Customers
   /customers/{customerID}/metadata:
@@ -603,7 +603,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -639,7 +639,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer metadata was not updated, see error(s)
-      summary: Update customer metadata
+      summary: Update Customer Metadata
       tags:
       - Customers
   /customers/{customerID}/status:
@@ -659,7 +659,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -695,54 +695,10 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer status was not updated, see error(s)
-      summary: Update customer status
+      summary: Update Customer Status
       tags:
       - Customers
   /customers/{customerID}/accounts:
-    delete:
-      description: Remove an account from the given Customer
-      operationId: deleteCustomerAccount
-      parameters:
-      - description: Optional requestID allows application developer to trace requests
-          through the systems logs
-        example: rs4f9915
-        explode: false
-        in: header
-        name: X-Request-ID
-        required: false
-        schema:
-          type: string
-        style: simple
-      - description: Value used to separate and identify models
-        example: org342
-        explode: false
-        in: header
-        name: X-Organization
-        required: false
-        schema:
-          type: string
-        style: simple
-      - description: customerID of the Customer to remove an Account
-        explode: false
-        in: path
-        name: customerID
-        required: true
-        schema:
-          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
-          type: string
-        style: simple
-      responses:
-        "200":
-          description: Account removed form customer
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Failed to get accounts, see error(s)
-      summary: Delete Customer Account
-      tags:
-      - Customers
     get:
       description: Retrieve all accounts for the given customer.
       operationId: getCustomerAccounts
@@ -758,7 +714,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -806,7 +762,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -846,6 +802,59 @@ paths:
       tags:
       - Customers
   /customers/{customerID}/accounts/{accountID}:
+    delete:
+      description: Remove an account from the given Customer
+      operationId: deleteCustomerAccount
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Value used to separate and identify models
+        example: de2c99f3
+        explode: false
+        in: header
+        name: X-Organization
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer to remove an Account
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: e210a9d6
+          type: string
+        style: simple
+      - description: accountID of the Account
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: Account removed form customer
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to get accounts, see error(s)
+      summary: Delete Customer Account
+      tags:
+      - Customers
     get:
       description: Retrieve an account by ID for the given customer.
       operationId: getCustomerAccountByID
@@ -861,7 +870,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -875,7 +884,7 @@ paths:
         name: customerID
         required: true
         schema:
-          example: e210a9d6-d755-4455-9bd2-9577ea7e1081
+          example: e210a9d6
           type: string
         style: simple
       - description: accountID of the Account
@@ -900,7 +909,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Failed to get accounts, see error(s)
-      summary: Get Customer Account by ID
+      summary: Get Customer Account
       tags:
       - Customers
   /customers/{customerID}/accounts/{accountID}/decrypt:
@@ -920,7 +929,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -962,81 +971,6 @@ paths:
       summary: Decrypt Account Number
       tags:
       - Customers
-  /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
-    get:
-      description: |
-        Get information about account validation strategy, status, etc.
-      operationId: getAccountValidation
-      parameters:
-      - description: Optional requestID allows application developer to trace requests
-          through the systems logs
-        example: rs4f9915
-        explode: false
-        in: header
-        name: X-Request-ID
-        required: false
-        schema:
-          type: string
-        style: simple
-      - description: Value used to separate and identify models
-        example: org342
-        explode: false
-        in: header
-        name: X-Organization
-        required: false
-        schema:
-          type: string
-        style: simple
-      - description: customerID of the Customer the accountID belongs to
-        explode: false
-        in: path
-        name: customerID
-        required: true
-        schema:
-          example: 51dd8cdd
-          type: string
-        style: simple
-      - description: accountID of the Account to validate
-        explode: false
-        in: path
-        name: accountID
-        required: true
-        schema:
-          example: b74d7c51
-          type: string
-        style: simple
-      - description: ID of the Validation
-        explode: false
-        in: path
-        name: validationID
-        required: true
-        schema:
-          example: b74d7c51
-          type: string
-        style: simple
-      responses:
-        "200":
-          content:
-            application/json:
-              example:
-                validationID: b74d7c51
-                strategy: instant
-                vendor: plaid
-                status: completed
-                createdAt: 2020-08-25T13:07:19Z
-                updatedAt: 2020-08-25T13:09:22Z
-              schema:
-                $ref: '#/components/schemas/AccountValidationResponse'
-          description: Account validation information
-        "400":
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-          description: Failed to initiate account validation, see error(s)
-      summary: Get Account Validation
-      tags:
-      - Customers
   /customers/{customerID}/accounts/{accountID}/ofac:
     get:
       description: Get the latest OFAC search for an Account
@@ -1053,7 +987,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1092,7 +1026,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: An error occurred when refreshing OFAC data, see error(s)
-      summary: Latest Account OFAC search
+      summary: Latest Account OFAC Search
       tags:
       - Customers
   /customers/{customerID}/accounts/{accountID}/refresh/ofac:
@@ -1111,7 +1045,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1150,7 +1084,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: An error occurred when refreshing OFAC data, see error(s)
-      summary: Refresh Account OFAC search
+      summary: Refresh Account OFAC Search
       tags:
       - Customers
   /customers/{customerID}/accounts/{accountID}/status:
@@ -1215,7 +1149,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1314,7 +1248,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1393,6 +1327,81 @@ paths:
       summary: Complete Account Validation
       tags:
       - Customers
+  /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
+    get:
+      description: |
+        Get information about account validation strategy, status, etc.
+      operationId: getAccountValidation
+      parameters:
+      - description: Optional requestID allows application developer to trace requests
+          through the systems logs
+        example: rs4f9915
+        explode: false
+        in: header
+        name: X-Request-ID
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: Value used to separate and identify models
+        example: de2c99f3
+        explode: false
+        in: header
+        name: X-Organization
+        required: false
+        schema:
+          type: string
+        style: simple
+      - description: customerID of the Customer the accountID belongs to
+        explode: false
+        in: path
+        name: customerID
+        required: true
+        schema:
+          example: 51dd8cdd
+          type: string
+        style: simple
+      - description: accountID of the Account to validate
+        explode: false
+        in: path
+        name: accountID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      - description: ID of the Validation
+        explode: false
+        in: path
+        name: validationID
+        required: true
+        schema:
+          example: b74d7c51
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              example:
+                validationID: b74d7c51
+                strategy: instant
+                vendor: plaid
+                status: completed
+                createdAt: 2020-08-25T13:07:19Z
+                updatedAt: 2020-08-25T13:09:22Z
+              schema:
+                $ref: '#/components/schemas/AccountValidationResponse'
+          description: Account validation information
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Failed to initiate account validation, see error(s)
+      summary: Get Account Validation
+      tags:
+      - Customers
   /customers/{customerID}/disclaimers:
     get:
       description: Get active disclaimers for the given customer
@@ -1409,7 +1418,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1439,7 +1448,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Failed to get disclaimers, see error(s)
-      summary: Get customer disclaimers
+      summary: Get Customer Disclaimers
       tags:
       - Customers
   /customers/{customerID}/disclaimers/{disclaimerID}:
@@ -1459,7 +1468,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1498,7 +1507,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer disclaimer was not accepted, see error(s)
-      summary: Accept customer disclaimer
+      summary: Accept Customer Disclaimer
       tags:
       - Customers
   /customers/{customerID}/documents:
@@ -1517,7 +1526,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1547,7 +1556,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Failed to get customer documents, see error(s)
-      summary: Get customer documents
+      summary: Get Customer Documents
       tags:
       - Customers
     post:
@@ -1565,7 +1574,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1615,12 +1624,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Document was not uploaded, see error(s)
-      summary: Upload document
+      summary: Upload Customer Document
       tags:
       - Customers
   /customers/{customerID}/documents/{documentID}:
     delete:
-      description: Remove a customer's document
+      description: Remove Customer Document
       operationId: deleteCustomerDocument
       parameters:
       - description: Optional requestID allows application developer to trace requests
@@ -1660,7 +1669,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Failed to delete customer's document, see error(s)
-      summary: Delete a customer's document
+      summary: Delete Customer Document
       tags:
       - Customers
     get:
@@ -1678,7 +1687,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1722,7 +1731,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Failed to get customer document, see error(s)
-      summary: Get customer document
+      summary: Get Customer Document
       tags:
       - Customers
   /customers/{customerID}/ofac:
@@ -1741,7 +1750,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1790,7 +1799,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1839,7 +1848,7 @@ paths:
           type: string
         style: simple
       - description: Value used to separate and identify models
-        example: org342
+        example: de2c99f3
         explode: false
         in: header
         name: X-Organization
@@ -1869,6 +1878,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Failed to get accounts, see error(s)
+      summary: Create Report of Accounts
       tags:
       - Customers
 components:
@@ -2279,7 +2289,7 @@ components:
           example: 851233a1
           type: string
         type:
-          $ref: '#/components/Schemas/AddressType'
+          $ref: '#/components/schemas/AddressType'
         address1:
           description: First line of the address
           type: string

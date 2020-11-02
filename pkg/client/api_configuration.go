@@ -32,7 +32,7 @@ type GetConfigurationOpts struct {
 }
 
 /*
-GetConfiguration Get Configuration
+GetConfiguration Get Organization Configuration
 Retrieve current configuration for the provided organization.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *GetConfigurationOpts - Optional Parameters:
@@ -112,7 +112,7 @@ func (a *ConfigurationApiService) GetConfiguration(ctx _context.Context, localVa
 }
 
 /*
-GetOrganizationLogo Get organization logo
+GetOrganizationLogo Get Organization Logo
 Retrieve the organization&#39;s logo
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param xOrganization Value used to separate and identify models
@@ -203,7 +203,7 @@ type UpdateConfigurationOpts struct {
 }
 
 /*
-UpdateConfiguration Update Configuration
+UpdateConfiguration Update Organization Configuration
 Update the configuration for the provided organization.
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param organizationConfiguration
@@ -295,7 +295,7 @@ func (a *ConfigurationApiService) UpdateConfiguration(ctx _context.Context, orga
 }
 
 /*
-UploadOrganizationLogo Upload organization logo
+UploadOrganizationLogo Update Organization Logo
 Upload an organization&#39;s logo, or update it if it already exists
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param xOrganization Value used to separate and identify models
