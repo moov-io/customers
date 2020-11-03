@@ -1,9 +1,9 @@
 openapi: 3.0.2
 info:
   description: |
-    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with United States federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
 
-    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgement are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
+    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgment are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
 
     ![](https://raw.githubusercontent.com/adamdecaf/customers/create-accounts/docs/images/customer.png)
   version: v1
@@ -24,22 +24,22 @@ tags:
       Endpoints for retrieving and updating configuration for an organization.
   - name: Customers
     description: |
-      Endpoints for searching, creating, and verifying individuals according to US government criteria for money movement within the country.
+      Endpoints for searching, creating, and verifying individuals according to United States regulations for money movement.
   - name: Accounts
     description: |
-      Endpoints for searching, creating, and verifying financial instruments according to US government criteria for money movement within the country.
+      Endpoints for searching, creating, and validating financial instruments according to United States regulations for money movement.
   - name: Account Validation
     description: |
-      Endpoints for validation Accounts after they're created
+      Endpoints for validating Accounts after they're created.
   - name: Disclaimers
     description: |
-      Endpoints for accepting legal agreements for moving money in the United States
+      Endpoints for accepting legal agreements for moving money in the United States.
   - name: Documents
     description: |
-      Endpoints for uploading and accepting legal documents to comply with United States regulations
+      Endpoints for uploading and accepting legal documents to comply with United States regulations.
   - name: Reports
     description: |
-      Endpoints for generating bulk listings of Accounts and Customers
+      Endpoints for generating bulk listings of Accounts and Customers.
 
 paths:
   /ping:
@@ -1781,7 +1781,7 @@ components:
           type: string
           minimum: 2
           maximum: 2
-          description: two charcer code of US state
+          description: two character code of a US state
         postalCode:
           type: string
         country:
@@ -1849,7 +1849,7 @@ components:
           type: string
           minimum: 2
           maximum: 2
-          description: two charcer code of US state
+          description: two character code of a US state
           example: CO
         postalCode:
           type: string
@@ -1885,7 +1885,7 @@ components:
           type: string
           minimum: 2
           maximum: 2
-          description: two charcer code of US state
+          description: two character code of a US state
         postalCode:
           type: string
         country:
