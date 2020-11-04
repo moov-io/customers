@@ -85,11 +85,11 @@ type customerRepresentativeRequest struct {
 	CustomerID       string         `json:"customerID"`
 	FirstName        string         `json:"firstName"`
 	LastName         string         `json:"lastName"`
-	JobTitle         string         `json:"jobTitle"`
-	BirthDate        model.YYYYMMDD `json:"birthDate"`
-	SSN              string         `json:"SSN"`
-	Phones           []phone        `json:"phones"`
-	Addresses        []address      `json:"addresses"`
+	JobTitle         string         `json:"jobTitle,omitempty"`
+	BirthDate        model.YYYYMMDD `json:"birthDate,omitempty"`
+	SSN              string         `json:"SSN,omitempty"`
+	Phones           []phone        `json:"phones,omitempty"`
+	Addresses        []address      `json:"addresses,omitempty"`
 }
 
 func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
@@ -331,8 +331,8 @@ func (r *sqlCustomerRepository) CreateCustomerRepresentative(c *client.CustomerR
 	}
 
 	// Insert customer record
-	query := `insert into customer_representatives (representative_id, customer_id, first_name, last_name, birth_date, created_at, last_modified)
-values (?, ?, ?, ?, ?, ?, ?);`
+	query := `insert into customer_representatives (representative_id, customer_id, first_name, last_name, job_title, birth_date, created_at, last_modified)
+values (?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -345,7 +345,7 @@ values (?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	now := time.Now()
-	_, err = stmt.Exec(c.RepresentativeID, c.CustomerID, c.FirstName, c.LastName, birthDate, now, now)
+	_, err = stmt.Exec(c.RepresentativeID, customerID, c.FirstName, c.LastName, c.JobTitle, birthDate, now, now)
 	if err != nil {
 		return fmt.Errorf("CreateCustomerRepresentative: insert into customer_representatives err=%v | rollback=%v", err, tx.Rollback())
 	}
@@ -373,7 +373,7 @@ func (r *sqlCustomerRepository) updateCustomerRepresentative(c *client.CustomerR
 	}
 	defer tx.Rollback()
 
-	query := `update customer_representatives set first_name = ?, last_name = ?, birth_date = ?, last_modified = ? where representative_id = ? and customer_id = ? and deleted_at is null;`
+	query := `update customer_representatives set first_name = ?, last_name = ?, job_title = ?, birth_date = ?, last_modified = ? where representative_id = ? and customer_id = ? and deleted_at is null;`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -381,7 +381,7 @@ func (r *sqlCustomerRepository) updateCustomerRepresentative(c *client.CustomerR
 	defer stmt.Close()
 
 	now := time.Now()
-	res, err := stmt.Exec(c.FirstName, c.LastName, c.BirthDate, now, c.RepresentativeID, c.CustomerID)
+	res, err := stmt.Exec(c.FirstName, c.LastName, c.JobTitle, c.BirthDate, now, c.RepresentativeID, customerID)
 	if err != nil {
 		return fmt.Errorf("updating customer representative: %v", err)
 	}
@@ -430,9 +430,10 @@ func (req customerRepresentativeRequest) asCustomerRepresentative(storage *ssnSt
 
 	representative := &client.CustomerRepresentative{
 		RepresentativeID: req.RepresentativeID,
-		CustomerID:       req.CustomerID,
+		CustomerID:		  req.CustomerID,
 		FirstName:        req.FirstName,
 		LastName:         req.LastName,
+		JobTitle: 		  req.JobTitle,
 		BirthDate:        string(req.BirthDate),
 	}
 

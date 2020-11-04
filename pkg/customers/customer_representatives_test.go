@@ -303,6 +303,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	updateReq.RepresentativeID = rep.RepresentativeID
 	updateReq.FirstName = "Jim"
 	updateReq.LastName = "Smith"
+	updateReq.JobTitle = "CEO"
 	updateReq.BirthDate = "2020-01-01"
 	updateReq.Phones = []phone{
 		{
