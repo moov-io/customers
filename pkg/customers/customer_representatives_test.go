@@ -20,8 +20,6 @@ import (
 
 	"github.com/moov-io/base/database"
 
-	"github.com/moov-io/base"
-
 	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/gorilla/mux"
@@ -48,7 +46,7 @@ func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCusto
 		LastName:   "Doe",
 		JobTitle:   "CEO",
 	}).asCustomerRepresentative(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomerRepresentative(rep); err != nil {
+	if err := repo.CreateCustomerRepresentative(rep, cust.CustomerID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -256,9 +254,9 @@ func TestCustomers__CreateCustomerRepresentative(t *testing.T) {
 	w := httptest.NewRecorder()
 	phone := `{"number": "555.555.5555", "type": "mobile", "ownerType": "representative"}`
 	address := `{"type": "primary", "ownerType": "representative", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
-	body := fmt.Sprintf(`{"customerID": "%s", "firstName": "jane", "lastName": "doe", "birthDate": "1991-04-01", "ssn": "987654321", "phones": [%s], "addresses": [%s]}`, newCust.CustomerID, phone, address)
+	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "birthDate": "1991-04-01", "ssn": "987654321", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", fmt.Sprintf("/customers/%s/representatives", newCust.CustomerID), strings.NewReader(body))
-	req.Header.Set("x-organization", "test")
+	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 
 	customerSSNStorage := testCustomerSSNStorage(t)
@@ -318,7 +316,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	defer repo.close()
 
 	organization := "best-business"
-	createReq := &customerRequest{
+	createCustomerReq := &customerRequest{
 		FirstName:    "Jane",
 		LastName:     "Doe",
 		Email:        "jane@example.com",
@@ -326,7 +324,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
 		EIN:          "123-456-789",
 	}
-	cust, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
+	cust, _, _ := createCustomerReq.asCustomer(testCustomerSSNStorage(t))
 	if err := repo.CreateCustomer(cust, organization); err != nil {
 		t.Fatal(err)
 	}
@@ -356,7 +354,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 		},
 	}
 	rep, _, _ := createRepresentativeReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomerRepresentative(rep); err != nil {
+	if err := repo.CreateCustomerRepresentative(rep, cust.CustomerID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -367,6 +365,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	updateReq := *createRepresentativeReq
+	updateReq.RepresentativeID = rep.RepresentativeID
 	updateReq.FirstName = "Jim"
 	updateReq.LastName = "Smith"
 	updateReq.BirthDate = "2020-01-01"
@@ -392,7 +391,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	require.NoError(t, err)
 
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/representatives/%s", cust.CustomerID, rep.RepresentativeID), bytes.NewReader(payload))
-	req.Header.Set("x-organization", "test")
+	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
 	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
 	router.ServeHTTP(w, req)
@@ -403,12 +402,6 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&got))
 	want, _, _ := updateReq.asCustomerRepresentative(testCustomerSSNStorage(t))
 	require.NoError(t, err)
-
-	want.RepresentativeID = got.RepresentativeID
-	want.Addresses[0].AddressID = got.Addresses[0].AddressID
-	want.BirthDate = got.BirthDate
-	want.CreatedAt = got.CreatedAt
-	want.LastModified = got.LastModified
 	require.Equal(t, want, got)
 
 	/* Error when settings two addresses as primary */
@@ -488,7 +481,7 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 		},
 	}
 	rep, _, _ := createRepresentativeReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	err := repo.CreateCustomerRepresentative(rep)
+	err := repo.CreateCustomerRepresentative(rep, cust.CustomerID)
 	require.NoError(t, err)
 
 	updateReq := customerRepresentativeRequest{
@@ -514,10 +507,9 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 	}
 
 	updatedRep, _, _ := updateReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	err = repo.updateCustomerRepresentative(updatedRep)
+	err = repo.updateCustomerRepresentative(updatedRep, cust.CustomerID)
 	require.NoError(t, err)
 
-	require.Equal(t, cust.CustomerID, updatedRep.CustomerID)
 	require.Equal(t, updateReq.FirstName, updatedRep.FirstName)
 	require.Equal(t, updateReq.LastName, updatedRep.LastName)
 	require.Equal(t, updateReq.Phones[0].Number, updatedRep.Phones[0].Number)
@@ -556,7 +548,7 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 		},
 	}
 	rep, _, _ := createRepresentativeReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomerRepresentative(rep); err != nil {
+	if err := repo.CreateCustomerRepresentative(rep, cust.CustomerID); err != nil {
 		t.Fatal(err)
 	}
 

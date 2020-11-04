@@ -42,9 +42,10 @@ type CreateCustomer struct {
 	// Company Website for business type customers
 	Website string `json:"website,omitempty"`
 	// Date business was established for business type customers
-	DateBusinessEstablished string          `json:"dateBusinessEstablished,omitempty"`
-	Phones                  []CreatePhone   `json:"phones,omitempty"`
-	Addresses               []CreateAddress `json:"addresses,omitempty"`
+	DateBusinessEstablished string                         `json:"dateBusinessEstablished,omitempty"`
+	Phones                  []CreatePhone                  `json:"phones,omitempty"`
+	Addresses               []CreateAddress                `json:"addresses,omitempty"`
+	Representatives         []CreateCustomerRepresentative `json:"representatives,omitempty"`
 	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 	Metadata map[string]string `json:"metadata,omitempty"`
 }

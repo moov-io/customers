@@ -2238,6 +2238,53 @@ components:
         doingBusinessAs: Google
         DUNS: 15-048-3782
         middleName: Flex
+        representatives:
+        - firstName: Mary
+          lastName: Smith
+          addresses:
+          - country: US
+            address2: address2
+            city: Denver
+            address1: address1
+            postalCode: postalCode
+            state: CO
+            type: Primary
+          - country: US
+            address2: address2
+            city: Denver
+            address1: address1
+            postalCode: postalCode
+            state: CO
+            type: Primary
+          jobTitle: Chief Executive Officer
+          phones:
+          - number: +1.818.555.1212
+          - number: +1.818.555.1212
+          birthDate: 2016-08-29
+          SSN: 111-11-1111
+        - firstName: Mary
+          lastName: Smith
+          addresses:
+          - country: US
+            address2: address2
+            city: Denver
+            address1: address1
+            postalCode: postalCode
+            state: CO
+            type: Primary
+          - country: US
+            address2: address2
+            city: Denver
+            address1: address1
+            postalCode: postalCode
+            state: CO
+            type: Primary
+          jobTitle: Chief Executive Officer
+          phones:
+          - number: +1.818.555.1212
+          - number: +1.818.555.1212
+          birthDate: 2016-08-29
+          SSN: 111-11-1111
         email: email
       properties:
         firstName:
@@ -2315,6 +2362,10 @@ components:
             $ref: '#/components/schemas/CreateAddress'
           minimum: 1
           type: array
+        representatives:
+          items:
+            $ref: '#/components/schemas/CreateCustomerRepresentative'
+          type: array
         metadata:
           additionalProperties:
             type: string
@@ -2332,7 +2383,6 @@ components:
     Customer:
       example:
         lastName: Smith
-        website: http://google.com
         addresses:
         - country: US
           validated: true
@@ -2352,25 +2402,89 @@ components:
           addressID: 851233a1
         metadata:
           paygateID: 23beb5fd
-        nickName: Bob
         businessName: Alphabet Inc.
-        dateBusinessEstablished: 2016-08-29
         phones:
         - valid: true
           number: +1.818.555.1212
         - valid: true
           number: +1.818.555.1212
-        EIN: 77-0493581
         suffix: suffix
-        birthDate: 2016-08-29
-        firstName: Robert
         createdAt: 2016-08-29T09:12:33.001Z
         doingBusinessAs: Google
+        email: email
+        website: http://google.com
+        nickName: Bob
+        dateBusinessEstablished: 2016-08-29
+        EIN: 77-0493581
+        birthDate: 2016-08-29
+        firstName: Robert
         DUNS: 15-048-3782
         customerID: e210a9d6
         middleName: Flex
         lastModified: 2016-08-29T09:12:33.001Z
-        email: email
+        representatives:
+        - firstName: Mary
+          lastName: Smith
+          createdAt: 2016-08-29T09:12:33.001Z
+          addresses:
+          - country: US
+            validated: true
+            address2: address2
+            city: city
+            address1: address1
+            postalCode: postalCode
+            state: state
+            addressID: 851233a1
+          - country: US
+            validated: true
+            address2: address2
+            city: city
+            address1: address1
+            postalCode: postalCode
+            state: state
+            addressID: 851233a1
+          jobTitle: Chief Executive Officer
+          representativeID: b280b9d9
+          customerID: e210a9d6
+          phones:
+          - valid: true
+            number: +1.818.555.1212
+          - valid: true
+            number: +1.818.555.1212
+          lastModified: 2016-08-29T09:12:33.001Z
+          birthDate: 2016-08-29
+          SSN: 111-11-1111
+        - firstName: Mary
+          lastName: Smith
+          createdAt: 2016-08-29T09:12:33.001Z
+          addresses:
+          - country: US
+            validated: true
+            address2: address2
+            city: city
+            address1: address1
+            postalCode: postalCode
+            state: state
+            addressID: 851233a1
+          - country: US
+            validated: true
+            address2: address2
+            city: city
+            address1: address1
+            postalCode: postalCode
+            state: state
+            addressID: 851233a1
+          jobTitle: Chief Executive Officer
+          representativeID: b280b9d9
+          customerID: e210a9d6
+          phones:
+          - valid: true
+            number: +1.818.555.1212
+          - valid: true
+            number: +1.818.555.1212
+          lastModified: 2016-08-29T09:12:33.001Z
+          birthDate: 2016-08-29
+          SSN: 111-11-1111
       properties:
         customerID:
           description: The unique identifier for the customer who owns the account
@@ -2447,6 +2561,10 @@ components:
         addresses:
           items:
             $ref: '#/components/schemas/Address'
+          type: array
+        representatives:
+          items:
+            $ref: '#/components/schemas/CustomerRepresentative'
           type: array
         metadata:
           additionalProperties:
@@ -2978,18 +3096,12 @@ components:
           state: CO
           type: Primary
         jobTitle: Chief Executive Officer
-        customerID: e210a9d6
         phones:
         - number: +1.818.555.1212
         - number: +1.818.555.1212
         birthDate: 2016-08-29
         SSN: 111-11-1111
       properties:
-        customerID:
-          description: The unique identifier for the customer the representative belongs
-            to
-          example: e210a9d6
-          type: string
         firstName:
           description: Given Name or First Name
           example: Mary
@@ -3017,10 +3129,8 @@ components:
         addresses:
           items:
             $ref: '#/components/schemas/CreateAddress'
-          minimum: 1
           type: array
       required:
-      - customerID
       - firstName
       - lastName
     CustomerRepresentative:
@@ -3591,7 +3701,6 @@ components:
           status: validated
         Customer:
           lastName: Smith
-          website: http://google.com
           addresses:
           - country: US
             validated: true
@@ -3611,25 +3720,89 @@ components:
             addressID: 851233a1
           metadata:
             paygateID: 23beb5fd
-          nickName: Bob
           businessName: Alphabet Inc.
-          dateBusinessEstablished: 2016-08-29
           phones:
           - valid: true
             number: +1.818.555.1212
           - valid: true
             number: +1.818.555.1212
-          EIN: 77-0493581
           suffix: suffix
-          birthDate: 2016-08-29
-          firstName: Robert
           createdAt: 2016-08-29T09:12:33.001Z
           doingBusinessAs: Google
+          email: email
+          website: http://google.com
+          nickName: Bob
+          dateBusinessEstablished: 2016-08-29
+          EIN: 77-0493581
+          birthDate: 2016-08-29
+          firstName: Robert
           DUNS: 15-048-3782
           customerID: e210a9d6
           middleName: Flex
           lastModified: 2016-08-29T09:12:33.001Z
-          email: email
+          representatives:
+          - firstName: Mary
+            lastName: Smith
+            createdAt: 2016-08-29T09:12:33.001Z
+            addresses:
+            - country: US
+              validated: true
+              address2: address2
+              city: city
+              address1: address1
+              postalCode: postalCode
+              state: state
+              addressID: 851233a1
+            - country: US
+              validated: true
+              address2: address2
+              city: city
+              address1: address1
+              postalCode: postalCode
+              state: state
+              addressID: 851233a1
+            jobTitle: Chief Executive Officer
+            representativeID: b280b9d9
+            customerID: e210a9d6
+            phones:
+            - valid: true
+              number: +1.818.555.1212
+            - valid: true
+              number: +1.818.555.1212
+            lastModified: 2016-08-29T09:12:33.001Z
+            birthDate: 2016-08-29
+            SSN: 111-11-1111
+          - firstName: Mary
+            lastName: Smith
+            createdAt: 2016-08-29T09:12:33.001Z
+            addresses:
+            - country: US
+              validated: true
+              address2: address2
+              city: city
+              address1: address1
+              postalCode: postalCode
+              state: state
+              addressID: 851233a1
+            - country: US
+              validated: true
+              address2: address2
+              city: city
+              address1: address1
+              postalCode: postalCode
+              state: state
+              addressID: 851233a1
+            jobTitle: Chief Executive Officer
+            representativeID: b280b9d9
+            customerID: e210a9d6
+            phones:
+            - valid: true
+              number: +1.818.555.1212
+            - valid: true
+              number: +1.818.555.1212
+            lastModified: 2016-08-29T09:12:33.001Z
+            birthDate: 2016-08-29
+            SSN: 111-11-1111
       properties:
         Customer:
           $ref: '#/components/schemas/Customer'

@@ -163,6 +163,7 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 	for _, c := range customers {
 		c.Phones = phonesByCustomerID[c.CustomerID]
 		c.Addresses = addressesByCustomerID[c.CustomerID]
+		c.Representatives = representativesByCustomerID[c.CustomerID]
 		c.Metadata = metadataByCustomerID[c.CustomerID].Metadata
 	}
 

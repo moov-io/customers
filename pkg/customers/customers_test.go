@@ -118,11 +118,11 @@ func (r *testCustomerRepository) GetCustomerRepresentative(representativeID stri
 	return r.customerRepresentative, nil
 }
 
-func (r *testCustomerRepository) CreateCustomerRepresentative(c *client.CustomerRepresentative) error {
+func (r *testCustomerRepository) CreateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomerRepresentative(c *client.CustomerRepresentative) error {
+func (r *testCustomerRepository) updateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
 	return r.err
 }
 

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/moov-io/base"
@@ -109,6 +110,8 @@ func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 			return
 		}
 
+		req.CustomerID = route.GetCustomerID(w, r)
+
 		representative, ssn, err := req.asCustomerRepresentative(customerSSNStorage)
 		if err != nil {
 			logger.LogErrorf("problem transforming request into Customer Representative=%s: %v", representative.RepresentativeID, err)
@@ -123,7 +126,7 @@ func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 				return
 			}
 		}
-		if err := repo.CreateCustomerRepresentative(representative); err != nil {
+		if err := repo.CreateCustomerRepresentative(representative, req.CustomerID); err != nil {
 			logger.LogErrorf("createCustomer: %v", err)
 			moovhttp.Problem(w, err)
 			return
@@ -182,7 +185,7 @@ func updateCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 				return
 			}
 		}
-		if err := repo.updateCustomerRepresentative(representative); err != nil {
+		if err := repo.updateCustomerRepresentative(representative, req.CustomerID); err != nil {
 			logger.LogErrorf("error updating customer representative: %v", err)
 			moovhttp.Problem(w, fmt.Errorf("updating customer representative: %v", err))
 			return
@@ -227,10 +230,106 @@ func (r *sqlCustomerRepository) GetCustomerRepresentative(representativeID strin
 		return nil, errors.New("customer representative not found")
 	}
 
-	return reps[0], nil
+	return reps[representativeID], nil
 }
 
-func (r *sqlCustomerRepository) CreateCustomerRepresentative(c *client.CustomerRepresentative) error {
+func (r *sqlCustomerRepository) getCustomerRepresentatives(customerIDs []string) (map[string][]client.CustomerRepresentative, error) {
+	query := fmt.Sprintf(
+		"select representative_id, customer_id, first_name, last_name, job_title, birth_date from customer_representatives where customer_id in (?%s) and deleted_at is null;",
+		strings.Repeat(",?", len(customerIDs)-1),
+	)
+	rows, err := r.queryRowsByCustomerIDs(query, customerIDs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ret := make(map[string][]client.CustomerRepresentative)
+	for rows.Next() {
+		var c client.CustomerRepresentative
+		var jobTitle *string
+		var birthDate *time.Time
+		if err := rows.Scan(
+			&c.RepresentativeID,
+			&c.CustomerID,
+			&c.FirstName,
+			&c.LastName,
+			&jobTitle,
+			&birthDate,
+		); err != nil {
+			return nil, fmt.Errorf("scanning row: %v", err)
+		}
+		if birthDate != nil {
+			c.BirthDate = birthDate.Format(model.YYYYMMDD_Format)
+		}
+		if jobTitle != nil {
+			c.JobTitle = *jobTitle
+		}
+		phonesByCustomerID, err := r.GetPhones([]string{c.RepresentativeID}, client.OWNERTYPE_REPRESENTATIVE)
+		if err != nil {
+			return nil, fmt.Errorf("fetching customer representative phones: %v", err)
+		}
+		c.Phones = phonesByCustomerID[c.RepresentativeID]
+		addressesByCustomerID, err := r.GetAddresses([]string{c.RepresentativeID}, client.OWNERTYPE_REPRESENTATIVE)
+		if err != nil {
+			return nil, fmt.Errorf("fetching customer representative addresses: %v", err)
+		}
+		c.Addresses = addressesByCustomerID[c.RepresentativeID]
+		ret[c.CustomerID] = append(ret[c.CustomerID], c)
+	}
+
+	return ret, nil
+}
+
+func (r *sqlCustomerRepository) getCustomerRepresentativesByIds(representativeIDs []string) (map[string]*client.CustomerRepresentative, error) {
+	query := fmt.Sprintf(
+		"select representative_id, customer_id, first_name, last_name, job_title, birth_date from customer_representatives where representative_id in (?%s) and deleted_at is null;",
+		strings.Repeat(",?", len(representativeIDs)-1),
+	)
+	rows, err := r.queryRowsByCustomerIDs(query, representativeIDs)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ret := make(map[string]*client.CustomerRepresentative)
+	for rows.Next() {
+		var c client.CustomerRepresentative
+		var jobTitle *string
+		var birthDate *time.Time
+		if err := rows.Scan(
+			&c.RepresentativeID,
+			&c.CustomerID,
+			&c.FirstName,
+			&c.LastName,
+			&jobTitle,
+			&birthDate,
+		); err != nil {
+			return nil, fmt.Errorf("scanning row: %v", err)
+		}
+		if birthDate != nil {
+			c.BirthDate = birthDate.Format(model.YYYYMMDD_Format)
+		}
+		if jobTitle != nil {
+			c.JobTitle = *jobTitle
+		}
+		phonesByCustomerID, err := r.GetPhones([]string{c.RepresentativeID}, client.OWNERTYPE_REPRESENTATIVE)
+		if err != nil {
+			return nil, fmt.Errorf("fetching customer representative phones: %v", err)
+		}
+		c.Phones = phonesByCustomerID[c.RepresentativeID]
+		addressesByCustomerID, err := r.GetAddresses([]string{c.RepresentativeID}, client.OWNERTYPE_REPRESENTATIVE)
+		if err != nil {
+			return nil, fmt.Errorf("fetching customer representative addresses: %v", err)
+		}
+		c.Addresses = addressesByCustomerID[c.RepresentativeID]
+		ret[c.RepresentativeID] = &c
+	}
+
+	return ret, nil
+}
+
+func (r *sqlCustomerRepository) CreateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
@@ -272,7 +371,7 @@ values (?, ?, ?, ?, ?, ?, ?);`
 	return nil
 }
 
-func (r *sqlCustomerRepository) updateCustomerRepresentative(c *client.CustomerRepresentative) error {
+func (r *sqlCustomerRepository) updateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err

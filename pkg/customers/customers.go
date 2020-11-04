@@ -113,29 +113,30 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID, o
 // TODO(adam): What GDPR implications does this information have? IIRC if any EU citizen uses
 // this software we have to fully comply.
 type customerRequest struct {
-	CustomerID              string                `json:"-"`
-	FirstName               string                `json:"firstName"`
-	MiddleName              string                `json:"middleName"`
-	LastName                string                `json:"lastName"`
-	NickName                string                `json:"nickName"`
-	Suffix                  string                `json:"suffix"`
-	Type                    client.CustomerType   `json:"type"`
-	BusinessName            string                `json:"businessName"`
-	DoingBusinessAs         string                `json:"doingBusinessAs"`
-	BusinessType            client.BusinessType   `json:"businessType"`
-	EIN                     string                `json:"EIN"`
-	DUNS                    string                `json:"DUNS"`
-	SICCode                 client.SicCode        `json:"sicCode"`
-	NAICSCode               client.NaicsCode      `json:"naicsCode"`
-	BirthDate               model.YYYYMMDD        `json:"birthDate"`
-	Status                  client.CustomerStatus `json:"-"`
-	Email                   string                `json:"email"`
-	Website                 string                `json:"website"`
-	DateBusinessEstablished string                `json:"dateBusinessEstablished"`
-	SSN                     string                `json:"SSN"`
-	Phones                  []phone               `json:"phones"`
-	Addresses               []address             `json:"addresses"`
-	Metadata                map[string]string     `json:"metadata"`
+	CustomerID              string                		`json:"-"`
+	FirstName               string                		`json:"firstName"`
+	MiddleName              string                		`json:"middleName"`
+	LastName                string                		`json:"lastName"`
+	NickName                string                		`json:"nickName"`
+	Suffix                  string                		`json:"suffix"`
+	Type                    client.CustomerType   		`json:"type"`
+	BusinessName            string                		`json:"businessName"`
+	DoingBusinessAs         string                		`json:"doingBusinessAs"`
+	BusinessType            client.BusinessType   		`json:"businessType"`
+	EIN                     string                		`json:"EIN"`
+	DUNS                    string                		`json:"DUNS"`
+	SICCode                 client.SicCode        		`json:"sicCode"`
+	NAICSCode               client.NaicsCode      		`json:"naicsCode"`
+	BirthDate               model.YYYYMMDD        		`json:"birthDate"`
+	Status                  client.CustomerStatus 		`json:"-"`
+	Email                   string                		`json:"email"`
+	Website                 string                		`json:"website"`
+	DateBusinessEstablished string                		`json:"dateBusinessEstablished"`
+	SSN                     string                		`json:"SSN"`
+	Phones                  []phone               		`json:"phones"`
+	Addresses               []address             		`json:"addresses"`
+	Representatives 		[]customerRepresentative 	`json:"customerRepresentatives"`
+	Metadata                map[string]string     		`json:"metadata"`
 }
 
 type phone struct {
@@ -196,6 +197,22 @@ func (add *address) validate() error {
 	return nil
 }
 
+type customerRepresentative struct {
+	FirstName  string   	`json:"firstName"`
+	LastName   string       `json:"lastName"`
+	JobTitle   string       `json:"jobTitle,omitempty"`
+	BirthDate  string       `json:"birthDate,omitempty"`
+	Addresses  []address    `json:"addresses,omitempty"`
+	Phones     []phone      `json:"phones,omitempty"`
+}
+
+func (rep *customerRepresentative) validate() error {
+	if rep.FirstName == "" || rep.LastName == "" {
+		return errors.New("invalid customer representative fields: empty name field(s)")
+	}
+	return nil
+}
+
 func (req customerRequest) validate() error {
 	if req.FirstName == "" || req.LastName == "" {
 		return errors.New("invalid customer fields: empty name field(s)")
@@ -211,6 +228,9 @@ func (req customerRequest) validate() error {
 	}
 	if err := validatePhones(req.Phones); err != nil {
 		return fmt.Errorf("invalid customer phone: %v", err)
+	}
+	if err := validateCustomerRepresentatives(req.Representatives); err != nil {
+		return fmt.Errorf("invalid customer representative: %v", err)
 	}
 
 	return nil
@@ -269,6 +289,16 @@ func validatePhones(phones []phone) error {
 	return nil
 }
 
+func validateCustomerRepresentatives(representatives []customerRepresentative) error {
+	for _, r := range representatives {
+		if err := r.validate(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *SSN, error) {
 	if req.CustomerID == "" {
 		req.CustomerID = base.ID()
@@ -320,6 +350,37 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			Type:       req.Addresses[i].Type,
 			OwnerType:  req.Addresses[i].OwnerType,
 		})
+	}
+	for i := range req.Representatives {
+		custRep := client.CustomerRepresentative{
+			RepresentativeID: base.ID(),
+			FirstName:        req.Representatives[i].FirstName,
+			LastName:         req.Representatives[i].LastName,
+			JobTitle:         req.Representatives[i].JobTitle,
+			BirthDate:        req.Representatives[i].BirthDate,
+		}
+
+		for j := range req.Representatives[i].Addresses {
+			custRep.Addresses = append(custRep.Addresses, client.Address{
+				AddressID:  base.ID(),
+				Address1:   req.Representatives[i].Addresses[j].Address1,
+				Address2:   req.Representatives[i].Addresses[j].Address2,
+				City:       req.Representatives[i].Addresses[j].City,
+				State:      req.Representatives[i].Addresses[j].State,
+				PostalCode: req.Representatives[i].Addresses[j].PostalCode,
+				Country:    req.Representatives[i].Addresses[j].Country,
+				Type:       req.Representatives[i].Addresses[j].Type,
+				OwnerType:  req.Representatives[i].Addresses[j].OwnerType,
+			})
+		}
+		for j := range req.Representatives[i].Phones {
+			custRep.Phones = append(custRep.Phones, client.Phone{
+				Number:    req.Representatives[i].Phones[j].Number,
+				Type:      req.Representatives[i].Phones[j].Type,
+				OwnerType: req.Representatives[i].Phones[j].OwnerType,
+			})
+		}
+		customer.Representatives = append(customer.Representatives, custRep)
 	}
 	if req.SSN != "" {
 		ssn, err := storage.encryptRaw(customer.CustomerID, client.OWNERTYPE_CUSTOMER, req.SSN)
@@ -501,8 +562,8 @@ type CustomerRepository interface {
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
 
 	GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error)
-	CreateCustomerRepresentative(c *client.CustomerRepresentative) error
-	updateCustomerRepresentative(c *client.CustomerRepresentative) error
+	CreateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error
+	updateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error
 	deleteCustomerRepresentative(representativeID string) error
 
 	searchCustomerRepresentatives(params RepresentativeSearchParams) ([]*client.CustomerRepresentative, error)
@@ -579,6 +640,11 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 		return fmt.Errorf("updating customer's addresses: %v", err)
 	}
 
+	err = r.updateRepresentativesByCustomerID(tx, c.CustomerID, c.Representatives)
+	if err != nil {
+		return fmt.Errorf("updating customer's representatives: %v", err)
+	}
+
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("CreateCustomer: tx.Commit: %v", err)
 	}
@@ -624,6 +690,11 @@ func (r *sqlCustomerRepository) updateCustomer(c *client.Customer, organization 
 	err = r.updateAddressesByOwnerID(tx, c.CustomerID, client.OWNERTYPE_CUSTOMER, c.Addresses)
 	if err != nil {
 		return fmt.Errorf("updating customer's addresses: %v", err)
+	}
+
+	err = r.updateRepresentativesByCustomerID(tx, c.CustomerID, c.Representatives)
+	if err != nil {
+		return fmt.Errorf("updating customer's representatives: %v", err)
 	}
 
 	if err := tx.Commit(); err != nil {
@@ -704,6 +775,37 @@ func (r *sqlCustomerRepository) updateAddressesByOwnerID(tx *sql.Tx, ownerID str
 
 	for _, addr := range addresses {
 		_, err := stmt.Exec(addr.AddressID, ownerID, string(ownerType), addr.Type, addr.Address1, addr.Address2, addr.City, addr.State, addr.PostalCode, addr.Country, addr.Validated)
+		if err != nil {
+			return fmt.Errorf("executing query: %v", err)
+		}
+	}
+
+	return nil
+}
+
+func (r *sqlCustomerRepository) updateRepresentativesByCustomerID(tx *sql.Tx, customerID string, representatives []client.CustomerRepresentative) error {
+	deleteQuery := `delete from customer_representatives where customer_id = ?;`
+
+	stmt, err := tx.Prepare(deleteQuery)
+	if err != nil {
+		return fmt.Errorf("preparing query: %v", err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(customerID)
+	if err != nil {
+		panic(err)
+	}
+
+	replaceQuery := `replace into customer_representatives(representative_id, customer_id, first_name, last_name, job_title, birth_date) values (?, ?, ?, ?, ?, ?);`
+	stmt, err = tx.Prepare(replaceQuery)
+	if err != nil {
+		return fmt.Errorf("preparing query: %v", err)
+	}
+	defer stmt.Close()
+
+	for _, rep := range representatives {
+		_, err := stmt.Exec(rep.RepresentativeID, customerID, rep.FirstName, rep.LastName, rep.JobTitle, rep.BirthDate)
 		if err != nil {
 			return fmt.Errorf("executing query: %v", err)
 		}

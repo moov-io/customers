@@ -1903,6 +1903,10 @@ components:
           minimum: 1
           items:
             $ref: '#/components/schemas/CreateAddress'
+        representatives:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateCustomerRepresentative'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -1993,6 +1997,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Address'
+        representatives:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerRepresentative'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -2465,10 +2473,6 @@ components:
         - secondary
     CreateCustomerRepresentative:
       properties:
-        customerID:
-          type: string
-          description: The unique identifier for the customer the representative belongs to
-          example: e210a9d6
         firstName:
           type: string
           description: Given Name or First Name
@@ -2495,11 +2499,9 @@ components:
             $ref: '#/components/schemas/CreatePhone'
         addresses:
           type: array
-          minimum: 1
           items:
             $ref: '#/components/schemas/CreateAddress'
       required:
-        - customerID
         - firstName
         - lastName
     CustomerRepresentative:
