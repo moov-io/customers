@@ -29,7 +29,7 @@ require (
 	github.com/moov-io/fed v0.5.1
 	github.com/moov-io/paygate v0.9.0-dev1.0.20201022020358-75870ae7acfc
 	github.com/moov-io/watchman v0.15.1
-	github.com/mxenabled/atrium-go v1.2.1-0.20200616191425-c9e0ead005ba
+	github.com/mxenabled/atrium-go/v2/v2 v2.11.1
 	github.com/ory/dockertest/v3 v3.6.1
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
 	github.com/pkg/errors v0.9.1
