@@ -566,8 +566,6 @@ type CustomerRepository interface {
 	updateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error
 	deleteCustomerRepresentative(representativeID string) error
 
-	searchCustomerRepresentatives(params RepresentativeSearchParams) ([]*client.CustomerRepresentative, error)
-
 	addAddress(ownerID string, ownerType client.OwnerType, address address) error
 	updateAddress(ownerID, addressID string, ownerType client.OwnerType, req updateAddressRequest) error
 	deleteAddress(ownerID string, ownerType client.OwnerType, addressID string) error

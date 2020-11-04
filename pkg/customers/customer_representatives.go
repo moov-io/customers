@@ -26,8 +26,6 @@ import (
 func AddCustomerRepresentativeRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage) {
 	logger = logger.Set("package", "customers")
 
-	r.Methods("GET").Path("/customers/{customerID}/representatives").HandlerFunc(searchCustomerRepresentatives(logger, repo))
-	r.Methods("GET").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(getCustomerRepresentative(logger, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(updateCustomerRepresentative(logger, repo, customerSSNStorage))
 	r.Methods("DELETE").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(deleteCustomerRepresentative(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/representatives").HandlerFunc(createCustomerRepresentative(logger, repo, customerSSNStorage))
@@ -218,10 +216,7 @@ func (req customerRepresentativeRequest) validate() error {
 }
 
 func (r *sqlCustomerRepository) GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error) {
-	reps, err := r.searchCustomerRepresentatives(RepresentativeSearchParams{
-		Count:             1,
-		RepresentativeIDs: []string{representativeID},
-	})
+	reps , err := r.getCustomerRepresentativesByIds([]string{representativeID})
 	if err != nil {
 		return nil, fmt.Errorf("getting customer representative: %v", err)
 	}
@@ -450,7 +445,6 @@ func (req customerRepresentativeRequest) asCustomerRepresentative(storage *ssnSt
 	}
 	for i := range req.Addresses {
 		representative.Addresses = append(representative.Addresses, client.Address{
-			AddressID:  base.ID(),
 			Address1:   req.Addresses[i].Address1,
 			Address2:   req.Addresses[i].Address2,
 			City:       req.Addresses[i].City,

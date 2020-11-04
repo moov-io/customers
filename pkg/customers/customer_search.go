@@ -147,13 +147,17 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 		customerIDs = append(customerIDs, c.CustomerID)
 	}
 
-	phonesByCustomerID, err := r.getPhones(customerIDs, client.OWNERTYPE_CUSTOMER)
+	phonesByCustomerID, err := r.GetPhones(customerIDs, client.OWNERTYPE_CUSTOMER)
 	if err != nil {
 		return nil, fmt.Errorf("fetching customer phones: %v", err)
 	}
-	addressesByCustomerID, err := r.getAddresses(customerIDs, client.OWNERTYPE_CUSTOMER)
+	addressesByCustomerID, err := r.GetAddresses(customerIDs, client.OWNERTYPE_CUSTOMER)
 	if err != nil {
 		return nil, fmt.Errorf("fetching customer addresses: %v", err)
+	}
+	representativesByCustomerID, err := r.getCustomerRepresentatives(customerIDs)
+	if err != nil {
+		return nil, fmt.Errorf("fetching customer representatives: %v", err)
 	}
 	metadataByCustomerID, err := r.getMetadata(customerIDs)
 	if err != nil {
@@ -219,7 +223,7 @@ from customers where deleted_at is null`
 	return query, args
 }
 
-func (r *sqlCustomerRepository) getPhones(ownerIDs []string, ownerType client.OwnerType) (map[string][]client.Phone, error) {
+func (r *sqlCustomerRepository) GetPhones(ownerIDs []string, ownerType client.OwnerType) (map[string][]client.Phone, error) {
 	query := fmt.Sprintf(
 		"select owner_id, owner_type, number, valid, type from phones where owner_id in (?%s) and owner_type = ?",
 		strings.Repeat(",?", len(ownerIDs)-1),
@@ -251,7 +255,7 @@ func (r *sqlCustomerRepository) getPhones(ownerIDs []string, ownerType client.Ow
 	return ret, nil
 }
 
-func (r *sqlCustomerRepository) getAddresses(customerIDs []string, ownerType client.OwnerType) (map[string][]client.Address, error) {
+func (r *sqlCustomerRepository) GetAddresses(customerIDs []string, ownerType client.OwnerType) (map[string][]client.Address, error) {
 	query := fmt.Sprintf(
 		"select owner_id, owner_type, address_id, type, address1, address2, city, state, postal_code, country, validated from addresses where owner_id in (?%s) and owner_type = ? and deleted_at is null;",
 		strings.Repeat(",?", len(customerIDs)-1),

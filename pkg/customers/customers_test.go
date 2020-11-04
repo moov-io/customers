@@ -130,16 +130,6 @@ func (r *testCustomerRepository) deleteCustomerRepresentative(representativeID s
 	return r.err
 }
 
-func (r *testCustomerRepository) searchCustomerRepresentatives(params RepresentativeSearchParams) ([]*client.CustomerRepresentative, error) {
-	if r.err != nil {
-		return nil, r.err
-	}
-	if r.customerRepresentative != nil {
-		return []*client.CustomerRepresentative{r.customerRepresentative}, nil
-	}
-	return nil, nil
-}
-
 func TestCustomers__formatCustomerName(t *testing.T) {
 	if out := formatCustomerName(nil); out != "" {
 		t.Errorf("got %q", out)

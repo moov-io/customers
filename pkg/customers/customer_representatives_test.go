@@ -53,7 +53,7 @@ func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCusto
 	return organization, cust, rep
 }
 
-func setupMockCustomer(t *testing.T, repo *sqlCustomerRepository) *client.Customer {
+func setupMockCustomer(t *testing.T, repo *sqlCustomerRepository) (*client.Customer, string) {
 	organization := "best-business"
 	cust, _, _ := (customerRequest{
 		FirstName:    "Jane",
@@ -67,54 +67,7 @@ func setupMockCustomer(t *testing.T, repo *sqlCustomerRepository) *client.Custom
 		t.Fatal(err)
 	}
 
-	return cust
-}
-
-func TestCustomers__GetCustomerRepresentative(t *testing.T) {
-	repo := createTestCustomerRepository(t)
-	defer repo.close()
-
-	organization, cust, rep := setupMockOrganizationCustomerAndRepresentative(t, repo)
-
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/representatives/%s", cust.CustomerID, rep.RepresentativeID), nil)
-	req.Header.Set("x-organization", organization)
-	req.Header.Set("x-request-id", "test")
-
-	router := mux.NewRouter()
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
-	router.ServeHTTP(w, req)
-	w.Flush()
-
-	if w.Code != http.StatusOK {
-		t.Errorf("bogus status code: %d", w.Code)
-	}
-
-	var customerRepresentative client.CustomerRepresentative
-	if err := json.NewDecoder(w.Body).Decode(&customerRepresentative); err != nil {
-		t.Fatal(err)
-	}
-	if customerRepresentative.RepresentativeID == "" {
-		t.Error("empty CustomerRepresentative.ID")
-	}
-}
-
-func TestCustomers__GetCustomerRepresentativeEmpty(t *testing.T) {
-	repo := &testCustomerRepository{}
-
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", fmt.Sprintf("/customers/%s/representatives/%s", base.ID(), base.ID()), nil)
-	req.Header.Set("x-organization", "test")
-	req.Header.Set("x-request-id", "test")
-
-	router := mux.NewRouter()
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
-	router.ServeHTTP(w, req)
-	w.Flush()
-
-	if w.Code != http.StatusNotFound {
-		t.Errorf("bogus status code: %d", w.Code)
-	}
+	return cust, organization
 }
 
 func TestCustomers__DeleteCustomerRepresentative(t *testing.T) {
@@ -174,24 +127,6 @@ func TestCustomerRepository__CreateCustomerRepresentative(t *testing.T) {
 	check(t, &sqlCustomerRepository{mysqlDB.DB, log.NewNopLogger()})
 }
 
-func TestCustomers__searchCustomerRepresentativesError(t *testing.T) {
-	repo := &testCustomerRepository{err: errors.New("bad error")}
-
-	w := httptest.NewRecorder()
-	req := httptest.NewRequest("GET", "/customers/foo/representatives/bar", nil)
-	req.Header.Set("x-organization", "test")
-	req.Header.Set("x-request-id", "test")
-
-	router := mux.NewRouter()
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
-	router.ServeHTTP(w, req)
-	w.Flush()
-
-	if w.Code != http.StatusBadRequest {
-		t.Errorf("bogus status code: %d", w.Code)
-	}
-}
-
 func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 	req := &customerRepresentativeRequest{JobTitle: "awesome job title"}
 	if err := req.validate(); err == nil {
@@ -246,7 +181,7 @@ func TestCustomers__CreateCustomerRepresentative(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
-	newCust := setupMockCustomer(t, repo)
+	newCust, organization := setupMockCustomer(t, repo)
 	if newCust.CustomerID == "" {
 		t.Error("empty Customer.CustomerID")
 	}
