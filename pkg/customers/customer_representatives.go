@@ -216,7 +216,7 @@ func (req customerRepresentativeRequest) validate() error {
 }
 
 func (r *sqlCustomerRepository) GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error) {
-	reps , err := r.getCustomerRepresentativesByIds([]string{representativeID})
+	reps, err := r.getCustomerRepresentativesByIds([]string{representativeID})
 	if err != nil {
 		return nil, fmt.Errorf("getting customer representative: %v", err)
 	}
@@ -430,10 +430,10 @@ func (req customerRepresentativeRequest) asCustomerRepresentative(storage *ssnSt
 
 	representative := &client.CustomerRepresentative{
 		RepresentativeID: req.RepresentativeID,
-		CustomerID:		  req.CustomerID,
+		CustomerID:       req.CustomerID,
 		FirstName:        req.FirstName,
 		LastName:         req.LastName,
-		JobTitle: 		  req.JobTitle,
+		JobTitle:         req.JobTitle,
 		BirthDate:        string(req.BirthDate),
 	}
 

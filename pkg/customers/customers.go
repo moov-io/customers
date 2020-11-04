@@ -113,30 +113,30 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID, o
 // TODO(adam): What GDPR implications does this information have? IIRC if any EU citizen uses
 // this software we have to fully comply.
 type customerRequest struct {
-	CustomerID              string                		`json:"-"`
-	FirstName               string                		`json:"firstName"`
-	MiddleName              string                		`json:"middleName"`
-	LastName                string                		`json:"lastName"`
-	NickName                string                		`json:"nickName"`
-	Suffix                  string                		`json:"suffix"`
-	Type                    client.CustomerType   		`json:"type"`
-	BusinessName            string                		`json:"businessName"`
-	DoingBusinessAs         string                		`json:"doingBusinessAs"`
-	BusinessType            client.BusinessType   		`json:"businessType"`
-	EIN                     string                		`json:"EIN"`
-	DUNS                    string                		`json:"DUNS"`
-	SICCode                 client.SicCode        		`json:"sicCode"`
-	NAICSCode               client.NaicsCode      		`json:"naicsCode"`
-	BirthDate               model.YYYYMMDD        		`json:"birthDate"`
-	Status                  client.CustomerStatus 		`json:"-"`
-	Email                   string                		`json:"email"`
-	Website                 string                		`json:"website"`
-	DateBusinessEstablished string                		`json:"dateBusinessEstablished"`
-	SSN                     string                		`json:"SSN"`
-	Phones                  []phone               		`json:"phones"`
-	Addresses               []address             		`json:"addresses"`
-	Representatives 		[]customerRepresentative 	`json:"customerRepresentatives"`
-	Metadata                map[string]string     		`json:"metadata"`
+	CustomerID              string                   `json:"-"`
+	FirstName               string                   `json:"firstName"`
+	MiddleName              string                   `json:"middleName"`
+	LastName                string                   `json:"lastName"`
+	NickName                string                   `json:"nickName"`
+	Suffix                  string                   `json:"suffix"`
+	Type                    client.CustomerType      `json:"type"`
+	BusinessName            string                   `json:"businessName"`
+	DoingBusinessAs         string                   `json:"doingBusinessAs"`
+	BusinessType            client.BusinessType      `json:"businessType"`
+	EIN                     string                   `json:"EIN"`
+	DUNS                    string                   `json:"DUNS"`
+	SICCode                 client.SicCode           `json:"sicCode"`
+	NAICSCode               client.NaicsCode         `json:"naicsCode"`
+	BirthDate               model.YYYYMMDD           `json:"birthDate"`
+	Status                  client.CustomerStatus    `json:"-"`
+	Email                   string                   `json:"email"`
+	Website                 string                   `json:"website"`
+	DateBusinessEstablished string                   `json:"dateBusinessEstablished"`
+	SSN                     string                   `json:"SSN"`
+	Phones                  []phone                  `json:"phones"`
+	Addresses               []address                `json:"addresses"`
+	Representatives         []customerRepresentative `json:"customerRepresentatives"`
+	Metadata                map[string]string        `json:"metadata"`
 }
 
 type phone struct {
@@ -198,12 +198,12 @@ func (add *address) validate() error {
 }
 
 type customerRepresentative struct {
-	FirstName  string   	`json:"firstName"`
-	LastName   string       `json:"lastName"`
-	JobTitle   string       `json:"jobTitle,omitempty"`
-	BirthDate  string       `json:"birthDate,omitempty"`
-	Addresses  []address    `json:"addresses,omitempty"`
-	Phones     []phone      `json:"phones,omitempty"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
+	JobTitle  string    `json:"jobTitle,omitempty"`
+	BirthDate string    `json:"birthDate,omitempty"`
+	Addresses []address `json:"addresses,omitempty"`
+	Phones    []phone   `json:"phones,omitempty"`
 }
 
 func (rep *customerRepresentative) validate() error {

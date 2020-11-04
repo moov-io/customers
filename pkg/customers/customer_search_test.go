@@ -86,9 +86,9 @@ func TestRepository__searchCustomers(t *testing.T) {
 	org := "test"
 	createCustomer := func(repo CustomerRepository, i int) *client.Customer {
 		var req = &customerRequest{
-			FirstName: fmt.Sprintf("jane-%d", i),
-			LastName:  fmt.Sprintf("doe-%d", i),
-			Email:     fmt.Sprintf("jane-%d@moov.com", i),
+			FirstName:    fmt.Sprintf("jane-%d", i),
+			LastName:     fmt.Sprintf("doe-%d", i),
+			Email:        fmt.Sprintf("jane-%d@moov.com", i),
 			BusinessName: fmt.Sprintf("janes-business-%d", i),
 			Phones: []phone{
 				{
@@ -110,16 +110,16 @@ func TestRepository__searchCustomers(t *testing.T) {
 			},
 			Representatives: []customerRepresentative{
 				{
-					FirstName: 	"Jane",
-					LastName:  	"Doe",
-					Phones: 	[]phone{
+					FirstName: "Jane",
+					LastName:  "Doe",
+					Phones: []phone{
 						{
 							Number:    "555-555-5555",
 							Type:      "primary",
 							OwnerType: "representative",
 						},
 					},
-					JobTitle:	"CEO",
+					JobTitle: "CEO",
 				},
 			},
 			Metadata: map[string]string{"key": "val"},
