@@ -2343,7 +2343,6 @@ components:
             - US
       required:
         - type
-        - ownerType
         - address1
         - city
         - state
@@ -2359,7 +2358,6 @@ components:
           $ref: '#/components/schemas/PhoneType'
       required:
         - number
-        - ownerType
         - type
     Phone:
       properties:
@@ -2376,7 +2374,6 @@ components:
           $ref: '#/components/schemas/PhoneType'
       required:
         - number
-        - ownerType
         - valid
         - type
     PhoneType:
@@ -2417,7 +2414,6 @@ components:
             - US
       required:
         - type
-        - ownerType
         - address1
         - city
         - state
@@ -2459,7 +2455,6 @@ components:
       required:
         - addressID
         - type
-        - ownerType
         - address1
         - city
         - state

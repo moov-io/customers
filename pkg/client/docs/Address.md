@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **AddressID** | **string** | Unique identifier for this Address | 
 **Type** | [**AddressType**](AddressType.md) |  | 
-**OwnerType** | [**OwnerType**](OwnerType.md) |  | 
+**OwnerType** | [**OwnerType**](OwnerType.md) |  | [optional] 
 **Address1** | **string** | First line of the address | 
 **Address2** | **string** | Second line of the address | [optional] 
 **City** | **string** |  | 

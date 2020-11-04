@@ -13,7 +13,7 @@ package client
 type Phone struct {
 	// phone number
 	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType"`
+	OwnerType OwnerType `json:"ownerType,omitempty"`
 	// phone number has been validated to connect with customer
 	Valid bool      `json:"valid"`
 	Type  PhoneType `json:"type"`

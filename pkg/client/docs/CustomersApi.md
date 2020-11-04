@@ -5,15 +5,17 @@ All URIs are relative to *http://localhost:8087*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
-[**AddAddress**](CustomersApi.md#AddAddress) | **Post** /customers/{customerID}/address | Add customer address
+[**AddAddress**](CustomersApi.md#AddAddress) | **Post** /customers/{customerID}/address | Add Customer Address
 [**AddCustomerRepresentative**](CustomersApi.md#AddCustomerRepresentative) | **Post** /customers/{customerID}/representatives | Add customer representative
 [**AddCustomerRepresentativeAddress**](CustomersApi.md#AddCustomerRepresentativeAddress) | **Post** /customers/{customerID}/representatives/{representativeID}/address | Add customer representative address
 [**CompleteAccountValidation**](CustomersApi.md#CompleteAccountValidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create Customer
+[**CreateCustomerAccount**](CustomersApi.md#CreateCustomerAccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
+[**DecryptAccountNumber**](CustomersApi.md#DecryptAccountNumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
+[**DeleteAddress**](CustomersApi.md#DeleteAddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
 [**DeleteCustomer**](CustomersApi.md#DeleteCustomer) | **Delete** /customers/{customerID} | Delete Customer
 [**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts/{accountID} | Delete Customer Account
 [**DeleteCustomerDocument**](CustomersApi.md#DeleteCustomerDocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
-[**DeleteAddress**](CustomersApi.md#DeleteAddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete a customer&#39;s address
 [**DeleteCustomerRepresentative**](CustomersApi.md#DeleteCustomerRepresentative) | **Delete** /customers/{customerID}/representatives/{representativeID} | Delete a customer&#39;s representative
 [**DeleteCustomerRepresentativeAddress**](CustomersApi.md#DeleteCustomerRepresentativeAddress) | **Delete** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Delete a customer representative&#39;s address
 [**GetAccountValidation**](CustomersApi.md#GetAccountValidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
@@ -23,12 +25,13 @@ Method | HTTP request | Description
 [**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update Customer Metadata
 [**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Search Customers
+[**UpdateAccountStatus**](CustomersApi.md#UpdateAccountStatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
+[**UpdateAddress**](CustomersApi.md#UpdateAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 [**UpdateCustomer**](CustomersApi.md#UpdateCustomer) | **Put** /customers/{customerID} | Update Customer
-[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update Customer Status
-[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
-[**UpdateAddress**](CustomersApi.md#UpdateAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customer&#39;s address
 [**UpdateCustomerRepresentative**](CustomersApi.md#UpdateCustomerRepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update customer representative
 [**UpdateCustomerRepresentativeAddress**](CustomersApi.md#UpdateCustomerRepresentativeAddress) | **Put** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Update customer representative&#39;s address
+[**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update Customer Status
+[**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
 
 
 
@@ -422,7 +425,7 @@ No authorization required
 
 > DeleteAddress(ctx, customerID, addressID)
 
-Delete a customer's address
+Delete Customer Address
 
 Deletes a customer's address
 
@@ -457,7 +460,7 @@ No authorization required
 
 > DeleteCustomer(ctx, customerID, optional)
 
-Delete Customer by ID
+Delete Customer
 
 Remove a given Customer
 
@@ -477,7 +480,6 @@ Optional parameters are passed through a pointer to a DeleteCustomerOpts struct
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
-
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
  **xOrganization** | **optional.String**| Value used to separate and identify models | 
@@ -502,7 +504,7 @@ No authorization required
 
 ## DeleteCustomerAccount
 
-> DeleteCustomerAccount(ctx, customerID, optional)
+> DeleteCustomerAccount(ctx, customerID, accountID, optional)
 
 Delete Customer Account
 
@@ -515,6 +517,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| customerID of the Customer to remove an Account | 
+**accountID** | **string**| accountID of the Account | 
  **optional** | ***DeleteCustomerAccountOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
@@ -524,6 +527,7 @@ Optional parameters are passed through a pointer to a DeleteCustomerAccountOpts 
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
+
 
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
  **xOrganization** | **optional.String**| Value used to separate and identify models | 
@@ -1288,7 +1292,7 @@ No authorization required
 
 > UpdateAddress(ctx, customerID, addressID, updateAddress)
 
-Update customer's address
+Update Customer Address
 
 Updates the specified customer address
 
@@ -1324,7 +1328,7 @@ No authorization required
 
 > Customer UpdateCustomer(ctx, customerID, createCustomer, optional)
 
-Update customer
+Update Customer
 
 Update a Customer object
 

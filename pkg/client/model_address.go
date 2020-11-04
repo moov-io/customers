@@ -14,7 +14,7 @@ type Address struct {
 	// Unique identifier for this Address
 	AddressID string      `json:"addressID"`
 	Type      AddressType `json:"type"`
-	OwnerType OwnerType   `json:"ownerType"`
+	OwnerType OwnerType   `json:"ownerType,omitempty"`
 	// First line of the address
 	Address1 string `json:"address1"`
 	// Second line of the address

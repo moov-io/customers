@@ -2928,7 +2928,6 @@ components:
       - address1
       - city
       - country
-      - ownerType
       - postalCode
       - state
       - type
@@ -2944,7 +2943,6 @@ components:
           $ref: '#/components/schemas/PhoneType'
       required:
       - number
-      - ownerType
       - type
     Phone:
       example:
@@ -2964,7 +2962,6 @@ components:
           $ref: '#/components/schemas/PhoneType'
       required:
       - number
-      - ownerType
       - type
       - valid
     PhoneType:
@@ -3014,7 +3011,6 @@ components:
       - address1
       - city
       - country
-      - ownerType
       - postalCode
       - state
       - type
@@ -3065,7 +3061,6 @@ components:
       - addressID
       - city
       - country
-      - ownerType
       - postalCode
       - state
       - type

@@ -138,7 +138,7 @@ type AddAddressOpts struct {
 }
 
 /*
-AddAddress Add customer address
+AddAddress Add Customer Address
 Add an Address onto an existing Customer record
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to add the address onto
@@ -816,7 +816,7 @@ func (a *CustomersApiService) GetCustomer(ctx _context.Context, customerID strin
 }
 
 /*
-DeleteAddress Delete a customer's address
+DeleteAddress Delete Customer Address
 Deletes a customer&#39;s address
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
@@ -901,7 +901,7 @@ type DeleteCustomerOpts struct {
 }
 
 /*
-DeleteCustomer Delete Customer by ID
+DeleteCustomer Delete Customer
 Remove a given Customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to be deleted
@@ -921,8 +921,6 @@ func (a *CustomersApiService) DeleteCustomer(ctx _context.Context, customerID st
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"accountID"+"}", _neturl.QueryEscape(parameterToString(accountID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -989,11 +987,12 @@ DeleteCustomerAccount Delete Customer Account
 Remove an account from the given Customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to remove an Account
+ * @param accountID accountID of the Account
  * @param optional nil or *DeleteCustomerAccountOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
  * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 */
-func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, customerID string, localVarOptionals *DeleteCustomerAccountOpts) (*_nethttp.Response, error) {
+func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, customerID string, accountID string, localVarOptionals *DeleteCustomerAccountOpts) (*_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
@@ -1003,8 +1002,10 @@ func (a *CustomersApiService) DeleteCustomerAccount(ctx _context.Context, custom
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/accounts/{accountID}"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"accountID"+"}", _neturl.QueryEscape(parameterToString(accountID, "")), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
@@ -3120,7 +3121,7 @@ func (a *CustomersApiService) UpdateAccountStatus(ctx _context.Context, customer
 }
 
 /*
-UpdateAddress Update customer's address
+UpdateAddress Update Customer Address
 Updates the specified customer address
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID Customer ID
@@ -3208,7 +3209,7 @@ type UpdateCustomerOpts struct {
 }
 
 /*
-UpdateCustomer Update customer
+UpdateCustomer Update Customer
 Update a Customer object
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID that identifies this Customer

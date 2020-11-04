@@ -53,13 +53,17 @@ Class | Method | HTTP request | Description
 *ConfigurationApi* | [**GetOrganizationLogo**](docs/ConfigurationApi.md#getorganizationlogo) | **Get** /configuration/logo | Get Organization Logo
 *ConfigurationApi* | [**UpdateOrganizationConfiguration**](docs/ConfigurationApi.md#updateorganizationconfiguration) | **Put** /configuration/customers | Update Organization Configuration
 *ConfigurationApi* | [**UploadOrganizationLogo**](docs/ConfigurationApi.md#uploadorganizationlogo) | **Put** /configuration/logo | Update Organization Logo
-*CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add Customer Address
+*CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
+*CustomersApi* | [**AddAddress**](docs/CustomersApi.md#addaddress) | **Post** /customers/{customerID}/address | Add Customer Address
 *CustomersApi* | [**AddCustomerRepresentative**](docs/CustomersApi.md#addcustomerrepresentative) | **Post** /customers/{customerID}/representatives | Add customer representative
 *CustomersApi* | [**AddCustomerRepresentativeAddress**](docs/CustomersApi.md#addcustomerrepresentativeaddress) | **Post** /customers/{customerID}/representatives/{representativeID}/address | Add customer representative address
 *CustomersApi* | [**CompleteAccountValidation**](docs/CustomersApi.md#completeaccountvalidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create Customer
+*CustomersApi* | [**CreateCustomerAccount**](docs/CustomersApi.md#createcustomeraccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
+*CustomersApi* | [**DecryptAccountNumber**](docs/CustomersApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
+*CustomersApi* | [**DeleteAddress**](docs/CustomersApi.md#deleteaddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
 *CustomersApi* | [**DeleteCustomer**](docs/CustomersApi.md#deletecustomer) | **Delete** /customers/{customerID} | Delete Customer
-*CustomersApi* | [**DeleteCustomerAddress**](docs/CustomersApi.md#deletecustomeraddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
+*CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts/{accountID} | Delete Customer Account
 *CustomersApi* | [**DeleteCustomerDocument**](docs/CustomersApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
 *CustomersApi* | [**DeleteCustomerRepresentative**](docs/CustomersApi.md#deletecustomerrepresentative) | **Delete** /customers/{customerID}/representatives/{representativeID} | Delete a customer&#39;s representative
 *CustomersApi* | [**DeleteCustomerRepresentativeAddress**](docs/CustomersApi.md#deletecustomerrepresentativeaddress) | **Delete** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Delete a customer representative&#39;s address
@@ -70,12 +74,13 @@ Class | Method | HTTP request | Description
 *CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update Customer Metadata
 *CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Search Customers
+*CustomersApi* | [**UpdateAccountStatus**](docs/CustomersApi.md#updateaccountstatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
+*CustomersApi* | [**UpdateAddress**](docs/CustomersApi.md#updateaddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 *CustomersApi* | [**UpdateCustomer**](docs/CustomersApi.md#updatecustomer) | **Put** /customers/{customerID} | Update Customer
-*CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer Status
-*CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
-*CustomersApi* | [**UpdateAddress**](docs/CustomersApi.md#updateaddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update customer&#39;s address
 *CustomersApi* | [**UpdateCustomerRepresentative**](docs/CustomersApi.md#updatecustomerrepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update customer representative
 *CustomersApi* | [**UpdateCustomerRepresentativeAddress**](docs/CustomersApi.md#updatecustomerrepresentativeaddress) | **Put** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Update customer representative&#39;s address
+*CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer Status
+*CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
 
 
 ## Documentation For Models
