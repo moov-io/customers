@@ -1,8 +1,8 @@
 # Go API client for client
 
-Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with United States federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
 
-Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgement are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
+Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgment are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
 
 ![](https://raw.githubusercontent.com/adamdecaf/customers/create-accounts/docs/images/customer.png)
 
@@ -38,41 +38,41 @@ All URIs are relative to *http://localhost:8087*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
+*AccountValidationApi* | [**CompleteAccountValidation**](docs/AccountValidationApi.md#completeaccountvalidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
+*AccountValidationApi* | [**GetAccountValidation**](docs/AccountValidationApi.md#getaccountvalidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
+*AccountValidationApi* | [**InitAccountValidation**](docs/AccountValidationApi.md#initaccountvalidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
+*AccountsApi* | [**CreateCustomerAccount**](docs/AccountsApi.md#createcustomeraccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
+*AccountsApi* | [**DecryptAccountNumber**](docs/AccountsApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
+*AccountsApi* | [**DeleteCustomerAccount**](docs/AccountsApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts/{accountID} | Delete Customer Account
+*AccountsApi* | [**GetCustomerAccountByID**](docs/AccountsApi.md#getcustomeraccountbyid) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account
+*AccountsApi* | [**GetCustomerAccounts**](docs/AccountsApi.md#getcustomeraccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
+*AccountsApi* | [**GetLatestAccountOFACSearch**](docs/AccountsApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC Search
+*AccountsApi* | [**RefreshAccountOFACSearch**](docs/AccountsApi.md#refreshaccountofacsearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC Search
+*AccountsApi* | [**UpdateAccountStatus**](docs/AccountsApi.md#updateaccountstatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
 *ConfigurationApi* | [**GetOrganizationConfiguration**](docs/ConfigurationApi.md#getorganizationconfiguration) | **Get** /configuration/customers | Get Organization Configuration
 *ConfigurationApi* | [**GetOrganizationLogo**](docs/ConfigurationApi.md#getorganizationlogo) | **Get** /configuration/logo | Get Organization Logo
 *ConfigurationApi* | [**UpdateOrganizationConfiguration**](docs/ConfigurationApi.md#updateorganizationconfiguration) | **Put** /configuration/customers | Update Organization Configuration
 *ConfigurationApi* | [**UploadOrganizationLogo**](docs/ConfigurationApi.md#uploadorganizationlogo) | **Put** /configuration/logo | Update Organization Logo
-*CustomersApi* | [**AcceptDisclaimer**](docs/CustomersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
 *CustomersApi* | [**AddCustomerAddress**](docs/CustomersApi.md#addcustomeraddress) | **Post** /customers/{customerID}/address | Add Customer Address
-*CustomersApi* | [**CompleteAccountValidation**](docs/CustomersApi.md#completeaccountvalidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
 *CustomersApi* | [**CreateCustomer**](docs/CustomersApi.md#createcustomer) | **Post** /customers | Create Customer
-*CustomersApi* | [**CreateCustomerAccount**](docs/CustomersApi.md#createcustomeraccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
-*CustomersApi* | [**DecryptAccountNumber**](docs/CustomersApi.md#decryptaccountnumber) | **Post** /customers/{customerID}/accounts/{accountID}/decrypt | Decrypt Account Number
 *CustomersApi* | [**DeleteCustomer**](docs/CustomersApi.md#deletecustomer) | **Delete** /customers/{customerID} | Delete Customer
-*CustomersApi* | [**DeleteCustomerAccount**](docs/CustomersApi.md#deletecustomeraccount) | **Delete** /customers/{customerID}/accounts/{accountID} | Delete Customer Account
 *CustomersApi* | [**DeleteCustomerAddress**](docs/CustomersApi.md#deletecustomeraddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
-*CustomersApi* | [**DeleteCustomerDocument**](docs/CustomersApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
-*CustomersApi* | [**GetAccountValidation**](docs/CustomersApi.md#getaccountvalidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 *CustomersApi* | [**GetCustomer**](docs/CustomersApi.md#getcustomer) | **Get** /customers/{customerID} | Get Customer
-*CustomersApi* | [**GetCustomerAccountByID**](docs/CustomersApi.md#getcustomeraccountbyid) | **Get** /customers/{customerID}/accounts/{accountID} | Get Customer Account
-*CustomersApi* | [**GetCustomerAccounts**](docs/CustomersApi.md#getcustomeraccounts) | **Get** /customers/{customerID}/accounts | Get Customer Accounts
-*CustomersApi* | [**GetCustomerDisclaimers**](docs/CustomersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get Customer Disclaimers
-*CustomersApi* | [**GetCustomerDocumentContents**](docs/CustomersApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get Customer Document
-*CustomersApi* | [**GetCustomerDocuments**](docs/CustomersApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get Customer Documents
-*CustomersApi* | [**GetLatestAccountOFACSearch**](docs/CustomersApi.md#getlatestaccountofacsearch) | **Get** /customers/{customerID}/accounts/{accountID}/ofac | Latest Account OFAC Search
 *CustomersApi* | [**GetLatestOFACSearch**](docs/CustomersApi.md#getlatestofacsearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
-*CustomersApi* | [**GetReportOfCustomerAccounts**](docs/CustomersApi.md#getreportofcustomeraccounts) | **Get** /reports/accounts | Create Report of Accounts
-*CustomersApi* | [**InitAccountValidation**](docs/CustomersApi.md#initaccountvalidation) | **Post** /customers/{customerID}/accounts/{accountID}/validations | Initiate Account Validation
 *CustomersApi* | [**Ping**](docs/CustomersApi.md#ping) | **Get** /ping | Ping Customers Service
-*CustomersApi* | [**RefreshAccountOFACSearch**](docs/CustomersApi.md#refreshaccountofacsearch) | **Put** /customers/{customerID}/accounts/{accountID}/refresh/ofac | Refresh Account OFAC Search
 *CustomersApi* | [**RefreshOFACSearch**](docs/CustomersApi.md#refreshofacsearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
 *CustomersApi* | [**ReplaceCustomerMetadata**](docs/CustomersApi.md#replacecustomermetadata) | **Put** /customers/{customerID}/metadata | Update Customer Metadata
 *CustomersApi* | [**SearchCustomers**](docs/CustomersApi.md#searchcustomers) | **Get** /customers | Search Customers
-*CustomersApi* | [**UpdateAccountStatus**](docs/CustomersApi.md#updateaccountstatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
 *CustomersApi* | [**UpdateCustomer**](docs/CustomersApi.md#updatecustomer) | **Put** /customers/{customerID} | Update Customer
 *CustomersApi* | [**UpdateCustomerAddress**](docs/CustomersApi.md#updatecustomeraddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 *CustomersApi* | [**UpdateCustomerStatus**](docs/CustomersApi.md#updatecustomerstatus) | **Put** /customers/{customerID}/status | Update Customer Status
-*CustomersApi* | [**UploadCustomerDocument**](docs/CustomersApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
+*DisclaimersApi* | [**AcceptDisclaimer**](docs/DisclaimersApi.md#acceptdisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
+*DisclaimersApi* | [**GetCustomerDisclaimers**](docs/DisclaimersApi.md#getcustomerdisclaimers) | **Get** /customers/{customerID}/disclaimers | Get Customer Disclaimers
+*DocumentsApi* | [**DeleteCustomerDocument**](docs/DocumentsApi.md#deletecustomerdocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
+*DocumentsApi* | [**GetCustomerDocumentContents**](docs/DocumentsApi.md#getcustomerdocumentcontents) | **Get** /customers/{customerID}/documents/{documentID} | Get Customer Document
+*DocumentsApi* | [**GetCustomerDocuments**](docs/DocumentsApi.md#getcustomerdocuments) | **Get** /customers/{customerID}/documents | Get Customer Documents
+*DocumentsApi* | [**UploadCustomerDocument**](docs/DocumentsApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
+*ReportsApi* | [**GetReportOfCustomerAccounts**](docs/ReportsApi.md#getreportofcustomeraccounts) | **Get** /reports/accounts | Create Report of Accounts
 
 
 ## Documentation For Models

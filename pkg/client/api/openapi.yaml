@@ -3,9 +3,9 @@ info:
   contact:
     url: https://github.com/moov-io/customers
   description: |
-    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with United States federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
 
-    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgement are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
+    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgment are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
 
     ![](https://raw.githubusercontent.com/adamdecaf/customers/create-accounts/docs/images/customer.png)
   license:
@@ -17,11 +17,27 @@ servers:
 - description: Local development
   url: http://localhost:8087
 tags:
-- description: Endpoints for retrieving and updating configuration for an organization.
+- description: |
+    Endpoints for retrieving and updating configuration for an organization.
   name: Configuration
-- description: Endpoints for searching, creating, and verifying individuals according
-    to US government criteria for money movement within the country.
+- description: |
+    Endpoints for searching, creating, and verifying individuals according to United States regulations for money movement.
   name: Customers
+- description: |
+    Endpoints for searching, creating, and validating financial instruments according to United States regulations for money movement.
+  name: Accounts
+- description: |
+    Endpoints for validating Accounts after they're created.
+  name: Account Validation
+- description: |
+    Endpoints for accepting legal agreements for moving money in the United States.
+  name: Disclaimers
+- description: |
+    Endpoints for uploading and accepting legal documents to comply with United States regulations.
+  name: Documents
+- description: |
+    Endpoints for generating bulk listings of Accounts and Customers.
+  name: Reports
 paths:
   /ping:
     get:
@@ -746,7 +762,7 @@ paths:
           description: Failed to get accounts, see error(s)
       summary: Get Customer Accounts
       tags:
-      - Customers
+      - Accounts
     post:
       description: Create an account for the given customer
       operationId: createCustomerAccount
@@ -800,7 +816,7 @@ paths:
           description: Failed to get accounts, see error(s)
       summary: Create Customer Account
       tags:
-      - Customers
+      - Accounts
   /customers/{customerID}/accounts/{accountID}:
     delete:
       description: Remove an account from the given Customer
@@ -854,7 +870,7 @@ paths:
           description: Failed to get accounts, see error(s)
       summary: Delete Customer Account
       tags:
-      - Customers
+      - Accounts
     get:
       description: Retrieve an account by ID for the given customer.
       operationId: getCustomerAccountByID
@@ -911,7 +927,7 @@ paths:
           description: Failed to get accounts, see error(s)
       summary: Get Customer Account
       tags:
-      - Customers
+      - Accounts
   /customers/{customerID}/accounts/{accountID}/decrypt:
     post:
       description: |
@@ -970,7 +986,7 @@ paths:
           description: Failed to decrypt account number, see error(s)
       summary: Decrypt Account Number
       tags:
-      - Customers
+      - Accounts
   /customers/{customerID}/accounts/{accountID}/ofac:
     get:
       description: Get the latest OFAC search for an Account
@@ -1028,7 +1044,7 @@ paths:
           description: An error occurred when refreshing OFAC data, see error(s)
       summary: Latest Account OFAC Search
       tags:
-      - Customers
+      - Accounts
   /customers/{customerID}/accounts/{accountID}/refresh/ofac:
     put:
       description: Refresh OFAC search for a given Account
@@ -1086,7 +1102,7 @@ paths:
           description: An error occurred when refreshing OFAC data, see error(s)
       summary: Refresh Account OFAC Search
       tags:
-      - Customers
+      - Accounts
   /customers/{customerID}/accounts/{accountID}/status:
     put:
       description: Update the status for the specified accountID
@@ -1131,7 +1147,7 @@ paths:
           description: See error message
       summary: Update Account Status
       tags:
-      - Customers
+      - Accounts
   /customers/{customerID}/accounts/{accountID}/validations:
     post:
       description: |
@@ -1231,7 +1247,7 @@ paths:
           description: Failed to initiate account validation, see error(s)
       summary: Initiate Account Validation
       tags:
-      - Customers
+      - Account Validation
     put:
       description: |
         Complete account validation with specified strategy and vendor.
@@ -1326,7 +1342,7 @@ paths:
           description: Failed to complete account validation, see error(s)
       summary: Complete Account Validation
       tags:
-      - Customers
+      - Account Validation
   /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
     get:
       description: |
@@ -1401,7 +1417,7 @@ paths:
           description: Failed to initiate account validation, see error(s)
       summary: Get Account Validation
       tags:
-      - Customers
+      - Account Validation
   /customers/{customerID}/disclaimers:
     get:
       description: Get active disclaimers for the given customer
@@ -1450,7 +1466,7 @@ paths:
           description: Failed to get disclaimers, see error(s)
       summary: Get Customer Disclaimers
       tags:
-      - Customers
+      - Disclaimers
   /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
       description: Accept a disclaimer for the given customer which could include
@@ -1509,7 +1525,7 @@ paths:
           description: Customer disclaimer was not accepted, see error(s)
       summary: Accept Customer Disclaimer
       tags:
-      - Customers
+      - Disclaimers
   /customers/{customerID}/documents:
     get:
       description: Get documents for a customer
@@ -1558,7 +1574,7 @@ paths:
           description: Failed to get customer documents, see error(s)
       summary: Get Customer Documents
       tags:
-      - Customers
+      - Documents
     post:
       description: Upload a document for the given customer
       operationId: uploadCustomerDocument
@@ -1626,7 +1642,7 @@ paths:
           description: Document was not uploaded, see error(s)
       summary: Upload Customer Document
       tags:
-      - Customers
+      - Documents
   /customers/{customerID}/documents/{documentID}:
     delete:
       description: Remove Customer Document
@@ -1671,7 +1687,7 @@ paths:
           description: Failed to delete customer's document, see error(s)
       summary: Delete Customer Document
       tags:
-      - Customers
+      - Documents
     get:
       description: Retrieve the referenced document
       operationId: getCustomerDocumentContents
@@ -1733,7 +1749,7 @@ paths:
           description: Failed to get customer document, see error(s)
       summary: Get Customer Document
       tags:
-      - Customers
+      - Documents
   /customers/{customerID}/ofac:
     get:
       description: Get the latest OFAC search for a Customer
@@ -1880,7 +1896,7 @@ paths:
           description: Failed to get accounts, see error(s)
       summary: Create Report of Accounts
       tags:
-      - Customers
+      - Reports
 components:
   schemas:
     OrganizationConfiguration:
@@ -2174,7 +2190,7 @@ components:
         city:
           type: string
         state:
-          description: two charcer code of US state
+          description: two character code of a US state
           maximum: 2
           minimum: 2
           type: string
@@ -2254,7 +2270,7 @@ components:
           example: Denver
           type: string
         state:
-          description: two charcer code of US state
+          description: two character code of a US state
           example: CO
           maximum: 2
           minimum: 2
@@ -2299,7 +2315,7 @@ components:
         city:
           type: string
         state:
-          description: two charcer code of US state
+          description: two character code of a US state
           maximum: 2
           minimum: 2
           type: string

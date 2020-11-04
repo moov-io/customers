@@ -262,7 +262,7 @@ func TestUpdateAccountStatus(t *testing.T) {
 	req := client.UpdateAccountStatus{
 		Status: client.ACCOUNTSTATUS_VALIDATED,
 	}
-	account, resp, err := c.CustomersApi.UpdateAccountStatus(context.TODO(), customerID, accountID, req)
+	account, resp, err := c.AccountsApi.UpdateAccountStatus(context.TODO(), customerID, accountID, req)
 	if resp != nil && resp.Body != nil {
 		resp.Body.Close()
 	}
@@ -279,7 +279,7 @@ func TestUpdateAccountStatus(t *testing.T) {
 	router = setupRouterWithRepo(t, repo)
 	c = testclient.New(t, router)
 
-	_, resp, err = c.CustomersApi.UpdateAccountStatus(context.TODO(), customerID, accountID, req)
+	_, resp, err = c.AccountsApi.UpdateAccountStatus(context.TODO(), customerID, accountID, req)
 	if resp != nil && resp.Body != nil {
 		resp.Body.Close()
 	}

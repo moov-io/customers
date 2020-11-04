@@ -16,6 +16,7 @@ import (
 	_nethttp "net/http"
 	_neturl "net/url"
 	"os"
+	"strings"
 )
 
 // Linger please
@@ -23,34 +24,38 @@ var (
 	_ _context.Context
 )
 
-// ConfigurationApiService ConfigurationApi service
-type ConfigurationApiService service
+// DocumentsApiService DocumentsApi service
+type DocumentsApiService service
 
-// GetOrganizationConfigurationOpts Optional parameters for the method 'GetOrganizationConfiguration'
-type GetOrganizationConfigurationOpts struct {
-	XOrganization optional.String
+// DeleteCustomerDocumentOpts Optional parameters for the method 'DeleteCustomerDocument'
+type DeleteCustomerDocumentOpts struct {
+	XRequestID optional.String
 }
 
 /*
-GetOrganizationConfiguration Get Organization Configuration
-Retrieve current configuration for the provided organization.
+DeleteCustomerDocument Delete Customer Document
+Remove Customer Document
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param optional nil or *GetOrganizationConfigurationOpts - Optional Parameters:
- * @param "XOrganization" (optional.String) -  Value used to separate and identify models
-@return OrganizationConfiguration
+ * @param customerID ID of the customer that owns the document
+ * @param documentID ID of the document
+ * @param optional nil or *DeleteCustomerDocumentOpts - Optional Parameters:
+ * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
 */
-func (a *ConfigurationApiService) GetOrganizationConfiguration(ctx _context.Context, localVarOptionals *GetOrganizationConfigurationOpts) (OrganizationConfiguration, *_nethttp.Response, error) {
+func (a *DocumentsApiService) DeleteCustomerDocument(ctx _context.Context, customerID string, documentID string, localVarOptionals *DeleteCustomerDocumentOpts) (*_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodGet
+		localVarHTTPMethod   = _nethttp.MethodDelete
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  OrganizationConfiguration
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/configuration/customers"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/documents/{documentID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"documentID"+"}", _neturl.QueryEscape(parameterToString(documentID, "")), -1)
+
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
@@ -72,23 +77,23 @@ func (a *ConfigurationApiService) GetOrganizationConfiguration(ctx _context.Cont
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
-		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
+	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
+		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
-		return localVarReturnValue, nil, err
+		return nil, err
 	}
 
 	localVarHTTPResponse, err := a.client.callAPI(r)
 	if err != nil || localVarHTTPResponse == nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse, err
 	}
 
 	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
 	localVarHTTPResponse.Body.Close()
 	if err != nil {
-		return localVarReturnValue, localVarHTTPResponse, err
+		return localVarHTTPResponse, err
 	}
 
 	if localVarHTTPResponse.StatusCode >= 300 {
@@ -96,29 +101,39 @@ func (a *ConfigurationApiService) GetOrganizationConfiguration(ctx _context.Cont
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
-	}
-
-	err = a.client.decode(&localVarReturnValue, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-	if err != nil {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: err.Error(),
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
 		}
-		return localVarReturnValue, localVarHTTPResponse, newErr
+		return localVarHTTPResponse, newErr
 	}
 
-	return localVarReturnValue, localVarHTTPResponse, nil
+	return localVarHTTPResponse, nil
+}
+
+// GetCustomerDocumentContentsOpts Optional parameters for the method 'GetCustomerDocumentContents'
+type GetCustomerDocumentContentsOpts struct {
+	XRequestID    optional.String
+	XOrganization optional.String
 }
 
 /*
-GetOrganizationLogo Get Organization Logo
-Retrieve the organization&#39;s logo
+GetCustomerDocumentContents Get Customer Document
+Retrieve the referenced document
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param xOrganization Value used to separate and identify models
+ * @param customerID customerID of the Customer to get a Document
+ * @param documentID documentID to identify a Document
+ * @param optional nil or *GetCustomerDocumentContentsOpts - Optional Parameters:
+ * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
+ * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 @return *os.File
 */
-func (a *ConfigurationApiService) GetOrganizationLogo(ctx _context.Context, xOrganization string) (*os.File, *_nethttp.Response, error) {
+func (a *DocumentsApiService) GetCustomerDocumentContents(ctx _context.Context, customerID string, documentID string, localVarOptionals *GetCustomerDocumentContentsOpts) (*os.File, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
@@ -129,7 +144,11 @@ func (a *ConfigurationApiService) GetOrganizationLogo(ctx _context.Context, xOrg
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/configuration/logo"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/documents/{documentID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"documentID"+"}", _neturl.QueryEscape(parameterToString(documentID, "")), -1)
+
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
@@ -144,14 +163,19 @@ func (a *ConfigurationApiService) GetOrganizationLogo(ctx _context.Context, xOrg
 	}
 
 	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"image/png", "image/jpg", "image/svg+xml", "image/gif", "application/json"}
+	localVarHTTPHeaderAccepts := []string{"application/pdf", "image/_*", "application/json"}
 
 	// set Accept header
 	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["X-Organization"] = parameterToString(xOrganization, "")
+	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
+		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
+	}
+	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
+		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
+	}
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -197,38 +221,42 @@ func (a *ConfigurationApiService) GetOrganizationLogo(ctx _context.Context, xOrg
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
-// UpdateOrganizationConfigurationOpts Optional parameters for the method 'UpdateOrganizationConfiguration'
-type UpdateOrganizationConfigurationOpts struct {
+// GetCustomerDocumentsOpts Optional parameters for the method 'GetCustomerDocuments'
+type GetCustomerDocumentsOpts struct {
+	XRequestID    optional.String
 	XOrganization optional.String
 }
 
 /*
-UpdateOrganizationConfiguration Update Organization Configuration
-Update the configuration for the provided organization.
+GetCustomerDocuments Get Customer Documents
+Get documents for a customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param organizationConfiguration
- * @param optional nil or *UpdateOrganizationConfigurationOpts - Optional Parameters:
+ * @param customerID customerID of the Customer to get all Documents
+ * @param optional nil or *GetCustomerDocumentsOpts - Optional Parameters:
+ * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
  * @param "XOrganization" (optional.String) -  Value used to separate and identify models
-@return OrganizationConfiguration
+@return []Document
 */
-func (a *ConfigurationApiService) UpdateOrganizationConfiguration(ctx _context.Context, organizationConfiguration OrganizationConfiguration, localVarOptionals *UpdateOrganizationConfigurationOpts) (OrganizationConfiguration, *_nethttp.Response, error) {
+func (a *DocumentsApiService) GetCustomerDocuments(ctx _context.Context, customerID string, localVarOptionals *GetCustomerDocumentsOpts) ([]Document, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarHTTPMethod   = _nethttp.MethodGet
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  OrganizationConfiguration
+		localVarReturnValue  []Document
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/configuration/customers"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/documents"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
 	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
+	localVarHTTPContentTypes := []string{}
 
 	// set Content-Type header
 	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
@@ -244,11 +272,12 @@ func (a *ConfigurationApiService) UpdateOrganizationConfiguration(ctx _context.C
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
+	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
+		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
+	}
 	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
 		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
 	}
-	// body params
-	localVarPostBody = &organizationConfiguration
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -294,30 +323,43 @@ func (a *ConfigurationApiService) UpdateOrganizationConfiguration(ctx _context.C
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+// UploadCustomerDocumentOpts Optional parameters for the method 'UploadCustomerDocument'
+type UploadCustomerDocumentOpts struct {
+	XRequestID    optional.String
+	XOrganization optional.String
+}
+
 /*
-UploadOrganizationLogo Update Organization Logo
-Upload an organization&#39;s logo, or update it if it already exists
+UploadCustomerDocument Upload Customer Document
+Upload a document for the given customer
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param xOrganization Value used to separate and identify models
- * @param file Logo image file to be uploaded
-@return OrganizationConfiguration
+ * @param customerID customerID of the Customer to add a document
+ * @param type_ Document type (see Document type for values)
+ * @param file Document to be uploaded
+ * @param optional nil or *UploadCustomerDocumentOpts - Optional Parameters:
+ * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
+ * @param "XOrganization" (optional.String) -  Value used to separate and identify models
+@return Document
 */
-func (a *ConfigurationApiService) UploadOrganizationLogo(ctx _context.Context, xOrganization string, file *os.File) (OrganizationConfiguration, *_nethttp.Response, error) {
+func (a *DocumentsApiService) UploadCustomerDocument(ctx _context.Context, customerID string, type_ string, file *os.File, localVarOptionals *UploadCustomerDocumentOpts) (Document, *_nethttp.Response, error) {
 	var (
-		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
 		localVarFormFileName string
 		localVarFileName     string
 		localVarFileBytes    []byte
-		localVarReturnValue  OrganizationConfiguration
+		localVarReturnValue  Document
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/configuration/logo"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/documents"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := _neturl.Values{}
 	localVarFormParams := _neturl.Values{}
 
+	localVarQueryParams.Add("type", parameterToString(type_, ""))
 	// to determine the Content-Type header
 	localVarHTTPContentTypes := []string{"multipart/form-data"}
 
@@ -335,7 +377,12 @@ func (a *ConfigurationApiService) UploadOrganizationLogo(ctx _context.Context, x
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	localVarHeaderParams["X-Organization"] = parameterToString(xOrganization, "")
+	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
+		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
+	}
+	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
+		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
+	}
 	localVarFormFileName = "file"
 	localVarFile := file
 	if localVarFile != nil {

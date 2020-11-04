@@ -1,9 +1,9 @@
 openapi: 3.0.2
 info:
   description: |
-    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with US federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
+    Customers focuses on solving authentic identification of humans who are legally able to hold and transfer currency within the US. Primarily this project solves [Know Your Customer](https://en.wikipedia.org/wiki/Know_your_customer) (KYC), [Customer Identification Program](https://en.wikipedia.org/wiki/Customer_Identification_Program) (CIP), [Office of Foreign Asset Control](https://www.treasury.gov/about/organizational-structure/offices/Pages/Office-of-Foreign-Assets-Control.aspx) (OFAC) checks and verification workflows to comply with United States federal law and ensure authentic transfers. Customers has an objective to be a service for detailed due diligence on individuals and companies for Financial Institutions and services in a modernized and extensible way.
 
-    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgement are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
+    Customer phone numbers and addresses are stored and partially used in KYC/OFAC validation. Arbitrary key/value pairs can be stored for a Customer. Documents and Disclaimers, and their acknowledgment are also stored under a Customer as they're accepted. Bank Accounts, which can be validated with micro-deposits currently, are stored under each Customer.
 
     ![](https://raw.githubusercontent.com/adamdecaf/customers/create-accounts/docs/images/customer.png)
   version: v1
@@ -20,9 +20,26 @@ servers:
 
 tags:
   - name: Configuration
-    description: Endpoints for retrieving and updating configuration for an organization.
+    description: |
+      Endpoints for retrieving and updating configuration for an organization.
   - name: Customers
-    description: Endpoints for searching, creating, and verifying individuals according to US government criteria for money movement within the country.
+    description: |
+      Endpoints for searching, creating, and verifying individuals according to United States regulations for money movement.
+  - name: Accounts
+    description: |
+      Endpoints for searching, creating, and validating financial instruments according to United States regulations for money movement.
+  - name: Account Validation
+    description: |
+      Endpoints for validating Accounts after they're created.
+  - name: Disclaimers
+    description: |
+      Endpoints for accepting legal agreements for moving money in the United States.
+  - name: Documents
+    description: |
+      Endpoints for uploading and accepting legal documents to comply with United States regulations.
+  - name: Reports
+    description: |
+      Endpoints for generating bulk listings of Accounts and Customers.
 
 paths:
   /ping:
@@ -585,7 +602,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts:
     get:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Get Customer Accounts
       description: Retrieve all accounts for the given customer.
       operationId: getCustomerAccounts
@@ -623,7 +640,7 @@ paths:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     post:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Create Customer Account
       description: Create an account for the given customer
       operationId: createCustomerAccount
@@ -668,7 +685,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}:
     get:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Get Customer Account
       description: Retrieve an account by ID for the given customer.
       operationId: getCustomerAccountByID
@@ -715,7 +732,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
           description: Failed to get accounts, see error(s)
     delete:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Delete Customer Account
       description: Remove an account from the given Customer
       operationId: deleteCustomerAccount
@@ -758,7 +775,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/decrypt:
     post:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Decrypt Account Number
       description: |
         Return the account number encrypted with a shared secret for application requests. This encryption key is different from the key used for persistence.
@@ -805,7 +822,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/ofac:
     get:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Latest Account OFAC Search
       description: Get the latest OFAC search for an Account
       operationId: getLatestAccountOFACSearch
@@ -851,7 +868,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/refresh/ofac:
     put:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Refresh Account OFAC Search
       description: Refresh OFAC search for a given Account
       operationId: refreshAccountOFACSearch
@@ -897,7 +914,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/status:
     put:
-      tags: [Customers]
+      tags: [Accounts]
       summary: Update Account Status
       description: Update the status for the specified accountID
       operationId: updateAccountStatus
@@ -937,7 +954,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/validations:
     post:
-      tags: [Customers]
+      tags: ["Account Validation"]
       summary: Initiate Account Validation
       description: |
         Initiate account validation with specified strategy and vendor.
@@ -1024,7 +1041,7 @@ paths:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     put:
-      tags: [Customers]
+      tags: ["Account Validation"]
       summary: Complete Account Validation
       description: |
         Complete account validation with specified strategy and vendor.
@@ -1108,7 +1125,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/accounts/{accountID}/validations/{validationID}:
     get:
-      tags: [Customers]
+      tags: ["Account Validation"]
       summary: Get Account Validation
       description: |
         Get information about account validation strategy, status, etc.
@@ -1169,7 +1186,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers:
     get:
-      tags: [Customers]
+      tags: [Disclaimers]
       summary: Get Customer Disclaimers
       description: Get active disclaimers for the given customer
       operationId: getCustomerDisclaimers
@@ -1208,7 +1225,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/disclaimers/{disclaimerID}:
     post:
-      tags: [Customers]
+      tags: [Disclaimers]
       summary: Accept Customer Disclaimer
       description: Accept a disclaimer for the given customer which could include a document also
       operationId: acceptDisclaimer
@@ -1254,7 +1271,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/documents:
     post:
-      tags: [Customers]
+      tags: [Documents]
       summary: Upload Customer Document
       description: Upload a document for the given customer
       operationId: uploadCustomerDocument
@@ -1310,7 +1327,7 @@ paths:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     get:
-      tags: [Customers]
+      tags: [Documents]
       summary: Get Customer Documents
       description: Get documents for a customer
       operationId: getCustomerDocuments
@@ -1349,7 +1366,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /customers/{customerID}/documents/{documentID}:
     get:
-      tags: [Customers]
+      tags: [Documents]
       summary: Get Customer Document
       description: Retrieve the referenced document
       operationId: getCustomerDocumentContents
@@ -1399,7 +1416,7 @@ paths:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     delete:
-      tags: [Customers]
+      tags: [Documents]
       summary: Delete Customer Document
       description: Remove Customer Document
       operationId: deleteCustomerDocument
@@ -1515,7 +1532,7 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
   /reports/accounts:
     get:
-      tags: [Customers]
+      tags: [Reports]
       summary: Create Report of Accounts
       description: Retrieves a list of customer and account information.
       operationId: getReportOfCustomerAccounts
@@ -1764,7 +1781,7 @@ components:
           type: string
           minimum: 2
           maximum: 2
-          description: two charcer code of US state
+          description: two character code of a US state
         postalCode:
           type: string
         country:
@@ -1832,7 +1849,7 @@ components:
           type: string
           minimum: 2
           maximum: 2
-          description: two charcer code of US state
+          description: two character code of a US state
           example: CO
         postalCode:
           type: string
@@ -1868,7 +1885,7 @@ components:
           type: string
           minimum: 2
           maximum: 2
-          description: two charcer code of US state
+          description: two character code of a US state
         postalCode:
           type: string
         country:
