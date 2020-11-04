@@ -31,19 +31,6 @@ func AddCustomerRepresentativeRoutes(logger log.Logger, r *mux.Router, repo Cust
 	r.Methods("POST").Path("/customers/{customerID}/representatives").HandlerFunc(createCustomerRepresentative(logger, repo, customerSSNStorage))
 }
 
-func getCustomerRepresentative(logger log.Logger, repo CustomerRepository) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w = route.Responder(logger, w, r)
-
-		representativeID, requestID := route.GetRepresentativeID(w, r), moovhttp.GetRequestID(r)
-		if representativeID == "" {
-			return
-		}
-
-		respondWithCustomerRepresentative(logger, w, representativeID, requestID, repo)
-	}
-}
-
 func deleteCustomerRepresentative(logger log.Logger, repo CustomerRepository) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
@@ -60,22 +47,6 @@ func deleteCustomerRepresentative(logger log.Logger, repo CustomerRepository) fu
 		}
 
 		w.WriteHeader(http.StatusNoContent)
-	}
-}
-
-func respondWithCustomerRepresentative(logger log.Logger, w http.ResponseWriter, representativeID, requestID string, repo CustomerRepository) {
-	cust, err := repo.GetCustomerRepresentative(representativeID)
-	if err != nil {
-		logger.LogErrorf("getCustomerRepresentative: lookup: %v", err)
-		moovhttp.Problem(w, err)
-		return
-	}
-	if cust == nil {
-		w.WriteHeader(http.StatusNotFound)
-	} else {
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(cust)
 	}
 }
 
