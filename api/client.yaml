@@ -1534,13 +1534,14 @@ paths:
     post:
       tags: [Customers]
       summary: Add customer representative
-      description: Add a Customer representative
+      description: Add a Customer Representative
       operationId: addCustomerRepresentative
       parameters:
         - name: X-Request-ID
           in: header
           description: Optional requestID allows application developer to trace requests through the systems logs
           example: rs4f9915
+          required: true
           schema:
             type: string
         - name: X-Organization

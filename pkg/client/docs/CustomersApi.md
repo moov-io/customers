@@ -133,11 +133,11 @@ No authorization required
 
 ## AddCustomerRepresentative
 
-> Customer AddCustomerRepresentative(ctx, customerID, createCustomerRepresentative, optional)
+> Customer AddCustomerRepresentative(ctx, xRequestID, customerID, createCustomerRepresentative, optional)
 
 Add customer representative
 
-Add a Customer representative
+Add a Customer Representative
 
 ### Required Parameters
 
@@ -145,6 +145,7 @@ Add a Customer representative
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**xRequestID** | **string**| Optional requestID allows application developer to trace requests through the systems logs | 
 **customerID** | **string**| customerID of the Customer for whom to add the representative | 
 **createCustomerRepresentative** | [**CreateCustomerRepresentative**](CreateCustomerRepresentative.md)|  | 
  **optional** | ***AddCustomerRepresentativeOpts** | optional parameters | nil if no parameters
@@ -158,7 +159,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
 
- **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
+
  **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type

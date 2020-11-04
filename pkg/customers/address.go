@@ -67,7 +67,7 @@ func createAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 				return
 			}
 			if rep == nil {
-				w.WriteHeader(http.StatusNotFound)
+				http.NotFound(w, r)
 				return
 			}
 			addresses = rep.Addresses
@@ -114,8 +114,12 @@ func updateAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		customerID, addressId := route.GetCustomerID(w, r), getAddressId(w, r)
-		if customerID == "" || addressId == "" {
+		customerID := route.GetCustomerID(w, r)
+		if customerID == "" {
+			return
+		}
+		addressId := getAddressID(w, r)
+		if addressId == "" {
 			return
 		}
 
@@ -123,6 +127,9 @@ func updateAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 		var representativeID string
 		if ownerType == client.OWNERTYPE_REPRESENTATIVE {
 			representativeID = route.GetRepresentativeID(w, r)
+			if representativeID == "" {
+				return
+			}
 			ownerID = representativeID
 		}
 
@@ -186,7 +193,7 @@ func deleteAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
-		customerID, addressId := route.GetCustomerID(w, r), getAddressId(w, r)
+		customerID, addressId := route.GetCustomerID(w, r), getAddressID(w, r)
 		if customerID == "" {
 			return
 		}
@@ -198,6 +205,9 @@ func deleteAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 		ownerID := customerID
 		if ownerType == client.OWNERTYPE_REPRESENTATIVE {
 			representativeID := route.GetRepresentativeID(w, r)
+			if representativeID == "" {
+				return
+			}
 			ownerID = representativeID
 		}
 
@@ -214,7 +224,7 @@ func deleteAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 	}
 }
 
-func getAddressId(w http.ResponseWriter, r *http.Request) string {
+func getAddressID(w http.ResponseWriter, r *http.Request) string {
 	varName := "addressID"
 	v, ok := mux.Vars(r)[varName]
 	if !ok || v == "" {

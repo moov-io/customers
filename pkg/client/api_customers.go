@@ -238,22 +238,21 @@ func (a *CustomersApiService) AddAddress(ctx _context.Context, customerID string
 
 // AddCustomerRepresentativeOpts Optional parameters for the method 'AddCustomerRepresentative'
 type AddCustomerRepresentativeOpts struct {
-	XRequestID    optional.String
 	XOrganization optional.String
 }
 
 /*
 AddCustomerRepresentative Add customer representative
-Add a Customer representative
+Add a Customer Representative
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param xRequestID Optional requestID allows application developer to trace requests through the systems logs
  * @param customerID customerID of the Customer for whom to add the representative
  * @param createCustomerRepresentative
  * @param optional nil or *AddCustomerRepresentativeOpts - Optional Parameters:
- * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
  * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
-func (a *CustomersApiService) AddCustomerRepresentative(ctx _context.Context, customerID string, createCustomerRepresentative CreateCustomerRepresentative, localVarOptionals *AddCustomerRepresentativeOpts) (Customer, *_nethttp.Response, error) {
+func (a *CustomersApiService) AddCustomerRepresentative(ctx _context.Context, xRequestID string, customerID string, createCustomerRepresentative CreateCustomerRepresentative, localVarOptionals *AddCustomerRepresentativeOpts) (Customer, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -288,9 +287,7 @@ func (a *CustomersApiService) AddCustomerRepresentative(ctx _context.Context, cu
 	if localVarHTTPHeaderAccept != "" {
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
-	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
-		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
-	}
+	localVarHeaderParams["X-Request-ID"] = parameterToString(xRequestID, "")
 	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
 		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
 	}

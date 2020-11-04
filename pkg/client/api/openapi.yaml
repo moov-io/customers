@@ -1850,7 +1850,7 @@ paths:
       - Customers
   /customers/{customerID}/representatives:
     post:
-      description: Add a Customer representative
+      description: Add a Customer Representative
       operationId: addCustomerRepresentative
       parameters:
       - description: Optional requestID allows application developer to trace requests
@@ -1859,7 +1859,7 @@ paths:
         explode: false
         in: header
         name: X-Request-ID
-        required: false
+        required: true
         schema:
           type: string
         style: simple
