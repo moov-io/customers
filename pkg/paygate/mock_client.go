@@ -17,13 +17,13 @@ func (c *MockClient) Ping() error {
 	return c.Err
 }
 
-func (c *MockClient) GetMicroDeposits(accountID, userID string) (*client.MicroDeposits, error) {
+func (c *MockClient) GetMicroDeposits(accountID, organization string) (*client.MicroDeposits, error) {
 	if c.Err != nil {
 		return nil, c.Err
 	}
 	return c.Micro, nil
 }
 
-func (c *MockClient) InitiateMicroDeposits(userID string, destination client.Destination) error {
+func (c *MockClient) InitiateMicroDeposits(organization string, destination client.Destination) error {
 	return c.Err
 }

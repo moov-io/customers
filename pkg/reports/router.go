@@ -75,12 +75,11 @@ func getCustomerAccounts(
 			})
 		}
 
-		err = json.NewEncoder(w).Encode(results)
-		if err != nil {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(results); err != nil {
 			moovhttp.Problem(w, err)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(http.StatusOK)
 	}
 }

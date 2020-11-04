@@ -82,6 +82,7 @@ Class | Method | HTTP request | Description
  - [AccountType](docs/AccountType.md)
  - [AccountValidationResponse](docs/AccountValidationResponse.md)
  - [AddressType](docs/AddressType.md)
+ - [Amount](docs/Amount.md)
  - [CompleteAccountValidationRequest](docs/CompleteAccountValidationRequest.md)
  - [CompleteAccountValidationResponse](docs/CompleteAccountValidationResponse.md)
  - [CreateAccount](docs/CreateAccount.md)
@@ -119,6 +120,3 @@ Class | Method | HTTP request | Description
 
 
 ## Author
-
-
-

@@ -12,7 +12,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/snappy v0.0.2 // indirect
 	github.com/google/go-cmp v0.5.2
-	github.com/google/gofuzz v1.0.0
+	github.com/google/gofuzz v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.0 // indirect
@@ -27,7 +27,7 @@ require (
 	github.com/moov-io/ach v1.4.4
 	github.com/moov-io/base v0.13.1
 	github.com/moov-io/fed v0.5.1
-	github.com/moov-io/paygate v0.8.0
+	github.com/moov-io/paygate v0.9.0-dev1.0.20201022020358-75870ae7acfc
 	github.com/moov-io/watchman v0.15.1
 	github.com/mxenabled/atrium-go v1.2.1-0.20200616191425-c9e0ead005ba
 	github.com/ory/dockertest/v3 v3.6.1

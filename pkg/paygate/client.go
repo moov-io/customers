@@ -22,8 +22,8 @@ import (
 type Client interface {
 	Ping() error
 
-	GetMicroDeposits(accountID, userID string) (*client.MicroDeposits, error)
-	InitiateMicroDeposits(userID string, destination client.Destination) error
+	GetMicroDeposits(accountID, organization string) (*client.MicroDeposits, error)
+	InitiateMicroDeposits(organization string, destination client.Destination) error
 }
 
 type moovClient struct {
@@ -60,11 +60,11 @@ func sqlNoRows(err error) error {
 	return err
 }
 
-func (c *moovClient) GetMicroDeposits(accountID, userID string) (*client.MicroDeposits, error) {
+func (c *moovClient) GetMicroDeposits(accountID, organization string) (*client.MicroDeposits, error) {
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
 
-	micro, resp, err := c.underlying.ValidationApi.GetAccountMicroDeposits(ctx, accountID, userID)
+	micro, resp, err := c.underlying.ValidationApi.GetAccountMicroDeposits(ctx, accountID, organization)
 	if resp != nil && resp.Body != nil {
 		resp.Body.Close()
 	}
@@ -81,11 +81,11 @@ func (c *moovClient) GetMicroDeposits(accountID, userID string) (*client.MicroDe
 	return &micro, nil
 }
 
-func (c *moovClient) InitiateMicroDeposits(userID string, destination client.Destination) error {
+func (c *moovClient) InitiateMicroDeposits(organization string, destination client.Destination) error {
 	ctx, cancelFn := context.WithTimeout(context.TODO(), 10*time.Second)
 	defer cancelFn()
 
-	micro, resp, err := c.underlying.ValidationApi.InitiateMicroDeposits(ctx, userID, client.CreateMicroDeposits{
+	micro, resp, err := c.underlying.ValidationApi.InitiateMicroDeposits(ctx, organization, client.CreateMicroDeposits{
 		Destination: destination,
 	})
 	if resp != nil && resp.Body != nil {

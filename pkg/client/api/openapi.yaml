@@ -2518,12 +2518,8 @@ components:
           example: micro-deposits
           type: string
         micro-deposits:
-          description: Amounts used to validate the account is owned by the customer.
-          example:
-          - USD 0.01
-          - USD 0.13
           items:
-            type: string
+            $ref: '#/components/schemas/Amount'
           type: array
       required:
       - strategy
@@ -2878,3 +2874,17 @@ components:
           type: string
       required:
       - error
+    Amount:
+      properties:
+        currency:
+          description: A 3-letter ISO 4217 currency code
+          example: USD
+          type: string
+        value:
+          description: Quantity in the smallest unit of the specified currency. In
+            USD this is cents, so $12.04 is 1204 and $0.99 would be 99.
+          example: 1204
+          type: integer
+      required:
+      - currency
+      - value

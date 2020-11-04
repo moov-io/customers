@@ -26,10 +26,6 @@ func getAccountValidation(logger log.Logger, accounts Repository, validations va
 		w = route.Responder(logger, w, r)
 
 		vars := mux.Vars(r)
-		// ASK do we need userID here and in methods below?
-		// with micro-deposits it's clear that we need to pass it
-		// to paygate. But
-		// userID := moovhttp.GetUserID(r)
 
 		customerID := vars["customerID"]
 		accountID := vars["accountID"]
@@ -67,9 +63,13 @@ func initAccountValidation(logger log.Logger, accounts Repository, validations v
 		w = route.Responder(logger, w, r)
 
 		vars := mux.Vars(r)
-		userID := moovhttp.GetUserID(r)
 		customerID := vars["customerID"]
 		accountID := vars["accountID"]
+
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
 
 		account, err := accounts.getCustomerAccount(customerID, accountID)
 		if err != nil {
@@ -120,7 +120,7 @@ func initAccountValidation(logger log.Logger, accounts Repository, validations v
 		}
 
 		// execute strategy and get vendor response
-		vendorResponse, err := strategy.InitAccountValidation(userID, accountID, customerID)
+		vendorResponse, err := strategy.InitAccountValidation(organization, accountID, customerID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -148,10 +148,14 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 		w = route.Responder(logger, w, r)
 
 		vars := mux.Vars(r)
-		userID := moovhttp.GetUserID(r)
 		customerID := vars["customerID"]
 		accountID := vars["accountID"]
 		validationID := vars["validationID"]
+
+		organization := route.GetOrganization(w, r)
+		if organization == "" {
+			return
+		}
 
 		account, err := repo.getCustomerAccount(customerID, accountID)
 		if err != nil {
@@ -193,9 +197,6 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 			return
 		}
 
-		// get organization
-		organization := route.GetOrganization(w, r)
-
 		// grab encrypted account number
 		encrypted, err := repo.getEncryptedAccountNumber(organization, customerID, accountID)
 		if err != nil {
@@ -211,7 +212,7 @@ func completeAccountValidation(logger log.Logger, repo Repository, validations v
 		}
 
 		vendorRequest := validator.VendorRequest(req.VendorRequest)
-		vendorResponse, err := strategy.CompleteAccountValidation(userID, customerID, account, accountNumber, &vendorRequest)
+		vendorResponse, err := strategy.CompleteAccountValidation(organization, customerID, account, accountNumber, &vendorRequest)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
