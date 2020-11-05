@@ -1868,7 +1868,7 @@ paths:
         explode: false
         in: header
         name: X-Organization
-        required: false
+        required: true
         schema:
           type: string
         style: simple
@@ -1998,7 +1998,7 @@ paths:
         explode: false
         in: header
         name: X-Organization
-        required: false
+        required: true
         schema:
           type: string
         style: simple

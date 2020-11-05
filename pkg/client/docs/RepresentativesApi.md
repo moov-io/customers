@@ -15,7 +15,7 @@ Method | HTTP request | Description
 
 ## AddRepresentative
 
-> Customer AddRepresentative(ctx, xRequestID, customerID, createRepresentative, optional)
+> Customer AddRepresentative(ctx, xRequestID, xOrganization, customerID, createRepresentative)
 
 Add Customer Representative
 
@@ -28,21 +28,9 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **xRequestID** | **string**| Optional requestID allows application developer to trace requests through the systems logs | 
+**xOrganization** | **string**| Value used to separate and identify models | 
 **customerID** | **string**| customerID of the Customer for whom to add the representative | 
 **createRepresentative** | [**CreateRepresentative**](CreateRepresentative.md)|  | 
- **optional** | ***AddRepresentativeOpts** | optional parameters | nil if no parameters
-
-### Optional Parameters
-
-Optional parameters are passed through a pointer to a AddRepresentativeOpts struct
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-
-
-
- **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 
@@ -64,7 +52,7 @@ No authorization required
 
 ## AddRepresentativeAddress
 
-> Representative AddRepresentativeAddress(ctx, customerID, representativeID, createAddress, optional)
+> Representative AddRepresentativeAddress(ctx, xOrganization, customerID, representativeID, createAddress, optional)
 
 Add Customer Representative Address
 
@@ -76,6 +64,7 @@ Add an address to an existing customer representative record
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**xOrganization** | **string**| Value used to separate and identify models | 
 **customerID** | **string**| customerID of the Customer to add the address onto | 
 **representativeID** | **string**| representativeID of the Customer representative for whom to add the address | 
 **createAddress** | [**CreateAddress**](CreateAddress.md)|  | 
@@ -91,8 +80,8 @@ Name | Type | Description  | Notes
 
 
 
+
  **xRequestID** | **optional.String**| Optional requestID allows application developer to trace requests through the systems logs | 
- **xOrganization** | **optional.String**| Value used to separate and identify models | 
 
 ### Return type
 

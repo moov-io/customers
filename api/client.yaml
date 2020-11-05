@@ -1547,6 +1547,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
+          required: true
           example: org342
           schema:
             type: string
@@ -1657,6 +1658,7 @@ paths:
         - name: X-Organization
           in: header
           description: Value used to separate and identify models
+          required: true
           example: org342
           schema:
             type: string

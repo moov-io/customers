@@ -26,23 +26,17 @@ var (
 // RepresentativesApiService RepresentativesApi service
 type RepresentativesApiService service
 
-// AddRepresentativeOpts Optional parameters for the method 'AddRepresentative'
-type AddRepresentativeOpts struct {
-	XOrganization optional.String
-}
-
 /*
 AddRepresentative Add Customer Representative
 Add a Customer Representative
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param xRequestID Optional requestID allows application developer to trace requests through the systems logs
+ * @param xOrganization Value used to separate and identify models
  * @param customerID customerID of the Customer for whom to add the representative
  * @param createRepresentative
- * @param optional nil or *AddRepresentativeOpts - Optional Parameters:
- * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
-func (a *RepresentativesApiService) AddRepresentative(ctx _context.Context, xRequestID string, customerID string, createRepresentative CreateRepresentative, localVarOptionals *AddRepresentativeOpts) (Customer, *_nethttp.Response, error) {
+func (a *RepresentativesApiService) AddRepresentative(ctx _context.Context, xRequestID string, xOrganization string, customerID string, createRepresentative CreateRepresentative) (Customer, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -78,9 +72,7 @@ func (a *RepresentativesApiService) AddRepresentative(ctx _context.Context, xReq
 		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
 	}
 	localVarHeaderParams["X-Request-ID"] = parameterToString(xRequestID, "")
-	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
-		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
-	}
+	localVarHeaderParams["X-Organization"] = parameterToString(xOrganization, "")
 	// body params
 	localVarPostBody = &createRepresentative
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
@@ -130,23 +122,22 @@ func (a *RepresentativesApiService) AddRepresentative(ctx _context.Context, xReq
 
 // AddRepresentativeAddressOpts Optional parameters for the method 'AddRepresentativeAddress'
 type AddRepresentativeAddressOpts struct {
-	XRequestID    optional.String
-	XOrganization optional.String
+	XRequestID optional.String
 }
 
 /*
 AddRepresentativeAddress Add Customer Representative Address
 Add an address to an existing customer representative record
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param xOrganization Value used to separate and identify models
  * @param customerID customerID of the Customer to add the address onto
  * @param representativeID representativeID of the Customer representative for whom to add the address
  * @param createAddress
  * @param optional nil or *AddRepresentativeAddressOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
- * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 @return Representative
 */
-func (a *RepresentativesApiService) AddRepresentativeAddress(ctx _context.Context, customerID string, representativeID string, createAddress CreateAddress, localVarOptionals *AddRepresentativeAddressOpts) (Representative, *_nethttp.Response, error) {
+func (a *RepresentativesApiService) AddRepresentativeAddress(ctx _context.Context, xOrganization string, customerID string, representativeID string, createAddress CreateAddress, localVarOptionals *AddRepresentativeAddressOpts) (Representative, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -186,9 +177,7 @@ func (a *RepresentativesApiService) AddRepresentativeAddress(ctx _context.Contex
 	if localVarOptionals != nil && localVarOptionals.XRequestID.IsSet() {
 		localVarHeaderParams["X-Request-ID"] = parameterToString(localVarOptionals.XRequestID.Value(), "")
 	}
-	if localVarOptionals != nil && localVarOptionals.XOrganization.IsSet() {
-		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
-	}
+	localVarHeaderParams["X-Organization"] = parameterToString(xOrganization, "")
 	// body params
 	localVarPostBody = &createAddress
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
