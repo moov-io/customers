@@ -7,7 +7,8 @@ Customers v0.5.0 comes with several new features including Customer searching/fi
 We now require the `X-Organization` HTTP header on requests. This is to enforce isolation of models for multi-tenant installs. The value can be a free-form string so a UUID, random string, or other identifier can be supplied.
 
 - Accounts require HolderName (legal name on the financial account)
-- ./pkg/client and ./pkg/admin package move
+- ./pkg/client and ./pkg/admin package moved from the root package
+- Database migrations use golang-migrate and so require copying the old data into new tables
 
 ADDITIONS
 
@@ -17,6 +18,7 @@ ADDITIONS
 - cmd/server: add an endpoint for searching customers
 - customers: added search filter params `status`, `type` and pagination with `skip` and `count`
 - accounts: perform OFAC search of HolderName
+- approval: return 'blocked' boolean from OFAC search
 
 IMPROVEMENTS
 
