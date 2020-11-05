@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **Address1** | **string** | First line of the address | 
 **Address2** | **string** | Second line of the address | [optional] 
 **City** | **string** |  | 
-**State** | **string** | two charcer code of US state | 
+**State** | **string** | two character code of a US state | 
 **PostalCode** | **string** |  | 
 **Country** | **string** |  | 
 

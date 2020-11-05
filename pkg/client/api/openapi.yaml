@@ -1902,7 +1902,7 @@ paths:
           description: Customer representative was not added, see error(s)
       summary: Add Customer Representative
       tags:
-      - Customers
+      - Representatives
   /customers/{customerID}/representatives/{representativeID}:
     delete:
       description: Deletes a Customer Representative
@@ -1937,7 +1937,7 @@ paths:
           description: See error message
       summary: Delete Customer Representative
       tags:
-      - Customers
+      - Representatives
     put:
       description: Updates the specified Customer Representative
       operationId: updateRepresentative
@@ -1977,7 +1977,7 @@ paths:
           description: See error message
       summary: Update Customer Representative
       tags:
-      - Customers
+      - Representatives
   /customers/{customerID}/representatives/{representativeID}/address:
     post:
       description: Add an address to an existing customer representative record
@@ -2042,7 +2042,7 @@ paths:
           description: Customer representative address was not added, see error(s)
       summary: Add Customer Representative Address
       tags:
-      - Customers
+      - Representatives
   /customers/{customerID}/representatives/{representativeID}/addresses/{addressID}:
     delete:
       description: Deletes a customer representative's address
@@ -2086,7 +2086,7 @@ paths:
           description: See error message
       summary: Delete a Customer Representative Address
       tags:
-      - Customers
+      - Representatives
     put:
       description: Updates the specified customer representative address
       operationId: updateRepresentativeAddress
@@ -2135,7 +2135,7 @@ paths:
           description: See error message
       summary: Update Customer Representative Address
       tags:
-      - Customers
+      - Representatives
   /reports/accounts:
     get:
       description: Retrieves a list of customer and account information.
