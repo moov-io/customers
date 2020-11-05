@@ -1,10 +1,11 @@
-# CreateCustomerAddress
+# UpdateAddress
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Type** | **string** |  | 
+**Type** | **string** | Attribute of address | 
+**Validated** | **bool** | If this address has been confirmed with the Customer | [optional] [default to false]
 **Address1** | **string** | First line of the address | 
 **Address2** | **string** | Second line of the address | [optional] 
 **City** | **string** |  | 

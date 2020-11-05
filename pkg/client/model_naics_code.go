@@ -9,12 +9,34 @@
 
 package client
 
-// Phone struct for Phone
-type Phone struct {
-	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType,omitempty"`
-	// phone number has been validated to connect with customer
-	Valid bool      `json:"valid"`
-	Type  PhoneType `json:"type"`
-}
+// NaicsCode NAICS Code (https://docs.google.com/spreadsheets/d/1erIdqoy60JwLAnpb91EfoJV5YrXDnbwSaA-aqcBlw48/edit#gid=1627409140)
+type NaicsCode string
+
+// List of NAICSCode
+const (
+	NAICSCODE__11 NaicsCode = "11"
+	NAICSCODE__21 NaicsCode = "21"
+	NAICSCODE__22 NaicsCode = "22"
+	NAICSCODE__23 NaicsCode = "23"
+	NAICSCODE__31 NaicsCode = "31"
+	NAICSCODE__32 NaicsCode = "32"
+	NAICSCODE__33 NaicsCode = "33"
+	NAICSCODE__42 NaicsCode = "42"
+	NAICSCODE__44 NaicsCode = "44"
+	NAICSCODE__45 NaicsCode = "45"
+	NAICSCODE__48 NaicsCode = "48"
+	NAICSCODE__49 NaicsCode = "49"
+	NAICSCODE__51 NaicsCode = "51"
+	NAICSCODE__52 NaicsCode = "52"
+	NAICSCODE__53 NaicsCode = "53"
+	NAICSCODE__54 NaicsCode = "54"
+	NAICSCODE__55 NaicsCode = "55"
+	NAICSCODE__56 NaicsCode = "56"
+	NAICSCODE__61 NaicsCode = "61"
+	NAICSCODE__62 NaicsCode = "62"
+	NAICSCODE__71 NaicsCode = "71"
+	NAICSCODE__72 NaicsCode = "72"
+	NAICSCODE__81 NaicsCode = "81"
+	NAICSCODE__92 NaicsCode = "92"
+	NAICSCODE__99 NaicsCode = "99"
+)

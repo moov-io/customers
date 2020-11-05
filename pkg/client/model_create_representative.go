@@ -9,16 +9,18 @@
 
 package client
 
-// CreateCustomerAddress struct for CreateCustomerAddress
-type CreateCustomerAddress struct {
-	Type string `json:"type"`
-	// First line of the address
-	Address1 string `json:"address1"`
-	// Second line of the address
-	Address2 string `json:"address2,omitempty"`
-	City     string `json:"city"`
-	// two character code of a US state
-	State      string `json:"state"`
-	PostalCode string `json:"postalCode"`
-	Country    string `json:"country"`
+// CreateRepresentative struct for CreateRepresentative
+type CreateRepresentative struct {
+	// Given Name or First Name
+	FirstName string `json:"firstName"`
+	// Surname or Last Name
+	LastName string `json:"lastName"`
+	// Job title of this representative
+	JobTitle string `json:"jobTitle,omitempty"`
+	// Legal date of birth
+	BirthDate string `json:"birthDate,omitempty"`
+	// Customer Representative's Social Security Number (SSN)
+	SSN       string          `json:"SSN,omitempty"`
+	Phones    []CreatePhone   `json:"phones,omitempty"`
+	Addresses []CreateAddress `json:"addresses,omitempty"`
 }

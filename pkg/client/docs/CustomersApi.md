@@ -4,25 +4,25 @@ All URIs are relative to *http://localhost:8087*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**AddCustomerAddress**](CustomersApi.md#AddCustomerAddress) | **Post** /customers/{customerID}/address | Add Customer Address
+[**AddAddress**](CustomersApi.md#AddAddress) | **Post** /customers/{customerID}/address | Add Customer Address
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create Customer
+[**DeleteAddress**](CustomersApi.md#DeleteAddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
 [**DeleteCustomer**](CustomersApi.md#DeleteCustomer) | **Delete** /customers/{customerID} | Delete Customer
-[**DeleteCustomerAddress**](CustomersApi.md#DeleteCustomerAddress) | **Delete** /customers/{customerID}/addresses/{addressID} | Delete Customer Address
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Get Customer
 [**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
 [**Ping**](CustomersApi.md#Ping) | **Get** /ping | Ping Customers Service
 [**RefreshOFACSearch**](CustomersApi.md#RefreshOFACSearch) | **Put** /customers/{customerID}/refresh/ofac | Refresh Customer OFAC search
 [**ReplaceCustomerMetadata**](CustomersApi.md#ReplaceCustomerMetadata) | **Put** /customers/{customerID}/metadata | Update Customer Metadata
 [**SearchCustomers**](CustomersApi.md#SearchCustomers) | **Get** /customers | Search Customers
+[**UpdateAddress**](CustomersApi.md#UpdateAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 [**UpdateCustomer**](CustomersApi.md#UpdateCustomer) | **Put** /customers/{customerID} | Update Customer
-[**UpdateCustomerAddress**](CustomersApi.md#UpdateCustomerAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update Customer Status
 
 
 
-## AddCustomerAddress
+## AddAddress
 
-> Customer AddCustomerAddress(ctx, customerID, createCustomerAddress, optional)
+> Customer AddAddress(ctx, customerID, createAddress, optional)
 
 Add Customer Address
 
@@ -35,12 +35,12 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **customerID** | **string**| customerID of the Customer to add the address onto | 
-**createCustomerAddress** | [**CreateCustomerAddress**](CreateCustomerAddress.md)|  | 
- **optional** | ***AddCustomerAddressOpts** | optional parameters | nil if no parameters
+**createAddress** | [**CreateAddress**](CreateAddress.md)|  | 
+ **optional** | ***AddAddressOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
 
-Optional parameters are passed through a pointer to a AddCustomerAddressOpts struct
+Optional parameters are passed through a pointer to a AddAddressOpts struct
 
 
 Name | Type | Description  | Notes
@@ -114,6 +114,41 @@ No authorization required
 [[Back to README]](../README.md)
 
 
+## DeleteAddress
+
+> DeleteAddress(ctx, customerID, addressID)
+
+Delete Customer Address
+
+Deletes a customer's address
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+**addressID** | **string**| Address ID | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## DeleteCustomer
 
 > DeleteCustomer(ctx, customerID, optional)
@@ -154,41 +189,6 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## DeleteCustomerAddress
-
-> DeleteCustomerAddress(ctx, customerID, addressID)
-
-Delete Customer Address
-
-Deletes a customer's address
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
-**addressID** | **string**| Address ID | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
 [[Back to Model list]](../README.md#documentation-for-models)
@@ -460,6 +460,42 @@ No authorization required
 [[Back to README]](../README.md)
 
 
+## UpdateAddress
+
+> UpdateAddress(ctx, customerID, addressID, updateAddress)
+
+Update Customer Address
+
+Updates the specified customer address
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+**addressID** | **string**| Address ID | 
+**updateAddress** | [**UpdateAddress**](UpdateAddress.md)|  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
 ## UpdateCustomer
 
 > Customer UpdateCustomer(ctx, customerID, createCustomer, optional)
@@ -493,42 +529,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Customer**](Customer.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## UpdateCustomerAddress
-
-> UpdateCustomerAddress(ctx, customerID, addressID, updateCustomerAddress)
-
-Update Customer Address
-
-Updates the specified customer address
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
-**addressID** | **string**| Address ID | 
-**updateCustomerAddress** | [**UpdateCustomerAddress**](UpdateCustomerAddress.md)|  | 
-
-### Return type
-
- (empty response body)
 
 ### Authorization
 

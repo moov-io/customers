@@ -9,12 +9,9 @@
 
 package client
 
-// UpdateCustomerAddress struct for UpdateCustomerAddress
-type UpdateCustomerAddress struct {
-	// Attribute of address
+// CreateAddress struct for CreateAddress
+type CreateAddress struct {
 	Type string `json:"type"`
-	// If this address has been confirmed with the Customer
-	Validated bool `json:"validated,omitempty"`
 	// First line of the address
 	Address1 string `json:"address1"`
 	// Second line of the address

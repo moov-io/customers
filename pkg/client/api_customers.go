@@ -26,24 +26,24 @@ var (
 // CustomersApiService CustomersApi service
 type CustomersApiService service
 
-// AddCustomerAddressOpts Optional parameters for the method 'AddCustomerAddress'
-type AddCustomerAddressOpts struct {
+// AddAddressOpts Optional parameters for the method 'AddAddress'
+type AddAddressOpts struct {
 	XRequestID    optional.String
 	XOrganization optional.String
 }
 
 /*
-AddCustomerAddress Add Customer Address
+AddAddress Add Customer Address
 Add an Address onto an existing Customer record
  * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param customerID customerID of the Customer to add the address onto
- * @param createCustomerAddress
- * @param optional nil or *AddCustomerAddressOpts - Optional Parameters:
+ * @param createAddress
+ * @param optional nil or *AddAddressOpts - Optional Parameters:
  * @param "XRequestID" (optional.String) -  Optional requestID allows application developer to trace requests through the systems logs
  * @param "XOrganization" (optional.String) -  Value used to separate and identify models
 @return Customer
 */
-func (a *CustomersApiService) AddCustomerAddress(ctx _context.Context, customerID string, createCustomerAddress CreateCustomerAddress, localVarOptionals *AddCustomerAddressOpts) (Customer, *_nethttp.Response, error) {
+func (a *CustomersApiService) AddAddress(ctx _context.Context, customerID string, createAddress CreateAddress, localVarOptionals *AddAddressOpts) (Customer, *_nethttp.Response, error) {
 	var (
 		localVarHTTPMethod   = _nethttp.MethodPost
 		localVarPostBody     interface{}
@@ -85,7 +85,7 @@ func (a *CustomersApiService) AddCustomerAddress(ctx _context.Context, customerI
 		localVarHeaderParams["X-Organization"] = parameterToString(localVarOptionals.XOrganization.Value(), "")
 	}
 	// body params
-	localVarPostBody = &createCustomerAddress
+	localVarPostBody = &createAddress
 	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
 	if err != nil {
 		return localVarReturnValue, nil, err
@@ -233,6 +233,85 @@ func (a *CustomersApiService) CreateCustomer(ctx _context.Context, createCustome
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+/*
+DeleteAddress Delete Customer Address
+Deletes a customer&#39;s address
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param customerID Customer ID
+ * @param addressID Address ID
+*/
+func (a *CustomersApiService) DeleteAddress(ctx _context.Context, customerID string, addressID string) (*_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodDelete
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/addresses/{addressID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"addressID"+"}", _neturl.QueryEscape(parameterToString(addressID, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 // DeleteCustomerOpts Optional parameters for the method 'DeleteCustomer'
 type DeleteCustomerOpts struct {
 	XRequestID    optional.String
@@ -308,85 +387,6 @@ func (a *CustomersApiService) DeleteCustomer(ctx _context.Context, customerID st
 		newErr := GenericOpenAPIError{
 			body:  localVarBody,
 			error: localVarHTTPResponse.Status,
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
-}
-
-/*
-DeleteCustomerAddress Delete Customer Address
-Deletes a customer&#39;s address
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerID Customer ID
- * @param addressID Address ID
-*/
-func (a *CustomersApiService) DeleteCustomerAddress(ctx _context.Context, customerID string, addressID string) (*_nethttp.Response, error) {
-	var (
-		localVarHTTPMethod   = _nethttp.MethodDelete
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/addresses/{addressID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"addressID"+"}", _neturl.QueryEscape(parameterToString(addressID, "")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
-			var v Error
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
-			}
-			newErr.model = v
 		}
 		return localVarHTTPResponse, newErr
 	}
@@ -994,6 +994,88 @@ func (a *CustomersApiService) SearchCustomers(ctx _context.Context, localVarOpti
 	return localVarReturnValue, localVarHTTPResponse, nil
 }
 
+/*
+UpdateAddress Update Customer Address
+Updates the specified customer address
+ * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param customerID Customer ID
+ * @param addressID Address ID
+ * @param updateAddress
+*/
+func (a *CustomersApiService) UpdateAddress(ctx _context.Context, customerID string, addressID string, updateAddress UpdateAddress) (*_nethttp.Response, error) {
+	var (
+		localVarHTTPMethod   = _nethttp.MethodPut
+		localVarPostBody     interface{}
+		localVarFormFileName string
+		localVarFileName     string
+		localVarFileBytes    []byte
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/addresses/{addressID}"
+	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
+
+	localVarPath = strings.Replace(localVarPath, "{"+"addressID"+"}", _neturl.QueryEscape(parameterToString(addressID, "")), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := _neturl.Values{}
+	localVarFormParams := _neturl.Values{}
+
+	// to determine the Content-Type header
+	localVarHTTPContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
+	if localVarHTTPContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
+	}
+
+	// to determine the Accept header
+	localVarHTTPHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
+	if localVarHTTPHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
+	}
+	// body params
+	localVarPostBody = &updateAddress
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	localVarHTTPResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHTTPResponse == nil {
+		return localVarHTTPResponse, err
+	}
+
+	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
+	localVarHTTPResponse.Body.Close()
+	if err != nil {
+		return localVarHTTPResponse, err
+	}
+
+	if localVarHTTPResponse.StatusCode >= 300 {
+		newErr := GenericOpenAPIError{
+			body:  localVarBody,
+			error: localVarHTTPResponse.Status,
+		}
+		if localVarHTTPResponse.StatusCode == 400 {
+			var v Error
+			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
+			if err != nil {
+				newErr.error = err.Error()
+				return localVarHTTPResponse, newErr
+			}
+			newErr.model = v
+		}
+		return localVarHTTPResponse, newErr
+	}
+
+	return localVarHTTPResponse, nil
+}
+
 // UpdateCustomerOpts Optional parameters for the method 'UpdateCustomer'
 type UpdateCustomerOpts struct {
 	XRequestID    optional.String
@@ -1097,88 +1179,6 @@ func (a *CustomersApiService) UpdateCustomer(ctx _context.Context, customerID st
 	}
 
 	return localVarReturnValue, localVarHTTPResponse, nil
-}
-
-/*
-UpdateCustomerAddress Update Customer Address
-Updates the specified customer address
- * @param ctx _context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param customerID Customer ID
- * @param addressID Address ID
- * @param updateCustomerAddress
-*/
-func (a *CustomersApiService) UpdateCustomerAddress(ctx _context.Context, customerID string, addressID string, updateCustomerAddress UpdateCustomerAddress) (*_nethttp.Response, error) {
-	var (
-		localVarHTTPMethod   = _nethttp.MethodPut
-		localVarPostBody     interface{}
-		localVarFormFileName string
-		localVarFileName     string
-		localVarFileBytes    []byte
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/addresses/{addressID}"
-	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
-
-	localVarPath = strings.Replace(localVarPath, "{"+"addressID"+"}", _neturl.QueryEscape(parameterToString(addressID, "")), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := _neturl.Values{}
-	localVarFormParams := _neturl.Values{}
-
-	// to determine the Content-Type header
-	localVarHTTPContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHTTPContentType := selectHeaderContentType(localVarHTTPContentTypes)
-	if localVarHTTPContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHTTPContentType
-	}
-
-	// to determine the Accept header
-	localVarHTTPHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHTTPHeaderAccept := selectHeaderAccept(localVarHTTPHeaderAccepts)
-	if localVarHTTPHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHTTPHeaderAccept
-	}
-	// body params
-	localVarPostBody = &updateCustomerAddress
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHTTPMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFormFileName, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	localVarHTTPResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHTTPResponse == nil {
-		return localVarHTTPResponse, err
-	}
-
-	localVarBody, err := _ioutil.ReadAll(localVarHTTPResponse.Body)
-	localVarHTTPResponse.Body.Close()
-	if err != nil {
-		return localVarHTTPResponse, err
-	}
-
-	if localVarHTTPResponse.StatusCode >= 300 {
-		newErr := GenericOpenAPIError{
-			body:  localVarBody,
-			error: localVarHTTPResponse.Status,
-		}
-		if localVarHTTPResponse.StatusCode == 400 {
-			var v Error
-			err = a.client.decode(&v, localVarBody, localVarHTTPResponse.Header.Get("Content-Type"))
-			if err != nil {
-				newErr.error = err.Error()
-				return localVarHTTPResponse, newErr
-			}
-			newErr.model = v
-		}
-		return localVarHTTPResponse, newErr
-	}
-
-	return localVarHTTPResponse, nil
 }
 
 // UpdateCustomerStatusOpts Optional parameters for the method 'UpdateCustomerStatus'

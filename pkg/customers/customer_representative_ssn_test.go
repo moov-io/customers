@@ -10,57 +10,31 @@ import (
 	"testing"
 
 	"github.com/moov-io/base/database"
-	"github.com/moov-io/customers/pkg/secrets"
 
 	"github.com/moov-io/base"
 	"github.com/moov-io/base/log"
 )
 
-var (
-	testCustomerSSNStorage = func(t *testing.T) *ssnStorage {
-		return &ssnStorage{
-			keeper: secrets.TestStringKeeper(t),
-			repo:   &testCustomerSSNRepository{},
-		}
-	}
-)
-
-type testCustomerSSNRepository struct {
-	err error
-	ssn *SSN
-}
-
-func (r *testCustomerSSNRepository) saveSSN(*SSN) error {
-	return r.err
-}
-
-func (r *testCustomerSSNRepository) getSSN(ownerID string, ownerType client.OwnerType) (*SSN, error) {
-	if r.ssn != nil {
-		return r.ssn, nil
-	}
-	return nil, r.err
-}
-
-func TestCustomerSSNStorage(t *testing.T) {
+func TestRepresentativeSSNStorage(t *testing.T) {
 	storage := testCustomerSSNStorage(t)
 
-	if _, err := storage.encryptRaw("", client.OWNERTYPE_CUSTOMER, ""); err == nil {
+	if _, err := storage.encryptRaw("", client.OWNERTYPE_REPRESENTATIVE, ""); err == nil {
 		t.Errorf("expected error")
 	}
-	if _, err := storage.encryptRaw(base.ID(), client.OWNERTYPE_CUSTOMER, ""); err == nil {
+	if _, err := storage.encryptRaw(base.ID(), client.OWNERTYPE_REPRESENTATIVE, ""); err == nil {
 		t.Errorf("expected error")
 	}
 
 	// encrypt SSN
-	customerID := base.ID()
-	ssn, err := storage.encryptRaw(customerID, client.OWNERTYPE_CUSTOMER, "123456789")
+	representativeID := base.ID()
+	ssn, err := storage.encryptRaw(representativeID, client.OWNERTYPE_REPRESENTATIVE, "987654321")
 	if err != nil {
 		t.Error(err)
 	}
-	if ssn.ownerID != customerID {
+	if ssn.ownerID != representativeID {
 		t.Errorf("ssn.ownerID=%s", ssn.ownerID)
 	}
-	if ssn.masked != "1#######9" {
+	if ssn.masked != "9#######1" {
 		t.Errorf("ssn.masked=%s", ssn.masked)
 	}
 
@@ -68,29 +42,29 @@ func TestCustomerSSNStorage(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if decrypted != "123456789" {
+	if decrypted != "987654321" {
 		t.Errorf("decrypted SSN=%s", decrypted)
 	}
 }
 
-func TestCustomerSSNRepository(t *testing.T) {
-	customerID := base.ID()
-	ownerType := client.OWNERTYPE_CUSTOMER
+func TestRepresentativeSSNRepository(t *testing.T) {
+	representativeID := base.ID()
+	ownerType := client.OWNERTYPE_REPRESENTATIVE
 	check := func(t *testing.T, customerSSNRepo *sqlSSNRepository) {
 
-		if ssn, err := customerSSNRepo.getSSN(customerID, ownerType); ssn != nil || err != nil {
+		if ssn, err := customerSSNRepo.getSSN(representativeID, ownerType); ssn != nil || err != nil {
 			t.Fatalf("ssn=%v error=%v", ssn, err)
 		}
 
 		// write
-		bs := base64.StdEncoding.EncodeToString([]byte("123456789"))
-		ssn := &SSN{ownerID: customerID, ownerType: ownerType, encrypted: bs, masked: "1#######9"}
+		bs := base64.StdEncoding.EncodeToString([]byte("987654321"))
+		ssn := &SSN{ownerID: representativeID, ownerType: ownerType, encrypted: bs, masked: "9#######1"}
 		if err := customerSSNRepo.saveSSN(ssn); err != nil {
 			t.Fatal(err)
 		}
 
 		// read again
-		ssn, err := customerSSNRepo.getSSN(customerID, ownerType)
+		ssn, err := customerSSNRepo.getSSN(representativeID, ownerType)
 		if ssn == nil || err != nil {
 			t.Fatalf("ssn=%v error=%v", ssn, err)
 		}
@@ -98,10 +72,10 @@ func TestCustomerSSNRepository(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if v := string(out); v != "123456789" {
+		if v := string(out); v != "987654321" {
 			t.Errorf("ssn.encrypte=%s", v)
 		}
-		if ssn.masked != "1#######9" {
+		if ssn.masked != "9#######1" {
 			t.Errorf("ssn.masked=%s", ssn.masked)
 		}
 	}

@@ -9,20 +9,29 @@
 
 package client
 
-// CustomerAddress struct for CustomerAddress
-type CustomerAddress struct {
-	// Unique identifier for this Address
-	AddressID string      `json:"addressID"`
-	Type      AddressType `json:"type"`
-	// First line of the address
-	Address1 string `json:"address1"`
-	// Second line of the address
-	Address2 string `json:"address2,omitempty"`
-	City     string `json:"city"`
-	// two character code of a US state
-	State      string `json:"state"`
-	PostalCode string `json:"postalCode"`
-	Country    string `json:"country"`
-	// Address has been validated for customer
-	Validated bool `json:"validated,omitempty"`
+import (
+	"time"
+)
+
+// Representative struct for Representative
+type Representative struct {
+	// Unique identifier for this Representative
+	RepresentativeID string `json:"representativeID"`
+	// The unique identifier for the customer the representative belongs to
+	CustomerID string `json:"customerID"`
+	// Given Name or First Name
+	FirstName string `json:"firstName"`
+	// Surname or Last Name
+	LastName string `json:"lastName"`
+	// Job title of this representative
+	JobTitle string `json:"jobTitle,omitempty"`
+	// Legal date of birth
+	BirthDate string    `json:"birthDate,omitempty"`
+	CreatedAt time.Time `json:"createdAt"`
+	// Last time the object was modified
+	LastModified time.Time `json:"lastModified"`
+	// Customer Representative's Social Security Number (SSN)
+	SSN       string    `json:"SSN,omitempty"`
+	Phones    []Phone   `json:"phones,omitempty"`
+	Addresses []Address `json:"addresses,omitempty"`
 }

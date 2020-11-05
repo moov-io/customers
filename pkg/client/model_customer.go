@@ -28,13 +28,29 @@ type Customer struct {
 	// Customers name suffix. \"Jr\", \"PH.D.\"
 	Suffix string       `json:"suffix,omitempty"`
 	Type   CustomerType `json:"type"`
+	// Business Name for business type customers
+	BusinessName string `json:"businessName,omitempty"`
+	// Doing Business As (DBA) name for business type customers
+	DoingBusinessAs string       `json:"doingBusinessAs,omitempty"`
+	BusinessType    BusinessType `json:"businessType,omitempty"`
+	// Employer Identification Number (EIN) for business type customers
+	EIN string `json:"EIN,omitempty"`
+	// Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers
+	DUNS      string    `json:"DUNS,omitempty"`
+	SICCode   SicCode   `json:"SICCode,omitempty"`
+	NAICSCode NaicsCode `json:"NAICSCode,omitempty"`
 	// Legal date of birth
 	BirthDate string         `json:"birthDate,omitempty"`
 	Status    CustomerStatus `json:"status"`
 	// Primary email address of customer name@domain.com
-	Email     string            `json:"email"`
-	Phones    []Phone           `json:"phones,omitempty"`
-	Addresses []CustomerAddress `json:"addresses,omitempty"`
+	Email string `json:"email"`
+	// Company Website for business type customers
+	Website string `json:"website,omitempty"`
+	// Date business was established for business type customers
+	DateBusinessEstablished string           `json:"dateBusinessEstablished,omitempty"`
+	Phones                  []Phone          `json:"phones,omitempty"`
+	Addresses               []Address        `json:"addresses,omitempty"`
+	Representatives         []Representative `json:"representatives,omitempty"`
 	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
 	Metadata  map[string]string `json:"metadata,omitempty"`
 	CreatedAt time.Time         `json:"createdAt"`

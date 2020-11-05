@@ -114,9 +114,18 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 			&c.NickName,
 			&c.Suffix,
 			&c.Type,
+			&c.BusinessName,
+			&c.DoingBusinessAs,
+			&c.BusinessType,
+			&c.EIN,
+			&c.DUNS,
+			&c.SICCode,
+			&c.NAICSCode,
 			&birthDate,
 			&c.Status,
 			&c.Email,
+			&c.Website,
+			&c.DateBusinessEstablished,
 			&c.CreatedAt,
 			&c.LastModified,
 		)
@@ -138,13 +147,17 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 		customerIDs = append(customerIDs, c.CustomerID)
 	}
 
-	phonesByCustomerID, err := r.getPhones(customerIDs)
+	phonesByCustomerID, err := r.GetPhones(customerIDs, client.OWNERTYPE_CUSTOMER)
 	if err != nil {
 		return nil, fmt.Errorf("fetching customer phones: %v", err)
 	}
-	addressesByCustomerID, err := r.getAddresses(customerIDs)
+	addressesByCustomerID, err := r.GetAddresses(customerIDs, client.OWNERTYPE_CUSTOMER)
 	if err != nil {
 		return nil, fmt.Errorf("fetching customer addresses: %v", err)
+	}
+	representativesByCustomerID, err := r.getRepresentatives(customerIDs)
+	if err != nil {
+		return nil, fmt.Errorf("fetching customer representatives: %v", err)
 	}
 	metadataByCustomerID, err := r.getMetadata(customerIDs)
 	if err != nil {
@@ -154,6 +167,7 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 	for _, c := range customers {
 		c.Phones = phonesByCustomerID[c.CustomerID]
 		c.Addresses = addressesByCustomerID[c.CustomerID]
+		c.Representatives = representativesByCustomerID[c.CustomerID]
 		c.Metadata = metadataByCustomerID[c.CustomerID].Metadata
 	}
 
@@ -162,7 +176,7 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 
 func buildSearchQuery(params SearchParams) (string, []interface{}) {
 	var args []interface{}
-	query := `select customer_id, first_name, middle_name, last_name, nick_name, suffix, type, birth_date, status, email, created_at, last_modified
+	query := `select customer_id, first_name, middle_name, last_name, nick_name, suffix, type, business_name, doing_business_as, business_type, ein, duns, sic_code, naics_code, birth_date, status, email, website, date_business_established, created_at, last_modified
 from customers where deleted_at is null`
 
 	if params.Organization != "" {
@@ -209,13 +223,13 @@ from customers where deleted_at is null`
 	return query, args
 }
 
-func (r *sqlCustomerRepository) getPhones(customerIDs []string) (map[string][]client.Phone, error) {
+func (r *sqlCustomerRepository) GetPhones(ownerIDs []string, ownerType client.OwnerType) (map[string][]client.Phone, error) {
 	query := fmt.Sprintf(
-		"select customer_id, number, valid, type from customers_phones where customer_id in (?%s)",
-		strings.Repeat(",?", len(customerIDs)-1),
+		"select owner_id, owner_type, number, valid, type from phones where owner_id in (?%s) and owner_type = ?",
+		strings.Repeat(",?", len(ownerIDs)-1),
 	)
 
-	rows, err := r.queryRowsByCustomerIDs(query, customerIDs)
+	rows, err := r.queryRowsByCustomerIDsAndOwnerType(query, ownerIDs, ownerType)
 	if err != nil {
 		return nil, err
 	}
@@ -224,9 +238,10 @@ func (r *sqlCustomerRepository) getPhones(customerIDs []string) (map[string][]cl
 	ret := make(map[string][]client.Phone)
 	for rows.Next() {
 		var p client.Phone
-		var customerID string
+		var ownerID string
 		err := rows.Scan(
-			&customerID,
+			&ownerID,
+			&p.OwnerType,
 			&p.Number,
 			&p.Valid,
 			&p.Type,
@@ -234,29 +249,30 @@ func (r *sqlCustomerRepository) getPhones(customerIDs []string) (map[string][]cl
 		if err != nil {
 			return nil, fmt.Errorf("scanning row: %v", err)
 		}
-		ret[customerID] = append(ret[customerID], p)
+		ret[ownerID] = append(ret[ownerID], p)
 	}
 
 	return ret, nil
 }
 
-func (r *sqlCustomerRepository) getAddresses(customerIDs []string) (map[string][]client.CustomerAddress, error) {
+func (r *sqlCustomerRepository) GetAddresses(customerIDs []string, ownerType client.OwnerType) (map[string][]client.Address, error) {
 	query := fmt.Sprintf(
-		"select customer_id, address_id, type, address1, address2, city, state, postal_code, country, validated from customers_addresses where customer_id in (?%s) and deleted_at is null;",
+		"select owner_id, owner_type, address_id, type, address1, address2, city, state, postal_code, country, validated from addresses where owner_id in (?%s) and owner_type = ? and deleted_at is null;",
 		strings.Repeat(",?", len(customerIDs)-1),
 	)
-	rows, err := r.queryRowsByCustomerIDs(query, customerIDs)
+	rows, err := r.queryRowsByCustomerIDsAndOwnerType(query, customerIDs, ownerType)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	ret := make(map[string][]client.CustomerAddress)
+	ret := make(map[string][]client.Address)
 	for rows.Next() {
-		var a client.CustomerAddress
-		var customerID string
+		var a client.Address
+		var ownerID string
 		if err := rows.Scan(
-			&customerID,
+			&ownerID,
+			&a.OwnerType,
 			&a.AddressID,
 			&a.Type,
 			&a.Address1,
@@ -269,7 +285,7 @@ func (r *sqlCustomerRepository) getAddresses(customerIDs []string) (map[string][
 		); err != nil {
 			return nil, fmt.Errorf("scanning row: %v", err)
 		}
-		ret[customerID] = append(ret[customerID], a)
+		ret[ownerID] = append(ret[ownerID], a)
 	}
 
 	return ret, nil
@@ -302,6 +318,28 @@ func (r *sqlCustomerRepository) getMetadata(customerIDs []string) (map[string]cl
 	}
 
 	return result, nil
+}
+
+func (r *sqlCustomerRepository) queryRowsByCustomerIDsAndOwnerType(query string, customerIDs []string, ownerType client.OwnerType) (*sql.Rows, error) {
+	stmt, err := r.db.Prepare(query)
+	if err != nil {
+		return nil, fmt.Errorf("preparing query: %v", err)
+	}
+	defer stmt.Close()
+
+	var args []interface{}
+	for _, id := range customerIDs {
+		args = append(args, id)
+	}
+
+	args = append(args, string(ownerType))
+
+	rows, err := stmt.Query(args...)
+	if err != nil {
+		return nil, fmt.Errorf("executing query: %v", err)
+	}
+
+	return rows, nil
 }
 
 func (r *sqlCustomerRepository) queryRowsByCustomerIDs(query string, customerIDs []string) (*sql.Rows, error) {

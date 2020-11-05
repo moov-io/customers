@@ -9,12 +9,11 @@
 
 package client
 
-// Phone struct for Phone
-type Phone struct {
-	// phone number
-	Number    string    `json:"number"`
-	OwnerType OwnerType `json:"ownerType,omitempty"`
-	// phone number has been validated to connect with customer
-	Valid bool      `json:"valid"`
-	Type  PhoneType `json:"type"`
-}
+// OwnerType The type of individual owner of a resource, such as SSN, phone, or address
+type OwnerType string
+
+// List of OwnerType
+const (
+	OWNERTYPE_CUSTOMER       OwnerType = "customer"
+	OWNERTYPE_REPRESENTATIVE OwnerType = "representative"
+)

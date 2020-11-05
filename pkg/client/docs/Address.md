@@ -1,17 +1,19 @@
-# UpdateCustomerAddress
+# Address
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**Type** | **string** | Attribute of address | 
-**Validated** | **bool** | If this address has been confirmed with the Customer | [optional] [default to false]
+**AddressID** | **string** | Unique identifier for this Address | 
+**Type** | [**AddressType**](AddressType.md) |  | 
+**OwnerType** | [**OwnerType**](OwnerType.md) |  | [optional] 
 **Address1** | **string** | First line of the address | 
 **Address2** | **string** | Second line of the address | [optional] 
 **City** | **string** |  | 
 **State** | **string** | two character code of a US state | 
 **PostalCode** | **string** |  | 
 **Country** | **string** |  | 
+**Validated** | **bool** | Address has been validated for customer | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 
