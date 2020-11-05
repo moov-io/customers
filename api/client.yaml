@@ -1533,9 +1533,9 @@ paths:
   /customers/{customerID}/representatives:
     post:
       tags: [Customers]
-      summary: Add customer representative
+      summary: Add Customer Representative
       description: Add a Customer Representative
-      operationId: addCustomerRepresentative
+      operationId: addRepresentative
       parameters:
         - name: X-Request-ID
           in: header
@@ -1562,7 +1562,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCustomerRepresentative'
+              $ref: '#/components/schemas/CreateRepresentative'
       responses:
         '200':
           description: A customer object
@@ -1579,9 +1579,9 @@ paths:
   /customers/{customerID}/representatives/{representativeID}:
     put:
       tags: [Customers]
-      summary: Update customer representative
-      description: Updates the specified customer representative
-      operationId: updateCustomerRepresentative
+      summary: Update Customer Representative
+      description: Updates the specified Customer Representative
+      operationId: updateRepresentative
       parameters:
         - name: customerID
           in: path
@@ -1602,10 +1602,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCustomerRepresentative'
+              $ref: '#/components/schemas/CreateRepresentative'
       responses:
         '200':
-          description: Updated Customer representative
+          description: Updated Customer Representative
         '400':
           description: See error message
           content:
@@ -1614,9 +1614,9 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     delete:
       tags: [Customers]
-      summary: Delete a customer's representative
-      description: Deletes a customer's representative
-      operationId: deleteCustomerRepresentative
+      summary: Delete Customer Representative
+      description: Deletes a Customer Representative
+      operationId: deleteRepresentative
       parameters:
         - name: customerID
           in: path
@@ -1644,9 +1644,9 @@ paths:
   /customers/{customerID}/representatives/{representativeID}/address:
     post:
       tags: [Customers]
-      summary: Add customer representative address
-      description: Add an Address onto an existing Customer representative record
-      operationId: addCustomerRepresentativeAddress
+      summary: Add Customer Representative Address
+      description: Add an address to an existing customer representative record
+      operationId: addRepresentativeAddress
       parameters:
         - name: X-Request-ID
           in: header
@@ -1686,7 +1686,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerRepresentative'
+                $ref: '#/components/schemas/Representative'
         '400':
           description: Customer representative address was not added, see error(s)
           content:
@@ -1696,9 +1696,9 @@ paths:
   /customers/{customerID}/representatives/{representativeID}/addresses/{addressID}:
     put:
       tags: [Customers]
-      summary: Update customer representative's address
+      summary: Update Customer Representative Address
       description: Updates the specified customer representative address
-      operationId: updateCustomerRepresentativeAddress
+      operationId: updateRepresentativeAddress
       parameters:
         - name: customerID
           in: path
@@ -1738,9 +1738,9 @@ paths:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
     delete:
       tags: [Customers]
-      summary: Delete a customer representative's address
+      summary: Delete a Customer Representative Address
       description: Deletes a customer representative's address
-      operationId: deleteCustomerRepresentativeAddress
+      operationId: deleteRepresentativeAddress
       parameters:
         - name: customerID
           in: path
@@ -1907,7 +1907,7 @@ components:
         representatives:
           type: array
           items:
-            $ref: '#/components/schemas/CreateCustomerRepresentative'
+            $ref: '#/components/schemas/CreateRepresentative'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -2001,7 +2001,7 @@ components:
         representatives:
           type: array
           items:
-            $ref: '#/components/schemas/CustomerRepresentative'
+            $ref: '#/components/schemas/Representative'
         metadata:
           type: object
           description: Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
@@ -2467,7 +2467,7 @@ components:
       enum:
         - primary
         - secondary
-    CreateCustomerRepresentative:
+    CreateRepresentative:
       properties:
         firstName:
           type: string
@@ -2500,7 +2500,7 @@ components:
       required:
         - firstName
         - lastName
-    CustomerRepresentative:
+    Representative:
       properties:
         representativeID:
           type: string

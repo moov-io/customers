@@ -25,7 +25,7 @@ Name | Type | Description | Notes
 **DateBusinessEstablished** | **string** | Date business was established for business type customers | [optional] 
 **Phones** | [**[]Phone**](Phone.md) |  | [optional] 
 **Addresses** | [**[]Address**](Address.md) |  | [optional] 
-**Representatives** | [**[]CustomerRepresentative**](CustomerRepresentative.md) |  | [optional] 
+**Representatives** | [**[]Representative**](Representative.md) |  | [optional] 
 **Metadata** | **map[string]string** | Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer. | [optional] 
 **CreatedAt** | [**time.Time**](time.Time.md) |  | 
 **LastModified** | [**time.Time**](time.Time.md) | Last time the object was modified | 

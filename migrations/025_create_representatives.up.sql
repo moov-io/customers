@@ -1,4 +1,4 @@
-CREATE TABLE if not exists customer_representatives (
+CREATE TABLE if not exists representatives (
     representative_id varchar(40) primary key,
     customer_id varchar(40),
     first_name varchar(40),

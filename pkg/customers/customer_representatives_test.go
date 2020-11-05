@@ -26,7 +26,7 @@ import (
 	"github.com/moov-io/base/log"
 )
 
-func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCustomerRepository) (string, *client.Customer, *client.CustomerRepresentative) {
+func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCustomerRepository) (string, *client.Customer, *client.Representative) {
 	organization := "best-business"
 	cust, _, _ := (customerRequest{
 		FirstName:    "Jane",
@@ -45,8 +45,8 @@ func setupMockOrganizationCustomerAndRepresentative(t *testing.T, repo *sqlCusto
 		FirstName:  "Jane",
 		LastName:   "Doe",
 		JobTitle:   "CEO",
-	}).asCustomerRepresentative(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomerRepresentative(rep, cust.CustomerID); err != nil {
+	}).asRepresentative(testCustomerSSNStorage(t))
+	if err := repo.CreateRepresentative(rep, cust.CustomerID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -70,13 +70,13 @@ func setupMockCustomer(t *testing.T, repo *sqlCustomerRepository) (*client.Custo
 	return cust, organization
 }
 
-func TestCustomers__DeleteCustomerRepresentative(t *testing.T) {
+func TestCustomers__DeleteRepresentative(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
 	_, cust, rep := setupMockOrganizationCustomerAndRepresentative(t, repo)
 
-	got, err := repo.GetCustomerRepresentative(rep.RepresentativeID)
+	got, err := repo.GetRepresentative(rep.RepresentativeID)
 	require.NoError(t, err)
 	require.NotNil(t, got)
 
@@ -84,18 +84,18 @@ func TestCustomers__DeleteCustomerRepresentative(t *testing.T) {
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("DELETE", fmt.Sprintf("/customers/%s/representatives/%s", cust.CustomerID, rep.RepresentativeID), nil)
 
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
+	AddRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
 	require.Equal(t, http.StatusNoContent, w.Code)
 	require.Empty(t, w.Body)
-	got, err = repo.GetCustomerRepresentative(rep.RepresentativeID)
+	got, err = repo.GetRepresentative(rep.RepresentativeID)
 	require.Error(t, err)
 	require.Nil(t, got)
 }
 
-func TestCustomerRepository__CreateCustomerRepresentative(t *testing.T) {
+func TestCustomerRepository__CreateRepresentative(t *testing.T) {
 	check := func(t *testing.T, repo *sqlCustomerRepository) {
 		organization, cust, rep := setupMockOrganizationCustomerAndRepresentative(t, repo)
 
@@ -107,12 +107,12 @@ func TestCustomerRepository__CreateCustomerRepresentative(t *testing.T) {
 			t.Error("got nil Customer")
 		}
 
-		rep, err = repo.GetCustomerRepresentative(rep.RepresentativeID)
+		rep, err = repo.GetRepresentative(rep.RepresentativeID)
 		if err != nil {
 			t.Fatal(err)
 		}
 		if rep == nil {
-			t.Error("got nil CustomerRepresentative")
+			t.Error("got nil Representative")
 		}
 	}
 
@@ -165,7 +165,7 @@ func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 	}
 
 	// asCustomer
-	representative, _, _ := req.asCustomerRepresentative(testCustomerSSNStorage(t))
+	representative, _, _ := req.asRepresentative(testCustomerSSNStorage(t))
 	if representative.RepresentativeID == "" {
 		t.Errorf("empty Customer Representative: %#v", representative)
 	}
@@ -177,7 +177,7 @@ func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 	}
 }
 
-func TestCustomers__CreateCustomerRepresentative(t *testing.T) {
+func TestCustomers__CreateRepresentative(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
@@ -197,7 +197,7 @@ func TestCustomers__CreateCustomerRepresentative(t *testing.T) {
 	customerSSNStorage := testCustomerSSNStorage(t)
 
 	router := mux.NewRouter()
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, customerSSNStorage)
+	AddRepresentativeRoutes(log.NewNopLogger(), router, repo, customerSSNStorage)
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -246,7 +246,7 @@ func TestCustomers__CreateCustomerRepresentative(t *testing.T) {
 	}
 }
 
-func TestCustomers__updateCustomerRepresentative(t *testing.T) {
+func TestCustomers__updateRepresentative(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
@@ -288,12 +288,12 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 			},
 		},
 	}
-	rep, _, _ := createRepresentativeReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomerRepresentative(rep, cust.CustomerID); err != nil {
+	rep, _, _ := createRepresentativeReq.asRepresentative(testCustomerSSNStorage(t))
+	if err := repo.CreateRepresentative(rep, cust.CustomerID); err != nil {
 		t.Fatal(err)
 	}
 
-	_, err := repo.GetCustomerRepresentative(rep.RepresentativeID)
+	_, err := repo.GetRepresentative(rep.RepresentativeID)
 	require.NoError(t, err)
 
 	router := mux.NewRouter()
@@ -329,14 +329,14 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s/representatives/%s", cust.CustomerID, rep.RepresentativeID), bytes.NewReader(payload))
 	req.Header.Set("x-organization", organization)
 	req.Header.Set("x-request-id", "test")
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
+	AddRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
 	router.ServeHTTP(w, req)
 	w.Flush()
 	require.Equal(t, http.StatusOK, w.Code)
 
-	var got *client.CustomerRepresentative
+	var got *client.Representative
 	require.NoError(t, json.NewDecoder(w.Body).Decode(&got))
-	want, _, _ := updateReq.asCustomerRepresentative(testCustomerSSNStorage(t))
+	want, _, _ := updateReq.asRepresentative(testCustomerSSNStorage(t))
 	require.NoError(t, err)
 	require.Equal(t, want, got)
 
@@ -375,7 +375,7 @@ func TestCustomers__updateCustomerRepresentative(t *testing.T) {
 	require.Contains(t, errResp.ErrorMsg, ErrAddressTypeDuplicate.Error())
 }
 
-func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
+func TestCustomerRepository__updateRepresentative(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
@@ -416,8 +416,8 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 			},
 		},
 	}
-	rep, _, _ := createRepresentativeReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	err := repo.CreateCustomerRepresentative(rep, cust.CustomerID)
+	rep, _, _ := createRepresentativeReq.asRepresentative(testCustomerSSNStorage(t))
+	err := repo.CreateRepresentative(rep, cust.CustomerID)
 	require.NoError(t, err)
 
 	updateReq := customerRepresentativeRequest{
@@ -442,8 +442,8 @@ func TestCustomerRepository__updateCustomerRepresentative(t *testing.T) {
 		},
 	}
 
-	updatedRep, _, _ := updateReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	err = repo.updateCustomerRepresentative(updatedRep, cust.CustomerID)
+	updatedRep, _, _ := updateReq.asRepresentative(testCustomerSSNStorage(t))
+	err = repo.updateRepresentative(updatedRep, cust.CustomerID)
 	require.NoError(t, err)
 
 	require.Equal(t, updateReq.FirstName, updatedRep.FirstName)
@@ -483,8 +483,8 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 			},
 		},
 	}
-	rep, _, _ := createRepresentativeReq.asCustomerRepresentative(testCustomerSSNStorage(t))
-	if err := repo.CreateCustomerRepresentative(rep, cust.CustomerID); err != nil {
+	rep, _, _ := createRepresentativeReq.asRepresentative(testCustomerSSNStorage(t))
+	if err := repo.CreateRepresentative(rep, cust.CustomerID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -503,7 +503,7 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 	}
 
 	// re-read
-	rep, err := repo.GetCustomerRepresentative(rep.RepresentativeID)
+	rep, err := repo.GetRepresentative(rep.RepresentativeID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -515,7 +515,7 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 	}
 }
 
-func TestCustomerRepresentatives__minimumFields(t *testing.T) {
+func TestRepresentatives__minimumFields(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
@@ -528,7 +528,7 @@ func TestCustomerRepresentatives__minimumFields(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
+	AddRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
 	router.ServeHTTP(w, req)
 	w.Flush()
 
@@ -537,7 +537,7 @@ func TestCustomerRepresentatives__minimumFields(t *testing.T) {
 	}
 }
 
-func TestCustomerRepresentatives__BadReq(t *testing.T) {
+func TestRepresentatives__BadReq(t *testing.T) {
 	repo := createTestCustomerRepository(t)
 	defer repo.close()
 
@@ -549,7 +549,7 @@ func TestCustomerRepresentatives__BadReq(t *testing.T) {
 	req.Header.Set("x-request-id", "test")
 
 	router := mux.NewRouter()
-	AddCustomerRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
+	AddRepresentativeRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t))
 	router.ServeHTTP(w, req)
 	w.Flush()
 

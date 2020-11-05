@@ -40,7 +40,7 @@ type testCustomerRepository struct {
 	updatedStatus     client.CustomerStatus
 	savedSearchResult *client.OfacSearch
 
-	customerRepresentative *client.CustomerRepresentative
+	customerRepresentative *client.Representative
 }
 
 func (r *testCustomerRepository) GetCustomer(customerID, organization string) (*client.Customer, error) {
@@ -111,22 +111,22 @@ func (r *testCustomerRepository) saveCustomerOFACSearch(customerID string, resul
 	return r.err
 }
 
-func (r *testCustomerRepository) GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error) {
+func (r *testCustomerRepository) GetRepresentative(representativeID string) (*client.Representative, error) {
 	if r.err != nil {
 		return nil, r.err
 	}
 	return r.customerRepresentative, nil
 }
 
-func (r *testCustomerRepository) CreateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
+func (r *testCustomerRepository) CreateRepresentative(c *client.Representative, customerID string) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) updateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
+func (r *testCustomerRepository) updateRepresentative(c *client.Representative, customerID string) error {
 	return r.err
 }
 
-func (r *testCustomerRepository) deleteCustomerRepresentative(representativeID string) error {
+func (r *testCustomerRepository) deleteRepresentative(representativeID string) error {
 	return r.err
 }
 

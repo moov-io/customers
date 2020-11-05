@@ -61,7 +61,7 @@ func createAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 			if representativeID == "" {
 				return
 			}
-			rep, err := repo.GetCustomerRepresentative(representativeID)
+			rep, err := repo.GetRepresentative(representativeID)
 			if err != nil {
 				moovhttp.Problem(w, err)
 				return
@@ -160,7 +160,7 @@ func updateAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 				}
 				addresses = cust.Addresses
 			} else {
-				rep, err := repo.GetCustomerRepresentative(representativeID)
+				rep, err := repo.GetRepresentative(representativeID)
 				if err != nil {
 					moovhttp.Problem(w, err)
 					return

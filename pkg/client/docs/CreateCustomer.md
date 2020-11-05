@@ -24,7 +24,7 @@ Name | Type | Description | Notes
 **DateBusinessEstablished** | **string** | Date business was established for business type customers | [optional] 
 **Phones** | [**[]CreatePhone**](CreatePhone.md) |  | [optional] 
 **Addresses** | [**[]CreateAddress**](CreateAddress.md) |  | [optional] 
-**Representatives** | [**[]CreateCustomerRepresentative**](CreateCustomerRepresentative.md) |  | [optional] 
+**Representatives** | [**[]CreateRepresentative**](CreateRepresentative.md) |  | [optional] 
 **Metadata** | **map[string]string** | Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

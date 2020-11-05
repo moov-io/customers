@@ -9,16 +9,8 @@
 
 package client
 
-import (
-	"time"
-)
-
-// CustomerRepresentative struct for CustomerRepresentative
-type CustomerRepresentative struct {
-	// Unique identifier for this Representative
-	RepresentativeID string `json:"representativeID"`
-	// The unique identifier for the customer the representative belongs to
-	CustomerID string `json:"customerID"`
+// CreateRepresentative struct for CreateRepresentative
+type CreateRepresentative struct {
 	// Given Name or First Name
 	FirstName string `json:"firstName"`
 	// Surname or Last Name
@@ -26,12 +18,9 @@ type CustomerRepresentative struct {
 	// Job title of this representative
 	JobTitle string `json:"jobTitle,omitempty"`
 	// Legal date of birth
-	BirthDate string    `json:"birthDate,omitempty"`
-	CreatedAt time.Time `json:"createdAt"`
-	// Last time the object was modified
-	LastModified time.Time `json:"lastModified"`
+	BirthDate string `json:"birthDate,omitempty"`
 	// Customer Representative's Social Security Number (SSN)
-	SSN       string    `json:"SSN,omitempty"`
-	Phones    []Phone   `json:"phones,omitempty"`
-	Addresses []Address `json:"addresses,omitempty"`
+	SSN       string          `json:"SSN,omitempty"`
+	Phones    []CreatePhone   `json:"phones,omitempty"`
+	Addresses []CreateAddress `json:"addresses,omitempty"`
 }

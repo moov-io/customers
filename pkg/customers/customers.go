@@ -229,7 +229,7 @@ func (req customerRequest) validate() error {
 	if err := validatePhones(req.Phones); err != nil {
 		return fmt.Errorf("invalid customer phone: %v", err)
 	}
-	if err := validateCustomerRepresentatives(req.Representatives); err != nil {
+	if err := validateRepresentatives(req.Representatives); err != nil {
 		return fmt.Errorf("invalid customer representative: %v", err)
 	}
 
@@ -289,7 +289,7 @@ func validatePhones(phones []phone) error {
 	return nil
 }
 
-func validateCustomerRepresentatives(representatives []customerRepresentative) error {
+func validateRepresentatives(representatives []customerRepresentative) error {
 	for _, r := range representatives {
 		if err := r.validate(); err != nil {
 			return err
@@ -352,7 +352,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		})
 	}
 	for i := range req.Representatives {
-		custRep := client.CustomerRepresentative{
+		custRep := client.Representative{
 			RepresentativeID: base.ID(),
 			FirstName:        req.Representatives[i].FirstName,
 			LastName:         req.Representatives[i].LastName,
@@ -561,10 +561,10 @@ type CustomerRepository interface {
 
 	replaceCustomerMetadata(customerID string, metadata map[string]string) error
 
-	GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error)
-	CreateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error
-	updateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error
-	deleteCustomerRepresentative(representativeID string) error
+	GetRepresentative(representativeID string) (*client.Representative, error)
+	CreateRepresentative(c *client.Representative, customerID string) error
+	updateRepresentative(c *client.Representative, customerID string) error
+	deleteRepresentative(representativeID string) error
 
 	addAddress(ownerID string, ownerType client.OwnerType, address address) error
 	updateAddress(ownerID, addressID string, ownerType client.OwnerType, req updateAddressRequest) error
@@ -781,8 +781,8 @@ func (r *sqlCustomerRepository) updateAddressesByOwnerID(tx *sql.Tx, ownerID str
 	return nil
 }
 
-func (r *sqlCustomerRepository) updateRepresentativesByCustomerID(tx *sql.Tx, customerID string, representatives []client.CustomerRepresentative) error {
-	deleteQuery := `delete from customer_representatives where customer_id = ?;`
+func (r *sqlCustomerRepository) updateRepresentativesByCustomerID(tx *sql.Tx, customerID string, representatives []client.Representative) error {
+	deleteQuery := `delete from representatives where customer_id = ?;`
 
 	stmt, err := tx.Prepare(deleteQuery)
 	if err != nil {
@@ -795,7 +795,7 @@ func (r *sqlCustomerRepository) updateRepresentativesByCustomerID(tx *sql.Tx, cu
 		panic(err)
 	}
 
-	replaceQuery := `replace into customer_representatives(representative_id, customer_id, first_name, last_name, job_title, birth_date) values (?, ?, ?, ?, ?, ?);`
+	replaceQuery := `replace into representatives(representative_id, customer_id, first_name, last_name, job_title, birth_date) values (?, ?, ?, ?, ?, ?);`
 	stmt, err = tx.Prepare(replaceQuery)
 	if err != nil {
 		return fmt.Errorf("preparing query: %v", err)

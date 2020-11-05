@@ -6,8 +6,8 @@ Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**AcceptDisclaimer**](CustomersApi.md#AcceptDisclaimer) | **Post** /customers/{customerID}/disclaimers/{disclaimerID} | Accept Customer Disclaimer
 [**AddAddress**](CustomersApi.md#AddAddress) | **Post** /customers/{customerID}/address | Add Customer Address
-[**AddCustomerRepresentative**](CustomersApi.md#AddCustomerRepresentative) | **Post** /customers/{customerID}/representatives | Add customer representative
-[**AddCustomerRepresentativeAddress**](CustomersApi.md#AddCustomerRepresentativeAddress) | **Post** /customers/{customerID}/representatives/{representativeID}/address | Add customer representative address
+[**AddRepresentative**](CustomersApi.md#AddRepresentative) | **Post** /customers/{customerID}/representatives | Add Customer Representative
+[**AddRepresentativeAddress**](CustomersApi.md#AddRepresentativeAddress) | **Post** /customers/{customerID}/representatives/{representativeID}/address | Add Customer Representative Address
 [**CompleteAccountValidation**](CustomersApi.md#CompleteAccountValidation) | **Put** /customers/{customerID}/accounts/{accountID}/validations | Complete Account Validation
 [**CreateCustomer**](CustomersApi.md#CreateCustomer) | **Post** /customers | Create Customer
 [**CreateCustomerAccount**](CustomersApi.md#CreateCustomerAccount) | **Post** /customers/{customerID}/accounts | Create Customer Account
@@ -16,8 +16,8 @@ Method | HTTP request | Description
 [**DeleteCustomer**](CustomersApi.md#DeleteCustomer) | **Delete** /customers/{customerID} | Delete Customer
 [**DeleteCustomerAccount**](CustomersApi.md#DeleteCustomerAccount) | **Delete** /customers/{customerID}/accounts/{accountID} | Delete Customer Account
 [**DeleteCustomerDocument**](CustomersApi.md#DeleteCustomerDocument) | **Delete** /customers/{customerID}/documents/{documentID} | Delete Customer Document
-[**DeleteCustomerRepresentative**](CustomersApi.md#DeleteCustomerRepresentative) | **Delete** /customers/{customerID}/representatives/{representativeID} | Delete a customer&#39;s representative
-[**DeleteCustomerRepresentativeAddress**](CustomersApi.md#DeleteCustomerRepresentativeAddress) | **Delete** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Delete a customer representative&#39;s address
+[**DeleteRepresentative**](CustomersApi.md#DeleteRepresentative) | **Delete** /customers/{customerID}/representatives/{representativeID} | Delete Customer Representative
+[**DeleteRepresentativeAddress**](CustomersApi.md#DeleteRepresentativeAddress) | **Delete** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Delete a Customer Representative Address
 [**GetAccountValidation**](CustomersApi.md#GetAccountValidation) | **Get** /customers/{customerID}/accounts/{accountID}/validations/{validationID} | Get Account Validation
 [**GetCustomer**](CustomersApi.md#GetCustomer) | **Get** /customers/{customerID} | Get Customer
 [**GetLatestOFACSearch**](CustomersApi.md#GetLatestOFACSearch) | **Get** /customers/{customerID}/ofac | Latest Customer OFAC search
@@ -28,9 +28,9 @@ Method | HTTP request | Description
 [**UpdateAccountStatus**](CustomersApi.md#UpdateAccountStatus) | **Put** /customers/{customerID}/accounts/{accountID}/status | Update Account Status
 [**UpdateAddress**](CustomersApi.md#UpdateAddress) | **Put** /customers/{customerID}/addresses/{addressID} | Update Customer Address
 [**UpdateCustomer**](CustomersApi.md#UpdateCustomer) | **Put** /customers/{customerID} | Update Customer
-[**UpdateCustomerRepresentative**](CustomersApi.md#UpdateCustomerRepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update customer representative
-[**UpdateCustomerRepresentativeAddress**](CustomersApi.md#UpdateCustomerRepresentativeAddress) | **Put** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Update customer representative&#39;s address
 [**UpdateCustomerStatus**](CustomersApi.md#UpdateCustomerStatus) | **Put** /customers/{customerID}/status | Update Customer Status
+[**UpdateRepresentative**](CustomersApi.md#UpdateRepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update Customer Representative
+[**UpdateRepresentativeAddress**](CustomersApi.md#UpdateRepresentativeAddress) | **Put** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Update Customer Representative Address
 [**UploadCustomerDocument**](CustomersApi.md#UploadCustomerDocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
 
 
@@ -131,11 +131,11 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## AddCustomerRepresentative
+## AddRepresentative
 
-> Customer AddCustomerRepresentative(ctx, xRequestID, customerID, createCustomerRepresentative, optional)
+> Customer AddRepresentative(ctx, xRequestID, customerID, createRepresentative, optional)
 
-Add customer representative
+Add Customer Representative
 
 Add a Customer Representative
 
@@ -147,12 +147,12 @@ Name | Type | Description  | Notes
 **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
 **xRequestID** | **string**| Optional requestID allows application developer to trace requests through the systems logs | 
 **customerID** | **string**| customerID of the Customer for whom to add the representative | 
-**createCustomerRepresentative** | [**CreateCustomerRepresentative**](CreateCustomerRepresentative.md)|  | 
- **optional** | ***AddCustomerRepresentativeOpts** | optional parameters | nil if no parameters
+**createRepresentative** | [**CreateRepresentative**](CreateRepresentative.md)|  | 
+ **optional** | ***AddRepresentativeOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
 
-Optional parameters are passed through a pointer to a AddCustomerRepresentativeOpts struct
+Optional parameters are passed through a pointer to a AddRepresentativeOpts struct
 
 
 Name | Type | Description  | Notes
@@ -180,13 +180,13 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## AddCustomerRepresentativeAddress
+## AddRepresentativeAddress
 
-> CustomerRepresentative AddCustomerRepresentativeAddress(ctx, customerID, representativeID, createAddress, optional)
+> Representative AddRepresentativeAddress(ctx, customerID, representativeID, createAddress, optional)
 
-Add customer representative address
+Add Customer Representative Address
 
-Add an Address onto an existing Customer representative record
+Add an address to an existing customer representative record
 
 ### Required Parameters
 
@@ -197,11 +197,11 @@ Name | Type | Description  | Notes
 **customerID** | **string**| customerID of the Customer to add the address onto | 
 **representativeID** | **string**| representativeID of the Customer representative for whom to add the address | 
 **createAddress** | [**CreateAddress**](CreateAddress.md)|  | 
- **optional** | ***AddCustomerRepresentativeAddressOpts** | optional parameters | nil if no parameters
+ **optional** | ***AddRepresentativeAddressOpts** | optional parameters | nil if no parameters
 
 ### Optional Parameters
 
-Optional parameters are passed through a pointer to a AddCustomerRepresentativeAddressOpts struct
+Optional parameters are passed through a pointer to a AddRepresentativeAddressOpts struct
 
 
 Name | Type | Description  | Notes
@@ -214,7 +214,7 @@ Name | Type | Description  | Notes
 
 ### Return type
 
-[**CustomerRepresentative**](CustomerRepresentative.md)
+[**Representative**](Representative.md)
 
 ### Authorization
 
@@ -598,13 +598,13 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## DeleteCustomerRepresentative
+## DeleteRepresentative
 
-> DeleteCustomerRepresentative(ctx, customerID, representativeID)
+> DeleteRepresentative(ctx, customerID, representativeID)
 
-Delete a customer's representative
+Delete Customer Representative
 
-Deletes a customer's representative
+Deletes a Customer Representative
 
 ### Required Parameters
 
@@ -633,11 +633,11 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## DeleteCustomerRepresentativeAddress
+## DeleteRepresentativeAddress
 
-> DeleteCustomerRepresentativeAddress(ctx, customerID, representativeID, addressID)
+> DeleteRepresentativeAddress(ctx, customerID, representativeID, addressID)
 
-Delete a customer representative's address
+Delete a Customer Representative Address
 
 Deletes a customer representative's address
 
@@ -1373,79 +1373,6 @@ No authorization required
 [[Back to README]](../README.md)
 
 
-## UpdateCustomerRepresentative
-
-> UpdateCustomerRepresentative(ctx, customerID, representativeID, createCustomerRepresentative)
-
-Update customer representative
-
-Updates the specified customer representative
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
-**representativeID** | **string**| Representative ID | 
-**createCustomerRepresentative** | [**CreateCustomerRepresentative**](CreateCustomerRepresentative.md)|  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
-## UpdateCustomerRepresentativeAddress
-
-> UpdateCustomerRepresentativeAddress(ctx, customerID, representativeID, addressID, updateAddress)
-
-Update customer representative's address
-
-Updates the specified customer representative address
-
-### Required Parameters
-
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
-**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
-**customerID** | **string**| Customer ID | 
-**representativeID** | **string**| Customer Representative ID | 
-**addressID** | **string**| Address ID | 
-**updateAddress** | [**UpdateAddress**](UpdateAddress.md)|  | 
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: application/json
-- **Accept**: application/json
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
-[[Back to Model list]](../README.md#documentation-for-models)
-[[Back to README]](../README.md)
-
-
 ## UpdateCustomerStatus
 
 > Customer UpdateCustomerStatus(ctx, customerID, updateCustomerStatus, optional)
@@ -1479,6 +1406,79 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Customer**](Customer.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateRepresentative
+
+> UpdateRepresentative(ctx, customerID, representativeID, createRepresentative)
+
+Update Customer Representative
+
+Updates the specified Customer Representative
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+**representativeID** | **string**| Representative ID | 
+**createRepresentative** | [**CreateRepresentative**](CreateRepresentative.md)|  | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints)
+[[Back to Model list]](../README.md#documentation-for-models)
+[[Back to README]](../README.md)
+
+
+## UpdateRepresentativeAddress
+
+> UpdateRepresentativeAddress(ctx, customerID, representativeID, addressID, updateAddress)
+
+Update Customer Representative Address
+
+Updates the specified customer representative address
+
+### Required Parameters
+
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+**ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+**customerID** | **string**| Customer ID | 
+**representativeID** | **string**| Customer Representative ID | 
+**addressID** | **string**| Address ID | 
+**updateAddress** | [**UpdateAddress**](UpdateAddress.md)|  | 
+
+### Return type
+
+ (empty response body)
 
 ### Authorization
 

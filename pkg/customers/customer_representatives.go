@@ -23,15 +23,15 @@ import (
 	"github.com/moov-io/base/log"
 )
 
-func AddCustomerRepresentativeRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage) {
+func AddRepresentativeRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage) {
 	logger = logger.Set("package", "customers")
 
-	r.Methods("PUT").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(updateCustomerRepresentative(logger, repo, customerSSNStorage))
-	r.Methods("DELETE").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(deleteCustomerRepresentative(logger, repo))
-	r.Methods("POST").Path("/customers/{customerID}/representatives").HandlerFunc(createCustomerRepresentative(logger, repo, customerSSNStorage))
+	r.Methods("PUT").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(updateRepresentative(logger, repo, customerSSNStorage))
+	r.Methods("DELETE").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(deleteRepresentative(logger, repo))
+	r.Methods("POST").Path("/customers/{customerID}/representatives").HandlerFunc(createRepresentative(logger, repo, customerSSNStorage))
 }
 
-func deleteCustomerRepresentative(logger log.Logger, repo CustomerRepository) func(http.ResponseWriter, *http.Request) {
+func deleteRepresentative(logger log.Logger, repo CustomerRepository) func(http.ResponseWriter, *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 
@@ -40,7 +40,7 @@ func deleteCustomerRepresentative(logger log.Logger, repo CustomerRepository) fu
 			return
 		}
 
-		err := repo.deleteCustomerRepresentative(representativeID)
+		err := repo.deleteRepresentative(representativeID)
 		if err != nil {
 			moovhttp.Problem(w, fmt.Errorf("deleting customer representative: %v", err))
 			return
@@ -63,7 +63,7 @@ type customerRepresentativeRequest struct {
 	Addresses        []address      `json:"addresses,omitempty"`
 }
 
-func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
+func createRepresentative(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -81,7 +81,7 @@ func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 
 		req.CustomerID = route.GetCustomerID(w, r)
 
-		representative, ssn, err := req.asCustomerRepresentative(customerSSNStorage)
+		representative, ssn, err := req.asRepresentative(customerSSNStorage)
 		if err != nil {
 			logger.LogErrorf("problem transforming request into Customer Representative=%s: %v", representative.RepresentativeID, err)
 			moovhttp.Problem(w, err)
@@ -95,7 +95,7 @@ func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 				return
 			}
 		}
-		if err := repo.CreateCustomerRepresentative(representative, req.CustomerID); err != nil {
+		if err := repo.CreateRepresentative(representative, req.CustomerID); err != nil {
 			logger.LogErrorf("createCustomer: %v", err)
 			moovhttp.Problem(w, err)
 			return
@@ -103,7 +103,7 @@ func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 
 		logger.Logf("created customer representative=%s", representative.RepresentativeID)
 
-		representative, err = repo.GetCustomerRepresentative(representative.RepresentativeID)
+		representative, err = repo.GetRepresentative(representative.RepresentativeID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -114,7 +114,7 @@ func createCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 	}
 }
 
-func updateCustomerRepresentative(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
+func updateRepresentative(logger log.Logger, repo CustomerRepository, customerSSNStorage *ssnStorage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w = route.Responder(logger, w, r)
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -140,7 +140,7 @@ func updateCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 			return
 		}
 
-		representative, ssn, err := req.asCustomerRepresentative(customerSSNStorage)
+		representative, ssn, err := req.asRepresentative(customerSSNStorage)
 		if err != nil {
 			logger.LogErrorf("transforming request into Customer Representative=%s: %v", representative.RepresentativeID, err)
 			moovhttp.Problem(w, err)
@@ -154,14 +154,14 @@ func updateCustomerRepresentative(logger log.Logger, repo CustomerRepository, cu
 				return
 			}
 		}
-		if err := repo.updateCustomerRepresentative(representative, req.CustomerID); err != nil {
+		if err := repo.updateRepresentative(representative, req.CustomerID); err != nil {
 			logger.LogErrorf("error updating customer representative: %v", err)
 			moovhttp.Problem(w, fmt.Errorf("updating customer representative: %v", err))
 			return
 		}
 
 		logger.Logf("updated customer representative=%s", representative.RepresentativeID)
-		representative, err = repo.GetCustomerRepresentative(representative.RepresentativeID)
+		representative, err = repo.GetRepresentative(representative.RepresentativeID)
 		if err != nil {
 			moovhttp.Problem(w, err)
 			return
@@ -186,8 +186,8 @@ func (req customerRepresentativeRequest) validate() error {
 	return nil
 }
 
-func (r *sqlCustomerRepository) GetCustomerRepresentative(representativeID string) (*client.CustomerRepresentative, error) {
-	reps, err := r.getCustomerRepresentativesByIds([]string{representativeID})
+func (r *sqlCustomerRepository) GetRepresentative(representativeID string) (*client.Representative, error) {
+	reps, err := r.getRepresentativesByIds([]string{representativeID})
 	if err != nil {
 		return nil, fmt.Errorf("getting customer representative: %v", err)
 	}
@@ -199,9 +199,9 @@ func (r *sqlCustomerRepository) GetCustomerRepresentative(representativeID strin
 	return reps[representativeID], nil
 }
 
-func (r *sqlCustomerRepository) getCustomerRepresentatives(customerIDs []string) (map[string][]client.CustomerRepresentative, error) {
+func (r *sqlCustomerRepository) getRepresentatives(customerIDs []string) (map[string][]client.Representative, error) {
 	query := fmt.Sprintf(
-		"select representative_id, customer_id, first_name, last_name, job_title, birth_date from customer_representatives where customer_id in (?%s) and deleted_at is null;",
+		"select representative_id, customer_id, first_name, last_name, job_title, birth_date from representatives where customer_id in (?%s) and deleted_at is null;",
 		strings.Repeat(",?", len(customerIDs)-1),
 	)
 	rows, err := r.queryRowsByCustomerIDs(query, customerIDs)
@@ -210,9 +210,9 @@ func (r *sqlCustomerRepository) getCustomerRepresentatives(customerIDs []string)
 	}
 	defer rows.Close()
 
-	ret := make(map[string][]client.CustomerRepresentative)
+	ret := make(map[string][]client.Representative)
 	for rows.Next() {
-		var c client.CustomerRepresentative
+		var c client.Representative
 		var jobTitle *string
 		var birthDate *time.Time
 		if err := rows.Scan(
@@ -247,9 +247,9 @@ func (r *sqlCustomerRepository) getCustomerRepresentatives(customerIDs []string)
 	return ret, nil
 }
 
-func (r *sqlCustomerRepository) getCustomerRepresentativesByIds(representativeIDs []string) (map[string]*client.CustomerRepresentative, error) {
+func (r *sqlCustomerRepository) getRepresentativesByIds(representativeIDs []string) (map[string]*client.Representative, error) {
 	query := fmt.Sprintf(
-		"select representative_id, customer_id, first_name, last_name, job_title, birth_date from customer_representatives where representative_id in (?%s) and deleted_at is null;",
+		"select representative_id, customer_id, first_name, last_name, job_title, birth_date from representatives where representative_id in (?%s) and deleted_at is null;",
 		strings.Repeat(",?", len(representativeIDs)-1),
 	)
 	rows, err := r.queryRowsByCustomerIDs(query, representativeIDs)
@@ -258,9 +258,9 @@ func (r *sqlCustomerRepository) getCustomerRepresentativesByIds(representativeID
 	}
 	defer rows.Close()
 
-	ret := make(map[string]*client.CustomerRepresentative)
+	ret := make(map[string]*client.Representative)
 	for rows.Next() {
-		var c client.CustomerRepresentative
+		var c client.Representative
 		var jobTitle *string
 		var birthDate *time.Time
 		if err := rows.Scan(
@@ -295,14 +295,14 @@ func (r *sqlCustomerRepository) getCustomerRepresentativesByIds(representativeID
 	return ret, nil
 }
 
-func (r *sqlCustomerRepository) CreateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
+func (r *sqlCustomerRepository) CreateRepresentative(c *client.Representative, customerID string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
 	}
 
 	// Insert customer record
-	query := `insert into customer_representatives (representative_id, customer_id, first_name, last_name, job_title, birth_date, created_at, last_modified)
+	query := `insert into representatives (representative_id, customer_id, first_name, last_name, job_title, birth_date, created_at, last_modified)
 values (?, ?, ?, ?, ?, ?, ?, ?);`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
@@ -318,7 +318,7 @@ values (?, ?, ?, ?, ?, ?, ?, ?);`
 	now := time.Now()
 	_, err = stmt.Exec(c.RepresentativeID, customerID, c.FirstName, c.LastName, c.JobTitle, birthDate, now, now)
 	if err != nil {
-		return fmt.Errorf("CreateCustomerRepresentative: insert into customer_representatives err=%v | rollback=%v", err, tx.Rollback())
+		return fmt.Errorf("CreateRepresentative: insert into representatives err=%v | rollback=%v", err, tx.Rollback())
 	}
 
 	err = r.updatePhonesByOwnerID(tx, c.RepresentativeID, client.OWNERTYPE_REPRESENTATIVE, c.Phones)
@@ -332,19 +332,19 @@ values (?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("CreateCustomerRepresentative: tx.Commit: %v", err)
+		return fmt.Errorf("CreateRepresentative: tx.Commit: %v", err)
 	}
 	return nil
 }
 
-func (r *sqlCustomerRepository) updateCustomerRepresentative(c *client.CustomerRepresentative, customerID string) error {
+func (r *sqlCustomerRepository) updateRepresentative(c *client.Representative, customerID string) error {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 
-	query := `update customer_representatives set first_name = ?, last_name = ?, job_title = ?, birth_date = ?, last_modified = ? where representative_id = ? and customer_id = ? and deleted_at is null;`
+	query := `update representatives set first_name = ?, last_name = ?, job_title = ?, birth_date = ?, last_modified = ? where representative_id = ? and customer_id = ? and deleted_at is null;`
 	stmt, err := tx.Prepare(query)
 	if err != nil {
 		return err
@@ -377,13 +377,13 @@ func (r *sqlCustomerRepository) updateCustomerRepresentative(c *client.CustomerR
 	}
 
 	if err := tx.Commit(); err != nil {
-		return fmt.Errorf("updateCustomerRepresentative: tx.Commit: %v", err)
+		return fmt.Errorf("updateRepresentative: tx.Commit: %v", err)
 	}
 	return nil
 }
 
-func (r *sqlCustomerRepository) deleteCustomerRepresentative(representativeID string) error {
-	query := `update customer_representatives set deleted_at = ? where representative_id = ? and deleted_at is null;`
+func (r *sqlCustomerRepository) deleteRepresentative(representativeID string) error {
+	query := `update representatives set deleted_at = ? where representative_id = ? and deleted_at is null;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {
 		return err
@@ -394,12 +394,12 @@ func (r *sqlCustomerRepository) deleteCustomerRepresentative(representativeID st
 	return err
 }
 
-func (req customerRepresentativeRequest) asCustomerRepresentative(storage *ssnStorage) (*client.CustomerRepresentative, *SSN, error) {
+func (req customerRepresentativeRequest) asRepresentative(storage *ssnStorage) (*client.Representative, *SSN, error) {
 	if req.RepresentativeID == "" {
 		req.RepresentativeID = base.ID()
 	}
 
-	representative := &client.CustomerRepresentative{
+	representative := &client.Representative{
 		RepresentativeID: req.RepresentativeID,
 		CustomerID:       req.CustomerID,
 		FirstName:        req.FirstName,

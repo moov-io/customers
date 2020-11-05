@@ -1851,7 +1851,7 @@ paths:
   /customers/{customerID}/representatives:
     post:
       description: Add a Customer Representative
-      operationId: addCustomerRepresentative
+      operationId: addRepresentative
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -1885,7 +1885,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCustomerRepresentative'
+              $ref: '#/components/schemas/CreateRepresentative'
         required: true
       responses:
         "200":
@@ -1900,13 +1900,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer representative was not added, see error(s)
-      summary: Add customer representative
+      summary: Add Customer Representative
       tags:
       - Customers
   /customers/{customerID}/representatives/{representativeID}:
     delete:
-      description: Deletes a customer's representative
-      operationId: deleteCustomerRepresentative
+      description: Deletes a Customer Representative
+      operationId: deleteRepresentative
       parameters:
       - description: Customer ID
         explode: false
@@ -1935,12 +1935,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Delete a customer's representative
+      summary: Delete Customer Representative
       tags:
       - Customers
     put:
-      description: Updates the specified customer representative
-      operationId: updateCustomerRepresentative
+      description: Updates the specified Customer Representative
+      operationId: updateRepresentative
       parameters:
       - description: Customer ID
         explode: false
@@ -1964,24 +1964,24 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateCustomerRepresentative'
+              $ref: '#/components/schemas/CreateRepresentative'
         required: true
       responses:
         "200":
-          description: Updated Customer representative
+          description: Updated Customer Representative
         "400":
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Update customer representative
+      summary: Update Customer Representative
       tags:
       - Customers
   /customers/{customerID}/representatives/{representativeID}/address:
     post:
-      description: Add an Address onto an existing Customer representative record
-      operationId: addCustomerRepresentativeAddress
+      description: Add an address to an existing customer representative record
+      operationId: addRepresentativeAddress
       parameters:
       - description: Optional requestID allows application developer to trace requests
           through the systems logs
@@ -2032,7 +2032,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CustomerRepresentative'
+                $ref: '#/components/schemas/Representative'
           description: A customer representative object
         "400":
           content:
@@ -2040,13 +2040,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: Customer representative address was not added, see error(s)
-      summary: Add customer representative address
+      summary: Add Customer Representative Address
       tags:
       - Customers
   /customers/{customerID}/representatives/{representativeID}/addresses/{addressID}:
     delete:
       description: Deletes a customer representative's address
-      operationId: deleteCustomerRepresentativeAddress
+      operationId: deleteRepresentativeAddress
       parameters:
       - description: Customer ID
         explode: false
@@ -2084,12 +2084,12 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Delete a customer representative's address
+      summary: Delete a Customer Representative Address
       tags:
       - Customers
     put:
       description: Updates the specified customer representative address
-      operationId: updateCustomerRepresentativeAddress
+      operationId: updateRepresentativeAddress
       parameters:
       - description: Customer ID
         explode: false
@@ -2133,7 +2133,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
           description: See error message
-      summary: Update customer representative's address
+      summary: Update Customer Representative Address
       tags:
       - Customers
   /reports/accounts:
@@ -2364,7 +2364,7 @@ components:
           type: array
         representatives:
           items:
-            $ref: '#/components/schemas/CreateCustomerRepresentative'
+            $ref: '#/components/schemas/CreateRepresentative'
           type: array
         metadata:
           additionalProperties:
@@ -2564,7 +2564,7 @@ components:
           type: array
         representatives:
           items:
-            $ref: '#/components/schemas/CustomerRepresentative'
+            $ref: '#/components/schemas/Representative'
           type: array
         metadata:
           additionalProperties:
@@ -3071,7 +3071,7 @@ components:
       - primary
       - secondary
       type: string
-    CreateCustomerRepresentative:
+    CreateRepresentative:
       example:
         firstName: Mary
         lastName: Smith
@@ -3128,7 +3128,7 @@ components:
       required:
       - firstName
       - lastName
-    CustomerRepresentative:
+    Representative:
       example:
         firstName: Mary
         lastName: Smith

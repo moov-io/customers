@@ -15,7 +15,7 @@ import (
 	"github.com/moov-io/base/log"
 )
 
-func TestCustomerRepresentativeSSNStorage(t *testing.T) {
+func TestRepresentativeSSNStorage(t *testing.T) {
 	storage := testCustomerSSNStorage(t)
 
 	if _, err := storage.encryptRaw("", client.OWNERTYPE_REPRESENTATIVE, ""); err == nil {
@@ -47,7 +47,7 @@ func TestCustomerRepresentativeSSNStorage(t *testing.T) {
 	}
 }
 
-func TestCustomerRepresentativeSSNRepository(t *testing.T) {
+func TestRepresentativeSSNRepository(t *testing.T) {
 	representativeID := base.ID()
 	ownerType := client.OWNERTYPE_REPRESENTATIVE
 	check := func(t *testing.T, customerSSNRepo *sqlSSNRepository) {

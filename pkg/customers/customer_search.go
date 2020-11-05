@@ -155,7 +155,7 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 	if err != nil {
 		return nil, fmt.Errorf("fetching customer addresses: %v", err)
 	}
-	representativesByCustomerID, err := r.getCustomerRepresentatives(customerIDs)
+	representativesByCustomerID, err := r.getRepresentatives(customerIDs)
 	if err != nil {
 		return nil, fmt.Errorf("fetching customer representatives: %v", err)
 	}
