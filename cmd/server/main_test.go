@@ -14,21 +14,21 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMain__setupSigner(t *testing.T) {
+func TestMain_setupSigner(t *testing.T) {
 	logger := log.NewNopLogger()
 
-	signer := setupSigner(logger, "", "file")
+	signer := setupSigner(logger, "file", "")
 	if signer == nil {
 		t.Fatal("expected non-nil Signer")
 	}
 
-	signer = setupSigner(logger, "", "other")
+	signer = setupSigner(logger, "other", "")
 	if signer != nil {
 		t.Fatal("expected nil Signer")
 	}
 }
 
-func TestMain__setupValidationStrategies(t *testing.T) {
+func TestMain_setupValidationStrategies(t *testing.T) {
 	logger := log.NewNopLogger()
 	adminServer := admin.NewServer(*adminAddr)
 
@@ -48,5 +48,31 @@ func TestMain__setupValidationStrategies(t *testing.T) {
 	// microdeposits / moov for now should always be there
 	_, found := strategies[validator.StrategyKey{Strategy: "micro-deposits", Vendor: "moov"}]
 	require.True(t, found)
+}
 
+func TestSecurityConfiguration_emptyConfig(t *testing.T) {
+	missing := checkMissingSecurityOptions(&securityConfiguration{})
+
+	require.Equal(t, []string{"APP_SALT", "TRANSIT_LOCAL_BASE64_KEY"}, missing)
+}
+
+func TestSecurityConfiguration_defaultConfig(t *testing.T) {
+	cfg := loadSecurityConfig()
+
+	missing := checkMissingSecurityOptions(cfg)
+
+	require.Equal(t, []string{"APP_SALT", "SSN_SECRET_KEY", "DOCUMENTS_SECRET_KEY", "FILEBLOB_HMAC_SECRET", "TRANSIT_LOCAL_BASE64_KEY"}, missing)
+}
+
+func TestSecurityConfiguration_completeConfig(t *testing.T) {
+	cfg := loadSecurityConfig()
+	cfg.appSalt = "appSalt"
+	cfg.docLocalKey = "docKey"
+	cfg.ssnLocalKey = "ssnKey"
+	cfg.fileblobURLSecret = "fileblobSecret"
+	cfg.transitLocalKey = "transitKey"
+
+	missing := checkMissingSecurityOptions(cfg)
+
+	require.Empty(t, missing)
 }
