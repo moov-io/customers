@@ -10,7 +10,8 @@ The following environment variables can be set to configure behavior in Customer
 |-----|-----|-----|
 | `HTTPS_CERT_FILE` | Filepath containing a certificate (or intermediate chain) to be served by the HTTP server. Requires all traffic to be served over a secure HTTP connection. | Empty |
 | `HTTPS_KEY_FILE`  | Filepath of a private key matching the leaf certificate from `HTTPS_CERT_FILE`. | Empty |
-| `DATABASE_TYPE` | Which database to use (Options: `sqlite`, `mysql`) | Default: `sqlite` |
+| `DATABASE_TYPE` | Which database to use (Options: `sqlite`, `mysql`) | `sqlite` |
+| `PREVENT_INSECURE_STARTUP` | Configures application to fail to start if security-specific configuration variables are missing. | `false` |
 
 #### Fed
 

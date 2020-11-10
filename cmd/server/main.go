@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -53,7 +54,27 @@ var (
 	adminAddr = flag.String("admin.addr", bind.Admin("customers"), "Admin HTTP listen address")
 
 	flagLogFormat = flag.String("log.format", "", "Format for log lines (Options: json, plain")
+
+	preventInsecureStartup = func() bool {
+		prevent, err := strconv.ParseBool(os.Getenv("PREVENT_INSECURE_STARTUP"))
+		if err != nil {
+			return false
+		}
+		return prevent
+	}()
 )
+
+type securityConfiguration struct {
+	appSalt            string
+	ssnSecretsProvider string
+	ssnLocalKey        string
+	docSecretsProvider string
+	docLocalKey        string
+	docStorageProvider string
+	docBucketName      string
+	fileblobURLSecret  string
+	transitLocalKey    string
+}
 
 func main() {
 	flag.Parse()
@@ -82,14 +103,14 @@ func main() {
 		logger.Logf("sqlite version %s", sqliteVersion)
 	}
 
-	conf := config.New()
-	if err := conf.Load(); err != nil {
+	dbConf := config.New()
+	if err := dbConf.Load(); err != nil {
 		logger.LogErrorf("failed to load application config: %v", err)
 		os.Exit(1)
 	}
 
 	ctx := context.TODO()
-	db, err := database.NewAndMigrate(ctx, logger, *conf.Database)
+	db, err := database.NewAndMigrate(ctx, logger, *dbConf.Database)
 	if err != nil {
 		logger.LogErrorf("failed to connect to database: %v", err)
 		os.Exit(1)
@@ -115,17 +136,6 @@ func main() {
 	}()
 	defer adminServer.Shutdown()
 
-	// Setup our cloud Storage object
-	bucketName := os.Getenv("BUCKET_NAME")
-	if bucketName == "" {
-		bucketName = "./storage"
-	}
-	cloudProvider := strings.ToLower(os.Getenv("SSN_SECRET_PROVIDER"))
-	if cloudProvider == "" {
-		cloudProvider = "file"
-	}
-	signer := setupSigner(logger, bucketName, cloudProvider)
-
 	// Create our Watchman client
 	debugWatchmanCalls := util.Or(os.Getenv("WATCHMAN_DEBUG_CALLS"), "false")
 	watchmanEndpoint := util.Or(os.Getenv("WATCHMAN_ENDPOINT"), os.Getenv("OFAC_ENDPOINT"))
@@ -139,8 +149,18 @@ func main() {
 	// Register our admin routes
 	documents.AddDisclaimerAdminRoutes(logger, adminServer, disclaimerRepo, documentRepo)
 
+	securityCfg := loadSecurityConfig()
+	missingOpts := checkMissingSecurityOptions(securityCfg)
+	if len(missingOpts) > 0 {
+		if preventInsecureStartup {
+			logger.Fatal().Log(fmt.Sprintf("prevented insecure startup - missing: %s", strings.Join(missingOpts, ", ")))
+			os.Exit(0)
+		}
+		logger.Warn().Log(fmt.Sprintf("running with insecure configuration - missing: %s", strings.Join(missingOpts, ", ")))
+	}
+
 	// Setup Customer SSN storage wrapper
-	keeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-ssn", os.Getenv("SSN_SECRET_PROVIDER"), os.Getenv("SSN_SECRET_KEY"))
+	keeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-ssn", securityCfg.ssnSecretsProvider, securityCfg.ssnLocalKey)
 	if err != nil {
 		panic(err)
 	}
@@ -149,7 +169,7 @@ func main() {
 	customerSSNStorage := customers.NewSSNStorage(stringKeeper, customerSSNRepo)
 
 	// read transit keeper
-	transitKeeper, err := secrets.OpenLocal(os.Getenv("TRANSIT_LOCAL_BASE64_KEY"))
+	transitKeeper, err := secrets.OpenLocal(securityCfg.transitLocalKey)
 	if err != nil {
 		panic(err)
 	}
@@ -168,9 +188,8 @@ func main() {
 		Repo: accountsRepo, WatchmanClient: watchmanClient,
 	}
 
-	appSalt := os.Getenv("APP_SALT")
 	if util.Yes(os.Getenv("REHASH_ACCOUNTS")) {
-		if count, err := internal.RehashStoredAccountNumber(logger, db, appSalt, stringKeeper); err != nil {
+		if count, err := internal.RehashStoredAccountNumber(logger, db, securityCfg.appSalt, stringKeeper); err != nil {
 			panic(logger.LogErrorf("Failed to re-hash account numbers: %v", err))
 		} else {
 			logger.Logf("Re-hashed %d account numbers", count)
@@ -181,36 +200,34 @@ func main() {
 	router := mux.NewRouter()
 	moovhttp.AddCORSHandler(router)
 	addPingRoute(router)
-	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher, appSalt)
+	accounts.RegisterRoutes(logger, router, accountsRepo, validationsRepo, fedClient, stringKeeper, transitStringKeeper, validationStrategies, &accountOfacSeacher, securityCfg.appSalt)
 	customers.AddCustomerRoutes(logger, router, customerRepo, customerSSNStorage, ofac)
 	customers.AddCustomerAddressRoutes(logger, router, customerRepo)
 	customers.AddRepresentativeRoutes(logger, router, customerRepo, customerSSNStorage)
 	documents.AddDisclaimerRoutes(logger, router, disclaimerRepo)
 
-	docsStorageProvider := util.Or(os.Getenv("DOCUMENTS_STORAGE_PROVIDER"), "file")
-	docsBucketName := util.Or(os.Getenv("DOCUMENTS_BUCKET_NAME"), "./storage")
-	bucket := storage.GetBucket(logger, docsBucketName, docsStorageProvider, signer)
-
-	docsSecretProvider := util.Or(os.Getenv("DOCUMENTS_SECRET_PROVIDER"), "local")
-	docsKeeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-documents", docsSecretProvider, os.Getenv("DOCUMENTS_SECRET_KEY"))
+	signer := setupSigner(logger, securityCfg.docStorageProvider, securityCfg.fileblobURLSecret)
+	bucket := storage.GetBucket(logger, securityCfg.docBucketName, securityCfg.docStorageProvider, signer)
+	docsKeeper, err := secrets.OpenSecretKeeper(context.Background(), "customer-documents", securityCfg.docSecretsProvider, securityCfg.docLocalKey)
 	if err != nil {
 		panic(err)
 	}
 	defer docsKeeper.Close()
 
 	documents.AddDocumentRoutes(logger, router, documentRepo, docsKeeper, bucket)
+
+	// Optionally serve /files/ as our fileblob routes
+	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
+	if securityCfg.docStorageProvider == "file" {
+		storage.AddFileblobRoutes(logger, router, signer, bucket)
+	}
+
 	customers.AddOFACRoutes(logger, router, customerRepo, ofac)
 	reports.AddRoutes(logger, router, customerRepo, accountsRepo)
 
 	// Add Configuration routes
 	configRepo := configuration.NewRepository(db)
 	configuration.RegisterRoutes(logger, router, configRepo, bucket)
-
-	// Optionally serve /files/ as our fileblob routes
-	// Note: FILEBLOB_BASE_URL needs to match something that's routed to /files/...
-	if cloudProvider == "file" {
-		storage.AddFileblobRoutes(logger, router, signer, bucket)
-	}
 
 	// Start business HTTP server
 	readTimeout, _ := time.ParseDuration("30s")
@@ -266,9 +283,45 @@ func addPingRoute(r *mux.Router) {
 	})
 }
 
-func setupSigner(logger log.Logger, bucketName, cloudProvider string) *fileblob.URLSignerHMAC {
+func loadSecurityConfig() *securityConfiguration {
+	cfg := &securityConfiguration{
+		appSalt:            os.Getenv("APP_SALT"),
+		ssnSecretsProvider: util.Or(os.Getenv("SSN_SECRET_PROVIDER"), "local"),
+		ssnLocalKey:        os.Getenv("SSN_SECRET_KEY"),
+		docSecretsProvider: util.Or(os.Getenv("DOCUMENTS_SECRET_PROVIDER"), "local"),
+		docLocalKey:        os.Getenv("DOCUMENTS_SECRET_KEY"),
+		docStorageProvider: util.Or(os.Getenv("DOCUMENTS_STORAGE_PROVIDER"), "file"),
+		docBucketName:      util.Or(os.Getenv("DOCUMENTS_BUCKET_NAME"), "./storage"),
+		fileblobURLSecret:  os.Getenv("FILEBLOB_HMAC_SECRET"),
+		transitLocalKey:    os.Getenv("TRANSIT_LOCAL_BASE64_KEY"),
+	}
+
+	return cfg
+}
+
+func checkMissingSecurityOptions(cfg *securityConfiguration) []string {
+	var missingOpts []string
+	if cfg.appSalt == "" {
+		missingOpts = append(missingOpts, "APP_SALT")
+	}
+	if cfg.ssnSecretsProvider == "local" && cfg.ssnLocalKey == "" {
+		missingOpts = append(missingOpts, "SSN_SECRET_KEY")
+	}
+	if cfg.docSecretsProvider == "local" && cfg.docLocalKey == "" {
+		missingOpts = append(missingOpts, "DOCUMENTS_SECRET_KEY")
+	}
+	if cfg.docStorageProvider == "file" && cfg.fileblobURLSecret == "" {
+		missingOpts = append(missingOpts, "FILEBLOB_HMAC_SECRET")
+	}
+	if cfg.transitLocalKey == "" {
+		missingOpts = append(missingOpts, "TRANSIT_LOCAL_BASE64_KEY")
+	}
+
+	return missingOpts
+}
+func setupSigner(logger log.Logger, cloudProvider, secret string) *fileblob.URLSignerHMAC {
 	if cloudProvider == "file" || cloudProvider == "" {
-		baseURL, secret := os.Getenv("FILEBLOB_BASE_URL"), os.Getenv("FILEBLOB_HMAC_SECRET")
+		baseURL := os.Getenv("FILEBLOB_BASE_URL")
 		if baseURL == "" {
 			baseURL = fmt.Sprintf("http://localhost%s/files", bind.HTTP("customers"))
 		}
