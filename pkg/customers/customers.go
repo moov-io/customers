@@ -155,12 +155,6 @@ func (p *phone) validate() error {
 		return fmt.Errorf("unknown type: %s", p.Type)
 	}
 
-	switch p.OwnerType {
-	case client.OWNERTYPE_CUSTOMER, client.OWNERTYPE_REPRESENTATIVE:
-	default:
-		return fmt.Errorf("unknown owner type: %s", p.OwnerType)
-	}
-
 	return nil
 }
 
@@ -183,12 +177,6 @@ func (add *address) validate() error {
 	case client.ADDRESSTYPE_PRIMARY, client.ADDRESSTYPE_SECONDARY:
 	default:
 		return fmt.Errorf("unknown type: %s", add.Type)
-	}
-
-	switch add.OwnerType {
-	case client.OWNERTYPE_CUSTOMER, client.OWNERTYPE_REPRESENTATIVE:
-	default:
-		return fmt.Errorf("unknown owner type: %s", add.OwnerType)
 	}
 
 	if !usstates.Valid(add.State) {

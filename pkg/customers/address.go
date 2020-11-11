@@ -86,7 +86,7 @@ func createAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 		for _, addr := range addresses {
 			addrs = append(addrs, address{
 				Type:       addr.Type,
-				OwnerType:  addr.OwnerType,
+				OwnerType:  ownerType,
 				Address1:   addr.Address1,
 				Address2:   addr.Address2,
 				City:       addr.City,
