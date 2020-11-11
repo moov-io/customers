@@ -9,8 +9,8 @@
 
 package client
 
-// CreateCustomer struct for CreateCustomer
-type CreateCustomer struct {
+// CreateCustomerBusiness struct for CreateCustomerBusiness
+type CreateCustomerBusiness struct {
 	// Given Name or First Name
 	FirstName string `json:"firstName,omitempty"`
 	// Middle Name
@@ -26,7 +26,7 @@ type CreateCustomer struct {
 	BusinessName string `json:"businessName,omitempty"`
 	// Doing Business As (DBA) name for business type customers
 	DoingBusinessAs string       `json:"doingBusinessAs,omitempty"`
-	BusinessType    BusinessType `json:"businessType,omitempty"`
+	BusinessType    BusinessType `json:"businessType"`
 	// Employer Identification Number (EIN) for business type customers
 	EIN string `json:"EIN,omitempty"`
 	// Dun & Bradstreet D-U-N-S Number (D-U-N-S) for business type customers

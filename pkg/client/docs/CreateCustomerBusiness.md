@@ -1,4 +1,4 @@
-# CreateCustomer
+# CreateCustomerBusiness
 
 ## Properties
 
@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **Type** | [**CustomerType**](CustomerType.md) |  | 
 **BusinessName** | **string** | Business Name for business type customers | [optional] 
 **DoingBusinessAs** | **string** | Doing Business As (DBA) name for business type customers | [optional] 
-**BusinessType** | [**BusinessType**](BusinessType.md) |  | [optional] 
+**BusinessType** | [**BusinessType**](BusinessType.md) |  | 
 **EIN** | **string** | Employer Identification Number (EIN) for business type customers | [optional] 
 **DUNS** | **string** | Dun &amp; Bradstreet D-U-N-S Number (D-U-N-S) for business type customers | [optional] 
 **SICCode** | [**SicCode**](SICCode.md) |  | [optional] 

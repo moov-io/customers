@@ -2204,6 +2204,11 @@ components:
       - legalEntity
       - primaryAccount
     CreateCustomer:
+      discriminator:
+        mapping:
+          individual: '#/components/schemas/CreateCustomerIndividual'
+          business: '#/components/schemas/CreateCustomerBusiness'
+        propertyName: type
       example:
         lastName: Smith
         website: http://google.com
@@ -2376,11 +2381,48 @@ components:
           type: object
       required:
       - email
-      - firstName
-      - lastName
       - type
       type: object
+    CreateCustomerIndividual:
+      allOf:
+      - $ref: '#/components/schemas/CreateCustomer'
+      - required:
+        - firstName
+        - lastName
+        type: object
+    CreateCustomerBusinessIndividual:
+      allOf:
+      - $ref: '#/components/schemas/CreateCustomer'
+      - required:
+        - firstName
+        - lastName
+        type: object
+    CreateCustomerBusinessCorp:
+      allOf:
+      - $ref: '#/components/schemas/CreateCustomer'
+      - required:
+        - businessName
+        type: object
+    CreateCustomerBusiness:
+      allOf:
+      - $ref: '#/components/schemas/CreateCustomer'
+      - required:
+        - businessType
+        type: object
+      discriminator:
+        mapping:
+          individual, sole proprietor, or single-member LLC: '#/components/schemas/CreateCustomerBusinessIndividual'
+          corporation: '#/components/schemas/CreateCustomerBusinessCorp'
+          non-profit organization: '#/components/schemas/CreateCustomerBusinessCorp'
+          partnership: '#/components/schemas/CreateCustomerBusinessCorp'
+          limited liability company: '#/components/schemas/CreateCustomerBusinessCorp'
+        propertyName: businessType
     Customer:
+      discriminator:
+        mapping:
+          individual: '#/components/schemas/CustomerIndividual'
+          business: '#/components/schemas/CustomerBusiness'
+        propertyName: type
       example:
         lastName: Smith
         addresses:
@@ -2587,12 +2629,34 @@ components:
       - createdAt
       - customerID
       - email
-      - firstName
       - lastModified
-      - lastName
       - status
       - type
       type: object
+    CustomerIndividual:
+      allOf:
+      - $ref: '#/components/schemas/Customer'
+      - $ref: '#/components/schemas/CustomerIndividual_allOf'
+    CustomerBusinessIndividual:
+      allOf:
+      - $ref: '#/components/schemas/Customer'
+      - $ref: '#/components/schemas/CustomerIndividual_allOf'
+    CustomerBusinessCorp:
+      allOf:
+      - $ref: '#/components/schemas/Customer'
+      - $ref: '#/components/schemas/CustomerBusinessCorp_allOf'
+    CustomerBusiness:
+      allOf:
+      - $ref: '#/components/schemas/Customer'
+      - $ref: '#/components/schemas/CustomerBusiness_allOf'
+      discriminator:
+        mapping:
+          individual, sole proprietor, or single-member LLC: '#/components/schemas/CustomerBusinessIndividual'
+          corporation: '#/components/schemas/CustomerBusinessCorp'
+          non-profit organization: '#/components/schemas/CustomerBusinessCorp'
+          partnership: '#/components/schemas/CustomerBusinessCorp'
+          limited liability company: '#/components/schemas/CustomerBusinessCorp'
+        propertyName: businessType
     Customers:
       items:
         $ref: '#/components/schemas/Customer'
@@ -3830,3 +3894,43 @@ components:
       required:
       - currency
       - value
+    CustomerIndividual_allOf:
+      properties:
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        lastModified:
+          description: Last time the object was modified
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+      required:
+      - firstName
+      - lastName
+    CustomerBusinessCorp_allOf:
+      properties:
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        lastModified:
+          description: Last time the object was modified
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+      required:
+      - businessName
+    CustomerBusiness_allOf:
+      properties:
+        createdAt:
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+        lastModified:
+          description: Last time the object was modified
+          example: 2016-08-29T09:12:33.001Z
+          format: date-time
+          type: string
+      required:
+      - businessType

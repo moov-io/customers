@@ -1,4 +1,4 @@
-# CreateCustomer
+# CreateCustomerBusinessCorp
 
 ## Properties
 
@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **Type** | [**CustomerType**](CustomerType.md) |  | 
-**BusinessName** | **string** | Business Name for business type customers | [optional] 
+**BusinessName** | **string** | Business Name for business type customers | 
 **DoingBusinessAs** | **string** | Doing Business As (DBA) name for business type customers | [optional] 
 **BusinessType** | [**BusinessType**](BusinessType.md) |  | [optional] 
 **EIN** | **string** | Employer Identification Number (EIN) for business type customers | [optional] 
