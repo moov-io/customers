@@ -318,7 +318,6 @@ func TestCustomers__customerRequest(t *testing.T) {
 	req.Phones = append(req.Phones, phone{
 		Number:    "123.456.7890",
 		Type:      "mobile",
-		OwnerType: "customer",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -351,7 +350,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 }
 
 func TestCustomers__addressValidate(t *testing.T) {
-	add := address{Type: "primary", OwnerType: "customer"}
+	add := address{Type: "primary"}
 
 	add.State = "IA"
 	if err := add.validate(); err != nil {
@@ -366,8 +365,8 @@ func TestCustomers__addressValidate(t *testing.T) {
 
 func TestCustomers__CreateCustomer(t *testing.T) {
 	w := httptest.NewRecorder()
-	phone := `{"number": "555.555.5555", "type": "mobile", "ownerType": "customer"}`
-	address := `{"type": "primary", "ownerType": "customer", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
+	phone := `{"number": "555.555.5555", "type": "mobile"}`
+	address := `{"type": "primary", "address1": "123 1st St", "city": "Denver", "state": "CO", "postalCode": "12345", "country": "USA"}`
 	body := fmt.Sprintf(`{"firstName": "jane", "lastName": "doe", "email": "jane@example.com", "birthDate": "1991-04-01", "ssn": "123456789", "type": "individual", "phones": [%s], "addresses": [%s]}`, phone, address)
 	req := httptest.NewRequest("POST", "/customers", strings.NewReader(body))
 	req.Header.Set("x-organization", "test")
@@ -444,7 +443,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			{
 				Number:    "123.456.7890",
 				Type:      "mobile",
-				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -455,7 +453,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 				PostalCode: "90210",
 				Country:    "US",
 				Type:       "primary",
-				OwnerType:  "customer",
 			},
 		},
 	}
@@ -479,7 +476,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 		{
 			Number:    "555.555.5555",
 			Type:      "mobile",
-			OwnerType: "customer",
 		},
 	}
 	updateReq.Addresses = []address{
@@ -490,7 +486,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
-			OwnerType:  "customer",
 		},
 	}
 	payload, err := json.Marshal(&updateReq)
@@ -526,7 +521,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
-			OwnerType:  "customer",
 		},
 		{
 			Address1:   "444 4th st",
@@ -535,7 +529,6 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
-			OwnerType:  "customer",
 		},
 	}
 	payload, err = json.Marshal(&updateReq)
@@ -581,7 +574,6 @@ func TestCustomers__repository(t *testing.T) {
 			{
 				Number:    "123.456.7890",
 				Type:      "mobile",
-				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -686,7 +678,6 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 			{
 				Number:    "123.456.7890",
 				Type:      "mobile",
-				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -712,7 +703,6 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 			{
 				Number:    "555.555.5555",
 				Type:      "mobile",
-				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -720,7 +710,6 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 				Address1:  "555 5th st",
 				City:      "real city",
 				Type:      "primary",
-				OwnerType: "customer",
 			},
 		},
 	}
@@ -789,7 +778,6 @@ func TestCustomersRepository__addAddress(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:  "customer",
 	},
 	); err != nil {
 		t.Fatal(err)
@@ -1056,7 +1044,6 @@ func mockCustomerRequest() customerRequest {
 	p := phone{}
 	p.Number = "123-456-7892"
 	p.Type = "mobile"
-	p.OwnerType = "customer"
 	c.Phones = append(c.Phones, p)
 
 	a := address{}
@@ -1066,7 +1053,6 @@ func mockCustomerRequest() customerRequest {
 	a.Country = "USA"
 	a.PostalCode = "19456"
 	a.State = "MA"
-	a.OwnerType = "customer"
 	c.Addresses = append(c.Addresses, a)
 	return c
 }

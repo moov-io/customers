@@ -412,7 +412,7 @@ func (req customerRepresentativeRequest) asRepresentative(storage *ssnStorage) (
 		representative.Phones = append(representative.Phones, client.Phone{
 			Number:    req.Phones[i].Number,
 			Type:      req.Phones[i].Type,
-			OwnerType: req.Phones[i].OwnerType,
+			OwnerType: client.OWNERTYPE_REPRESENTATIVE,
 		})
 	}
 	for i := range req.Addresses {

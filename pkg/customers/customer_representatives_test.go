@@ -145,7 +145,6 @@ func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 	req.Phones = append(req.Phones, phone{
 		Number:    "123.456.7890",
 		Type:      "mobile",
-		OwnerType: "customer",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -158,7 +157,6 @@ func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:  client.OWNERTYPE_REPRESENTATIVE,
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -273,7 +271,6 @@ func TestCustomers__updateRepresentative(t *testing.T) {
 			{
 				Number:    "123.456.7890",
 				Type:      "mobile",
-				OwnerType: "representative",
 			},
 		},
 		Addresses: []address{
@@ -284,7 +281,6 @@ func TestCustomers__updateRepresentative(t *testing.T) {
 				PostalCode: "90210",
 				Country:    "US",
 				Type:       "primary",
-				OwnerType:  "representative",
 			},
 		},
 	}
@@ -349,7 +345,6 @@ func TestCustomers__updateRepresentative(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
-			OwnerType:  "representative",
 		},
 		{
 			Address1:   "444 4th st",
@@ -358,7 +353,6 @@ func TestCustomers__updateRepresentative(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
-			OwnerType:  "representative",
 		},
 	}
 	payload, err = json.Marshal(&updateReq)
@@ -412,7 +406,6 @@ func TestCustomerRepository__updateRepresentative(t *testing.T) {
 				PostalCode: "90210",
 				Country:    "US",
 				Type:       "primary",
-				OwnerType:  "customer",
 			},
 		},
 	}
@@ -429,7 +422,6 @@ func TestCustomerRepository__updateRepresentative(t *testing.T) {
 			{
 				Number:    "555.555.5555",
 				Type:      "mobile",
-				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -437,7 +429,6 @@ func TestCustomerRepository__updateRepresentative(t *testing.T) {
 				Address1:  "555 5th st",
 				City:      "real city",
 				Type:      "primary",
-				OwnerType: "customer",
 			},
 		},
 	}
@@ -496,7 +487,6 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:  "representative",
 	},
 	); err != nil {
 		t.Fatal(err)
