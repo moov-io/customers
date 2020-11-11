@@ -9,14 +9,20 @@
 
 package client
 
-// CreateCustomer struct for CreateCustomer
-type CreateCustomer struct {
+import (
+	"time"
+)
+
+// CustomerBusinessIndividual struct for CustomerBusinessIndividual
+type CustomerBusinessIndividual struct {
+	// The unique identifier for the customer who owns the account
+	CustomerID string `json:"customerID"`
 	// Given Name or First Name
-	FirstName string `json:"firstName,omitempty"`
+	FirstName string `json:"firstName"`
 	// Middle Name
 	MiddleName string `json:"middleName,omitempty"`
 	// Surname or Last Name
-	LastName string `json:"lastName,omitempty"`
+	LastName string `json:"lastName"`
 	// Name Customer is preferred to be called
 	NickName string `json:"nickName,omitempty"`
 	// Customers name suffix. \"Jr\", \"PH.D.\"
@@ -34,18 +40,20 @@ type CreateCustomer struct {
 	SICCode   SicCode   `json:"SICCode,omitempty"`
 	NAICSCode NaicsCode `json:"NAICSCode,omitempty"`
 	// Legal date of birth
-	BirthDate string `json:"birthDate,omitempty"`
+	BirthDate string         `json:"birthDate,omitempty"`
+	Status    CustomerStatus `json:"status"`
 	// Primary email address of customer name@domain.com
 	Email string `json:"email"`
-	// Customer Social Security Number (SSN)
-	SSN string `json:"SSN,omitempty"`
 	// Company Website for business type customers
 	Website string `json:"website,omitempty"`
 	// Date business was established for business type customers
-	DateBusinessEstablished string                 `json:"dateBusinessEstablished,omitempty"`
-	Phones                  []CreatePhone          `json:"phones,omitempty"`
-	Addresses               []CreateAddress        `json:"addresses,omitempty"`
-	Representatives         []CreateRepresentative `json:"representatives,omitempty"`
+	DateBusinessEstablished string           `json:"dateBusinessEstablished,omitempty"`
+	Phones                  []Phone          `json:"phones,omitempty"`
+	Addresses               []Address        `json:"addresses,omitempty"`
+	Representatives         []Representative `json:"representatives,omitempty"`
 	// Map of unique keys associated to values to act as foreign key relationships or arbitrary data associated to a Customer.
-	Metadata map[string]string `json:"metadata,omitempty"`
+	Metadata  map[string]string `json:"metadata,omitempty"`
+	CreatedAt time.Time         `json:"createdAt"`
+	// Last time the object was modified
+	LastModified time.Time `json:"lastModified"`
 }

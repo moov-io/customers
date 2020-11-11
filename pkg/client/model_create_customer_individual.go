@@ -9,14 +9,14 @@
 
 package client
 
-// CreateCustomer struct for CreateCustomer
-type CreateCustomer struct {
+// CreateCustomerIndividual struct for CreateCustomerIndividual
+type CreateCustomerIndividual struct {
 	// Given Name or First Name
-	FirstName string `json:"firstName,omitempty"`
+	FirstName string `json:"firstName"`
 	// Middle Name
 	MiddleName string `json:"middleName,omitempty"`
 	// Surname or Last Name
-	LastName string `json:"lastName,omitempty"`
+	LastName string `json:"lastName"`
 	// Name Customer is preferred to be called
 	NickName string `json:"nickName,omitempty"`
 	// Customers name suffix. \"Jr\", \"PH.D.\"

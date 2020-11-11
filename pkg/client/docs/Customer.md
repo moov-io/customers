@@ -5,9 +5,9 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **CustomerID** | **string** | The unique identifier for the customer who owns the account | 
-**FirstName** | **string** | Given Name or First Name | 
+**FirstName** | **string** | Given Name or First Name | [optional] 
 **MiddleName** | **string** | Middle Name | [optional] 
-**LastName** | **string** | Surname or Last Name | 
+**LastName** | **string** | Surname or Last Name | [optional] 
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **Type** | [**CustomerType**](CustomerType.md) |  | 

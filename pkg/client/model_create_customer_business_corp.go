@@ -9,8 +9,8 @@
 
 package client
 
-// CreateCustomer struct for CreateCustomer
-type CreateCustomer struct {
+// CreateCustomerBusinessCorp struct for CreateCustomerBusinessCorp
+type CreateCustomerBusinessCorp struct {
 	// Given Name or First Name
 	FirstName string `json:"firstName,omitempty"`
 	// Middle Name
@@ -23,7 +23,7 @@ type CreateCustomer struct {
 	Suffix string       `json:"suffix,omitempty"`
 	Type   CustomerType `json:"type"`
 	// Business Name for business type customers
-	BusinessName string `json:"businessName,omitempty"`
+	BusinessName string `json:"businessName"`
 	// Doing Business As (DBA) name for business type customers
 	DoingBusinessAs string       `json:"doingBusinessAs,omitempty"`
 	BusinessType    BusinessType `json:"businessType,omitempty"`

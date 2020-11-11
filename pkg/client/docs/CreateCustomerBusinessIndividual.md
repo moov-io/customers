@@ -1,12 +1,12 @@
-# CreateCustomer
+# CreateCustomerBusinessIndividual
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**FirstName** | **string** | Given Name or First Name | [optional] 
+**FirstName** | **string** | Given Name or First Name | 
 **MiddleName** | **string** | Middle Name | [optional] 
-**LastName** | **string** | Surname or Last Name | [optional] 
+**LastName** | **string** | Surname or Last Name | 
 **NickName** | **string** | Name Customer is preferred to be called | [optional] 
 **Suffix** | **string** | Customers name suffix. \&quot;Jr\&quot;, \&quot;PH.D.\&quot; | [optional] 
 **Type** | [**CustomerType**](CustomerType.md) |  | 

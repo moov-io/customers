@@ -316,8 +316,8 @@ func TestCustomers__customerRequest(t *testing.T) {
 	}
 
 	req.Phones = append(req.Phones, phone{
-		Number:    "123.456.7890",
-		Type:      "mobile",
+		Number: "123.456.7890",
+		Type:   "mobile",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -330,7 +330,128 @@ func TestCustomers__customerRequest(t *testing.T) {
 		PostalCode: "90210",
 		Country:    "US",
 		Type:       "primary",
-		OwnerType:  "customer",
+	})
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// asCustomer
+	cust, _, _ := req.asCustomer(testCustomerSSNStorage(t))
+	if cust.CustomerID == "" {
+		t.Errorf("empty Customer: %#v", cust)
+	}
+	if len(cust.Phones) != 1 {
+		t.Errorf("cust.Phones: %#v", cust.Phones)
+	}
+	if len(cust.Addresses) != 1 {
+		t.Errorf("cust.Addresses: %#v", cust.Addresses)
+	}
+}
+
+func TestCustomers__soleProprietorCustomerRequest(t *testing.T) {
+	req := &customerRequest{
+		Type:         client.CUSTOMERTYPE_BUSINESS,
+		BusinessType: client.BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC,
+	}
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+	req.FirstName = "jane"
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+
+	req.BusinessName = "janes business"
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+
+	req.LastName = "doe"
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	req.Email = "jane.doe@example.com"
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	req.Phones = append(req.Phones, phone{
+		Number: "123.456.7890",
+		Type:   "mobile",
+	})
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	req.Addresses = append(req.Addresses, address{
+		Address1:   "123 1st st",
+		City:       "fake city",
+		State:      "CA",
+		PostalCode: "90210",
+		Country:    "US",
+		Type:       "primary",
+	})
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// asCustomer
+	cust, _, _ := req.asCustomer(testCustomerSSNStorage(t))
+	if cust.CustomerID == "" {
+		t.Errorf("empty Customer: %#v", cust)
+	}
+	if len(cust.Phones) != 1 {
+		t.Errorf("cust.Phones: %#v", cust.Phones)
+	}
+	if len(cust.Addresses) != 1 {
+		t.Errorf("cust.Addresses: %#v", cust.Addresses)
+	}
+}
+
+func TestCustomers__businessCustomerRequest(t *testing.T) {
+	req := &customerRequest{
+		Type:         client.CUSTOMERTYPE_BUSINESS,
+		BusinessType: client.BUSINESSTYPE_CORPORATION,
+	}
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+	req.FirstName = "jane"
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+
+	req.LastName = "doe"
+	if err := req.validate(); err == nil {
+		t.Error("expected error")
+	}
+
+	req.BusinessName = "janes business"
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	req.Email = "jane.doe@example.com"
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	req.Phones = append(req.Phones, phone{
+		Number: "123.456.7890",
+		Type:   "mobile",
+	})
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	req.Addresses = append(req.Addresses, address{
+		Address1:   "123 1st st",
+		City:       "fake city",
+		State:      "CA",
+		PostalCode: "90210",
+		Country:    "US",
+		Type:       "primary",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -443,6 +564,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			{
 				Number:    "123.456.7890",
 				Type:      "mobile",
+				OwnerType: "customer",
 			},
 		},
 		Addresses: []address{
@@ -453,6 +575,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 				PostalCode: "90210",
 				Country:    "US",
 				Type:       "primary",
+				OwnerType:  "customer",
 			},
 		},
 	}
@@ -476,6 +599,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 		{
 			Number:    "555.555.5555",
 			Type:      "mobile",
+			OwnerType: "customer",
 		},
 	}
 	updateReq.Addresses = []address{
@@ -486,6 +610,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 			PostalCode: "90210",
 			Country:    "US",
 			Type:       "primary",
+			OwnerType:  "customer",
 		},
 	}
 	payload, err := json.Marshal(&updateReq)
@@ -572,8 +697,8 @@ func TestCustomers__repository(t *testing.T) {
 		Email:     "jane@example.com",
 		Phones: []phone{
 			{
-				Number:    "123.456.7890",
-				Type:      "mobile",
+				Number: "123.456.7890",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
@@ -676,8 +801,8 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		Email:     "jane@example.com",
 		Phones: []phone{
 			{
-				Number:    "123.456.7890",
-				Type:      "mobile",
+				Number: "123.456.7890",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
@@ -701,15 +826,15 @@ func TestCustomerRepository__updateCustomer(t *testing.T) {
 		Email:      "jim@google.com",
 		Phones: []phone{
 			{
-				Number:    "555.555.5555",
-				Type:      "mobile",
+				Number: "555.555.5555",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
 			{
-				Address1:  "555 5th st",
-				City:      "real city",
-				Type:      "primary",
+				Address1: "555 5th st",
+				City:     "real city",
+				Type:     "primary",
 			},
 		},
 	}

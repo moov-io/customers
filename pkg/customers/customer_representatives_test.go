@@ -143,8 +143,8 @@ func TestCustomers__customerRepresentativeRequest(t *testing.T) {
 	}
 
 	req.Phones = append(req.Phones, phone{
-		Number:    "123.456.7890",
-		Type:      "mobile",
+		Number: "123.456.7890",
+		Type:   "mobile",
 	})
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
@@ -269,8 +269,8 @@ func TestCustomers__updateRepresentative(t *testing.T) {
 		JobTitle:   "CEO",
 		Phones: []phone{
 			{
-				Number:    "123.456.7890",
-				Type:      "mobile",
+				Number: "123.456.7890",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
@@ -420,15 +420,15 @@ func TestCustomerRepository__updateRepresentative(t *testing.T) {
 		LastName:         "Smith",
 		Phones: []phone{
 			{
-				Number:    "555.555.5555",
-				Type:      "mobile",
+				Number: "555.555.5555",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
 			{
-				Address1:  "555 5th st",
-				City:      "real city",
-				Type:      "primary",
+				Address1: "555 5th st",
+				City:     "real city",
+				Type:     "primary",
 			},
 		},
 	}

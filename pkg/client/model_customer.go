@@ -18,11 +18,11 @@ type Customer struct {
 	// The unique identifier for the customer who owns the account
 	CustomerID string `json:"customerID"`
 	// Given Name or First Name
-	FirstName string `json:"firstName"`
+	FirstName string `json:"firstName,omitempty"`
 	// Middle Name
 	MiddleName string `json:"middleName,omitempty"`
 	// Surname or Last Name
-	LastName string `json:"lastName"`
+	LastName string `json:"lastName,omitempty"`
 	// Name Customer is preferred to be called
 	NickName string `json:"nickName,omitempty"`
 	// Customers name suffix. \"Jr\", \"PH.D.\"
