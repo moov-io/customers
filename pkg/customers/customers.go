@@ -205,7 +205,7 @@ func (req customerRequest) validate() error {
 	isIndividualOrSoleProprietor := req.Type == client.CUSTOMERTYPE_INDIVIDUAL || req.BusinessType == client.BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC
 	if isIndividualOrSoleProprietor && (req.FirstName == "" || req.LastName == ""){
 	         return errors.New("invalid customer fields: empty name field(s)")
-	} else if req.BusinessName == "" {
+	} else if req.Type == client.CUSTOMERTYPE_BUSINESS && req.BusinessName == "" {
 		return errors.New("invalid customer fields: empty business name")
 	}
 	if err := validateCustomerType(req.Type); err != nil {
@@ -254,7 +254,7 @@ func validateMetadata(meta map[string]string) error {
 func validateAddresses(addrs []address) error {
 	hasPrimaryAddr := false
 	for _, addr := range addrs {
-		if hasPrimaryAddr {
+		if hasPrimaryAddr && addr.Type == client.ADDRESSTYPE_PRIMARY {
 			return ErrAddressTypeDuplicate
 		}
 
