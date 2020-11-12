@@ -1642,7 +1642,7 @@ paths:
             application/json:
               schema:
                 $ref: 'https://raw.githubusercontent.com/moov-io/base/master/api/common.yaml#/components/schemas/Error'
-  /customers/{customerID}/representatives/{representativeID}/address:
+  /customers/{customerID}/representatives/{representativeID}/addresses:
     post:
       tags: [Representatives]
       summary: Add Customer Representative Address

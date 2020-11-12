@@ -148,7 +148,7 @@ func (a *RepresentativesApiService) AddRepresentativeAddress(ctx _context.Contex
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/representatives/{representativeID}/address"
+	localVarPath := a.client.cfg.BasePath + "/customers/{customerID}/representatives/{representativeID}/addresses"
 	localVarPath = strings.Replace(localVarPath, "{"+"customerID"+"}", _neturl.QueryEscape(parameterToString(customerID, "")), -1)
 
 	localVarPath = strings.Replace(localVarPath, "{"+"representativeID"+"}", _neturl.QueryEscape(parameterToString(representativeID, "")), -1)
