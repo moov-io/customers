@@ -1978,7 +1978,7 @@ paths:
       summary: Update Customer Representative
       tags:
       - Representatives
-  /customers/{customerID}/representatives/{representativeID}/address:
+  /customers/{customerID}/representatives/{representativeID}/addresses:
     post:
       description: Add an address to an existing customer representative record
       operationId: addRepresentativeAddress

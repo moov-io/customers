@@ -74,7 +74,7 @@ Class | Method | HTTP request | Description
 *DocumentsApi* | [**UploadCustomerDocument**](docs/DocumentsApi.md#uploadcustomerdocument) | **Post** /customers/{customerID}/documents | Upload Customer Document
 *ReportsApi* | [**GetReportOfCustomerAccounts**](docs/ReportsApi.md#getreportofcustomeraccounts) | **Get** /reports/accounts | Create Report of Accounts
 *RepresentativesApi* | [**AddRepresentative**](docs/RepresentativesApi.md#addrepresentative) | **Post** /customers/{customerID}/representatives | Add Customer Representative
-*RepresentativesApi* | [**AddRepresentativeAddress**](docs/RepresentativesApi.md#addrepresentativeaddress) | **Post** /customers/{customerID}/representatives/{representativeID}/address | Add Customer Representative Address
+*RepresentativesApi* | [**AddRepresentativeAddress**](docs/RepresentativesApi.md#addrepresentativeaddress) | **Post** /customers/{customerID}/representatives/{representativeID}/addresses | Add Customer Representative Address
 *RepresentativesApi* | [**DeleteRepresentative**](docs/RepresentativesApi.md#deleterepresentative) | **Delete** /customers/{customerID}/representatives/{representativeID} | Delete Customer Representative
 *RepresentativesApi* | [**DeleteRepresentativeAddress**](docs/RepresentativesApi.md#deleterepresentativeaddress) | **Delete** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Delete a Customer Representative Address
 *RepresentativesApi* | [**UpdateRepresentative**](docs/RepresentativesApi.md#updaterepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update Customer Representative

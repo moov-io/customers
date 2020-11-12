@@ -5,7 +5,7 @@ All URIs are relative to *http://localhost:8087*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**AddRepresentative**](RepresentativesApi.md#AddRepresentative) | **Post** /customers/{customerID}/representatives | Add Customer Representative
-[**AddRepresentativeAddress**](RepresentativesApi.md#AddRepresentativeAddress) | **Post** /customers/{customerID}/representatives/{representativeID}/address | Add Customer Representative Address
+[**AddRepresentativeAddress**](RepresentativesApi.md#AddRepresentativeAddress) | **Post** /customers/{customerID}/representatives/{representativeID}/addresses | Add Customer Representative Address
 [**DeleteRepresentative**](RepresentativesApi.md#DeleteRepresentative) | **Delete** /customers/{customerID}/representatives/{representativeID} | Delete Customer Representative
 [**DeleteRepresentativeAddress**](RepresentativesApi.md#DeleteRepresentativeAddress) | **Delete** /customers/{customerID}/representatives/{representativeID}/addresses/{addressID} | Delete a Customer Representative Address
 [**UpdateRepresentative**](RepresentativesApi.md#UpdateRepresentative) | **Put** /customers/{customerID}/representatives/{representativeID} | Update Customer Representative
