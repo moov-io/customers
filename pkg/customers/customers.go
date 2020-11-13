@@ -113,30 +113,30 @@ func respondWithCustomer(logger log.Logger, w http.ResponseWriter, customerID, o
 // TODO(adam): What GDPR implications does this information have? IIRC if any EU citizen uses
 // this software we have to fully comply.
 type customerRequest struct {
-	CustomerID              string                   `json:"-"`
-	FirstName               string                   `json:"firstName"`
-	MiddleName              string                   `json:"middleName"`
-	LastName                string                   `json:"lastName"`
-	NickName                string                   `json:"nickName"`
-	Suffix                  string                   `json:"suffix"`
-	Type                    client.CustomerType      `json:"type"`
-	BusinessName            string                   `json:"businessName"`
-	DoingBusinessAs         string                   `json:"doingBusinessAs"`
-	BusinessType            client.BusinessType      `json:"businessType"`
-	EIN                     string                   `json:"EIN"`
-	DUNS                    string                   `json:"DUNS"`
-	SICCode                 client.SicCode           `json:"sicCode"`
-	NAICSCode               client.NaicsCode         `json:"naicsCode"`
-	BirthDate               model.YYYYMMDD           `json:"birthDate"`
-	Status                  client.CustomerStatus    `json:"-"`
-	Email                   string                   `json:"email"`
-	Website                 string                   `json:"website"`
-	DateBusinessEstablished string                   `json:"dateBusinessEstablished"`
-	SSN                     string                   `json:"SSN"`
-	Phones                  []phone                  `json:"phones"`
-	Addresses               []address                `json:"addresses"`
-	Representatives         []representative 		 `json:"representatives"`
-	Metadata                map[string]string        `json:"metadata"`
+	CustomerID              string                `json:"-"`
+	FirstName               string                `json:"firstName"`
+	MiddleName              string                `json:"middleName"`
+	LastName                string                `json:"lastName"`
+	NickName                string                `json:"nickName"`
+	Suffix                  string                `json:"suffix"`
+	Type                    client.CustomerType   `json:"type"`
+	BusinessName            string                `json:"businessName"`
+	DoingBusinessAs         string                `json:"doingBusinessAs"`
+	BusinessType            client.BusinessType   `json:"businessType"`
+	EIN                     string                `json:"EIN"`
+	DUNS                    string                `json:"DUNS"`
+	SICCode                 client.SicCode        `json:"sicCode"`
+	NAICSCode               client.NaicsCode      `json:"naicsCode"`
+	BirthDate               model.YYYYMMDD        `json:"birthDate"`
+	Status                  client.CustomerStatus `json:"-"`
+	Email                   string                `json:"email"`
+	Website                 string                `json:"website"`
+	DateBusinessEstablished string                `json:"dateBusinessEstablished"`
+	SSN                     string                `json:"SSN"`
+	Phones                  []phone               `json:"phones"`
+	Addresses               []address             `json:"addresses"`
+	Representatives         []representative      `json:"representatives"`
+	Metadata                map[string]string     `json:"metadata"`
 }
 
 type phone struct {
@@ -203,8 +203,8 @@ func (rep *representative) validate() error {
 
 func (req customerRequest) validate() error {
 	isIndividualOrSoleProprietor := req.Type == client.CUSTOMERTYPE_INDIVIDUAL || req.BusinessType == client.BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC
-	if isIndividualOrSoleProprietor && (req.FirstName == "" || req.LastName == ""){
-	         return errors.New("invalid customer fields: empty name field(s)")
+	if isIndividualOrSoleProprietor && (req.FirstName == "" || req.LastName == "") {
+		return errors.New("invalid customer fields: empty name field(s)")
 	} else if req.Type == client.CUSTOMERTYPE_BUSINESS && req.BusinessName == "" {
 		return errors.New("invalid customer fields: empty business name")
 	}
