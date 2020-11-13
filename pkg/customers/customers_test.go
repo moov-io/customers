@@ -453,21 +453,21 @@ func TestCustomers__businessCustomerRequest(t *testing.T) {
 	}
 	req.Representatives = append(req.Representatives, representative{
 		FirstName: "John",
-		LastName: "Doe",
+		LastName:  "Doe",
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
-				Type: "mobile",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
 			{
-				Address1: "123 Main St",
-				City: "some city",
-				State: "IL",
+				Address1:   "123 Main St",
+				City:       "some city",
+				State:      "IL",
 				PostalCode: "60606",
-				Country: "US",
-				Type: "primary",
+				Country:    "US",
+				Type:       "primary",
 			},
 		},
 	})
