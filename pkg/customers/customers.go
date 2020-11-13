@@ -135,7 +135,7 @@ type customerRequest struct {
 	SSN                     string                   `json:"SSN"`
 	Phones                  []phone                  `json:"phones"`
 	Addresses               []address                `json:"addresses"`
-	Representatives         []customerRepresentative `json:"customerRepresentatives"`
+	Representatives         []representative 		 `json:"representatives"`
 	Metadata                map[string]string        `json:"metadata"`
 }
 
@@ -185,7 +185,7 @@ func (add *address) validate() error {
 	return nil
 }
 
-type customerRepresentative struct {
+type representative struct {
 	FirstName string    `json:"firstName"`
 	LastName  string    `json:"lastName"`
 	JobTitle  string    `json:"jobTitle,omitempty"`
@@ -194,7 +194,7 @@ type customerRepresentative struct {
 	Phones    []phone   `json:"phones,omitempty"`
 }
 
-func (rep *customerRepresentative) validate() error {
+func (rep *representative) validate() error {
 	if rep.FirstName == "" || rep.LastName == "" {
 		return errors.New("invalid customer representative fields: empty name field(s)")
 	}
@@ -280,7 +280,7 @@ func validatePhones(phones []phone) error {
 	return nil
 }
 
-func validateRepresentatives(representatives []customerRepresentative) error {
+func validateRepresentatives(representatives []representative) error {
 	for _, r := range representatives {
 		if err := r.validate(); err != nil {
 			return err

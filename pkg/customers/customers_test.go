@@ -421,22 +421,18 @@ func TestCustomers__businessCustomerRequest(t *testing.T) {
 	if err := req.validate(); err == nil {
 		t.Error("expected error")
 	}
-
 	req.LastName = "doe"
 	if err := req.validate(); err == nil {
 		t.Error("expected error")
 	}
-
 	req.BusinessName = "janes business"
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
-
 	req.Email = "jane.doe@example.com"
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
-
 	req.Phones = append(req.Phones, phone{
 		Number: "123.456.7890",
 		Type:   "mobile",
@@ -444,7 +440,6 @@ func TestCustomers__businessCustomerRequest(t *testing.T) {
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
-
 	req.Addresses = append(req.Addresses, address{
 		Address1:   "123 1st st",
 		City:       "fake city",
@@ -456,9 +451,34 @@ func TestCustomers__businessCustomerRequest(t *testing.T) {
 	if err := req.validate(); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
+	req.Representatives = append(req.Representatives, representative{
+		FirstName: "John",
+		LastName: "Doe",
+		Phones: []phone{
+			{
+				Number: "123.456.7890",
+				Type: "mobile",
+			},
+		},
+		Addresses: []address{
+			{
+				Address1: "123 Main St",
+				City: "some city",
+				State: "IL",
+				PostalCode: "60606",
+				Country: "US",
+				Type: "primary",
+			},
+		},
+	})
+	if err := req.validate(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
 
-	// asCustomer
+	// Execute test by calling asCustomer on the request
 	cust, _, _ := req.asCustomer(testCustomerSSNStorage(t))
+
+	// Asserts
 	if cust.CustomerID == "" {
 		t.Errorf("empty Customer: %#v", cust)
 	}
@@ -467,6 +487,15 @@ func TestCustomers__businessCustomerRequest(t *testing.T) {
 	}
 	if len(cust.Addresses) != 1 {
 		t.Errorf("cust.Addresses: %#v", cust.Addresses)
+	}
+	if len(cust.Representatives) != 1 {
+		t.Errorf("cust.Representatives: %#v", cust.Representatives)
+	}
+	if len(cust.Representatives[0].Addresses) != 1 {
+		t.Errorf("cust.Representatives[0].Addresses: %#v", cust.Representatives[0].Addresses)
+	}
+	if len(cust.Representatives[0].Phones) != 1 {
+		t.Errorf("cust.Representatives[0].Phones: %#v", cust.Representatives[0].Phones)
 	}
 }
 

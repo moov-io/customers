@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **CustomerID** | **string** | The unique identifier for the customer the representative belongs to | 
 **FirstName** | **string** | Given Name or First Name | 
 **LastName** | **string** | Surname or Last Name | 
+**Email** | **string** | Primary email address of representative name@domain.com | [optional] 
 **JobTitle** | **string** | Job title of this representative | [optional] 
 **BirthDate** | **string** | Legal date of birth | [optional] 
 **CreatedAt** | [**time.Time**](time.Time.md) |  | 

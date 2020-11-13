@@ -493,14 +493,14 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 	}
 
 	// re-read
-	rep, err := repo.GetRepresentative(rep.RepresentativeID)
+	cust, err := repo.GetCustomer(cust.CustomerID, organization)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(rep.Addresses) != 1 {
-		t.Errorf("got %d Addresses", len(rep.Addresses))
+	if len(cust.Representatives[0].Addresses) != 1 {
+		t.Errorf("got %d Addresses", len(cust.Representatives[0].Addresses))
 	}
-	if rep.Addresses[0].Address1 != "123 1st st" {
+	if cust.Representatives[0].Addresses[0].Address1 != "123 1st st" {
 		t.Errorf("rep.Addresses[0].Address1=%s", rep.Addresses[0].Address1)
 	}
 }
