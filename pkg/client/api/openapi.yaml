@@ -2266,6 +2266,7 @@ components:
           - number: +1.818.555.1212
           - number: +1.818.555.1212
           birthDate: 2016-08-29
+          email: john@doe.com
           SSN: 111-11-1111
         - firstName: Mary
           lastName: Smith
@@ -2289,6 +2290,7 @@ components:
           - number: +1.818.555.1212
           - number: +1.818.555.1212
           birthDate: 2016-08-29
+          email: john@doe.com
           SSN: 111-11-1111
         email: email
       properties:
@@ -2495,6 +2497,7 @@ components:
             number: +1.818.555.1212
           lastModified: 2016-08-29T09:12:33.001Z
           birthDate: 2016-08-29
+          email: john@doe.com
           SSN: 111-11-1111
         - firstName: Mary
           lastName: Smith
@@ -2526,6 +2529,7 @@ components:
             number: +1.818.555.1212
           lastModified: 2016-08-29T09:12:33.001Z
           birthDate: 2016-08-29
+          email: john@doe.com
           SSN: 111-11-1111
       properties:
         customerID:
@@ -3159,6 +3163,7 @@ components:
         - number: +1.818.555.1212
         - number: +1.818.555.1212
         birthDate: 2016-08-29
+        email: john@doe.com
         SSN: 111-11-1111
       properties:
         firstName:
@@ -3168,6 +3173,11 @@ components:
         lastName:
           description: Surname or Last Name
           example: Smith
+          type: string
+        email:
+          description: Primary email address of representative name@domain.com
+          example: john@doe.com
+          maximum: 500
           type: string
         jobTitle:
           description: Job title of this representative
@@ -3224,6 +3234,7 @@ components:
           number: +1.818.555.1212
         lastModified: 2016-08-29T09:12:33.001Z
         birthDate: 2016-08-29
+        email: john@doe.com
         SSN: 111-11-1111
       properties:
         representativeID:
@@ -3242,6 +3253,11 @@ components:
         lastName:
           description: Surname or Last Name
           example: Smith
+          type: string
+        email:
+          description: Primary email address of representative name@domain.com
+          example: john@doe.com
+          maximum: 500
           type: string
         jobTitle:
           description: Job title of this representative
@@ -3830,6 +3846,7 @@ components:
               number: +1.818.555.1212
             lastModified: 2016-08-29T09:12:33.001Z
             birthDate: 2016-08-29
+            email: john@doe.com
             SSN: 111-11-1111
           - firstName: Mary
             lastName: Smith
@@ -3861,6 +3878,7 @@ components:
               number: +1.818.555.1212
             lastModified: 2016-08-29T09:12:33.001Z
             birthDate: 2016-08-29
+            email: john@doe.com
             SSN: 111-11-1111
       properties:
         Customer:

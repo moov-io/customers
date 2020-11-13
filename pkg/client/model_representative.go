@@ -23,6 +23,8 @@ type Representative struct {
 	FirstName string `json:"firstName"`
 	// Surname or Last Name
 	LastName string `json:"lastName"`
+	// Primary email address of representative name@domain.com
+	Email string `json:"email,omitempty"`
 	// Job title of this representative
 	JobTitle string `json:"jobTitle,omitempty"`
 	// Legal date of birth

@@ -2593,6 +2593,11 @@ components:
           type: string
           description: Surname or Last Name
           example: Smith
+        email:
+          type: string
+          maximum: 500
+          description: Primary email address of representative name@domain.com
+          example: john@doe.com
         jobTitle:
           type: string
           description: Job title of this representative
@@ -2634,6 +2639,11 @@ components:
           type: string
           description: Surname or Last Name
           example: Smith
+        email:
+          type: string
+          maximum: 500
+          description: Primary email address of representative name@domain.com
+          example: john@doe.com
         jobTitle:
           type: string
           description: Job title of this representative

@@ -108,7 +108,7 @@ func TestRepository__searchCustomers(t *testing.T) {
 					Country:    "US",
 				},
 			},
-			Representatives: []customerRepresentative{
+			Representatives: []representative{
 				{
 					FirstName: "Jane",
 					LastName:  "Doe",
