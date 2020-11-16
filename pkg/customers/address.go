@@ -61,6 +61,7 @@ func createAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 			if representativeID == "" {
 				return
 			}
+			ownerID = representativeID
 			rep, err := repo.GetRepresentative(representativeID)
 			if err != nil {
 				moovhttp.Problem(w, err)
@@ -80,6 +81,7 @@ func createAddress(logger log.Logger, ownerType client.OwnerType, repo CustomerR
 			moovhttp.Problem(w, err)
 			return
 		}
+		reqAddr.OwnerType = ownerType
 
 		// todo: vince-10/12/2020: we need to perform this conversion for validation til we develop a clean separation layer between client and model structs
 		var addrs []address
