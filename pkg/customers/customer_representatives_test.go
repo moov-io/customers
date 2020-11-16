@@ -267,20 +267,12 @@ func TestCustomers__updateRepresentative(t *testing.T) {
 		FirstName:  "Jane",
 		LastName:   "Doe",
 		JobTitle:   "CEO",
+		BirthDate:  "1980-09-12",
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
 				Type:   "mobile",
-			},
-		},
-		Addresses: []address{
-			{
-				Address1:   "123 1st st",
-				City:       "fake city",
-				State:      "CA",
-				PostalCode: "90210",
-				Country:    "US",
-				Type:       "primary",
+				OwnerType: "representative",
 			},
 		},
 	}
@@ -392,10 +384,12 @@ func TestCustomerRepository__updateRepresentative(t *testing.T) {
 		FirstName:  "Jane",
 		LastName:   "Doe",
 		JobTitle:   "CEO",
+		BirthDate:  "1980-09-12",
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
 				Type:   "mobile",
+				OwnerType: "representative",
 			},
 		},
 		Addresses: []address{
@@ -415,7 +409,6 @@ func TestCustomerRepository__updateRepresentative(t *testing.T) {
 
 	updateReq := customerRepresentativeRequest{
 		RepresentativeID: rep.RepresentativeID,
-		CustomerID:       cust.CustomerID,
 		FirstName:        "Jim",
 		LastName:         "Smith",
 		Phones: []phone{
@@ -463,7 +456,6 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 	}
 
 	createRepresentativeReq := &customerRepresentativeRequest{
-		CustomerID: cust.CustomerID,
 		FirstName:  "Jane",
 		LastName:   "Doe",
 		JobTitle:   "CEO",
@@ -503,6 +495,120 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 	if cust.Representatives[0].Addresses[0].Address1 != "123 1st st" {
 		t.Errorf("rep.Addresses[0].Address1=%s", rep.Addresses[0].Address1)
 	}
+}
+
+func TestCustomers__updateCustomerWithRepresentatives(t *testing.T) {
+	repo := createTestCustomerRepository(t)
+	defer repo.close()
+
+	organization := "organization"
+	createReq := &customerRequest{
+		BusinessName: "Jane's Business",
+		Type:      client.CUSTOMERTYPE_BUSINESS,
+		BusinessType: client.BUSINESSTYPE_CORPORATION,
+		BirthDate: "1999-01-01",
+		Email:     "jane@example.com",
+		Phones: []phone{
+			{
+				Number:    "123.456.7890",
+				Type:      "mobile",
+			},
+		},
+		Addresses: []address{
+			{
+				Address1:   "123 1st st",
+				City:       "fake city",
+				State:      "CA",
+				PostalCode: "90210",
+				Country:    "US",
+				Type:       "primary",
+			},
+		},
+		Representatives: []representative{
+			{
+				FirstName: "Jane",
+				LastName: "Doe",
+				JobTitle: "CEO",
+				BirthDate: "1980-09-24",
+				Phones: []phone{
+					{
+						Number:    "123.456.7890",
+						Type:      "mobile",
+					},
+				},
+			},
+		},
+	}
+	customer, _, _ := createReq.asCustomer(testCustomerSSNStorage(t))
+	require.NoError(t,
+		repo.CreateCustomer(customer, organization),
+	)
+
+	_, err := repo.GetCustomer(customer.CustomerID, organization)
+	require.NoError(t, err)
+
+	router := mux.NewRouter()
+	w := httptest.NewRecorder()
+
+	updateReq := *createReq
+	updateReq.BusinessType = client.BUSINESSTYPE_LIMITED_LIABILITY_COMPANY
+	updateReq.Email = "jim@google.com"
+	updateReq.Phones = []phone{
+		{
+			Number:    "555.555.5555",
+			Type:      "mobile",
+			OwnerType: "customer",
+		},
+	}
+	updateReq.Addresses = []address{
+		{
+			Address1:   "555 5th st",
+			City:       "real city",
+			State:      "CA",
+			PostalCode: "90210",
+			Country:    "US",
+			Type:       "primary",
+			OwnerType:  "customer",
+		},
+	}
+	updateReq.Representatives = []representative{
+		{
+			FirstName: "Jane",
+			LastName: "Doe",
+			JobTitle: "CEO",
+			BirthDate: "1980-09-24",
+			Phones: []phone{
+				{
+					Number:    "123.456.7890",
+					Type:      "mobile",
+				},
+			},
+		},
+	}
+	payload, err := json.Marshal(&updateReq)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest("PUT", fmt.Sprintf("/customers/%s", customer.CustomerID), bytes.NewReader(payload))
+	req.Header.Set("x-organization", organization)
+	req.Header.Set("x-request-id", "test")
+	AddCustomerRoutes(log.NewNopLogger(), router, repo, testCustomerSSNStorage(t), createTestOFACSearcher(nil, nil))
+	router.ServeHTTP(w, req)
+	w.Flush()
+	require.Equal(t, http.StatusOK, w.Code)
+
+	var got *client.Customer
+	require.NoError(t, json.NewDecoder(w.Body).Decode(&got))
+	want, _, _ := updateReq.asCustomer(testCustomerSSNStorage(t))
+	require.NoError(t, err)
+
+	want.CustomerID = got.CustomerID
+	want.Addresses[0].AddressID = got.Addresses[0].AddressID
+	want.Representatives[0].RepresentativeID = got.Representatives[0].RepresentativeID
+	want.Representatives[0].CustomerID = got.Representatives[0].CustomerID
+	want.Status = got.Status
+	want.CreatedAt = got.CreatedAt
+	want.LastModified = got.LastModified
+	require.Equal(t, want, got)
 }
 
 func TestRepresentatives__minimumFields(t *testing.T) {

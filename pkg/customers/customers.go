@@ -326,7 +326,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 		customer.Phones = append(customer.Phones, client.Phone{
 			Number:    req.Phones[i].Number,
 			Type:      req.Phones[i].Type,
-			OwnerType: req.Phones[i].OwnerType,
+			OwnerType: client.OWNERTYPE_CUSTOMER,
 		})
 	}
 	for i := range req.Addresses {
@@ -339,7 +339,7 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 			PostalCode: req.Addresses[i].PostalCode,
 			Country:    req.Addresses[i].Country,
 			Type:       req.Addresses[i].Type,
-			OwnerType:  req.Addresses[i].OwnerType,
+			OwnerType:  client.OWNERTYPE_CUSTOMER,
 		})
 	}
 	for i := range req.Representatives {
@@ -361,14 +361,14 @@ func (req customerRequest) asCustomer(storage *ssnStorage) (*client.Customer, *S
 				PostalCode: req.Representatives[i].Addresses[j].PostalCode,
 				Country:    req.Representatives[i].Addresses[j].Country,
 				Type:       req.Representatives[i].Addresses[j].Type,
-				OwnerType:  req.Representatives[i].Addresses[j].OwnerType,
+				OwnerType:  client.OWNERTYPE_REPRESENTATIVE,
 			})
 		}
 		for j := range req.Representatives[i].Phones {
 			custRep.Phones = append(custRep.Phones, client.Phone{
 				Number:    req.Representatives[i].Phones[j].Number,
 				Type:      req.Representatives[i].Phones[j].Type,
-				OwnerType: req.Representatives[i].Phones[j].OwnerType,
+				OwnerType: client.OWNERTYPE_REPRESENTATIVE,
 			})
 		}
 		customer.Representatives = append(customer.Representatives, custRep)
@@ -797,6 +797,16 @@ func (r *sqlCustomerRepository) updateRepresentativesByCustomerID(tx *sql.Tx, cu
 		_, err := stmt.Exec(rep.RepresentativeID, customerID, rep.FirstName, rep.LastName, rep.JobTitle, rep.BirthDate)
 		if err != nil {
 			return fmt.Errorf("executing query: %v", err)
+		}
+
+		err = r.updatePhonesByOwnerID(tx, rep.RepresentativeID, client.OWNERTYPE_REPRESENTATIVE, rep.Phones)
+		if err != nil {
+			return fmt.Errorf("updating customer representative's phones: %v", err)
+		}
+
+		err = r.updateAddressesByOwnerID(tx, rep.RepresentativeID, client.OWNERTYPE_REPRESENTATIVE, rep.Addresses)
+		if err != nil {
+			return fmt.Errorf("updating customer representative's addresses: %v", err)
 		}
 	}
 
