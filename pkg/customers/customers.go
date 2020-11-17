@@ -614,7 +614,11 @@ values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`
 	}
 
 	now := time.Now()
-	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, c.Type, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.EIN, c.DUNS, c.SICCode, c.NAICSCode, birthDate, client.CUSTOMERSTATUS_UNKNOWN, c.Email, c.Website, c.DateBusinessEstablished, now, now, organization)
+	customerType := c.Type
+	if customerType == "" {
+		customerType = client.CUSTOMERTYPE_INDIVIDUAL
+	}
+	_, err = stmt.Exec(c.CustomerID, c.FirstName, c.MiddleName, c.LastName, c.NickName, c.Suffix, customerType, c.BusinessName, c.DoingBusinessAs, c.BusinessType, c.EIN, c.DUNS, c.SICCode, c.NAICSCode, birthDate, client.CUSTOMERSTATUS_UNKNOWN, c.Email, c.Website, c.DateBusinessEstablished, now, now, organization)
 	if err != nil {
 		return fmt.Errorf("CreateCustomer: insert into customers err=%v | rollback=%v", err, tx.Rollback())
 	}

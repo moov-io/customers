@@ -185,8 +185,12 @@ from customers where deleted_at is null`
 	}
 
 	if params.Query != "" {
-		// warning: this will ONLY work for MySQL
-		query += " and lower(concat(first_name,' ', last_name)) LIKE ?"
+		if params.Type == string(client.CUSTOMERTYPE_BUSINESS) {
+			query += " and lower(business_name) LIKE ?"
+		} else {
+			// warning: this will ONLY work for MySQL
+			query += " and lower(concat(first_name, ' ', last_name)) LIKE ?"
+		}
 		args = append(args, fmt.Sprintf("%%%s%%", params.Query))
 	}
 

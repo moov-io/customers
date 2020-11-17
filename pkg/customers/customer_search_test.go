@@ -86,40 +86,23 @@ func TestRepository__searchCustomers(t *testing.T) {
 	org := "test"
 	createCustomer := func(repo CustomerRepository, i int) *client.Customer {
 		var req = &customerRequest{
-			FirstName:    fmt.Sprintf("jane-%d", i),
-			LastName:     fmt.Sprintf("doe-%d", i),
-			Email:        fmt.Sprintf("jane-%d@moov.com", i),
-			BusinessName: fmt.Sprintf("janes-business-%d", i),
+			FirstName: fmt.Sprintf("jane-%d", i),
+			LastName:  fmt.Sprintf("doe-%d", i),
+			Email:     fmt.Sprintf("jane-%d@moov.com", i),
 			Phones: []phone{
 				{
-					Number:    "555-555-5555",
-					Type:      "primary",
-					OwnerType: "customer",
+					Number: "555-555-5555",
+					Type:   "primary",
 				},
 			},
 			Addresses: []address{
 				{
 					Type:       "primary",
-					OwnerType:  "customer",
 					Address1:   "123 Cool St.",
 					City:       "San Francisco",
 					State:      "CA",
 					PostalCode: "94030",
 					Country:    "US",
-				},
-			},
-			Representatives: []representative{
-				{
-					FirstName: "Jane",
-					LastName:  "Doe",
-					Phones: []phone{
-						{
-							Number:    "555-555-5555",
-							Type:      "primary",
-							OwnerType: "representative",
-						},
-					},
-					JobTitle: "CEO",
 				},
 			},
 			Metadata: map[string]string{"key": "val"},
@@ -179,6 +162,7 @@ func TestRepository__searchCustomers(t *testing.T) {
 					Organization: org,
 					Count:        100,
 					Query:        "jane-10",
+					Type:         "individual",
 				}
 				got, err = repo.searchCustomers(params)
 				require.NoError(t, err)
@@ -192,6 +176,106 @@ func TestRepository__searchCustomers(t *testing.T) {
 			}
 
 			got, err = repo.searchCustomers(SearchParams{
+				Organization: org,
+				CustomerIDs:  wantIDs,
+				Count:        10,
+			})
+			require.NoError(t, err)
+			require.Len(t, got, len(wantIDs))
+
+			var gotIDs []string
+			for _, c := range got {
+				gotIDs = append(gotIDs, c.CustomerID)
+			}
+
+			require.ElementsMatch(t, wantIDs, gotIDs)
+		})
+	}
+}
+
+func TestRepository__searchBusinessCustomer(t *testing.T) {
+	logger := log.NewNopLogger()
+	org := "test"
+	createCustomer := func(repo CustomerRepository, i int) *client.Customer {
+		var req = &customerRequest{
+			Type:         client.CUSTOMERTYPE_BUSINESS,
+			Email:        fmt.Sprintf("jane-%d@moov.com", i),
+			BusinessName: fmt.Sprintf("janes-business-%d", i),
+			Addresses: []address{
+				{
+					Type:       "primary",
+					Address1:   "123 Cool St.",
+					City:       "San Francisco",
+					State:      "CA",
+					PostalCode: "94030",
+					Country:    "US",
+				},
+			},
+			Representatives: []representative{
+				{
+					FirstName: "Jane",
+					LastName:  "Doe",
+					Phones: []phone{
+						{
+							Number: "555-555-5555",
+							Type:   "primary",
+						},
+					},
+					JobTitle: "CEO",
+				},
+			},
+			Metadata: map[string]string{"key": "val"},
+		}
+		cust, _, _ := req.asCustomer(testCustomerSSNStorage(t))
+		require.NoError(t, repo.CreateCustomer(cust, org))
+		return cust
+	}
+
+	tests := []struct {
+		desc string
+		db   *sql.DB
+	}{
+		{
+			desc: "sqlite",
+			db:   database.CreateTestSqliteDB(t).DB,
+		},
+		{
+			desc: "mysql",
+			db:   database.CreateTestMySQLDB(t).DB,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.desc, func(t *testing.T) {
+			defer tc.db.Close()
+			repo := NewCustomerRepo(logger, tc.db)
+
+			n := 20 // seed database with customers
+			var customers []*client.Customer
+			for i := 0; i < n; i++ {
+				customers = append(customers, createCustomer(repo, i))
+			}
+
+			if tc.desc == "mysql" {
+				/* Search by query */
+				params := SearchParams{
+					Organization: org,
+					Count:        100,
+					Query:        "janes-business-10",
+					Type:         "business",
+				}
+				got, err := repo.searchCustomers(params)
+				require.NoError(t, err)
+				require.Len(t, got, 1)
+			}
+
+			/* Search by customerIDs */
+			wantIDs := make([]string, 3)
+			for i := 0; i < len(wantIDs); i++ {
+				wantIDs[i] = customers[i].CustomerID
+			}
+
+			got, err := repo.searchCustomers(SearchParams{
 				Organization: org,
 				CustomerIDs:  wantIDs,
 				Count:        10,
