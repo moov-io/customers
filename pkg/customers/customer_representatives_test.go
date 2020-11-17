@@ -270,8 +270,8 @@ func TestCustomers__updateRepresentative(t *testing.T) {
 		BirthDate:  "1980-09-12",
 		Phones: []phone{
 			{
-				Number: "123.456.7890",
-				Type:   "mobile",
+				Number:    "123.456.7890",
+				Type:      "mobile",
 				OwnerType: "representative",
 			},
 		},
@@ -387,8 +387,8 @@ func TestCustomerRepository__updateRepresentative(t *testing.T) {
 		BirthDate:  "1980-09-12",
 		Phones: []phone{
 			{
-				Number: "123.456.7890",
-				Type:   "mobile",
+				Number:    "123.456.7890",
+				Type:      "mobile",
 				OwnerType: "representative",
 			},
 		},
@@ -456,9 +456,9 @@ func TestCustomersRepository__addRepresentativeAddress(t *testing.T) {
 	}
 
 	createRepresentativeReq := &customerRepresentativeRequest{
-		FirstName:  "Jane",
-		LastName:   "Doe",
-		JobTitle:   "CEO",
+		FirstName: "Jane",
+		LastName:  "Doe",
+		JobTitle:  "CEO",
 		Phones: []phone{
 			{
 				Number: "123.456.7890",
@@ -504,14 +504,14 @@ func TestCustomers__updateCustomerWithRepresentatives(t *testing.T) {
 	organization := "organization"
 	createReq := &customerRequest{
 		BusinessName: "Jane's Business",
-		Type:      client.CUSTOMERTYPE_BUSINESS,
+		Type:         client.CUSTOMERTYPE_BUSINESS,
 		BusinessType: client.BUSINESSTYPE_CORPORATION,
-		BirthDate: "1999-01-01",
-		Email:     "jane@example.com",
+		BirthDate:    "1999-01-01",
+		Email:        "jane@example.com",
 		Phones: []phone{
 			{
-				Number:    "123.456.7890",
-				Type:      "mobile",
+				Number: "123.456.7890",
+				Type:   "mobile",
 			},
 		},
 		Addresses: []address{
@@ -527,13 +527,13 @@ func TestCustomers__updateCustomerWithRepresentatives(t *testing.T) {
 		Representatives: []representative{
 			{
 				FirstName: "Jane",
-				LastName: "Doe",
-				JobTitle: "CEO",
+				LastName:  "Doe",
+				JobTitle:  "CEO",
 				BirthDate: "1980-09-24",
 				Phones: []phone{
 					{
-						Number:    "123.456.7890",
-						Type:      "mobile",
+						Number: "123.456.7890",
+						Type:   "mobile",
 					},
 				},
 			},
@@ -574,13 +574,13 @@ func TestCustomers__updateCustomerWithRepresentatives(t *testing.T) {
 	updateReq.Representatives = []representative{
 		{
 			FirstName: "Jane",
-			LastName: "Doe",
-			JobTitle: "CEO",
+			LastName:  "Doe",
+			JobTitle:  "CEO",
 			BirthDate: "1980-09-24",
 			Phones: []phone{
 				{
-					Number:    "123.456.7890",
-					Type:      "mobile",
+					Number: "123.456.7890",
+					Type:   "mobile",
 				},
 			},
 		},

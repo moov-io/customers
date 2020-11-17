@@ -230,67 +230,46 @@ func TestRepository__searchBusinessCustomer(t *testing.T) {
 		require.NoError(t, repo.CreateCustomer(cust, org))
 		return cust
 	}
-
-	tests := []struct {
-		desc string
-		db   *sql.DB
-	}{
-		{
-			desc: "sqlite",
-			db:   database.CreateTestSqliteDB(t).DB,
-		},
-		{
-			desc: "mysql",
-			db:   database.CreateTestMySQLDB(t).DB,
-		},
+	db := database.CreateTestMySQLDB(t).DB
+	defer db.Close()
+	repo := NewCustomerRepo(logger, db)
+	n := 20 // seed database with customers
+	var customers []*client.Customer
+	for i := 0; i < n; i++ {
+		customers = append(customers, createCustomer(repo, i))
 	}
 
-	for _, tc := range tests {
-		t.Run(tc.desc, func(t *testing.T) {
-			defer tc.db.Close()
-			repo := NewCustomerRepo(logger, tc.db)
-
-			n := 20 // seed database with customers
-			var customers []*client.Customer
-			for i := 0; i < n; i++ {
-				customers = append(customers, createCustomer(repo, i))
-			}
-
-			if tc.desc == "mysql" {
-				/* Search by query */
-				params := SearchParams{
-					Organization: org,
-					Count:        100,
-					Query:        "janes-business-10",
-					Type:         "business",
-				}
-				got, err := repo.searchCustomers(params)
-				require.NoError(t, err)
-				require.Len(t, got, 1)
-			}
-
-			/* Search by customerIDs */
-			wantIDs := make([]string, 3)
-			for i := 0; i < len(wantIDs); i++ {
-				wantIDs[i] = customers[i].CustomerID
-			}
-
-			got, err := repo.searchCustomers(SearchParams{
-				Organization: org,
-				CustomerIDs:  wantIDs,
-				Count:        10,
-			})
-			require.NoError(t, err)
-			require.Len(t, got, len(wantIDs))
-
-			var gotIDs []string
-			for _, c := range got {
-				gotIDs = append(gotIDs, c.CustomerID)
-			}
-
-			require.ElementsMatch(t, wantIDs, gotIDs)
-		})
+	/* Search by query */
+	params := SearchParams{
+		Organization: org,
+		Count:        100,
+		Query:        "janes-business-10",
+		Type:         "business",
 	}
+	got, err := repo.searchCustomers(params)
+	require.NoError(t, err)
+	require.Len(t, got, 1)
+
+	/* Search by customerIDs */
+	wantIDs := make([]string, 3)
+	for i := 0; i < len(wantIDs); i++ {
+		wantIDs[i] = customers[i].CustomerID
+	}
+
+	got, err = repo.searchCustomers(SearchParams{
+		Organization: org,
+		CustomerIDs:  wantIDs,
+		Count:        10,
+	})
+	require.NoError(t, err)
+	require.Len(t, got, len(wantIDs))
+
+	var gotIDs []string
+	for _, c := range got {
+		gotIDs = append(gotIDs, c.CustomerID)
+	}
+
+	require.ElementsMatch(t, wantIDs, gotIDs)
 }
 
 func TestCustomerSearchEmpty(t *testing.T) {
