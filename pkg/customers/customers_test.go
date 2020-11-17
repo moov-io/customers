@@ -351,7 +351,7 @@ func TestCustomers__customerRequest(t *testing.T) {
 func TestCustomers__soleProprietorCustomerRequest(t *testing.T) {
 	req := &customerRequest{
 		Type:         client.CUSTOMERTYPE_BUSINESS,
-		BusinessType: client.BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC,
+		BusinessType: client.BUSINESSTYPE_SOLE_PROPRIETOR,
 	}
 	if err := req.validate(); err == nil {
 		t.Error("expected error")

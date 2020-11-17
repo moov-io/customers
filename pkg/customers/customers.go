@@ -202,7 +202,7 @@ func (rep *representative) validate() error {
 }
 
 func (req customerRequest) validate() error {
-	isIndividualOrSoleProprietor := req.Type == client.CUSTOMERTYPE_INDIVIDUAL || req.BusinessType == client.BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC
+	isIndividualOrSoleProprietor := req.Type == client.CUSTOMERTYPE_INDIVIDUAL || req.BusinessType == client.BUSINESSTYPE_SOLE_PROPRIETOR
 	if isIndividualOrSoleProprietor && (req.FirstName == "" || req.LastName == "") {
 		return errors.New("invalid customer fields: empty name field(s)")
 	} else if req.Type == client.CUSTOMERTYPE_BUSINESS && req.BusinessName == "" {

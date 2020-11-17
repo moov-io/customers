@@ -1,4 +1,4 @@
-# CreateCustomerBusinessCorp
+# CreateCustomerBusinessCorporation
 
 ## Properties
 

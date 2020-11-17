@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-// CustomerBusinessCorpAllOf struct for CustomerBusinessCorpAllOf
-type CustomerBusinessCorpAllOf struct {
+// CustomerBusinessCorporationAllOf struct for CustomerBusinessCorporationAllOf
+type CustomerBusinessCorporationAllOf struct {
 	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// Last time the object was modified
 	LastModified time.Time `json:"lastModified,omitempty"`

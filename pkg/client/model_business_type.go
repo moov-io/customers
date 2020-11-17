@@ -14,9 +14,9 @@ type BusinessType string
 
 // List of BusinessType
 const (
-	BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC BusinessType = "individual, sole proprietor, or single-member LLC"
-	BUSINESSTYPE_CORPORATION                                     BusinessType = "corporation"
-	BUSINESSTYPE_NON_PROFIT_ORGANIZATION                         BusinessType = "non-profit organization"
-	BUSINESSTYPE_PARTNERSHIP                                     BusinessType = "partnership"
-	BUSINESSTYPE_LIMITED_LIABILITY_COMPANY                       BusinessType = "limited liability company"
+	BUSINESSTYPE_SOLE_PROPRIETOR BusinessType = "sole-proprietor"
+	BUSINESSTYPE_CORPORATION     BusinessType = "corporation"
+	BUSINESSTYPE_NON_PROFIT      BusinessType = "non-profit"
+	BUSINESSTYPE_PARTNERSHIP     BusinessType = "partnership"
+	BUSINESSTYPE_LLC             BusinessType = "llc"
 )

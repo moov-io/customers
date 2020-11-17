@@ -1939,7 +1939,7 @@ components:
           required:
             - firstName
             - lastName
-    CreateCustomerBusinessCorp:
+    CreateCustomerBusinessCorporation:
       allOf:
         - $ref: '#/components/schemas/CreateCustomer'
         - type: object
@@ -1954,11 +1954,11 @@ components:
       discriminator:
         propertyName: businessType
         mapping:
-          individual, sole proprietor, or single-member LLC: '#/components/schemas/CreateCustomerBusinessIndividual'
-          corporation: '#/components/schemas/CreateCustomerBusinessCorp'
-          non-profit organization: '#/components/schemas/CreateCustomerBusinessCorp'
-          partnership: '#/components/schemas/CreateCustomerBusinessCorp'
-          limited liability company: '#/components/schemas/CreateCustomerBusinessCorp'
+          sole-proprietor: '#/components/schemas/CreateCustomerBusinessIndividual'
+          corporation: '#/components/schemas/CreateCustomerBusinessCorporation'
+          non-profit: '#/components/schemas/CreateCustomerBusinessCorporation'
+          partnership: '#/components/schemas/CreateCustomerBusinessCorporation'
+          llc: '#/components/schemas/CreateCustomerBusinessCorporation'
     Customer:
       type: object
       properties:
@@ -2103,7 +2103,7 @@ components:
           required:
             - firstName
             - lastName
-    CustomerBusinessCorp:
+    CustomerBusinessCorporation:
       allOf:
         - $ref: '#/components/schemas/Customer'
         - type: object
@@ -2139,10 +2139,10 @@ components:
         propertyName: businessType
         mapping:
           individual, sole proprietor, or single-member LLC: '#/components/schemas/CustomerBusinessIndividual'
-          corporation: '#/components/schemas/CustomerBusinessCorp'
-          non-profit organization: '#/components/schemas/CustomerBusinessCorp'
-          partnership: '#/components/schemas/CustomerBusinessCorp'
-          limited liability company: '#/components/schemas/CustomerBusinessCorp'
+          corporation: '#/components/schemas/CustomerBusinessCorporation'
+          non-profit organization: '#/components/schemas/CustomerBusinessCorporation'
+          partnership: '#/components/schemas/CustomerBusinessCorporation'
+          limited liability company: '#/components/schemas/CustomerBusinessCorporation'
     Customers:
       type: array
       items:
@@ -2157,11 +2157,11 @@ components:
       type: string
       description: The type of business for business customers
       enum:
-        - individual, sole proprietor, or single-member LLC
+        - sole-proprietor
         - corporation
-        - non-profit organization
+        - non-profit
         - partnership
-        - limited liability company
+        - llc
     OwnerType:
       type: string
       description: The type of individual owner of a resource, such as SSN, phone, or address

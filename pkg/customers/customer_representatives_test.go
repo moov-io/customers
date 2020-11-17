@@ -551,7 +551,7 @@ func TestCustomers__updateCustomerWithRepresentatives(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	updateReq := *createReq
-	updateReq.BusinessType = client.BUSINESSTYPE_LIMITED_LIABILITY_COMPANY
+	updateReq.BusinessType = client.BUSINESSTYPE_LLC
 	updateReq.Email = "jim@google.com"
 	updateReq.Phones = []phone{
 		{

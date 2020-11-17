@@ -1,4 +1,4 @@
-# CustomerBusinessCorp
+# CustomerBusinessCorporation
 
 ## Properties
 

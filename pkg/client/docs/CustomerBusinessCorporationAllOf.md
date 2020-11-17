@@ -1,4 +1,4 @@
-# CustomerBusinessCorpAllOf
+# CustomerBusinessCorporationAllOf
 
 ## Properties
 

@@ -377,8 +377,8 @@ func TestCustomers__addRepresentativeAddress(t *testing.T) {
 
 	representativeRequest := customerRepresentativeRequest{
 		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		LastName:  "Doe",
+		JobTitle:  "CEO",
 	}
 	rep, _, _ := representativeRequest.asRepresentative(testCustomerSSNStorage(t))
 	err = repo.CreateRepresentative(rep, cust.CustomerID)
@@ -443,7 +443,7 @@ func TestCustomers__updateRepresentativeAddress(t *testing.T) {
 
 	customerRequest := customerRequest{
 		BusinessName: "Jane's Business",
-		BusinessType: client.BUSINESSTYPE_INDIVIDUAL_SOLE_PROPRIETOR_OR_SINGLE_MEMBER_LLC,
+		BusinessType: client.BUSINESSTYPE_SOLE_PROPRIETOR,
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
 	organization := "organization"
@@ -452,8 +452,8 @@ func TestCustomers__updateRepresentativeAddress(t *testing.T) {
 
 	representativeRequest := customerRepresentativeRequest{
 		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		LastName:  "Doe",
+		JobTitle:  "CEO",
 	}
 	rep, _, _ := representativeRequest.asRepresentative(testCustomerSSNStorage(t))
 	err = repo.CreateRepresentative(rep, cust.CustomerID)
@@ -570,7 +570,7 @@ func TestCustomers__deleteRepresentativeAddress(t *testing.T) {
 
 	customerRequest := customerRequest{
 		BusinessName: "Jane's Business",
-		BusinessType: client.BUSINESSTYPE_LIMITED_LIABILITY_COMPANY,
+		BusinessType: client.BUSINESSTYPE_LLC,
 	}
 	cust, _, _ := customerRequest.asCustomer(testCustomerSSNStorage(t))
 	organization := "organization"
@@ -579,8 +579,8 @@ func TestCustomers__deleteRepresentativeAddress(t *testing.T) {
 
 	representativeRequest := customerRepresentativeRequest{
 		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		LastName:  "Doe",
+		JobTitle:  "CEO",
 	}
 	rep, _, _ := representativeRequest.asRepresentative(testCustomerSSNStorage(t))
 	err = repo.CreateRepresentative(rep, cust.CustomerID)
@@ -656,8 +656,8 @@ func TestCustomerRepository__updateRepresentativeAddress(t *testing.T) {
 
 	representativeRequest := customerRepresentativeRequest{
 		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		LastName:  "Doe",
+		JobTitle:  "CEO",
 	}
 	rep, _, _ := representativeRequest.asRepresentative(testCustomerSSNStorage(t))
 	err = repo.CreateRepresentative(rep, cust.CustomerID)
@@ -726,8 +726,8 @@ func TestCustomerRepository__deleteRepresentativeAddress(t *testing.T) {
 
 	representativeRequest := customerRepresentativeRequest{
 		FirstName: "Jane",
-		LastName: "Doe",
-		JobTitle: "CEO",
+		LastName:  "Doe",
+		JobTitle:  "CEO",
 	}
 	rep, _, _ := representativeRequest.asRepresentative(testCustomerSSNStorage(t))
 	err = repo.CreateRepresentative(rep, cust.CustomerID)
