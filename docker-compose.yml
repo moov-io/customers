@@ -1,7 +1,7 @@
 version: '3'
 services:
   customers:
-    image: moov/customers:latest
+    image: moov/customers:v0.5.0
     ports:
       - "8087:8087"
       - "9097:9097"
