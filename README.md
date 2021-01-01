@@ -23,7 +23,7 @@ Docs: [docs](https://moov-io.github.io/customers/) | [API Endpoints](https://moo
 
 ## Project Status
 
-Moov Customers is under active development, so please star the project if you are interested in its progress. We are developing an extensible HTTP API for interactions along with an OpenAPI specification file for generating clients for integration projects.
+We've noticed that Customers and [PayGate](https://github.com/moov-io/paygate) are too tightly coupled when trying to originate ACH files and are moving towards services which are better decoupled each other while offering the extensibility developers expect. We plan to make Customers read-only in the future and offer an "ACH uploader" service. On behalf of the entire Moov team, we appreciate your trust and support to build these low-level payment protocols and utilities.
 
 ## Getting Started
 
