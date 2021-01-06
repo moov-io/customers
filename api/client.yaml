@@ -61,6 +61,7 @@ paths:
       parameters:
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -80,6 +81,7 @@ paths:
       parameters:
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -111,6 +113,7 @@ paths:
       operationId: getOrganizationLogo
       parameters:
         - name: X-Organization
+          required: true
           in: header
           description: Value used to separate and identify models
           example: de2c99f3
@@ -151,6 +154,7 @@ paths:
       parameters:
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           required: true
@@ -260,6 +264,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -298,6 +303,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -338,6 +344,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -369,6 +376,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -414,6 +422,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -525,6 +534,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -570,6 +580,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -615,6 +626,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -653,6 +665,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -698,6 +711,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -745,6 +759,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -789,6 +804,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -835,6 +851,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -881,6 +898,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -968,6 +986,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1055,6 +1074,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1139,6 +1159,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1199,6 +1220,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1238,6 +1260,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1284,6 +1307,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1340,6 +1364,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1379,6 +1404,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1467,6 +1493,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1506,6 +1533,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
@@ -1546,6 +1574,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           required: true
           example: org342
@@ -1657,6 +1686,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           required: true
           example: org342
@@ -1790,6 +1820,7 @@ paths:
             type: string
         - name: X-Organization
           in: header
+          required: true
           description: Value used to separate and identify models
           example: de2c99f3
           schema:
