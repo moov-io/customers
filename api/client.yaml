@@ -794,6 +794,8 @@ paths:
       summary: Decrypt Account Number
       description: |
         Return the account number encrypted with a shared secret for application requests. This encryption key is different from the key used for persistence.
+        The returned value is a Base64 encoded NaCL SecretBox. You can decode and then decrypt the value to get UTF-8 bytes of the account number.
+        Example: https://gist.github.com/theFong/b7a3da1a718ecaa8e44b29467e6d8962
       operationId: decryptAccountNumber
       parameters:
         - name: X-Request-ID
