@@ -156,7 +156,6 @@ paths:
           required: true
           description: Value used to separate and identify models
           example: de2c99f3
-          required: true
           schema:
             type: string
       requestBody:
@@ -1577,7 +1576,6 @@ paths:
           in: header
           required: true
           description: Value used to separate and identify models
-          required: true
           example: org342
           schema:
             type: string
@@ -1689,7 +1687,6 @@ paths:
           in: header
           required: true
           description: Value used to separate and identify models
-          required: true
           example: org342
           schema:
             type: string
