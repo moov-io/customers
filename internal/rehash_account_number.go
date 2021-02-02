@@ -76,6 +76,10 @@ func findAccountsInBatches(logger log.Logger, db *sql.DB, updateFunc func(acc ac
 		}
 		rows.Close()
 
+		if err := rows.Err(); err != nil {
+			return err
+		}
+
 		if len(accounts) == 0 {
 			return nil
 		}

@@ -72,6 +72,10 @@ func (r *sqlAccountRepository) GetCustomerAccountsByIDs(accountIDs []string) ([]
 		result = append(result, account)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return result, nil
 }
 
@@ -137,6 +141,11 @@ func (r *sqlAccountRepository) getAccounts(customerID string, organization strin
 		}
 		out = append(out, acct)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return out, nil
 }
 
@@ -210,10 +219,10 @@ func (r *sqlAccountRepository) updateAccountStatus(accountID string, status clie
 }
 
 func (r *sqlAccountRepository) getEncryptedAccountNumber(organization, customerID, accountID string) (string, error) {
-	query := `select encrypted_account_number 
-from accounts as a 
-inner join customers as c on c.customer_id = a.customer_id 
-where a.customer_id = ? and a.account_id = ? and c.organization = ? and a.deleted_at is null 
+	query := `select encrypted_account_number
+from accounts as a
+inner join customers as c on c.customer_id = a.customer_id
+where a.customer_id = ? and a.account_id = ? and c.organization = ? and a.deleted_at is null
 limit 1;`
 	stmt, err := r.db.Prepare(query)
 	if err != nil {

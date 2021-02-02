@@ -75,6 +75,11 @@ where customers.organization = ? and documents.customer_id = ? and documents.del
 		}
 		docs = append(docs, &doc)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return docs, nil
 }
 

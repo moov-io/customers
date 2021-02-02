@@ -142,6 +142,8 @@ func TestDocumentsRepository__Delete(t *testing.T) {
 		require.NoError(t, rows.Scan(&ID))
 		deletedDocIDs[*ID] = true
 	}
+	require.Nil(t, rows.Err())
+	require.Nil(t, rows.Close())
 
 	for _, doc := range docs {
 		_, ok := deletedDocIDs[doc.DocumentID]

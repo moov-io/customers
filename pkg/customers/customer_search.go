@@ -137,6 +137,9 @@ func (r *sqlCustomerRepository) searchCustomers(params SearchParams) ([]*client.
 		}
 		customers = append(customers, &c)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
 	if len(customers) == 0 {
 		return customers, nil
@@ -252,6 +255,10 @@ func (r *sqlCustomerRepository) GetPhones(ownerIDs []string, ownerType client.Ow
 		ret[ownerID] = append(ret[ownerID], p)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return ret, nil
 }
 
@@ -288,6 +295,10 @@ func (r *sqlCustomerRepository) GetAddresses(customerIDs []string, ownerType cli
 		ret[ownerID] = append(ret[ownerID], a)
 	}
 
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
 	return ret, nil
 }
 
@@ -315,6 +326,10 @@ func (r *sqlCustomerRepository) getMetadata(customerIDs []string) (map[string]cl
 		}
 		m.Metadata[k] = v
 		result[customerID] = m
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return result, nil
