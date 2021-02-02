@@ -116,7 +116,7 @@ components:
       properties:
         error:
           description: An error message describing the problem intended for humans.
-          example: Validation error(s) present.
+          example: Example error, see description
           type: string
       required:
       - error

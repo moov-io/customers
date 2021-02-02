@@ -259,6 +259,7 @@ func TestDisclaimersAdmin__create(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer resp.Body.Close()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	if resp.StatusCode != http.StatusOK {
@@ -296,6 +297,7 @@ func TestDisclaimersAdmin__createErr(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer resp.Body.Close()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	if resp.StatusCode != http.StatusBadRequest {
@@ -323,6 +325,7 @@ func TestDisclaimersAdmin__createMethodErr(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer resp.Body.Close()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	if resp.StatusCode != http.StatusBadRequest {
@@ -351,6 +354,7 @@ func TestDisclaimersAdmin__createJSONErr(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer resp.Body.Close()
 	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	if resp.StatusCode != http.StatusBadRequest {

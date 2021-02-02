@@ -219,7 +219,9 @@ func TestRouterUploadAndGetLogo(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	require.Equal(t, http.StatusNoContent, w.Result().StatusCode)
+	res := w.Result()
+	require.Nil(t, res.Body.Close())
+	require.Equal(t, http.StatusNoContent, res.StatusCode)
 
 	w = httptest.NewRecorder()
 	req = httptest.NewRequest(http.MethodGet, "/configuration/logo", nil)
@@ -229,7 +231,9 @@ func TestRouterUploadAndGetLogo(t *testing.T) {
 	router.ServeHTTP(w, req)
 	w.Flush()
 
-	require.Equal(t, http.StatusOK, w.Result().StatusCode)
+	res = w.Result()
+	require.Nil(t, res.Body.Close())
+	require.Equal(t, http.StatusOK, res.StatusCode)
 	require.Equal(t, "image/png", w.Header().Get("Content-Type"))
 }
 
