@@ -114,7 +114,6 @@ paths:
           in: header
           description: Value used to separate and identify models
           example: de2c99f3
-          required: true
           schema:
             type: string
       responses:
