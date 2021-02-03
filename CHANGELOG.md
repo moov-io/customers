@@ -1,3 +1,12 @@
+## v0.5.1 (Released 2021-02-03)
+
+BUG FIXES
+
+- customers: fix validateAddresses for multiple addresses
+- all: fixup from linter upgrades
+- api: remove more duplicate properties
+- api: remove duplicate OpenAPI property
+
 ## v0.5.0 (Unreleased)
 
 Customers v0.5.0 comes with several new features including Customer searching/filtering, additional Instant Account Validation strategies, and a reformed model for separating models.
