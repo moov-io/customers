@@ -263,7 +263,7 @@ func validateMetadata(meta map[string]string) error {
 func validateAddresses(addrs []address) error {
 	hasPrimaryAddr := false
 	for _, addr := range addrs {
-		if hasPrimaryAddr {
+		if hasPrimaryAddr && addr.Type == client.ADDRESSTYPE_PRIMARY {
 			return ErrAddressTypeDuplicate
 		}
 
@@ -949,7 +949,7 @@ func (r *sqlCustomerRepository) deleteAddress(ownerID string, ownerType client.O
 }
 
 func (r *sqlCustomerRepository) getLatestCustomerOFACSearch(customerID, organization string) (*client.OfacSearch, error) {
-	query := `select entity_id, blocked, sdn_name, sdn_type, percentage_match, cos.created_at 
+	query := `select entity_id, blocked, sdn_name, sdn_type, percentage_match, cos.created_at
 from customer_ofac_searches as cos
 inner join customers as c on c.customer_id = cos.customer_id
 where cos.customer_id = ? and c.organization = ? order by cos.created_at desc limit 1;`
