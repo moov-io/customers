@@ -291,7 +291,6 @@ func setupValidationStrategies(logger log.Logger, adminServer *admin.Server) (ma
 	// we can make paygate optional for customers, but we need a flag for this
 	debugPayGateCalls := util.Or(os.Getenv("PAYGATE_DEBUG_CALLS"), "false")
 	paygateClient := paygate.NewClient(logger, os.Getenv("PAYGATE_ENDPOINT"), util.Yes(debugPayGateCalls))
-	adminServer.AddLivenessCheck("paygate", paygateClient.Ping)
 	strategies[validator.StrategyKey{Strategy: "micro-deposits", Vendor: "moov"}] = microdeposits.NewStrategy(paygateClient)
 
 	// setup Plaid instant account verification
