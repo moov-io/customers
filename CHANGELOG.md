@@ -1,3 +1,9 @@
+## v0.5.2 (Released 2021-02-22)
+
+IMPROVEMENTS
+
+- cmd/server: remove health check on paygate (https://github.com/moov-io/customers/commit/8351c4cf1bce4919c939f70eec1f326c2057daad)
+
 ## v0.5.1 (Released 2021-02-03)
 
 BUG FIXES
