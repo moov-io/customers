@@ -22,7 +22,7 @@ import (
 func TestGetAccounts(t *testing.T) {
 	router := mux.NewRouter()
 	logger := log.NewNopLogger()
-	db := database.CreateTestSqliteDB(t).DB
+	db := database.CreateTestSQLiteDB(t).DB
 	customerRepo := customers.NewCustomerRepo(logger, db)
 	accountRepo := accounts.NewRepo(logger, db)
 	organization := "organization"

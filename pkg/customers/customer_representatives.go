@@ -8,10 +8,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/gorilla/mux"
 
 	"github.com/moov-io/base"
 	moovhttp "github.com/moov-io/base/http"
@@ -24,7 +25,7 @@ import (
 )
 
 func AddRepresentativeRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage) {
-	logger = logger.Set("package", "customers")
+	logger = logger.Set("package", log.String("customers"))
 
 	r.Methods("PUT").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(updateRepresentative(logger, repo, customerSSNStorage))
 	r.Methods("DELETE").Path("/customers/{customerID}/representatives/{representativeID}").HandlerFunc(deleteRepresentative(logger, repo))

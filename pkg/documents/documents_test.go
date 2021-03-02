@@ -401,7 +401,7 @@ func TestDocumentsRetrieve_bucketErr(t *testing.T) {
 }
 
 func TestDocuments__delete(t *testing.T) {
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestSQLiteDB(t)
 	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
 
 	router := mux.NewRouter()

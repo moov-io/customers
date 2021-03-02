@@ -25,7 +25,7 @@ type testAccountRepository struct {
 }
 
 func setupTestAccountRepository(t *testing.T) *testAccountRepository {
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestSQLiteDB(t)
 	repo := NewRepo(log.NewNopLogger(), db.DB)
 
 	t.Cleanup(func() {
@@ -38,7 +38,7 @@ func setupTestAccountRepository(t *testing.T) *testAccountRepository {
 func TestRepository(t *testing.T) {
 	userID := base.ID()
 	logger := log.NewNopLogger()
-	db := database.CreateTestSqliteDB(t).DB
+	db := database.CreateTestSQLiteDB(t).DB
 	customerRepo := customers.NewCustomerRepo(logger, db)
 	accountRepo := NewRepo(logger, db)
 	organization := "test"
@@ -197,7 +197,7 @@ func TestRepositoryUnique(t *testing.T) {
 	}
 
 	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
+	sqliteDB := database.CreateTestSQLiteDB(t)
 	defer sqliteDB.Close()
 	check(t, NewRepo(log.NewNopLogger(), sqliteDB.DB))
 

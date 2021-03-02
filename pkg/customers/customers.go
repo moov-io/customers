@@ -27,7 +27,7 @@ import (
 )
 
 func AddCustomerRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository, customerSSNStorage *ssnStorage, ofac *OFACSearcher) {
-	logger = logger.Set("package", "customers")
+	logger = logger.Set("package", log.String("customers"))
 
 	r.Methods("GET").Path("/customers").HandlerFunc(searchCustomers(logger, repo))
 	r.Methods("GET").Path("/customers/{customerID}").HandlerFunc(getCustomer(logger, repo))

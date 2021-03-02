@@ -53,7 +53,7 @@ func listAllowedContentTypes() string {
 }
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, repo Repository, bucketFunc storage.BucketFunc) {
-	logger = logger.Set("package", "configuration")
+	logger = logger.Set("package", log.String("configuration"))
 
 	r.Methods("GET").Path("/configuration/customers").HandlerFunc(getOrganizationConfig(logger, repo))
 	r.Methods("PUT").Path("/configuration/customers").HandlerFunc(updateOrganizationConfig(logger, repo))
@@ -111,7 +111,7 @@ func getOrganizationLogo(logger log.Logger, repo Repository, bucketFactory stora
 			return
 		}
 
-		logger = logger.Set("organization", organization)
+		logger = logger.Set("organization", log.String(organization))
 
 		bucket, err := bucketFactory()
 		if err != nil {
@@ -172,8 +172,7 @@ func uploadOrganizationLogo(logger log.Logger, repo Repository, bucketFactory st
 
 		contentType := http.DetectContentType(buf)
 		if !allowedContentTypes[contentType] {
-			logger.Set("contentType", contentType).
-				Log("unsupported content type for logo image file")
+			logger.Set("contentType", log.String(contentType)).Log("unsupported content type for logo image file")
 			moovhttp.Problem(w, errUnsupportedType)
 			return
 		}

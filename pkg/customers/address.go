@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/moov-io/customers/pkg/client"
 	"net/http"
+
+	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/gorilla/mux"
 	moovhttp "github.com/moov-io/base/http"
@@ -19,7 +20,7 @@ var (
 )
 
 func AddCustomerAddressRoutes(logger log.Logger, r *mux.Router, repo CustomerRepository) {
-	logger = logger.Set("package", "customers")
+	logger = logger.Set("package", log.String("customers"))
 
 	r.Methods("POST").Path("/customers/{customerID}/addresses").HandlerFunc(createAddress(logger, client.OWNERTYPE_CUSTOMER, repo))
 	r.Methods("PUT").Path("/customers/{customerID}/addresses/{addressID}").HandlerFunc(updateAddress(logger, client.OWNERTYPE_CUSTOMER, repo))

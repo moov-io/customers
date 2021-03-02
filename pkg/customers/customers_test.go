@@ -267,7 +267,7 @@ func TestCustomerRepository__CreateCustomer(t *testing.T) {
 	}
 
 	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
+	sqliteDB := database.CreateTestSQLiteDB(t)
 	defer sqliteDB.Close()
 	check(t, &sqlCustomerRepository{sqliteDB.DB, log.NewNopLogger()})
 
@@ -555,7 +555,7 @@ func TestCustomers__updateCustomer(t *testing.T) {
 func createTestCustomerRepository(t *testing.T) *sqlCustomerRepository {
 	t.Helper()
 
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestSQLiteDB(t)
 	return &sqlCustomerRepository{db.DB, log.NewNopLogger()}
 }
 

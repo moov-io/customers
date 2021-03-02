@@ -174,7 +174,7 @@ func NewClient(logger log.Logger, endpoint string, debug bool) Client {
 		conf.BasePath = endpoint // override from provided Watchman_ENDPOINT env variable
 	}
 
-	logger = logger.Set("package", "watchman")
+	logger = logger.Set("package", log.String("watchman"))
 	logger.Logf("using %s for Watchman address", conf.BasePath)
 
 	return &moovWatchmanClient{

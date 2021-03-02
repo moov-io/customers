@@ -55,7 +55,7 @@ func TestRepository(t *testing.T) {
 }
 
 func sqliteRepo(t *testing.T) *sqlRepo {
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestSQLiteDB(t)
 	t.Cleanup(func() {
 		db.Close()
 	})

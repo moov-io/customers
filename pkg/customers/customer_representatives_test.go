@@ -117,7 +117,7 @@ func TestCustomerRepository__CreateRepresentative(t *testing.T) {
 	}
 
 	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
+	sqliteDB := database.CreateTestSQLiteDB(t)
 	defer sqliteDB.Close()
 	check(t, &sqlCustomerRepository{sqliteDB.DB, log.NewNopLogger()})
 

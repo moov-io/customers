@@ -86,8 +86,8 @@ func main() {
 		logger = log.NewDefaultLogger()
 	}
 
-	logger = logger.Set("app", "customers")
-	logger.Set("phase", "startup").Logf("Starting moov-io/customers server version %s", mainPkg.Version)
+	logger = logger.Set("app", log.String("customers"))
+	logger.Set("phase", log.String("startup")).Logf("Starting moov-io/customers server version %s", mainPkg.Version)
 
 	// Channel for errors
 	errs := make(chan error)
@@ -248,19 +248,19 @@ func main() {
 	}
 	shutdownServer := func() {
 		if err := serve.Shutdown(context.TODO()); err != nil {
-			logger.Set("phase", "shutdown").LogErrorf("failed to shutdown server: %v", err)
+			logger.Set("phase", log.String("shutdown")).LogErrorf("failed to shutdown server: %v", err)
 		}
 	}
 
 	// Start business logic HTTP server
 	go func() {
 		if certFile, keyFile := os.Getenv("HTTPS_CERT_FILE"), os.Getenv("HTTPS_KEY_FILE"); certFile != "" && keyFile != "" {
-			logger.Set("phase", "startup").Logf("binding to %s for secure HTTP server", *httpAddr)
+			logger.Set("phase", log.String("startup")).Logf("binding to %s for secure HTTP server", *httpAddr)
 			if err := serve.ListenAndServeTLS(certFile, keyFile); err != nil {
 				logger.LogErrorf("failed to start TLS server: %v", err)
 			}
 		} else {
-			logger.Set("phase", "startup").Logf("binding to %s for HTTP server", *httpAddr)
+			logger.Set("phase", log.String("startup")).Logf("binding to %s for HTTP server", *httpAddr)
 			if err := serve.ListenAndServe(); err != nil {
 				logger.LogErrorf("failed to start server: %v", err)
 			}

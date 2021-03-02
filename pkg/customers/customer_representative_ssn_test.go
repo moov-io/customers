@@ -6,8 +6,9 @@ package customers
 
 import (
 	"encoding/base64"
-	"github.com/moov-io/customers/pkg/client"
 	"testing"
+
+	"github.com/moov-io/customers/pkg/client"
 
 	"github.com/moov-io/base/database"
 
@@ -81,7 +82,7 @@ func TestRepresentativeSSNRepository(t *testing.T) {
 	}
 
 	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
+	sqliteDB := database.CreateTestSQLiteDB(t)
 	defer sqliteDB.Close()
 	check(t, &sqlSSNRepository{sqliteDB.DB, log.NewNopLogger()})
 

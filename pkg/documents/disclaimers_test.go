@@ -91,7 +91,7 @@ func TestDisclaimers__getCustomerDisclaimer(t *testing.T) {
 	}
 
 	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
+	sqliteDB := database.CreateTestSQLiteDB(t)
 	defer sqliteDB.Close()
 	check(t, &sqlDisclaimerRepository{sqliteDB.DB, log.NewNopLogger()})
 
@@ -220,7 +220,7 @@ func TestDisclaimersRepository(t *testing.T) {
 	}
 
 	// SQLite tests
-	sqliteDB := database.CreateTestSqliteDB(t)
+	sqliteDB := database.CreateTestSQLiteDB(t)
 	defer sqliteDB.Close()
 	check(t, &sqlDisclaimerRepository{sqliteDB.DB, log.NewNopLogger()})
 

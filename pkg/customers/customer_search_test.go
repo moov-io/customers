@@ -135,7 +135,7 @@ func TestRepository__searchCustomers(t *testing.T) {
 	}{
 		{
 			desc: "sqlite",
-			db:   database.CreateTestSqliteDB(t).DB,
+			db:   database.CreateTestSQLiteDB(t).DB,
 		},
 		{
 			desc: "mysql",

@@ -27,7 +27,7 @@ import (
 )
 
 func RegisterRoutes(logger log.Logger, r *mux.Router, accounts Repository, validations validator.Repository, fedClient fed.Client, keeper, transitKeeper *secrets.StringKeeper, validationStrategies map[validator.StrategyKey]validator.Strategy, ofac *AccountOfacSearcher, appSalt string) {
-	logger = logger.Set("package", "accounts")
+	logger = logger.Set("package", log.String("accounts"))
 
 	r.Methods("GET").Path("/customers/{customerID}/accounts").HandlerFunc(getCustomerAccounts(logger, accounts, fedClient))
 	r.Methods("POST").Path("/customers/{customerID}/accounts").HandlerFunc(createCustomerAccount(logger, accounts, fedClient, keeper, ofac, appSalt))

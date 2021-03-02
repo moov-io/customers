@@ -22,7 +22,7 @@ func AddRoutes(
 	customerRepo customers.CustomerRepository,
 	accountRepo accounts.Repository,
 ) {
-	logger = logger.Set("package", "reports")
+	logger = logger.Set("package", log.String("reports"))
 
 	r.Methods("GET").Path("/reports/accounts").HandlerFunc(getCustomerAccounts(logger, customerRepo, accountRepo))
 }

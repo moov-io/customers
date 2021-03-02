@@ -30,7 +30,7 @@ func TestDocumentRepository(t *testing.T) {
 	}{
 		{
 			dbName: "sqlite",
-			db:     database.CreateTestSqliteDB(t).DB,
+			db:     database.CreateTestSQLiteDB(t).DB,
 		},
 		{
 			dbName: "mysql",
@@ -95,7 +95,7 @@ func TestDocumentRepository(t *testing.T) {
 }
 
 func TestDocumentsRepository__Delete(t *testing.T) {
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestSQLiteDB(t)
 	repo := &sqlDocumentRepository{db.DB, log.NewNopLogger()}
 
 	type document struct {

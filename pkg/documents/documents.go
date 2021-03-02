@@ -46,7 +46,7 @@ const (
 )
 
 func AddDocumentRoutes(logger log.Logger, r *mux.Router, repo DocumentRepository, keeper *secrets.Keeper, bucketFactory storage.BucketFunc) {
-	logger = logger.Set("package", "documents")
+	logger = logger.Set("package", log.String("documents"))
 
 	r.Methods("GET").Path("/customers/{customerID}/documents").HandlerFunc(getCustomerDocuments(logger, repo))
 	r.Methods("POST").Path("/customers/{customerID}/documents").HandlerFunc(uploadCustomerDocument(logger, repo, keeper, bucketFactory))
@@ -74,7 +74,7 @@ func getCustomerDocuments(logger log.Logger, repo DocumentRepository) http.Handl
 
 		docs, err := repo.getCustomerDocuments(customerID, organization)
 		if err != nil {
-			logger.Set("customerID", customerID).LogErrorf("failed to get customer document: %v", err)
+			logger.Set("customerID", log.String(customerID)).LogErrorf("failed to get customer document: %v", err)
 			moovhttp.Problem(w, err)
 			return
 		}
@@ -106,7 +106,7 @@ func uploadCustomerDocument(logger log.Logger, repo DocumentRepository, keeper *
 			return
 		}
 
-		logger = logger.Set("customerID", customerID)
+		logger = logger.Set("customerID", log.String(customerID))
 
 		documentType, err := readDocumentType(r.URL.Query().Get("type"))
 		if err != nil {
@@ -215,8 +215,7 @@ func retrieveRawDocument(logger log.Logger, repo DocumentRepository, keeper *sec
 			return
 		}
 
-		logger = logger.Set("customerID", customerID).
-			Set("documentID", documentID)
+		logger = logger.Set("customerID", log.String(customerID)).Set("documentID", log.String(documentID))
 
 		// reject the request if the document is deleted
 		if exists, err := repo.exists(customerID, documentID, organization); !exists || err != nil {
@@ -277,8 +276,7 @@ func deleteCustomerDocument(logger log.Logger, repo DocumentRepository) http.Han
 			return
 		}
 
-		logger = logger.Set("customerID", customerID).
-			Set("documentID", documentID)
+		logger = logger.Set("customerID", log.String(customerID)).Set("documentID", log.String(documentID))
 
 		err := repo.deleteCustomerDocument(customerID, documentID)
 		if err != nil {

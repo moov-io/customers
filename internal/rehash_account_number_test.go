@@ -13,7 +13,7 @@ import (
 )
 
 func TestRehashAccountNumber(t *testing.T) {
-	db := database.CreateTestSqliteDB(t)
+	db := database.CreateTestSQLiteDB(t)
 	defer db.Close()
 
 	logger := log.NewNopLogger()
