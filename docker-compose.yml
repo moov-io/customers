@@ -1,7 +1,7 @@
 version: '3'
 services:
   customers:
-    image: moov/customers:v0.5.0
+    image: moov/customers:v0.5.2
     ports:
       - "8087:8087"
       - "9097:9097"
@@ -12,7 +12,7 @@ services:
       - fed
       - watchman
   fed:
-    image: moov/fed:v0.5.2
+    image: moov/fed:v0.6.0
     ports:
       - "8086:8086"
       - "9096:9096"
@@ -20,7 +20,7 @@ services:
       FEDACH_DATA_PATH: './data/fed/FedACHdir.txt'
       FEDWIRE_DATA_PATH: './data/fed/fpddir.txt'
   watchman:
-    image: moov/watchman:v0.16.2
+    image: moov/watchman:v0.18.0
     ports:
       - "8084:8084"
       - "9094:9094"
