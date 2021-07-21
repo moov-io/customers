@@ -52,7 +52,7 @@ Read through the [project docs](docs/README.md) over here to get an understandin
  ------- | -------
 [Documentation](https://moov-io.github.io/customers) | Project documentation for our community.
 [GitHub Issues](https://github.com/moov-io/customers/issues) | Public tracker of issues with our community. Please open a GitHub Issue if you're able to reproduce problems or to request features.
-Twitter [@moov_io](https://twitter.com/moov_io)	| You can follow Moov's Twitter feed to get updates on our projects. You can also tweet us to ask questions or share comments.
+Twitter [@moov](https://twitter.com/moov)	| You can follow Moov's Twitter feed to get updates on our projects. You can also tweet us to ask questions or share comments.
 Slack [#moov-io](https://slack.moov.io/) | Join the slack channel to discuss with other contributors about the development of Moov's open source projects.
 
 ## Contributing
