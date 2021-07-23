@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y make gcc g++ time
 COPY . .
 RUN make build
 
-FROM debian:10
+FROM debian:stable-slim
 LABEL maintainer="Moov <support@moov.io>"
 
 RUN apt-get update && apt-get install -y ca-certificates
