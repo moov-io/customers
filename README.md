@@ -23,7 +23,7 @@ Docs: [docs](https://moov-io.github.io/customers/) | [API Endpoints](https://moo
 
 ## Project Status
 
-We've noticed that Customers and [PayGate](https://github.com/moov-io/paygate) are too tightly coupled when trying to originate ACH files and are moving towards services which are better decoupled each other while offering the extensibility developers expect. We plan to make Customers read-only in the future and offer an "ACH uploader" service. On behalf of the entire Moov team, we appreciate your trust and support to build these low-level payment protocols and utilities.
+Moov Customers has been deprecated in favor of a more direct service for uploading ACH files. We’ve also realized that KYC/KYB, data modeling, workflows, and risk analysis are difficult to open-source. We are interested in hearing how you have solved these problems internally and want to develop something in the open.
 
 ## Getting Started
 

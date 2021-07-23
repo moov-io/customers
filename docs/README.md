@@ -2,6 +2,8 @@
 **Home** | **[Configuration](configuration.md)** | **[Running](running.md)** | **[Client](https://github.com/moov-io/customers/blob/master/pkg/client/README.md)**
 
 ---
+## Project status
+Moov Customers has been deprecated in favor of a more direct service for uploading ACH files. We’ve also realized that KYC/KYB, data modeling, workflows, and risk analysis are difficult to open-source. We are interested in hearing how you have solved these problems internally and want to develop something in the open.
 
 ## Purpose
 This project focuses on verifying the identity of people who are legally able to hold and transfer currency in the United States. It provides services related to:
