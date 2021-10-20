@@ -1,4 +1,4 @@
-FROM golang:1.15-buster as builder
+FROM golang:1.17-buster as builder
 WORKDIR /go/src/github.com/moov-io/customers
 RUN apt-get update && apt-get install -y make gcc g++ time
 COPY . .
