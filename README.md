@@ -1,6 +1,12 @@
 moov-io/customers
 ===
 
+## Project Status
+
+**Moov Customers has been deprecated in favor of a more [direct service for uploading ACH files](https://github.com/moov-io/achgateway). We’ve also realized that KYC/KYB, data modeling, workflows, and risk analysis are difficult to open-source. We are interested in hearing how you have solved these problems internally and want to develop something in the open. Thank you to everyone who has contributed and helped us grow.**
+
+<hr />
+
 [![GoDoc](https://godoc.org/github.com/moov-io/customers?status.svg)](https://godoc.org/github.com/moov-io/customers)
 [![Build Status](https://github.com/moov-io/customers/workflows/Go/badge.svg)](https://github.com/moov-io/customers/actions)
 [![Coverage Status](https://codecov.io/gh/moov-io/customers/branch/master/graph/badge.svg)](https://codecov.io/gh/moov-io/customers)
@@ -20,10 +26,6 @@ If you believe you have identified a security vulnerability please responsibly r
 [FFIEC Bank Secrecy Act - Customer Identification Program](https://www.fdic.gov/regulations/examinations/bsa/ffiec_cip.pdf)
 
 Docs: [docs](https://moov-io.github.io/customers/) | [API Endpoints](https://moov-io.github.io/customers/api/) | [Admin API Endpoints](https://moov-io.github.io/customers/admin/)
-
-## Project Status
-
-Moov Customers has been deprecated in favor of a more direct service for uploading ACH files. We’ve also realized that KYC/KYB, data modeling, workflows, and risk analysis are difficult to open-source. We are interested in hearing how you have solved these problems internally and want to develop something in the open.
 
 ## Getting Started
 
